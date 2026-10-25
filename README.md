@@ -8,7 +8,7 @@
 
 - **الأفكار والنصوص:** يكتبها Claude (حقائق مدهشة صحيحة، بداية تشد المشاهد، دعوة للمتابعة). بدون مفتاح يستخدم بنك 12 فكرة جاهزة.
 - **الصوت:** صوت عربي طبيعي مجاني (Microsoft Edge TTS – `ar-SA-HamedNeural`).
-- **الصورة:** فيديوهات خلفية مجانية من Pexels حسب الموضوع، أو خلفية متحركة ملونة.
+- **الصورة:** فيديوهات خلفية مجانية من Pixabay (أو Pexels) حسب الموضوع، أو خلفية متحركة ملونة.
 - **الترجمة:** كلمات كبيرة متحركة بالعربي + شريط تقدم أسفل الشاشة (يرفع نسبة المشاهدة للنهاية).
 - **النشر:** رفع تلقائي عبر YouTube API مرتين يومياً، ولا يكرر أي موضوع سبق نشره.
 - **التشغيل:** على GitHub Actions مجاناً – لا تحتاج كمبيوتر شغال.
@@ -29,8 +29,9 @@
 ### 2) مفتاح Claude (لأفكار لا تنتهي)
 من [console.anthropic.com](https://console.anthropic.com) ← API Keys ← أنشئ مفتاحاً. تكلفة الفيديو الواحد أقل من سنت تقريباً.
 
-### 3) مفتاح Pexels (لفيديوهات الخلفية – مجاني)
-سجّل في [pexels.com/api](https://www.pexels.com/api/) وانسخ المفتاح.
+### 3) مفتاح Pixabay (لفيديوهات الخلفية – مجاني)
+سجّل في [pixabay.com](https://pixabay.com/accounts/register/) ثم افتح [pixabay.com/api/docs](https://pixabay.com/api/docs/) وانسخ المفتاح الظاهر بجانب `key`.
+(Pexels أوقف إصدار مفاتيح جديدة، لكن النظام يدعمه لو عندك مفتاح قديم: `PEXELS_API_KEY`.)
 
 ### 4) صلاحية الرفع على يوتيوب
 1. ادخل [console.cloud.google.com](https://console.cloud.google.com) وأنشئ مشروعاً جديداً.
@@ -52,7 +53,7 @@
 | الاسم | القيمة |
 |---|---|
 | `ANTHROPIC_API_KEY` | مفتاح Claude |
-| `PEXELS_API_KEY` | مفتاح Pexels |
+| `PIXABAY_API_KEY` | مفتاح Pixabay |
 | `YOUTUBE_CLIENT_ID` | من الخطوة 4 |
 | `YOUTUBE_CLIENT_SECRET` | من الخطوة 4 |
 | `YOUTUBE_REFRESH_TOKEN` | من الخطوة 4 |
@@ -93,7 +94,7 @@ python -m pytest -q
 | `shorts/content.py` | توليد الفكرة والنص والعنوان والوسوم |
 | `shorts/voice.py` | التعليق الصوتي، مقطع لكل جملة لتزامن دقيق |
 | `shorts/captions.py` | الترجمة المتحركة وشريط التقدم (ASS) |
-| `shorts/background.py` | فيديوهات Pexels أو خلفية متدرجة |
+| `shorts/background.py` | فيديوهات Pixabay/Pexels أو خلفية متدرجة |
 | `shorts/render.py` | تركيب الفيديو النهائي 1080×1920 |
 | `shorts/upload.py` | الرفع على يوتيوب |
 | `data/history.json` | المواضيع المنشورة (لعدم التكرار) |

@@ -25,7 +25,8 @@ def make_one(cfg: Config, do_upload: bool, keep_work: bool = False) -> dict:
     narration = voice.synthesize(script.lines, cfg.voice, work / "voice")
     print(f"[voice] {narration.length:.1f}s{' (silent placeholder)' if narration.silent else ''}")
 
-    bg = background.build(script.search_terms, cfg.pexels_key, narration.length, work / "bg", cfg.width, cfg.height)
+    bg = background.build(script.search_terms, cfg.pexels_key, narration.length, work / "bg", cfg.width, cfg.height,
+                          pixabay_key=cfg.pixabay_key)
     video = render.render(cfg, narration, bg, work, cfg.output_dir / f"{name}.mp4")
     print(f"[video] {video}")
 

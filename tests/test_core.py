@@ -67,3 +67,21 @@ def test_claude_response_is_parsed(monkeypatch):
     cfg.anthropic_key = "k"
     script = content.generate(cfg, [])
     assert script.lines == ["a", "b"] and script.search_terms == ["sea"]
+
+
+def test_pixabay_picks_hd_file(monkeypatch, tmp_path):
+    from shorts import background
+
+    class Resp:
+        def raise_for_status(self): pass
+        def json(self):
+            return {"hits": [{"id": 1, "duration": 10, "videos": {
+                "large": {"url": "L", "width": 1920, "height": 1080},
+                "medium": {"url": "M", "width": 1280, "height": 720},
+                "tiny": {"url": "T", "width": 640, "height": 360}}}]}
+
+    got = []
+    monkeypatch.setattr(background.requests, "get", lambda *a, **k: Resp())
+    monkeypatch.setattr(background, "_download", lambda url, out: got.append(url))
+    clips = background.fetch_pixabay(["sea"], "key", tmp_path, want=1)
+    assert len(clips) == 1 and got == ["M"]

@@ -33,6 +33,7 @@ class Config:
     anthropic_key: str = field(default_factory=lambda: _env("ANTHROPIC_API_KEY"))
     model: str = field(default_factory=lambda: _env("SHORTS_MODEL", "claude-opus-5-5"))
     pexels_key: str = field(default_factory=lambda: _env("PEXELS_API_KEY"))
+    pixabay_key: str = field(default_factory=lambda: _env("PIXABAY_API_KEY"))
     yt_client_id: str = field(default_factory=lambda: _env("YOUTUBE_CLIENT_ID"))
     yt_client_secret: str = field(default_factory=lambda: _env("YOUTUBE_CLIENT_SECRET"))
     yt_refresh_token: str = field(default_factory=lambda: _env("YOUTUBE_REFRESH_TOKEN"))

@@ -42,16 +42,51 @@ def fetch_pexels(terms: list[str], api_key: str, workdir: Path, want: int = 7) -
                 if not link:
                     continue
                 out = workdir / f"stock_{len(clips)}.mp4"
-                with requests.get(link, stream=True, timeout=60) as r:
-                    r.raise_for_status()
-                    with open(out, "wb") as fh:
-                        for part in r.iter_content(1 << 20):
-                            fh.write(part)
+                _download(link, out)
                 seen.add(video["id"])
                 clips.append(out)
                 break
         except requests.RequestException as exc:
             print(f"[background] pexels '{term}' failed: {exc}")
+    return clips
+
+
+def _download(link: str, out: Path) -> None:
+    with requests.get(link, stream=True, timeout=60) as r:
+        r.raise_for_status()
+        with open(out, "wb") as fh:
+            for part in r.iter_content(1 << 20):
+                fh.write(part)
+
+
+def fetch_pixabay(terms: list[str], api_key: str, workdir: Path, want: int = 7) -> list[Path]:
+    """Free Pixabay videos. Most are landscape; they get center-cropped to vertical."""
+    clips: list[Path] = []
+    seen: set[int] = set()
+    for term in (terms * 3)[: want * 2]:
+        if len(clips) >= want:
+            break
+        try:
+            resp = requests.get(
+                "https://pixabay.com/api/videos/",
+                params={"key": api_key, "q": term, "per_page": 20, "safesearch": "true"},
+                timeout=20)
+            resp.raise_for_status()
+            hits = [h for h in resp.json().get("hits", []) if h["id"] not in seen and 4 <= h.get("duration", 0) <= 60]
+            random.shuffle(hits)
+            for hit in hits:
+                sizes = [v for v in hit.get("videos", {}).values() if v.get("url") and v.get("height", 0) >= 720]
+                if not sizes:
+                    continue
+                # Prefer portrait files, then the smallest one that is still HD.
+                best = min(sizes, key=lambda v: (v["height"] <= v["width"], v["height"]))
+                out = workdir / f"stock_{len(clips)}.mp4"
+                _download(best["url"], out)
+                seen.add(hit["id"])
+                clips.append(out)
+                break
+        except requests.RequestException as exc:
+            print(f"[background] pixabay '{term}' failed: {exc}")
     return clips
 
 
@@ -64,9 +99,12 @@ def gradient(seconds: float, workdir: Path, width: int, height: int) -> Path:
     return out
 
 
-def build(terms: list[str], api_key: str, seconds: float, workdir: Path, width: int, height: int) -> Path:
+def build(terms: list[str], pexels_key: str, seconds: float, workdir: Path, width: int, height: int,
+          pixabay_key: str = "") -> Path:
     workdir.mkdir(parents=True, exist_ok=True)
-    clips = fetch_pexels(terms, api_key, workdir) if api_key else []
+    clips = fetch_pexels(terms, pexels_key, workdir) if pexels_key else []
+    if not clips and pixabay_key:
+        clips = fetch_pixabay(terms, pixabay_key, workdir)
     if not clips:
         return gradient(seconds, workdir, width, height)
 
