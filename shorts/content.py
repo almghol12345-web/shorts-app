@@ -38,21 +38,26 @@ SCHEMA = {
     "additionalProperties": False,
 }
 
-PROMPT = """You write scripts for a faceless YouTube Shorts channel.
+PROMPT = """You write scripts for a faceless YouTube Shorts channel. Your only goal is
+retention: viewers must watch to the very last second and replay.
 
 Niche: {niche}
-Language of the video: {language}
+Language of the video: {language} (use simple, spoken, energetic language)
 
 Write ONE new Short. Rules:
-- Pick a fact that is true and verifiable. No myths, no exaggeration, no medical or financial advice.
-- Line 1 is a hook that stops the scroll in under 2 seconds (a surprising claim or question).
-- 6 to 9 short lines total, each under 12 words, spoken in about 35-45 seconds.
-- Add one concrete detail (number, place, date) that makes it credible.
-- Last line invites viewers to follow for a new fact every day.
-- title: under 70 characters, curiosity-driven, ends with " #shorts".
-- description: 2 sentences plus 3 hashtags, in the video language.
+- The fact must be true and verifiable. No myths, no exaggeration, no medical or financial advice.
+- Line 1 (the hook, spoken in under 2 seconds): a shocking claim, a "you" question, or a
+  pattern break. Never start with greetings, "did you know", or the channel name.
+- Line 2 opens a loop: promise a payoff that only comes at the end (e.g. "but the reason is stranger").
+- Middle lines: build tension; every line adds a new surprising detail (a number, place, or date).
+- The payoff/reveal comes in the second-to-last line, never earlier.
+- Last line must flow naturally back into line 1 so the video loops seamlessly when it restarts
+  (it can end mid-thought that line 1 completes). NO "follow us", "like", or "subscribe" line.
+- 6 to 8 lines, each 3 to 9 words, total spoken length 20-30 seconds.
+- title: under 60 characters, creates curiosity without giving away the answer, ends with " #shorts".
+- description: one curiosity sentence, then "تابع القناة لحقيقة جديدة كل يوم", then 3 hashtags.
 - tags: 8 short tags in the video language.
-- search_terms: 3 simple English keywords for stock footage that matches the visuals.
+- search_terms: 6 simple English keywords for stock footage, one per visual moment, in order.
 - Do NOT reuse any of these previous topics: {used}
 """
 
@@ -89,7 +94,7 @@ FALLBACK_BANK = [
         "والمفاجأة.. أنه ما زال صالحاً للأكل!",
         "السبب أن العسل فقير جداً بالماء وحمضي",
         "فلا تستطيع البكتيريا أن تعيش فيه",
-        "تابعنا لحقيقة مدهشة جديدة كل يوم",
+        "والآن.. أعد المشاهدة وانتبه للبداية",
     ], "لماذا لا يفسد العسل أبداً؟ اكتشف السر العلمي. #حقائق #هل_تعلم #shorts",
         ["حقائق", "هل تعلم", "عسل", "مصر القديمة", "علوم", "معلومات", "غرائب", "ثقافة"],
         ["honey", "ancient egypt", "pyramids"]),
@@ -100,7 +105,7 @@ FALLBACK_BANK = [
         "وقلب ثالث يضخه إلى باقي الجسم",
         "ودمه أزرق اللون وليس أحمر",
         "لأنه يعتمد على النحاس لنقل الأكسجين بدل الحديد",
-        "تابعنا لحقيقة مدهشة جديدة كل يوم",
+        "والآن.. أعد المشاهدة وانتبه للبداية",
     ], "الأخطبوط كائن عجيب بثلاثة قلوب ودم أزرق. #حقائق #هل_تعلم #shorts",
         ["حقائق", "هل تعلم", "أخطبوط", "حيوانات", "البحر", "علوم", "غرائب", "طبيعة"],
         ["octopus", "ocean", "underwater"]),
@@ -111,7 +116,7 @@ FALLBACK_BANK = [
         "لكنه يدور حول الشمس في 225 يوماً فقط",
         "يعني يومه هناك أطول من سنته",
         "والأغرب أنه يدور بعكس اتجاه معظم الكواكب",
-        "تابعنا لحقيقة مدهشة جديدة كل يوم",
+        "والآن.. أعد المشاهدة وانتبه للبداية",
     ], "حقيقة فلكية غريبة عن كوكب الزهرة. #فضاء #هل_تعلم #shorts",
         ["فضاء", "هل تعلم", "الزهرة", "كواكب", "فلك", "علوم", "حقائق", "غرائب"],
         ["planet", "space", "stars"]),
@@ -122,7 +127,7 @@ FALLBACK_BANK = [
         "أما أول الأشجار فظهرت قبل حوالي 385 مليون سنة",
         "يعني القرش أقدم من الأشجار بعشرات ملايين السنين",
         "ونجا من خمس موجات انقراض كبرى",
-        "تابعنا لحقيقة مدهشة جديدة كل يوم",
+        "والآن.. أعد المشاهدة وانتبه للبداية",
     ], "أسماك القرش من أقدم الكائنات على الأرض. #حقائق #هل_تعلم #shorts",
         ["حقائق", "هل تعلم", "قرش", "تاريخ الأرض", "حيوانات", "علوم", "غرائب", "طبيعة"],
         ["shark", "ocean", "forest"]),
@@ -133,7 +138,7 @@ FALLBACK_BANK = [
         "الهرم الأكبر بُني قبل حوالي 4500 سنة",
         "وكليوباترا عاشت قبل حوالي 2050 سنة فقط",
         "يعني الأهرامات كانت أثراً قديماً حتى في زمنها",
-        "تابعنا لحقيقة مدهشة جديدة كل يوم",
+        "والآن.. أعد المشاهدة وانتبه للبداية",
     ], "مقارنة زمنية مذهلة بين كليوباترا والأهرامات. #تاريخ #هل_تعلم #shorts",
         ["تاريخ", "هل تعلم", "كليوباترا", "الأهرامات", "مصر", "حقائق", "غرائب", "ثقافة"],
         ["pyramids", "egypt", "moon"]),
@@ -144,7 +149,7 @@ FALLBACK_BANK = [
         "والسبب أن جدران أمعائه مرنة بشكل غير متساوٍ",
         "ويستخدم هذه المكعبات لتحديد منطقته",
         "لأنها لا تتدحرج بسهولة على الصخور",
-        "تابعنا لحقيقة مدهشة جديدة كل يوم",
+        "والآن.. أعد المشاهدة وانتبه للبداية",
     ], "الومبت وأغرب حقيقة في عالم الحيوان. #حيوانات #هل_تعلم #shorts",
         ["حيوانات", "هل تعلم", "أستراليا", "ومبت", "غرائب", "حقائق", "طبيعة", "علوم"],
         ["wombat", "australia", "wildlife"]),
@@ -155,7 +160,7 @@ FALLBACK_BANK = [
         "بينما سطح الشمس حوالي خمسة آلاف وخمسمئة درجة",
         "يعني البرق أسخن بحوالي خمس مرات",
         "لكنه يستمر جزءاً صغيراً جداً من الثانية",
-        "تابعنا لحقيقة مدهشة جديدة كل يوم",
+        "والآن.. أعد المشاهدة وانتبه للبداية",
     ], "حرارة البرق مقارنة بالشمس. #علوم #هل_تعلم #shorts",
         ["علوم", "هل تعلم", "برق", "الشمس", "طقس", "حقائق", "فيزياء", "غرائب"],
         ["lightning", "storm", "sun"]),
@@ -166,7 +171,7 @@ FALLBACK_BANK = [
         "فتأسست حوالي عام 1325",
         "يعني الجامعة أقدم بأكثر من مئتي سنة",
         "التاريخ مليء بالمفاجآت",
-        "تابعنا لحقيقة مدهشة جديدة كل يوم",
+        "والآن.. أعد المشاهدة وانتبه للبداية",
     ], "مقارنة تاريخية غير متوقعة. #تاريخ #هل_تعلم #shorts",
         ["تاريخ", "هل تعلم", "أكسفورد", "الأزتك", "جامعات", "حقائق", "غرائب", "ثقافة"],
         ["oxford", "university", "ancient city"]),
@@ -177,7 +182,7 @@ FALLBACK_BANK = [
         "يعني أنت ترى الشمس كما كانت قبل ثماني دقائق",
         "ولو اختفت الشمس فجأة",
         "لن نلاحظ ذلك إلا بعد ثماني دقائق",
-        "تابعنا لحقيقة مدهشة جديدة كل يوم",
+        "والآن.. أعد المشاهدة وانتبه للبداية",
     ], "سرعة الضوء والمسافة إلى الشمس. #فضاء #هل_تعلم #shorts",
         ["فضاء", "هل تعلم", "الشمس", "الضوء", "فيزياء", "حقائق", "علوم", "فلك"],
         ["sun", "sunrise", "space"]),
@@ -188,7 +193,7 @@ FALLBACK_BANK = [
         "لأنه يبطئ نبضات قلبه بشكل كبير",
         "وهو سباح ماهر رغم بطئه على الأشجار",
         "الطبيعة دائماً تفاجئنا",
-        "تابعنا لحقيقة مدهشة جديدة كل يوم",
+        "والآن.. أعد المشاهدة وانتبه للبداية",
     ], "مهارة خفية عند حيوان الكسلان. #حيوانات #هل_تعلم #shorts",
         ["حيوانات", "هل تعلم", "كسلان", "طبيعة", "غرائب", "حقائق", "غابات", "علوم"],
         ["sloth", "rainforest", "river"]),
@@ -199,7 +204,7 @@ FALLBACK_BANK = [
         "قد يزيد ارتفاع البرج حتى خمسة عشر سنتيمتراً",
         "ثم يعود ويتقلص في الشتاء",
         "هذا اسمه التمدد الحراري",
-        "تابعنا لحقيقة مدهشة جديدة كل يوم",
+        "والآن.. أعد المشاهدة وانتبه للبداية",
     ], "برج إيفل والتمدد الحراري. #علوم #هل_تعلم #shorts",
         ["علوم", "هل تعلم", "برج إيفل", "فرنسا", "فيزياء", "حقائق", "غرائب", "هندسة"],
         ["eiffel tower", "paris", "summer"]),
@@ -210,7 +215,7 @@ FALLBACK_BANK = [
         "أكبر حتى من أضخم الديناصورات المعروفة",
         "ونبضات قلبه يمكن سماعها من مسافة بعيدة تحت الماء",
         "عملاق المحيط بحق",
-        "تابعنا لحقيقة مدهشة جديدة كل يوم",
+        "والآن.. أعد المشاهدة وانتبه للبداية",
     ], "حقائق مذهلة عن الحوت الأزرق. #حيوانات #هل_تعلم #shorts",
         ["حيوانات", "هل تعلم", "الحوت الأزرق", "المحيط", "حقائق", "غرائب", "طبيعة", "علوم"],
         ["blue whale", "ocean", "underwater"]),

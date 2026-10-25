@@ -4,7 +4,7 @@ libass (inside ffmpeg) shapes Arabic and handles right-to-left text.
 """
 from .voice import Segment
 
-MAX_WORDS = 3
+MAX_WORDS = 2
 
 
 def _ts(seconds: float) -> str:

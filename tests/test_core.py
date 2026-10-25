@@ -11,7 +11,7 @@ def test_timestamp_format():
 def test_chunk_covers_segment_exactly():
     seg = Segment("واحد اثنان ثلاثة أربعة خمسة ستة سبعة", 2.0, 6.0)
     pieces = chunk(seg)
-    assert len(pieces) == 3
+    assert len(pieces) == 4  # 7 words, 2 per caption
     assert pieces[0].start == 2.0 and pieces[-1].end == 6.0
     for a, b in zip(pieces, pieces[1:]):
         assert abs(a.end - b.start) < 1e-9

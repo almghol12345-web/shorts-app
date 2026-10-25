@@ -5,7 +5,7 @@ from pathlib import Path
 
 from .media import duration, run
 
-PAUSE = 0.25  # seconds of silence between lines
+PAUSE = 0.12  # seconds of silence between lines
 
 
 @dataclass
@@ -23,12 +23,12 @@ class Narration:
 
     @property
     def length(self) -> float:
-        return self.segments[-1].end + 0.6 if self.segments else 0.0
+        return self.segments[-1].end + 0.3 if self.segments else 0.0
 
 
 async def _tts(text: str, voice: str, out: Path) -> None:
     import edge_tts
-    await edge_tts.Communicate(text, voice, rate="+8%").save(str(out))
+    await edge_tts.Communicate(text, voice, rate="+14%").save(str(out))
 
 
 def _silence(seconds: float, out: Path) -> None:

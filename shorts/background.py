@@ -23,10 +23,10 @@ def _pick_file(video: dict) -> str | None:
     return min(files, key=lambda f: abs(f["height"] - 1920))["link"]
 
 
-def fetch_pexels(terms: list[str], api_key: str, workdir: Path, want: int = 3) -> list[Path]:
+def fetch_pexels(terms: list[str], api_key: str, workdir: Path, want: int = 7) -> list[Path]:
     clips: list[Path] = []
     seen: set[int] = set()
-    for term in terms:
+    for term in (terms * 3)[: want * 2]:
         if len(clips) >= want:
             break
         try:
@@ -76,7 +76,8 @@ def build(terms: list[str], api_key: str, seconds: float, workdir: Path, width: 
         part = workdir / f"norm_{i}.mp4"
         run(["ffmpeg", "-y", "-stream_loop", "-1", "-i", str(clip), "-t", f"{per_clip:.2f}", "-an",
              "-vf", f"scale={width}:{height}:force_original_aspect_ratio=increase,crop={width}:{height},"
-                    "setsar=1,fps=30,eq=brightness=-0.06:saturation=1.15",
+                    "setsar=1,fps=30,eq=brightness=-0.06:saturation=1.15,"
+                    f"zoompan=z='min(1+0.0015*on,1.15)':x='iw/2-iw/zoom/2':y='ih/2-ih/zoom/2':d=1:s={width}x{height}:fps=30",
              "-c:v", "libx264", "-preset", "veryfast", "-pix_fmt", "yuv420p", str(part)])
         parts.append(part)
     listing = workdir / "bg_list.txt"
