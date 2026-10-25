@@ -4,7 +4,10 @@ from pathlib import Path
 from .config import Config
 from .content import Script
 
-SCOPES = ["https://www.googleapis.com/auth/youtube.upload"]
+SCOPES = [
+    "https://www.googleapis.com/auth/youtube.upload",
+    "https://www.googleapis.com/auth/youtube",  # channel branding
+]
 EDUCATION = "27"
 
 
