@@ -1,0 +1,28 @@
+{
+  "name": "fajr-survivors",
+  "version": "1.0.0",
+  "description": "فجر الناجين - لعبة بقاء ضد الزومبي",
+  "scripts": {
+    "build": "node scripts/build-web.mjs",
+    "sync": "npm run build && npx cap sync ios",
+    "assets": "npx capacitor-assets generate --ios --iconBackgroundColor \"#0b0f14\" --splashBackgroundColor \"#0b0f14\"",
+    "test": "node scripts/smoke-test.cjs"
+  },
+  "license": "UNLICENSED",
+  "dependencies": {
+    "@capacitor/app": "8.1.2",
+    "@capacitor/core": "8.5.3",
+    "@capacitor/haptics": "8.0.2",
+    "@capacitor/ios": "8.5.3",
+    "@capacitor/splash-screen": "8.0.2",
+    "@capacitor/status-bar": "8.0.4"
+  },
+  "devDependencies": {
+    "@capacitor/assets": "3.0.5",
+    "@capacitor/cli": "8.5.3",
+    "@fontsource/changa": "5.3.0",
+    "@fontsource/tajawal": "5.3.0",
+    "playwright": "1.63.0"
+  },
+  "private": true
+}

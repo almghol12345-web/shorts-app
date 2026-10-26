@@ -1,0 +1,16 @@
+<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8">
+<style>
+@font-face{font-family:Changa;font-weight:800;src:url(../www/fonts/changa-arabic-800-normal.woff2)}
+@font-face{font-family:Tajawal;font-weight:700;src:url(../www/fonts/tajawal-arabic-700-normal.woff2)}
+html,body{margin:0;background:#000}
+#stage{position:relative;overflow:hidden}
+.t{position:absolute;left:0;right:0;text-align:center;font-family:Changa;font-weight:800;color:#fff3d6;text-shadow:0 .04em 0 #5a2410,0 0 .3em #0009}
+.s{position:absolute;left:0;right:0;text-align:center;font-family:Tajawal;font-weight:700;color:#f1b23c;letter-spacing:.02em}
+</style><script src="scene.js"></script></head><body><div id="stage"></div>
+<script>
+const q=new URLSearchParams(location.search),kind=q.get('k');
+const st=document.getElementById('stage');
+if(kind==='icon'){const w=1024;st.style.width=st.style.height=w+'px';st.innerHTML=scene(w,w,{zombies:true})+`<div class="t" style="top:120px;font-size:250px;line-height:1">فجر</div>`}
+else{const w=2732;st.style.width=st.style.height=w+'px';
+ st.innerHTML=`<div style="position:absolute;inset:0;background:#0b0f14"></div><div style="position:absolute;left:${w/2-600}px;top:${w/2-760}px;width:1200px;height:1200px;border-radius:60px;overflow:hidden">${scene(1200,1200,{zombies:true})}</div><div class="t" style="top:${w/2+470}px;font-size:200px">فجر الناجين</div><div class="s" style="top:${w/2+740}px;font-size:76px">ابنِ · قاتل · انجُ</div>`}
+</script></body></html>

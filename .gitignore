@@ -1,0 +1,4 @@
+node_modules/
+design/raw/
+.DS_Store
+*.p8

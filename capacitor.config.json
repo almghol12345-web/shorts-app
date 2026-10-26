@@ -1,0 +1,24 @@
+{
+  "appId": "com.almghol.fajrsurvivors",
+  "appName": "فجر الناجين",
+  "webDir": "www",
+  "backgroundColor": "#0e1215",
+  "ios": {
+    "contentInset": "never",
+    "backgroundColor": "#0e1215",
+    "scrollEnabled": false,
+    "allowsLinkPreview": false
+  },
+  "plugins": {
+    "SplashScreen": {
+      "launchShowDuration": 1200,
+      "launchAutoHide": true,
+      "backgroundColor": "#0b0f14",
+      "showSpinner": false
+    },
+    "StatusBar": {
+      "style": "DARK",
+      "overlaysWebView": true
+    }
+  }
+}

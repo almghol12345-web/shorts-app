@@ -1,0 +1,77 @@
+name: Upload to TestFlight
+
+# Run by hand from the Actions tab once the four secrets below are set.
+#   APPLE_TEAM_ID   - 10-character Team ID from developer.apple.com > Membership
+#   ASC_KEY_ID      - App Store Connect API key ID
+#   ASC_ISSUER_ID   - App Store Connect API issuer ID
+#   ASC_KEY_P8      - the .p8 key file: paste its text as-is, or as base64
+on:
+  workflow_dispatch:
+
+jobs:
+  testflight:
+    runs-on: macos-15
+    timeout-minutes: 60
+    env:
+      TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+      KEY_ID: ${{ secrets.ASC_KEY_ID }}
+      ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Check secrets
+        run: |
+          for v in TEAM_ID KEY_ID ISSUER_ID; do
+            if [ -z "${!v}" ]; then echo "::error::Missing secret for $v"; exit 1; fi
+          done
+
+      - name: Write the App Store Connect key
+        env:
+          KEY_P8: ${{ secrets.ASC_KEY_P8 }}
+        run: |
+          mkdir -p "$RUNNER_TEMP/keys"
+          KEY_PATH="$RUNNER_TEMP/keys/AuthKey_${KEY_ID}.p8"
+          if printf '%s' "$KEY_P8" | grep -q "BEGIN PRIVATE KEY"; then
+            printf '%s\n' "$KEY_P8" > "$KEY_PATH"
+          else
+            printf '%s' "$KEY_P8" | base64 --decode > "$KEY_PATH"
+          fi
+          echo "KEY_PATH=$KEY_PATH" >> "$GITHUB_ENV"
+
+      - run: npm ci
+      - run: npm run build
+      - run: npx cap sync ios
+
+      - name: Set build number
+        run: sed -i '' "s/CURRENT_PROJECT_VERSION = [0-9]*;/CURRENT_PROJECT_VERSION = ${{ github.run_number }};/g" ios/App/App.xcodeproj/project.pbxproj
+
+      - name: Archive
+        run: |
+          set -o pipefail
+          xcodebuild -project ios/App/App.xcodeproj -scheme App -configuration Release \
+            -destination 'generic/platform=iOS' \
+            -archivePath "$RUNNER_TEMP/App.xcarchive" \
+            DEVELOPMENT_TEAM="$TEAM_ID" CODE_SIGN_STYLE=Automatic \
+            -allowProvisioningUpdates \
+            -authenticationKeyPath "$KEY_PATH" \
+            -authenticationKeyID "$KEY_ID" \
+            -authenticationKeyIssuerID "$ISSUER_ID" \
+            archive | tail -n 80
+
+      - name: Export and upload to App Store Connect
+        run: |
+          set -o pipefail
+          sed "s/TEAM_ID_PLACEHOLDER/$TEAM_ID/" ios/ExportOptions.plist > "$RUNNER_TEMP/ExportOptions.plist"
+          xcodebuild -exportArchive \
+            -archivePath "$RUNNER_TEMP/App.xcarchive" \
+            -exportOptionsPlist "$RUNNER_TEMP/ExportOptions.plist" \
+            -exportPath "$RUNNER_TEMP/export" \
+            -allowProvisioningUpdates \
+            -authenticationKeyPath "$KEY_PATH" \
+            -authenticationKeyID "$KEY_ID" \
+            -authenticationKeyIssuerID "$ISSUER_ID" | tail -n 80
+          echo "Uploaded build ${{ github.run_number }}. It shows up in TestFlight after Apple finishes processing (about 10-30 minutes)."

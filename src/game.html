@@ -1,0 +1,1442 @@
+<title>فجر الناجين</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Changa:wght@500;700;800&family=Tajawal:wght@400;500;700;800&display=swap">
+<style>
+/* Layout: one-screen phone game. Resource bar on top, one swappable view, tab bar at the bottom. Battles open as a full-screen canvas. Single dark look by design: asphalt, rust and sodium-lamp amber. */
+:root{
+  --bg:#0e1215; --ground:#151b1f; --panel:#1a2127; --panel2:#232c34; --line:#33404a;
+  --fg:#ece5d7; --muted:#8e99a2; --rust:#cf6a2c; --rust2:#a9521f; --amber:#f1b23c;
+  --good:#64b66e; --bad:#e2513f; --sky:#5aa6d6;
+  --r1:#4f8fd6; --r2:#a66be0; --r3:#e8a62d;
+  --tank:#3f6f96; --atk:#9c3f2f; --sup:#3f8a5c;
+  --fd:'Changa',system-ui,sans-serif; --fb:'Tajawal',system-ui,sans-serif;
+  color-scheme:dark;
+}
+html{height:100%;box-sizing:border-box;background:var(--bg)}
+*,*::before,*::after{box-sizing:border-box}
+[hidden]{display:none!important}
+body{height:100%;background:var(--bg);color:var(--fg);font-family:var(--fb);font-size:15px;overflow:hidden;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none;touch-action:manipulation}
+button{font:inherit;color:inherit;border:0;background:none;cursor:pointer;padding:0}
+button:focus-visible,[tabindex]:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
+input{font:inherit}
+#app{height:100%;display:flex;flex-direction:column;direction:rtl;max-width:620px;margin:0 auto;position:relative;background:var(--bg)}
+.num{font-variant-numeric:tabular-nums}
+
+/* top bar */
+.top{background:linear-gradient(180deg,#1c252b,#141a1e);border-bottom:1px solid var(--line);padding-block:8px 8px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:grid;gap:8px}
+.top-r{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.me{display:flex;align-items:center;gap:8px;min-width:0}
+.me .av{width:38px;height:38px;font-size:18px}
+.me-t{display:grid;text-align:right;min-width:0}
+.me-t b{font-family:var(--fd);font-weight:700;font-size:15px;line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.me-t small{color:var(--amber);font-size:12px;font-family:var(--fd)}
+.gem{display:flex;align-items:center;gap:6px;background:#10161a;border:1px solid var(--line);border-radius:20px;padding:4px 6px 4px 12px;font-family:var(--fd);font-weight:700}
+.gem i{font-style:normal;background:var(--rust);color:#fff;width:22px;height:22px;border-radius:50%;display:grid;place-items:center;line-height:1}
+.resrow{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.rc{display:flex;align-items:center;gap:4px;background:#0f1518;border:1px solid #27323b;border-radius:8px;padding:3px 6px;font-family:var(--fd);font-size:13px;font-weight:600;min-width:0}
+.rc span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* view & tabs */
+#view{flex:1;overflow-y:auto;overflow-x:hidden;position:relative;-webkit-overflow-scrolling:touch}
+#view.fixed{overflow:hidden}
+.pad{padding-block:14px 24px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:grid;gap:14px}
+.tabs{display:grid;grid-template-columns:repeat(5,1fr);background:#12181c;border-top:1px solid var(--line);padding-left:env(safe-area-inset-left,0px);padding-right:env(safe-area-inset-right,0px)}
+.tab{display:grid;justify-items:center;gap:1px;padding:7px 2px 6px;font-size:12px;font-weight:700;color:var(--muted);position:relative}
+.tab .ti{font-size:21px;line-height:1.1;filter:grayscale(.7);opacity:.75}
+.tab.on{color:var(--amber)}
+.tab.on .ti{filter:none;opacity:1}
+.tab.on::before{content:"";position:absolute;top:-1px;left:22%;right:22%;height:3px;background:var(--rust);border-radius:0 0 3px 3px}
+.dot{position:absolute;top:5px;left:calc(50% - 16px);width:9px;height:9px;border-radius:50%;background:var(--bad);box-shadow:0 0 0 2px #12181c}
+
+/* generic */
+h2,h3{font-family:var(--fd);margin:0;text-wrap:balance}
+h2{font-size:20px;font-weight:800}
+h3{font-size:16px;font-weight:700;color:var(--muted);letter-spacing:.02em}
+p{margin:0;line-height:1.6}
+.muted{color:var(--muted)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:10px 14px;font-weight:800;font-family:var(--fd);font-size:15px;min-height:44px;transition:transform .08s}
+.btn:active{transform:scale(.97)}
+.btn.pri{background:linear-gradient(180deg,#dc7533,#b2561f);border-color:#e58a4a;color:#fff;text-shadow:0 1px 0 #0005}
+.btn.gold{background:linear-gradient(180deg,#f3c255,#cf9324);border-color:#f7d27a;color:#2a1a04}
+.btn.ok{background:linear-gradient(180deg,#6cbf74,#3f8d4a);border-color:#86d18d;color:#08200c}
+.btn.sm{min-height:34px;padding:5px 10px;font-size:13px;border-radius:8px}
+.btn.wide{width:100%}
+.btn[disabled]{opacity:.45;filter:grayscale(.6);pointer-events:none}
+.row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.between{justify-content:space-between}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px;display:grid;gap:10px}
+.cc{display:inline-flex;align-items:center;gap:3px;background:#0f1518;border:1px solid #2a353e;border-radius:7px;padding:2px 7px;font-family:var(--fd);font-size:13px;font-weight:600;font-variant-numeric:tabular-nums}
+.cc.lack{color:var(--bad);border-color:#5a2a24}
+.tag{display:inline-block;font-size:11px;font-weight:800;padding:1px 7px;border-radius:6px;background:#0f1518;border:1px solid var(--line);font-family:var(--fd);letter-spacing:.02em}
+.prog{height:8px;background:#0b0f12;border-radius:5px;overflow:hidden;border:1px solid #27323b}
+.prog i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--amber),var(--rust));border-radius:5px}
+.req{display:flex;gap:6px;align-items:center;font-size:14px}
+.req.no{color:var(--bad)}
+.req.yes{color:var(--good)}
+
+/* base */
+.base-wrap{display:grid;gap:12px;padding-block:12px 24px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.quest{display:flex;align-items:center;gap:10px;background:linear-gradient(90deg,#2a2014,#1b2228);border:1px solid #5b4524;border-radius:12px;padding:8px 10px}
+.quest .qk{font-family:var(--fd);font-size:11px;font-weight:800;color:#2a1a04;background:var(--amber);border-radius:6px;padding:2px 7px;flex:none}
+.quest .qt{flex:1;min-width:0;font-weight:700;font-size:14px;line-height:1.3}
+.siege{display:flex;align-items:center;gap:8px;background:#3a1512;border:1px solid #7c2a22;color:#ffd2c8;border-radius:12px;padding:8px 12px;font-weight:800;animation:pulse 1.2s infinite}
+@keyframes pulse{50%{background:#521c17}}
+.shortcuts{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+.sc{display:grid;justify-items:center;gap:3px;font-size:11px;font-weight:700;color:var(--muted);position:relative}
+.sc .si{width:46px;height:46px;border-radius:14px;display:grid;place-items:center;font-size:22px;background:var(--panel2);border:1px solid var(--line)}
+.sc .dot{top:-2px;left:calc(50% + 12px)}
+.compound{position:relative;border-radius:18px;padding:12px;background:
+  radial-gradient(ellipse at 50% 0%,#2a2a22 0,transparent 60%),
+  repeating-linear-gradient(115deg,transparent 0 38px,#ffffff05 38px 40px),
+  repeating-linear-gradient(25deg,transparent 0 61px,#00000030 61px 63px),
+  #1a1f21;border:3px solid #3b3a33;box-shadow:inset 0 0 0 3px #232320,inset 0 0 40px #000a;display:grid;grid-template-columns:repeat(3,1fr);gap:10px;overflow:hidden}
+.compound::after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(180deg,#0000 60%,#0e121588);}
+.tile{position:relative;display:grid;justify-items:center;align-content:center;gap:2px;aspect-ratio:1/1;max-width:100%;background:radial-gradient(circle at 50% 40%,#2d3438 0,#20262a 70%);border:1px solid #3a444b;border-radius:14px;padding:6px 4px;text-align:center;cursor:pointer;z-index:1}
+.tile:active{transform:scale(.97)}
+.tile.hq{grid-column:1/-1;aspect-ratio:auto;min-height:118px;background:radial-gradient(circle at 50% 35%,#3b3424 0,#22262a 70%);border-color:#6a5530}
+.tile.hq .ti{font-size:52px}
+.tile .ti{font-size:34px;line-height:1.1;filter:drop-shadow(0 4px 3px #000a)}
+.tile .ti.dim{filter:grayscale(1) brightness(.6);opacity:.6}
+.tile .tn{font-size:12px;font-weight:800;line-height:1.2;font-family:var(--fd)}
+.tile .ts{font-size:11px;color:var(--muted);font-weight:700}
+.tile .lv{position:absolute;top:5px;right:6px;background:#0d1114;border:1px solid #45525c;color:var(--amber);font-family:var(--fd);font-size:11px;font-weight:800;border-radius:6px;padding:0 5px;line-height:17px}
+.tile.empty{background:transparent;border:2px dashed #3d4950}
+.tile.locked{background:#14181b;border-color:#242b30;opacity:.7}
+.tile .tbar{position:absolute;bottom:6px;left:8px;right:8px;height:6px}
+.tile .tt{position:absolute;bottom:13px;left:0;right:0;font-size:11px;font-weight:800;color:var(--amber);font-family:var(--fd)}
+.tile.busy .ti{animation:bob 1.4s ease-in-out infinite}
+@keyframes bob{50%{transform:translateY(-3px)}}
+.bub{position:absolute;top:-6px;left:-4px;display:flex;align-items:center;gap:2px;background:#f4ecd8;color:#20170c;border-radius:14px 14px 14px 3px;padding:2px 7px 2px 6px;font-family:var(--fd);font-weight:800;font-size:12px;box-shadow:0 3px 8px #000a;z-index:2;animation:bubin .3s}
+@keyframes bubin{from{transform:scale(.4)}}
+.builders{display:grid;gap:6px}
+.bq{display:flex;align-items:center;gap:10px;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:7px 10px;font-size:13px;font-weight:700}
+.bq .prog{flex:1}
+.float{position:fixed;z-index:60;pointer-events:none;font-family:var(--fd);font-weight:800;color:var(--amber);text-shadow:0 2px 3px #000;animation:floatup 1s ease-out forwards}
+@keyframes floatup{to{transform:translateY(-50px);opacity:0}}
+
+/* heroes */
+.av{display:inline-grid;place-items:center;border-radius:50%;font-family:var(--fd);font-weight:800;color:#fff;flex:none;width:44px;height:44px;font-size:20px;border:3px solid var(--r1);text-shadow:0 1px 2px #0008}
+.av.r2{border-color:var(--r2)} .av.r3{border-color:var(--r3);box-shadow:0 0 10px #e8a62d66}
+.av.c-tank{background:radial-gradient(circle at 35% 30%,#6c9cc4,var(--tank))}
+.av.c-atk{background:radial-gradient(circle at 35% 30%,#d06a52,var(--atk))}
+.av.c-sup{background:radial-gradient(circle at 35% 30%,#73c08f,var(--sup))}
+.av.c-me{background:radial-gradient(circle at 35% 30%,#e4884a,var(--rust2));border-color:var(--amber)}
+.formation{background:linear-gradient(180deg,#1b2228,#151b1f);border:1px solid var(--line);border-radius:14px;padding:12px;display:grid;gap:10px}
+.frow{display:flex;justify-content:center;gap:12px}
+.slot{width:70px;display:grid;justify-items:center;gap:3px;font-size:11px;font-weight:700}
+.slot .av{width:58px;height:58px;font-size:24px}
+.slot .empty{width:58px;height:58px;border-radius:50%;border:2px dashed #4a5660;display:grid;place-items:center;color:var(--muted);font-size:24px}
+.flabel{font-size:11px;color:var(--muted);text-align:center;font-weight:700;letter-spacing:.04em}
+.roster{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.hc{position:relative;display:grid;justify-items:center;gap:2px;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:10px 4px 8px;text-align:center}
+.hc.r3{background:linear-gradient(180deg,#2c2416,var(--panel))}
+.hc.r2{background:linear-gradient(180deg,#261d30,var(--panel))}
+.hc .av{width:52px;height:52px;font-size:22px}
+.hc b{font-family:var(--fd);font-size:14px}
+.hc small{font-size:11px;color:var(--muted);font-weight:700}
+.hc .in{position:absolute;top:6px;left:6px;font-size:10px;background:var(--rust);color:#fff;border-radius:5px;padding:0 5px;font-weight:800}
+.hc .dot{top:6px;right:6px;left:auto}
+.hc.lockd{opacity:.45}
+.hc.lockd .av{background:#20272c;color:#56626b}
+.stars{color:var(--amber);font-size:12px;letter-spacing:-1px;line-height:1}
+.stars .off{color:#3b464e}
+.stat{background:#10161a;border:1px solid #27323b;border-radius:10px;padding:8px;display:grid;gap:2px;text-align:center}
+.stat small{color:var(--muted);font-size:11px;font-weight:700}
+.stat b{font-family:var(--fd);font-size:17px}
+.pull{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
+.pull .hc{padding:6px 2px}
+.pull .hc .av{width:40px;height:40px;font-size:17px}
+.pull .new{position:absolute;top:2px;left:2px;font-size:9px;background:var(--good);color:#04200a;border-radius:4px;padding:0 4px;font-weight:800}
+
+/* campaign */
+.stagecard{background:
+  linear-gradient(180deg,#0000,#0e1215 85%),
+  repeating-linear-gradient(90deg,#ffffff06 0 2px,transparent 2px 46px),
+  radial-gradient(ellipse at 50% 0%,#5a2a1a 0,#1a1f22 70%);
+  border:1px solid #5b3322;border-radius:16px;padding:16px;display:grid;gap:12px;text-align:center}
+.stagecard .big{font-family:var(--fd);font-size:44px;font-weight:800;line-height:1;color:var(--amber);text-shadow:0 3px 0 #0008}
+.vs{display:grid;grid-template-columns:1fr auto 1fr;gap:8px;align-items:center}
+.vs .stat b.bad{color:var(--bad)} .vs .stat b.good{color:var(--good)}
+.zrow{display:flex;justify-content:center;gap:6px;font-size:26px}
+.path{display:grid;gap:8px}
+.pn{display:flex;align-items:center;gap:10px;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:8px 12px;font-weight:700}
+.pn .pi{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;background:#10161a;border:2px solid var(--line);font-family:var(--fd);font-size:13px}
+.pn.done{opacity:.55}
+.pn.done .pi{border-color:var(--good);color:var(--good)}
+.pn.cur{border-color:var(--rust);background:#2a1d16}
+.pn.cur .pi{border-color:var(--amber);color:var(--amber)}
+.pn.boss .pi{border-color:var(--bad)}
+
+/* world */
+.world{position:absolute;inset:0}
+.world canvas{position:absolute;inset:0;width:100%;height:100%;touch-action:none;cursor:grab}
+.whud{position:absolute;top:10px;right:max(12px,env(safe-area-inset-right,0px));left:max(12px,env(safe-area-inset-left,0px));display:flex;justify-content:space-between;gap:8px;pointer-events:none}
+.whud>*{pointer-events:auto}
+.chip{background:#0e1215e6;border:1px solid var(--line);border-radius:10px;padding:6px 10px;font-family:var(--fd);font-weight:700;font-size:13px;display:flex;gap:10px;align-items:center}
+.wmarch{position:absolute;bottom:10px;right:max(12px,env(safe-area-inset-right,0px));left:max(12px,env(safe-area-inset-left,0px));display:grid;gap:6px;pointer-events:none}
+.wmarch .bq{background:#0e1215e6;pointer-events:auto}
+
+/* alliance */
+.msg{display:grid;gap:2px;background:var(--panel2);border-radius:12px 12px 12px 4px;padding:7px 10px;max-width:85%;justify-self:start}
+.msg.mine{justify-self:end;background:#3a2418;border-radius:12px 12px 4px 12px}
+.msg b{font-size:12px;color:var(--amber);font-family:var(--fd)}
+.msg span{font-size:14px;line-height:1.45;word-break:break-word;user-select:text;-webkit-user-select:text}
+.chat{display:grid;gap:6px;max-height:300px;overflow-y:auto;padding:4px}
+.field{flex:1;min-width:0;background:#0f1518;border:1px solid var(--line);border-radius:10px;padding:10px 12px;color:var(--fg);direction:rtl;user-select:text;-webkit-user-select:text}
+.mem{display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid #26313a;font-weight:700;font-size:14px}
+.mem:last-child{border:0}
+.mem .av{width:34px;height:34px;font-size:15px}
+.mem .p{margin-right:auto;color:var(--amber);font-family:var(--fd);font-size:13px}
+.ally{display:flex;align-items:center;gap:12px}
+.flag{width:52px;height:52px;border-radius:12px;display:grid;place-items:center;font-family:var(--fd);font-weight:800;font-size:15px;color:#fff;flex:none;border:2px solid #fff3}
+
+/* modal */
+#modal{position:fixed;inset:0;z-index:40;background:#000a;display:flex;align-items:flex-end;justify-content:center;direction:rtl;animation:fade .15s}
+@keyframes fade{from{opacity:0}}
+.sheet{width:100%;max-width:620px;max-height:88%;display:flex;flex-direction:column;background:var(--panel);border-top:2px solid var(--rust);border-radius:20px 20px 0 0;box-shadow:0 -10px 40px #000;animation:up .2s ease-out;padding-bottom:env(safe-area-inset-bottom,0px)}
+@keyframes up{from{transform:translateY(40px)}}
+.sh-h{display:flex;align-items:center;gap:12px;padding:14px max(16px,env(safe-area-inset-right,0px)) 10px max(16px,env(safe-area-inset-left,0px));border-bottom:1px solid var(--line)}
+.sh-h .hi{font-size:34px;line-height:1}
+.sh-h .htx{flex:1;min-width:0}
+.sh-h .x{width:36px;height:36px;border-radius:50%;background:var(--panel2);font-size:18px;display:grid;place-items:center;flex:none}
+.sh-b{overflow-y:auto;padding-block:14px 20px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:grid;gap:12px}
+.eff{display:grid;grid-template-columns:1fr auto 1fr;gap:6px;align-items:center;background:#10161a;border:1px solid #27323b;border-radius:10px;padding:8px 10px;font-size:13px;font-weight:700}
+.eff .arr{color:var(--rust)}
+.eff .nx{color:var(--good)}
+.li{display:flex;align-items:center;gap:10px;background:#10161a;border:1px solid #27323b;border-radius:12px;padding:10px}
+.li .lic{font-size:26px;width:40px;text-align:center;flex:none}
+.li .lit{flex:1;min-width:0;display:grid;gap:3px}
+.li .lit b{font-family:var(--fd);font-size:14px}
+.li .lit small{color:var(--muted);font-size:12px}
+input[type=range]{width:100%;accent-color:var(--rust)}
+.days{display:grid;grid-template-columns:repeat(7,1fr);gap:5px}
+.day{display:grid;justify-items:center;gap:2px;background:#10161a;border:1px solid #27323b;border-radius:10px;padding:6px 2px;font-size:11px;font-weight:700}
+.day .d1{font-size:20px}
+.day.got{opacity:.4}
+.day.now{border-color:var(--amber);background:#2d2414}
+.result{position:absolute;inset:0;display:grid;place-items:center;background:#000b;z-index:5;padding:20px}
+.result .panel{width:min(360px,100%);text-align:center;justify-items:center}
+.result h2{font-size:34px}
+.win h2{color:var(--amber)} .lose h2{color:var(--bad)}
+
+/* toast */
+#toasts{position:fixed;top:calc(env(safe-area-inset-top,0px) + 70px);left:0;right:0;z-index:80;display:grid;justify-items:center;gap:6px;pointer-events:none;padding:0 16px}
+.toast{background:#0e1215f2;border:1px solid var(--line);border-right:3px solid var(--amber);border-radius:10px;padding:8px 14px;font-weight:700;font-size:14px;box-shadow:0 6px 20px #000a;animation:tin .25s;direction:rtl;max-width:100%}
+.toast.bad{border-right-color:var(--bad)}
+@keyframes tin{from{transform:translateY(-10px);opacity:0}}
+
+/* battle */
+#battle{position:fixed;inset:0;z-index:50;background:#0b0e10;display:flex;flex-direction:column;direction:rtl;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+.b-top{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px max(12px,env(safe-area-inset-right,0px)) 8px max(12px,env(safe-area-inset-left,0px));background:#12171a;border-bottom:1px solid var(--line)}
+.b-top b{font-family:var(--fd);font-size:15px;display:block}
+.b-top small{color:var(--amber);font-family:var(--fd);font-weight:700}
+.b-ctl{display:flex;gap:6px}
+.b-ctl button{background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:6px 10px;font-weight:800;font-size:13px;font-family:var(--fd);min-height:36px}
+.b-ctl button.on{background:var(--rust);border-color:#e58a4a;color:#fff}
+.b-stage{flex:1;position:relative;overflow:hidden}
+.b-stage canvas{position:absolute;inset:0;width:100%;height:100%}
+#b-banner{position:absolute;top:30%;left:0;right:0;text-align:center;font-family:var(--fd);font-weight:800;font-size:30px;color:var(--amber);text-shadow:0 3px 0 #000,0 0 20px #000;pointer-events:none;opacity:0}
+#b-banner.go{animation:ban 1.6s ease-out}
+@keyframes ban{0%{opacity:0;transform:scale(1.6)}15%{opacity:1;transform:scale(1)}75%{opacity:1}100%{opacity:0}}
+.b-cards{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;padding:8px max(10px,env(safe-area-inset-right,0px)) 10px max(10px,env(safe-area-inset-left,0px));background:#12171a;border-top:1px solid var(--line)}
+.bc{display:grid;justify-items:center;gap:3px;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:6px 3px;position:relative}
+.bc .av{width:38px;height:38px;font-size:17px}
+.bc .bn{font-size:11px;font-weight:800}
+.bc .bar{width:100%;height:5px;background:#0a0d0f;border-radius:3px;overflow:hidden}
+.bc .bar i{display:block;height:100%;width:100%}
+.bc .hp i{background:var(--good)}
+.bc .en i{background:var(--sky)}
+.bc.ready{border-color:var(--amber);box-shadow:0 0 12px #f1b23c88;animation:rdy .8s infinite alternate}
+@keyframes rdy{to{box-shadow:0 0 2px #f1b23c44}}
+.bc.ready::after{content:"اضغط";position:absolute;top:-9px;background:var(--amber);color:#2a1a04;font-size:10px;font-weight:800;border-radius:5px;padding:0 5px}
+.bc.dead{opacity:.35;filter:grayscale(1)}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+
+<div id="app">
+  <header class="top">
+    <div class="top-r">
+      <button class="me" data-a="settings" aria-label="الملف الشخصي"><span class="av c-me" id="pav">ق</span><span class="me-t"><b id="pname">القائد</b><small>القوة <span id="ppow" class="num">0</span></small></span></button>
+      <button class="gem" data-a="shop" aria-label="المتجر">💎 <span id="r-gems" class="num">0</span><i>+</i></button>
+    </div>
+    <div class="resrow">
+      <div class="rc">🌽<span id="r-food" class="num">0</span></div>
+      <div class="rc">🪵<span id="r-wood" class="num">0</span></div>
+      <div class="rc">🔩<span id="r-iron" class="num">0</span></div>
+      <div class="rc">⛽<span id="r-fuel" class="num">0</span></div>
+    </div>
+  </header>
+  <main id="view"></main>
+  <nav class="tabs" id="tabs"></nav>
+</div>
+<div id="modal" hidden></div>
+<div id="toasts"></div>
+<div id="battle" hidden>
+  <div class="b-top">
+    <div><b id="b-title">المعركة</b><small id="b-wave"></small></div>
+    <div class="b-ctl"><button id="b-spd">×1</button><button id="b-auto">تلقائي</button><button id="b-quit">انسحاب</button></div>
+  </div>
+  <div class="b-stage" id="b-stage"><canvas id="bcan"></canvas><div id="b-banner"></div><div id="b-res" hidden></div></div>
+  <div class="b-cards" id="b-cards"></div>
+</div>
+
+<script>
+(function(){
+'use strict';
+/* ================= utils ================= */
+const $=s=>document.querySelector(s);
+const now=()=>Date.now();
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function fmt(n){n=Math.floor(n||0);const a=Math.abs(n);if(a>=1e9)return(n/1e9).toFixed(1).replace(/\.0$/,'')+'B';if(a>=1e6)return(n/1e6).toFixed(1).replace(/\.0$/,'')+'M';if(a>=1e4)return(n/1e3).toFixed(1).replace(/\.0$/,'')+'K';return n.toLocaleString('en-US')}
+function fmtT(sec){sec=Math.max(0,Math.ceil(sec));const d=Math.floor(sec/86400),h=Math.floor(sec%86400/3600),m=Math.floor(sec%3600/60),s=sec%60,p=x=>String(x).padStart(2,'0');if(d)return`${d}ي ${h}س`;if(h)return`${h}:${p(m)}:${p(s)}`;return`${m}:${p(s)}`}
+const pick=a=>a[Math.floor(Math.random()*a.length)];
+function rng(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+const today=()=>new Date().toDateString();
+
+/* ================= sound & haptics ================= */
+let AC=null,lastShot=0,lastHurt=0,noiseBuf=null;
+function ac(){try{if(!AC){const A=window.AudioContext||window.webkitAudioContext;if(!A)return null;AC=new A()}if(AC.state==='suspended')AC.resume();return AC}catch(e){return null}}
+function tone(f,d,type,vol,slide,delay){if(!S||!S.snd)return;const c=ac();if(!c)return;const t0=c.currentTime+(delay||0);const o=c.createOscillator(),g=c.createGain();o.type=type||'square';o.frequency.setValueAtTime(f,t0);if(slide)o.frequency.exponentialRampToValueAtTime(Math.max(30,f*slide),t0+d);g.gain.setValueAtTime(vol||.05,t0);g.gain.exponentialRampToValueAtTime(.0001,t0+d);o.connect(g);g.connect(c.destination);o.start(t0);o.stop(t0+d+.02)}
+function noise(d,vol,freq,delay){if(!S||!S.snd)return;const c=ac();if(!c)return;if(!noiseBuf){noiseBuf=c.createBuffer(1,c.sampleRate,c.sampleRate);const a=noiseBuf.getChannelData(0);for(let i=0;i<a.length;i++)a[i]=Math.random()*2-1}const t0=c.currentTime+(delay||0);const src=c.createBufferSource();src.buffer=noiseBuf;const fl=c.createBiquadFilter();fl.type='lowpass';fl.frequency.setValueAtTime(freq||1200,t0);fl.frequency.exponentialRampToValueAtTime(60,t0+d);const g=c.createGain();g.gain.setValueAtTime(vol||.1,t0);g.gain.exponentialRampToValueAtTime(.0001,t0+d);src.connect(fl);fl.connect(g);g.connect(c.destination);src.start(t0,Math.random()*.5);src.stop(t0+d+.02)}
+const SND={
+  click:()=>tone(520,.05,'triangle',.035),
+  coin:()=>{tone(988,.07,'square',.03);tone(1480,.12,'square',.03,0,.06)},
+  up:()=>{[523,659,784,1047].forEach((f,i)=>tone(f,.14,'triangle',.05,0,i*.07))},
+  shot:()=>{const t=performance.now();if(t-lastShot<70)return;lastShot=t;noise(.06,.035,3200)},
+  boom:()=>{noise(.55,.22,700);tone(90,.4,'sine',.12,.4)},
+  skill:()=>tone(260,.28,'sawtooth',.04,3.2),
+  hurt:()=>{const t=performance.now();if(t-lastHurt<160)return;lastHurt=t;tone(150,.12,'sawtooth',.04,.5)},
+  win:()=>{[523,659,784,1047,1319].forEach((f,i)=>tone(f,.22,'square',.04,0,i*.1))},
+  lose:()=>{[392,330,262,196].forEach((f,i)=>tone(f,.3,'triangle',.05,0,i*.16))},
+  rare:()=>{[784,988,1175,1568,1976].forEach((f,i)=>tone(f,.25,'triangle',.05,0,i*.08))},
+  alarm:()=>{tone(700,.25,'sawtooth',.04,.7);tone(700,.25,'sawtooth',.04,.7,.3)},
+};
+function buzz(kind){
+  if(!S||!S.vib)return;
+  try{
+    const H=window.Capacitor&&window.Capacitor.Plugins&&window.Capacitor.Plugins.Haptics;
+    if(H){if(kind==='ok')H.notification({type:'SUCCESS'});else if(kind==='bad')H.notification({type:'ERROR'});else H.impact({style:kind==='heavy'?'HEAVY':kind==='medium'?'MEDIUM':'LIGHT'});return}
+    if(navigator.vibrate)navigator.vibrate(kind==='heavy'?40:kind==='medium'?20:kind==='ok'?[20,40,20]:kind==='bad'?[60,40,60]:8);
+  }catch(e){}
+}
+
+/* ================= definitions ================= */
+const RES={food:{n:'غذاء',i:'🌽'},wood:{n:'خشب',i:'🪵'},iron:{n:'حديد',i:'🔩'},fuel:{n:'وقود',i:'⛽'},gems:{n:'جواهر',i:'💎'},exp:{n:'خبرة أبطال',i:'✨'}};
+const ITEMS={ticket:{n:'تذكرة تجنيد',i:'🎟️',d:'تجنيد بطل واحد'},sp5:{n:'تسريع 5 دقائق',i:'⏩',d:'يقلل أي مؤقت 5 دقائق'},sp60:{n:'تسريع ساعة',i:'⏭️',d:'يقلل أي مؤقت 60 دقيقة'},stam:{n:'علبة طاقة',i:'🥫',d:'+50 طاقة للعالم'}};
+const MAXLV=30;
+const BT={
+  hq:{n:'مقر القيادة',i:'🏛️',d:'قلب القاعدة. تطويره يفتح مباني جديدة ويرفع الحد الأعلى لمستوى كل المباني.',base:{wood:120,iron:90},t:15},
+  farm:{n:'المزرعة',i:'🌾',d:'تنتج الغذاء اللازم للبناء وتدريب الجنود.',prod:'food',base:{wood:50},t:6},
+  saw:{n:'المنشرة',i:'🪓',d:'تنتج الخشب من بقايا المدينة.',prod:'wood',base:{food:50},t:6},
+  mine:{n:'منجم الحديد',i:'⛏️',d:'ينتج الحديد للمباني والأسلحة.',prod:'iron',base:{food:60,wood:60},t:7},
+  oil:{n:'مصفاة الوقود',i:'🛢️',d:'تنتج الوقود للمباني المتقدمة والأبحاث.',prod:'fuel',base:{wood:100,iron:80},t:8},
+  barracks:{n:'الثكنة',i:'🎖️',d:'تدرّب الجنود. الجنود يرفعون هجوم الأبطال ويدافعون عن القاعدة.',base:{food:80,wood:80},t:8},
+  hospital:{n:'المستشفى',i:'🏥',d:'يستقبل الجنود الجرحى بعد المعارك. الجرحى خارج السعة يموتون.',base:{wood:90,iron:40},t:8},
+  lab:{n:'مختبر الأبحاث',i:'🔬',d:'يفتح الأبحاث التي تقوي الإنتاج والقتال.',base:{wood:120,iron:100},t:10},
+  wall:{n:'السور',i:'🧱',d:'يصد هجمات الزومبي على القاعدة. مطلوب لتطوير المقر.',base:{wood:100,iron:60},t:9},
+  warehouse:{n:'المستودع',i:'📦',d:'يرفع سعة التخزين في المباني ويحمي الموارد من النهب.',base:{wood:80,food:60},t:7},
+  tavern:{n:'قاعة الأبطال',i:'🎯',d:'ترفع الحد الأقصى لمستوى الأبطال.',base:{food:100,wood:100},t:9},
+  radar:{n:'برج الرادار',i:'📡',d:'يزيد عدد المسيرات التي ترسلها في العالم.',base:{wood:150,iron:150},t:10},
+};
+const PLOTS=[
+  {k:'hq',t:'hq',u:1},
+  {k:'farm1',t:'farm',u:1},{k:'saw1',t:'saw',u:1},{k:'barracks',t:'barracks',u:1},
+  {k:'tavern',t:'tavern',u:1},{k:'mine1',t:'mine',u:2},{k:'wall',t:'wall',u:2},
+  {k:'warehouse',t:'warehouse',u:2},{k:'hospital',t:'hospital',u:3},{k:'lab',t:'lab',u:3},
+  {k:'farm2',t:'farm',u:4},{k:'saw2',t:'saw',u:4},{k:'oil1',t:'oil',u:5},
+  {k:'radar',t:'radar',u:5},{k:'mine2',t:'mine',u:6},{k:'farm3',t:'farm',u:8},
+  {k:'saw3',t:'saw',u:9},{k:'oil2',t:'oil',u:10},{k:'mine3',t:'mine',u:11},
+];
+const PLOT=Object.fromEntries(PLOTS.map(p=>[p.k,p]));
+const TECH={
+  food:{n:'زراعة مائية',i:'🌱',d:'+5% إنتاج الغذاء لكل مستوى'},
+  wood:{n:'مناشير كهربائية',i:'🪚',d:'+5% إنتاج الخشب لكل مستوى'},
+  iron:{n:'تعدين عميق',i:'⚒️',d:'+5% إنتاج الحديد لكل مستوى'},
+  fuel:{n:'تكرير متقدم',i:'🧪',d:'+5% إنتاج الوقود لكل مستوى'},
+  build:{n:'هندسة إنشائية',i:'🏗️',d:'+4% سرعة البناء لكل مستوى'},
+  train:{n:'تدريب مكثف',i:'🏃',d:'+5% سرعة التدريب لكل مستوى'},
+  atk:{n:'ذخيرة خارقة',i:'💥',d:'+4% هجوم الأبطال لكل مستوى'},
+  hp:{n:'دروع كيفلار',i:'🦺',d:'+4% صحة الأبطال لكل مستوى'},
+  def:{n:'تحصينات',i:'🛡️',d:'+4% دفاع الأبطال والسور لكل مستوى'},
+  march:{n:'لوجستيات',i:'🚚',d:'+8% سرعة المسير والجمع لكل مستوى'},
+};
+const CLS={tank:{n:'مدافع',i:'🛡️'},atk:{n:'مهاجم',i:'⚔️'},sup:{n:'داعم',i:'✚'}};
+const RAR=[null,{n:'نادر',c:'var(--r1)'},{n:'ملحمي',c:'var(--r2)'},{n:'أسطوري',c:'var(--r3)'}];
+const RM=[0,.7,1,1.35];
+const HEROES=[
+  {id:'reem',n:'ريم',r:3,c:'atk',sk:'snipe',skn:'رصاصة الموت',q:'قناصة سابقة في القوات الخاصة. لا تطلق مرتين على نفس الهدف.'},
+  {id:'saqr',n:'صقر',r:3,c:'tank',sk:'shield',skn:'جدار الحديد',q:'حارس المعبر الشمالي. يقف أمام الموجة ولا يتراجع.'},
+  {id:'layla',n:'ليلى',r:3,c:'sup',sk:'heal',skn:'إسعاف ميداني',q:'طبيبة الطوارئ الوحيدة التي نجت من المستشفى المركزي.'},
+  {id:'noura',n:'نورة',r:3,c:'atk',sk:'air',skn:'ضربة جوية',q:'مهندسة اتصالات تملك شيفرة آخر طائرة مسيّرة.'},
+  {id:'jaser',n:'جاسر',r:2,c:'atk',sk:'aoe',skn:'قنبلة حارقة',q:'يصنع المتفجرات من أي شيء يجده.'},
+  {id:'nimr',n:'نمر',r:2,c:'tank',sk:'stun',skn:'زلزال',q:'مصارع سابق. ضربته على الأرض توقف الزومبي في مكانهم.'},
+  {id:'hala',n:'هالة',r:2,c:'atk',sk:'rapid',skn:'وابل رصاص',q:'سريعة اليد، تفرّغ المخزن قبل أن ترمش.'},
+  {id:'fares',n:'فارس',r:2,c:'sup',sk:'buff',skn:'صرخة القائد',q:'ضابط متقاعد. صوته وحده يرفع معنويات الفريق.'},
+  {id:'salem',n:'سالم',r:1,c:'atk',sk:'snipe',skn:'طلقة دقيقة',q:'صياد من البادية، عينه لا تخيب.'},
+  {id:'mona',n:'منى',r:1,c:'sup',sk:'heal',skn:'ضمادات',q:'ممرضة متطوعة، حقيبتها لا تفرغ.'},
+  {id:'badr',n:'بدر',r:1,c:'tank',sk:'shield',skn:'درع مؤقت',q:'عامل بناء يحمل باباً حديدياً كدرع.'},
+  {id:'ziad',n:'زياد',r:1,c:'atk',sk:'aoe',skn:'قنبلة يدوية',q:'شاب متهور يحب الانفجارات أكثر من اللازم.'},
+];
+const HB=Object.fromEntries(HEROES.map(h=>[h.id,h]));
+const SKD={
+  snipe:m=>`طلقة واحدة بقوة ${Math.round(7*m*100)}% من الهجوم على أقوى زومبي.`,
+  shield:m=>`درع لكل الفريق يعادل ${Math.round(30*m)}% من صحة البطل لمدة 6 ثوانٍ.`,
+  heal:m=>`يعالج كل الفريق بقوة ${Math.round(5*m*100)}% من الهجوم + 10% من الصحة.`,
+  air:m=>`قصف جوي يضرب كل الزومبي بقوة ${Math.round(3.5*m*100)}% من الهجوم.`,
+  aoe:m=>`قنبلة تصيب الزومبي القريبين بقوة ${Math.round(3*m*100)}% من الهجوم.`,
+  stun:m=>`يشلّ كل الزومبي ${(2.5*m).toFixed(1)} ثانية ويجرحهم.`,
+  rapid:m=>`يضاعف سرعة الإطلاق 3 مرات لمدة ${(4*m).toFixed(1)} ثانية.`,
+  buff:m=>`+40% هجوم لكل الفريق لمدة ${(6*m).toFixed(1)} ثانية.`,
+};
+const ZT={
+  w:{i:'🧟',n:'زاحف',hp:1,atk:1,spd:30,r:15},
+  run:{i:'🧟‍♀️',n:'عدّاء',hp:.6,atk:.8,spd:62,r:14},
+  sp:{i:'🤢',n:'باصق',hp:.8,atk:.9,spd:26,r:15,range:true},
+  br:{i:'👹',n:'متوحش',hp:4,atk:1.8,spd:19,r:21},
+  boss:{i:'👺',n:'زعيم',hp:22,atk:3,spd:15,r:32},
+};
+const BOTS=['أبو فهد','سلطان','غيمة','مشعل','الذيب','نوف','عبدالعزيز','ريان','شهد','تركي','لمى','حمد','جود','بندر'];
+const ALLIES=[
+  {n:'نسور الصحراء',tag:'NSR',lv:7,col:'#a9521f'},
+  {n:'ذئاب الليل',tag:'DHB',lv:5,col:'#3f6f96'},
+  {n:'حراس الفجر',tag:'FJR',lv:9,col:'#5d4a8a'},
+];
+const CHATL=['أحد يساعدني في البناء؟ 🙏','الموجة اليوم قوية انتبهوا','وصلت المرحلة الجديدة 🔥','مين عنده ريم؟ تستاهل','لا تنسون هدية التحالف','الله يعطيكم العافية يا شباب','فيه معسكر زومبي مستوى عالي قرب الطريق الشرقي','طوروا السور قبل الهجوم','ساعدتكم كلكم 💪','صباح الخير يا ناجين','أحد جرب نمر مع ليلى؟ تشكيلة قوية'];
+const DAILY=[
+  {k:'collect',n:'اجمع الموارد من المباني',g:5},
+  {k:'win',n:'انتصر في المعارك',g:3},
+  {k:'build',n:'ابدأ تطوير المباني',g:2},
+  {k:'train',n:'درّب دفعة جنود',g:1},
+  {k:'recruit',n:'جنّد أبطالاً',g:1},
+  {k:'gather',n:'اجمع موارد من العالم',g:1},
+  {k:'research',n:'ابدأ بحثاً',g:1},
+  {k:'help',n:'احصل على مساعدات التحالف',g:3},
+];
+const CHESTS=[{p:30,r:{gems:50,food:3000}},{p:60,r:{gems:80,sp5:2}},{p:90,r:{gems:120,ticket:1}},{p:120,r:{gems:200,sp60:1,exp:2000}}];
+const LOGIN=[{gems:100},{food:5000,wood:5000},{ticket:1},{sp60:1},{exp:3000},{gems:300},{ticket:3,gems:200}];
+
+/* ================= state ================= */
+let S=null;
+function newState(){
+  const b={};PLOTS.forEach(p=>b[p.k]={lv:0,acc:0});
+  b.hq.lv=1;b.farm1.lv=1;b.saw1.lv=1;b.barracks.lv=1;b.tavern.lv=1;b.farm1.acc=250;b.saw1.acc=250;
+  return{v:1,name:'القائد',savedAt:now(),
+    res:{food:1500,wood:1500,iron:900,fuel:200,gems:600,exp:600},
+    b,builds:[],tech:Object.fromEntries(Object.keys(TECH).map(k=>[k,0])),rq:null,
+    troops:120,wounded:0,tq:null,
+    heroes:{salem:{lv:1,st:1,sh:0},badr:{lv:1,st:1,sh:0},mona:{lv:1,st:1,sh:0}},
+    squad:['badr',null,'salem','mona',null],pity:0,
+    stage:1,stam:100,stamAt:now(),auto:true,spd:1,
+    inv:{ticket:3,sp5:5,sp60:1,stam:1},
+    world:{seed:(Math.random()*1e9)|0,nodes:null,maxZ:0,marches:[]},
+    quest:0,daily:{date:'',p:{},c:{}},login:{day:0,last:''},
+    alliance:null,chat:[],chatAt:0,siegeAt:now()+12*60e3,
+    stats:{kills:0,wins:0,recruits:0,trained:0,gathered:0,sieges:0},tut:false,snd:true,vib:true};
+}
+function migrate(o){
+  const d=newState();
+  for(const k in d){
+    if(o[k]===undefined||o[k]===null&&d[k]!==null)o[k]=d[k];
+    else if(d[k]&&typeof d[k]==='object'&&!Array.isArray(d[k])&&typeof o[k]==='object'&&!Array.isArray(o[k])){
+      for(const j in d[k])if(o[k][j]===undefined)o[k][j]=d[k][j];
+    }
+  }
+  return o;
+}
+
+/* ================= derived ================= */
+const hqLv=()=>S.b.hq.lv;
+const lvOf=t=>Math.max(0,...PLOTS.filter(p=>p.t===t).map(p=>S.b[p.k].lv));
+const prodRate=(t,lv)=>lv?180*lv*Math.pow(1.12,lv-1)*(1+.05*S.tech[BT[t].prod]):0;
+const storeH=wl=>2+.5*wl;
+const storeCap=(t,lv)=>prodRate(t,lv)*storeH(lvOf('warehouse'));
+const protect=wl=>wl?Math.round(1500*Math.pow(1.5,wl)):0;
+const wallDef=wl=>wl?Math.round(300*wl*Math.pow(1.3,wl)*(1+.04*S.tech.def)):0;
+const heroCap=tl=>5+5*tl;
+const troopCap=bl=>300+bl*200;
+const batchMax=bl=>20+bl*15;
+const hospCap=hl=>hl*150;
+const maxMarch=rl=>1+(rl>0?1:0)+Math.floor(rl/4);
+const maxBuilders=()=>2;
+function bCost(t,lv){const m=Math.pow(1.6,lv-1),c={};for(const k in BT[t].base)c[k]=Math.round(BT[t].base[k]*m);if(lv>=7)c.fuel=Math.round(25*m*.35);return c}
+const bTime=(t,lv)=>BT[t].t*Math.pow(1.55,lv-1)*(1-.04*S.tech.build)*1000;
+function rCost(lv){const m=Math.pow(1.7,lv-1),c={food:Math.round(250*m),wood:Math.round(250*m),iron:Math.round(180*m)};if(lv>=3)c.fuel=Math.round(120*m);return c}
+const rTime=lv=>25*Math.pow(1.75,lv-1)*1000;
+const gemCost=ms=>ms<=60000?0:Math.ceil(ms/15000);
+function heroStats(id){
+  const H=HB[id],h=S.heroes[id];
+  const base=[0,{a:30,h:420,d:10},{a:44,h:610,d:15},{a:62,h:860,d:22}][H.r];
+  const cm={tank:{a:.6,h:1.7,d:1.6},atk:{a:1.35,h:.8,d:.8},sup:{a:.9,h:1,d:1}}[H.c];
+  const m=(1+.11*(h.lv-1))*(1+.22*(h.st-1));
+  return{atk:base.a*cm.a*m*(1+.04*S.tech.atk),hp:base.h*cm.h*m*(1+.04*S.tech.hp),def:base.d*cm.d*m*(1+.04*S.tech.def)};
+}
+const heroPower=id=>{const x=heroStats(id);return Math.round(x.atk*3+x.hp*.3+x.def*4)};
+const squadPower=()=>S.squad.filter(Boolean).reduce((a,id)=>a+heroPower(id),0);
+function troopBonus(){const L=Math.max(1,lvOf('barracks'));return Math.min(1.5,S.troops*(1+.08*(L-1))/2000)}
+function totalPower(){
+  let p=squadPower()*(1+troopBonus());
+  for(const k in S.b)p+=S.b[k].lv*40;
+  for(const k in S.tech)p+=S.tech[k]*60;
+  return Math.round(p+S.troops*2);
+}
+const recPower=s=>Math.round(650*Math.pow(1.14,s-1));
+const starNeed=st=>[0,10,20,40,80][st]||0;
+const lvCost=lv=>Math.round(80*Math.pow(1.17,lv-1));
+const ownedHeroes=()=>Object.keys(S.heroes);
+
+/* ================= resources ================= */
+function canPay(c){for(const k in c)if((S.res[k]||0)<c[k])return false;return true}
+function pay(c){for(const k in c)S.res[k]-=c[k]}
+function give(r){for(const k in r){if(k in S.res)S.res[k]+=r[k];else if(k in ITEMS)S.inv[k]=(S.inv[k]||0)+r[k];else if(k==='troops')S.troops+=r[k]}}
+const GEMRATE={food:120,wood:120,iron:60,fuel:30,exp:40};
+function missingGems(c){let g=0;for(const k in c){const miss=c[k]-(S.res[k]||0);if(miss>0)g+=Math.ceil(miss/(GEMRATE[k]||1))}return g}
+function costHTML(c){return Object.keys(c).map(k=>`<span class="cc ${(S.res[k]||0)>=c[k]?'':'lack'}">${RES[k].i} ${fmt(c[k])}</span>`).join(' ')}
+function rewHTML(r){return Object.keys(r).filter(k=>r[k]).map(k=>{const d=RES[k]||ITEMS[k]||{i:'🪖'};return`<span class="cc">${d.i} ${fmt(r[k])}</span>`}).join(' ')}
+
+/* ================= toasts & floats ================= */
+function toast(t,bad){const e=document.createElement('div');e.className='toast'+(bad?' bad':'');e.textContent=t;$('#toasts').appendChild(e);setTimeout(()=>e.remove(),2600);while($('#toasts').children.length>3)$('#toasts').firstChild.remove()}
+function floatAt(el,text){if(!el)return;const r=el.getBoundingClientRect();const f=document.createElement('div');f.className='float';f.textContent=text;f.style.left=(r.left+r.width/2-30)+'px';f.style.top=(r.top+10)+'px';document.body.appendChild(f);setTimeout(()=>f.remove(),1000)}
+
+/* ================= tracking & quests ================= */
+function ensureDaily(){if(S.daily.date!==today())S.daily={date:today(),p:{},c:{}}}
+function track(k,n=1){ensureDaily();S.daily.p[k]=(S.daily.p[k]||0)+n}
+function dailyPoints(){ensureDaily();return DAILY.reduce((a,d)=>a+(S.daily.c[d.k]?15:0),0)}
+const anyHero=f=>ownedHeroes().some(id=>f(S.heroes[id]));
+const techSum=()=>Object.values(S.tech).reduce((a,b)=>a+b,0);
+const QUESTS=[
+  ['طوّر المزرعة إلى المستوى 2',()=>lvOf('farm')>=2,{food:600,wood:600},'farm1'],
+  ['طوّر المنشرة إلى المستوى 2',()=>lvOf('saw')>=2,{food:600,wood:600},'saw1'],
+  ['انتصر في المرحلة 1 من الحملة',()=>S.stage>1,{exp:400,gems:30},'#campaign'],
+  ['طوّر مقر القيادة إلى المستوى 2',()=>hqLv()>=2,{wood:1000,iron:600,gems:50},'hq'],
+  ['ابنِ منجم الحديد',()=>lvOf('mine')>=1,{iron:800},'mine1'],
+  ['جنّد بطلاً جديداً',()=>S.stats.recruits>=1,{gems:100},'#heroes'],
+  ['ابنِ السور',()=>lvOf('wall')>=1,{wood:1200,iron:800},'wall'],
+  ['درّب 50 جندياً',()=>S.stats.trained>=50,{food:1500,iron:800},'barracks'],
+  ['ارفع بطلاً إلى المستوى 5',()=>anyHero(h=>h.lv>=5),{exp:1000},'#heroes'],
+  ['انتصر في المرحلة 3',()=>S.stage>3,{gems:60,sp5:2},'#campaign'],
+  ['ابنِ المستودع',()=>lvOf('warehouse')>=1,{food:1500,wood:1500},'warehouse'],
+  ['طوّر السور إلى المستوى 2',()=>lvOf('wall')>=2,{iron:1500},'wall'],
+  ['طوّر مقر القيادة إلى المستوى 3',()=>hqLv()>=3,{gems:100,sp60:1},'hq'],
+  ['ابنِ مختبر الأبحاث',()=>lvOf('lab')>=1,{food:2000,wood:2000},'lab'],
+  ['أكمل أي بحث',()=>techSum()>=1,{gems:80},'lab'],
+  ['ابنِ المستشفى',()=>lvOf('hospital')>=1,{wood:2000,iron:1000},'hospital'],
+  ['اهزم معسكر زومبي في العالم',()=>S.world.maxZ>=1,{exp:1500,stam:1},'#world'],
+  ['اجمع موارد من العالم',()=>S.stats.gathered>=1,{gems:80},'#world'],
+  ['انضم إلى تحالف',()=>!!S.alliance,{gems:150},'#alliance'],
+  ['انتصر في المرحلة 5',()=>S.stage>5,{ticket:1,gems:80},'#campaign'],
+  ['امتلك 5 أبطال',()=>ownedHeroes().length>=5,{exp:3000},'#heroes'],
+  ['طوّر مقر القيادة إلى المستوى 4',()=>hqLv()>=4,{gems:150,sp60:1},'hq'],
+  ['ارفع بطلاً إلى المستوى 10',()=>anyHero(h=>h.lv>=10),{exp:4000},'#heroes'],
+  ['طوّر مقر القيادة إلى المستوى 5',()=>hqLv()>=5,{gems:200,ticket:1},'hq'],
+  ['ابنِ مصفاة الوقود',()=>lvOf('oil')>=1,{fuel:1500},'oil1'],
+  ['ابنِ برج الرادار',()=>lvOf('radar')>=1,{gems:100},'radar'],
+  ['انتصر في المرحلة 10',()=>S.stage>10,{ticket:2,gems:150},'#campaign'],
+  ['ارفع بطلاً إلى نجمتين',()=>anyHero(h=>h.st>=2),{gems:200},'#heroes'],
+  ['اهزم زومبي مستوى 5 في العالم',()=>S.world.maxZ>=5,{exp:8000},'#world'],
+  ['اجعل قوتك 5,000',()=>totalPower()>=5000,{gems:250},'#heroes'],
+  ['طوّر مقر القيادة إلى المستوى 7',()=>hqLv()>=7,{gems:300,sp60:2},'hq'],
+  ['انتصر في المرحلة 20',()=>S.stage>20,{ticket:3,gems:300},'#campaign'],
+  ['اجعل قوتك 20,000',()=>totalPower()>=20000,{gems:400,ticket:2},'#heroes'],
+  ['طوّر مقر القيادة إلى المستوى 10',()=>hqLv()>=10,{gems:500,ticket:3},'hq'],
+  ['انتصر في المرحلة 30',()=>S.stage>30,{gems:800,ticket:5},'#campaign'],
+];
+
+/* ================= actions: buildings ================= */
+function bReq(k){
+  const p=PLOT[k],to=S.b[k].lv+1,out=[];
+  if(to>MAXLV){out.push({ok:false,t:'وصل للمستوى الأقصى'});return out}
+  if(p.t!=='hq'&&to>2)out.push({ok:hqLv()>=to-1,t:`مقر القيادة مستوى ${to-1}`});
+  if(p.t==='hq'&&to>=3)out.push({ok:S.b.wall.lv>=to-1,t:`السور مستوى ${to-1}`});
+  return out;
+}
+const reqOk=k=>bReq(k).every(r=>r.ok);
+function upgrade(k,instant){
+  const p=PLOT[k],b=S.b[k],to=b.lv+1;
+  if(S.builds.some(x=>x.k===k))return;
+  if(!reqOk(k)){toast('المتطلبات غير مكتملة',1);return}
+  const c=bCost(p.t,to);
+  if(!canPay(c)){toast('الموارد غير كافية',1);return}
+  const ms=bTime(p.t,to);
+  if(instant){
+    const g=gemCost(ms);if(S.res.gems<g){toast('الجواهر غير كافية',1);return}
+    pay(c);S.res.gems-=g;finishBuild(k,to);track('build');closeModal();
+  }else{
+    if(S.builds.length>=maxBuilders()){toast('كل البنائين مشغولين',1);return}
+    pay(c);S.builds.push({k,to,st:now(),end:now()+ms,h:0,hr:false});track('build');toast(`بدأ تطوير ${BT[p.t].n}`);
+  }
+  save();refresh();
+}
+function finishBuild(k,to){
+  S.b[k].lv=to;const t=PLOT[k].t;SND.up();buzz('ok');
+  toast(`اكتمل: ${BT[t].n} مستوى ${to} ✅`);
+  if(t==='hq'&&PLOTS.some(p=>p.u===to))toast('مبانٍ جديدة صارت متاحة 🔓');
+}
+function fillRes(ref){
+  let c=null;
+  if(ref.startsWith('b:')){const k=ref.slice(2);c=bCost(PLOT[k].t,S.b[k].lv+1)}
+  else if(ref.startsWith('r:')){const k=ref.slice(2);c=rCost(S.tech[k]+1)}
+  if(!c)return;const g=missingGems(c);
+  if(S.res.gems<g){toast('الجواهر غير كافية',1);return}
+  S.res.gems-=g;for(const k in c)if(S.res[k]<c[k])S.res[k]=c[k];
+  toast('تم شراء الموارد الناقصة');save();refresh();
+}
+function collect(k,el){
+  const b=S.b[k],n=Math.floor(b.acc);if(n<1)return 0;
+  const r=BT[PLOT[k].t].prod;S.res[r]+=n;b.acc-=n;
+  if(el)floatAt(el,`+${fmt(n)} ${RES[r].i}`);
+  SND.coin();buzz('light');
+  return n;
+}
+function collectAll(){let any=0;PLOTS.forEach(p=>{if(BT[p.t].prod&&S.b[p.k].lv){const el=document.querySelector(`[data-tile="${p.k}"]`);if(collect(p.k,el))any++}});if(any){track('collect');toast('تم جمع كل الموارد')}else toast('لا توجد موارد للجمع بعد');refresh()}
+
+/* queues */
+function getQ(ref){if(ref.startsWith('b:'))return S.builds.find(x=>x.k===ref.slice(2));if(ref==='r')return S.rq;if(ref==='t')return S.tq;return null}
+function useSpeed(ref,item){const q=getQ(ref);if(!q)return;if(!S.inv[item]){toast('لا تملك هذا العنصر',1);return}S.inv[item]--;q.end-=item==='sp5'?300000:3600000;toast(`تم استخدام ${ITEMS[item].n}`);processQueues();save();refresh()}
+function gemFinish(ref){const q=getQ(ref);if(!q)return;const g=gemCost(q.end-now());if(S.res.gems<g){toast('الجواهر غير كافية',1);return}S.res.gems-=g;q.end=now();processQueues();save();refresh()}
+function askHelp(ref){const q=getQ(ref);if(!q||!S.alliance)return;q.hr=true;toast('أرسلت طلب مساعدة للتحالف 🤝');refresh()}
+function processQueues(){
+  let ch=false;const t=now();
+  for(const q of S.builds.slice())if(q.end<=t){S.builds.splice(S.builds.indexOf(q),1);finishBuild(q.k,q.to);ch=true}
+  if(S.rq&&S.rq.end<=t){S.tech[S.rq.k]=S.rq.to;toast(`اكتمل البحث: ${TECH[S.rq.k].n} ${S.rq.to} 🔬`);S.rq=null;ch=true}
+  if(S.tq&&S.tq.end<=t){S.troops+=S.tq.n;S.stats.trained+=S.tq.n;toast(`انضم ${S.tq.n} جندي للقوات 🎖️`);S.tq=null;ch=true}
+  return ch;
+}
+function allyHelpTick(dt){
+  if(!S.alliance)return false;let ch=false;
+  for(const q of [...S.builds,S.rq,S.tq]){
+    if(!q||!q.hr||q.h>=5)continue;
+    if(Math.random()<dt/2500){q.h++;const red=Math.max(60000,(q.end-q.st)*.05);q.end-=red;track('help');toast(`ساعدك ${pick(BOTS)} (−${fmtT(red/1000)})`);ch=true}
+  }
+  return ch;
+}
+
+/* training, hospital, research */
+function trainCount(){const L=lvOf('barracks');const room=troopCap(L)-S.troops;return Math.max(0,Math.min(batchMax(L),room))}
+function trainCostPer(){const L=Math.max(1,lvOf('barracks'));const m=1+.12*(L-1);return{food:Math.round(10*m),iron:Math.round(5*m)}}
+const trainMs=n=>n*1200*(1-.05*S.tech.train);
+let trainN=10;
+function doTrain(){
+  if(S.tq){toast('الثكنة مشغولة',1);return}
+  const n=Math.min(trainN,trainCount());if(n<1){toast('وصلت للحد الأقصى من الجنود',1);return}
+  const per=trainCostPer(),c={food:per.food*n,iron:per.iron*n};
+  if(!canPay(c)){toast('الموارد غير كافية',1);return}
+  pay(c);S.tq={n,st:now(),end:now()+trainMs(n),h:0,hr:false};track('train');toast(`بدأ تدريب ${n} جندي`);save();refresh();
+}
+function doHeal(){
+  const n=S.wounded;if(!n)return;const c={food:n*4,wood:n*2};
+  if(!canPay(c)){toast('الموارد غير كافية',1);return}
+  pay(c);S.troops+=n;S.wounded=0;toast(`تم علاج ${n} جندي 🏥`);save();refresh();
+}
+function doResearch(k){
+  if(S.rq){toast('المختبر مشغول ببحث آخر',1);return}
+  const lab=lvOf('lab'),to=S.tech[k]+1;
+  if(!lab){toast('ابنِ مختبر الأبحاث أولاً',1);return}
+  if(to>10){toast('وصل للمستوى الأقصى');return}
+  if(to>lab){toast(`يتطلب مختبر مستوى ${to}`,1);return}
+  const c=rCost(to);if(!canPay(c)){toast('الموارد غير كافية',1);return}
+  pay(c);S.rq={k,to,st:now(),end:now()+rTime(to),h:0,hr:false};track('research');toast(`بدأ البحث: ${TECH[k].n}`);save();refresh();
+}
+
+/* heroes */
+function heroLevelUp(id,n){
+  const h=S.heroes[id],cap=heroCap(lvOf('tavern'));let done=0;
+  while(done<n&&h.lv<cap){const c=lvCost(h.lv);if(S.res.exp<c)break;S.res.exp-=c;h.lv++;done++}
+  if(!done){toast(h.lv>=cap?`الحد الأقصى ${cap}. طوّر قاعة الأبطال`:'خبرة الأبطال غير كافية',1);return}
+  toast(`${HB[id].n} وصل المستوى ${h.lv} ⬆️`);save();refresh();
+}
+function heroStar(id){
+  const h=S.heroes[id];if(h.st>=5)return;const need=starNeed(h.st);
+  if(h.sh<need){toast('الشظايا غير كافية. جنّد نسخاً إضافية',1);return}
+  h.sh-=need;h.st++;toast(`${HB[id].n} الآن ${h.st} نجوم ⭐`);save();refresh();
+}
+let lastPull=[];
+function rollHero(){
+  S.pity++;let r;const x=Math.random();
+  if(S.pity>=40){r=3}else r=x<.05?3:x<.30?2:1;
+  if(r===3)S.pity=0;
+  const pool=HEROES.filter(h=>h.r===r);return pick(pool).id;
+}
+function recruit(n){
+  let costT=Math.min(S.inv.ticket,n),gem=(n-costT)*150;if(n===10&&costT===0)gem=1350;
+  if(S.res.gems<gem){toast('الجواهر أو التذاكر غير كافية',1);return}
+  S.inv.ticket-=costT;S.res.gems-=gem;lastPull=[];
+  for(let i=0;i<n;i++){const id=rollHero();let isNew=false;if(!S.heroes[id]){S.heroes[id]={lv:1,st:1,sh:0};isNew=true}else S.heroes[id].sh+=10;lastPull.push({id,isNew})}
+  S.stats.recruits+=n;track('recruit',n);
+  const leg=lastPull.find(p=>HB[p.id].r===3);if(leg){toast(`بطل أسطوري: ${HB[leg.id].n}! 🌟`);SND.rare();buzz('heavy')}else{SND.up();buzz('medium')}
+  save();refresh();
+}
+function squadAdd(id){if(S.squad.includes(id))return;const i=S.squad.indexOf(null);if(i<0){openModal(()=>mSlotPick(id));return}S.squad[i]=id;save();refresh()}
+function squadRem(id){const i=S.squad.indexOf(id);if(i<0)return;if(S.squad.filter(Boolean).length<=1){toast('لازم يبقى بطل واحد على الأقل',1);return}S.squad[i]=null;save();refresh()}
+
+/* ================= tick ================= */
+let lastTick=now();
+function produce(ms){
+  const h=ms/3600000;
+  PLOTS.forEach(p=>{const T=BT[p.t],b=S.b[p.k];if(!T.prod||!b.lv)return;b.acc=Math.min(storeCap(p.t,b.lv),b.acc+prodRate(p.t,b.lv)*h)});
+}
+function stamTick(){
+  if(S.stam>=100){S.stamAt=now();return}
+  while(S.stam<100&&now()-S.stamAt>=180000){S.stam++;S.stamAt+=180000}
+}
+function tick(){
+  const t=now(),dt=clamp(t-lastTick,0,24*3600e3);lastTick=t;
+  produce(dt);stamTick();
+  let ch=processQueues();
+  if(allyHelpTick(dt))ch=true;
+  if(marchTick())ch=true;
+  if(hqLv()>=2&&t>=S.siegeAt&&!B&&!modalFn){resolveSiege();ch=true}
+  if(S.alliance&&t-S.chatAt>45000+Math.random()*40000){S.chatAt=t;S.chat.push({u:pick(BOTS),m:pick(CHATL),t});if(S.chat.length>40)S.chat.shift();if(tab==='alliance')ch=true}
+  if(ch)refresh();
+  tickUI();
+  autosave();
+}
+function tickUI(){
+  renderTop();
+  const t=now();
+  document.querySelectorAll('[data-end]').forEach(e=>{e.textContent=fmtT((+e.dataset.end-t)/1000)});
+  document.querySelectorAll('[data-bar]').forEach(e=>{const st=+e.dataset.st,en=+e.dataset.en;e.style.width=clamp((t-st)/(en-st)*100,0,100)+'%'});
+  document.querySelectorAll('[data-gem]').forEach(e=>{const g=gemCost(+e.dataset.gem-t);e.textContent=g?`💎 ${g}`:'إنهاء مجاني'});
+  document.querySelectorAll('[data-acc]').forEach(e=>{const k=e.dataset.acc,b=S.b[k],cap=storeCap(PLOT[k].t,b.lv);const show=b.acc>=Math.max(5,cap*.04);e.hidden=!show;if(show)e.lastChild.textContent=fmt(b.acc)});
+  document.querySelectorAll('[data-stam]').forEach(e=>e.textContent=Math.floor(S.stam));
+}
+
+/* ================= siege ================= */
+function resolveSiege(){
+  const L=Math.max(1,lvOf('barracks'));
+  const def=wallDef(lvOf('wall'))+S.troops*10*(1+.08*(L-1))+squadPower()*.5;
+  const horde=Math.round(500*Math.pow(1.42,hqLv()-1)*(.8+Math.random()*.45));
+  const win=def>=horde;const rep={win,def:Math.round(def),horde};
+  if(win){rep.r={food:Math.round(horde*.8),wood:Math.round(horde*.8),exp:Math.round(horde*.3),gems:25};give(rep.r);S.stats.sieges++}
+  else{
+    const pr=protect(lvOf('warehouse'));rep.lost={};
+    ['food','wood','iron','fuel'].forEach(k=>{const l=Math.floor(Math.max(0,S.res[k]-pr)*.15);if(l){S.res[k]-=l;rep.lost[k]=l}});
+    const w=Math.floor(S.troops*.15);S.troops-=w;const room=hospCap(lvOf('hospital'))-S.wounded;const kept=Math.max(0,Math.min(w,room));S.wounded+=kept;rep.w=kept;rep.dead=w-kept;
+  }
+  S.siegeAt=now()+(16+Math.random()*12)*60e3;save();SND.alarm();buzz(win?'ok':'bad');
+  openModal(()=>mSiege(rep));
+}
+
+/* ================= UI shell ================= */
+let tab='base',modalFn=null;
+const TABS=[['base','🏚️','القاعدة'],['heroes','🦸','الأبطال'],['campaign','⚔️','الحملة'],['world','🗺️','العالم'],['alliance','🤝','التحالف']];
+function renderTabs(){
+  const dots={base:hasEventDot(),heroes:heroDot(),alliance:S.alliance&&S.alliance.gift!==today()};
+  $('#tabs').innerHTML=TABS.map(([k,i,n])=>`<button class="tab ${tab===k?'on':''}" data-a="tab" data-x="${k}">${dots[k]?'<span class="dot"></span>':''}<span class="ti">${i}</span>${n}</button>`).join('');
+}
+function renderTop(){
+  $('#pname').textContent=S.name;$('#pav').textContent=(S.name||'ق').trim()[0]||'ق';
+  $('#ppow').textContent=fmt(totalPower());
+  for(const k of ['food','wood','iron','fuel','gems'])$('#r-'+k).textContent=fmt(S.res[k]);
+}
+function render(){
+  if(tab!=='world')stopWorld();
+  const v=$('#view');const st=v.scrollTop;
+  const ci=$('#chatin'),cv=ci?ci.value:'',cf=ci&&document.activeElement===ci;
+  v.classList.toggle('fixed',tab==='world');
+  v.innerHTML=VIEWS[tab]();
+  v.scrollTop=st;
+  if(tab==='world')mountWorld();
+  if(tab==='alliance'){const c=v.querySelector('.chat');if(c)c.scrollTop=c.scrollHeight;const ni=$('#chatin');if(ni&&cv){ni.value=cv;if(cf)ni.focus()}}
+  renderTop();renderTabs();tickUI();
+}
+function openModal(fn){modalFn=fn;renderModal(true)}
+function renderModal(fresh){
+  const m=$('#modal');
+  if(!modalFn){m.hidden=true;m.innerHTML='';return}
+  const prev=m.querySelector('.sh-b'),sc=prev&&!fresh?prev.scrollTop:0;
+  m.innerHTML=`<div class="sheet" role="dialog">${modalFn()}</div>`;m.hidden=false;
+  const nb=m.querySelector('.sh-b');if(nb)nb.scrollTop=sc;
+}
+function closeModal(){modalFn=null;renderModal()}
+function refresh(){render();if(modalFn)renderModal();tickUI()}
+function sheet(icon,title,sub,body){return`<div class="sh-h"><div class="hi">${icon}</div><div class="htx"><h2>${title}</h2>${sub?`<div class="muted">${sub}</div>`:''}</div><button class="x" data-a="close" aria-label="إغلاق">✕</button></div><div class="sh-b">${body}</div>`}
+const avHTML=(id,cls='')=>{const H=HB[id];return`<span class="av c-${H.c} r${H.r} ${cls}">${H.n[0]}</span>`};
+const starsHTML=st=>`<span class="stars">${'★'.repeat(st)}<span class="off">${'★'.repeat(5-st)}</span></span>`;
+function hasEventDot(){ensureDaily();if(S.login.last!==today())return true;const pts=dailyPoints();if(CHESTS.some((c,i)=>pts>=c.p&&!S.daily.c['chest'+i]))return true;return DAILY.some(d=>(S.daily.p[d.k]||0)>=d.g&&!S.daily.c[d.k])}
+function heroDot(){if(S.inv.ticket>0)return true;return ownedHeroes().some(id=>{const h=S.heroes[id];return h.st<5&&h.sh>=starNeed(h.st)})}
+
+/* ================= views ================= */
+const VIEWS={};
+VIEWS.base=()=>{
+  const q=QUESTS[S.quest];const qd=q&&q[1]();
+  const siegeIn=S.siegeAt-now();
+  const shortcuts=[['events','🎁','الفعاليات',hasEventDot()],['quests','📋','المهام',false],['shop','🛒','المتجر',false],['bag','🎒','الحقيبة',false],['collectAll','🧺','جمع الكل',false]];
+  return`<div class="base-wrap">
+  ${hqLv()>=2&&siegeIn<120000?`<div class="siege">🧟 موجة زومبي تهاجم القاعدة خلال <b data-end="${S.siegeAt}"></b></div>`:''}
+  ${q?`<div class="quest"><span class="qk">مهمة</span><span class="qt">${q[0]}</span>${qd?`<button class="btn gold sm" data-a="qclaim">استلام</button>`:`<button class="btn sm" data-a="qgo">اذهب</button>`}</div>`:`<div class="quest"><span class="qk">مهمة</span><span class="qt">أكملت كل المهام الرئيسية. أنت أسطورة الناجين.</span></div>`}
+  <div class="shortcuts">${shortcuts.map(([a,i,n,d])=>`<button class="sc" data-a="${a}">${d?'<span class="dot"></span>':''}<span class="si">${i}</span>${n}</button>`).join('')}</div>
+  <div class="compound">${PLOTS.map(tileHTML).join('')}</div>
+  <div class="builders"><h3>البناؤون ${S.builds.length}/${maxBuilders()}</h3>
+  ${S.builds.length?S.builds.map(b=>`<button class="bq" data-a="bld" data-x="${b.k}"><span>${BT[PLOT[b.k].t].i}</span><span>${BT[PLOT[b.k].t].n} ← ${b.to}</span><span class="prog"><i data-bar data-st="${b.st}" data-en="${b.end}"></i></span><b class="num" data-end="${b.end}"></b></button>`).join(''):'<div class="bq muted">البناؤون متفرغون. اضغط على أي مبنى لتطويره.</div>'}
+  ${S.rq?`<button class="bq" data-a="bld" data-x="lab"><span>🔬</span><span>${TECH[S.rq.k].n}</span><span class="prog"><i data-bar data-st="${S.rq.st}" data-en="${S.rq.end}"></i></span><b class="num" data-end="${S.rq.end}"></b></button>`:''}
+  ${S.tq?`<button class="bq" data-a="bld" data-x="barracks"><span>🎖️</span><span>تدريب ${S.tq.n}</span><span class="prog"><i data-bar data-st="${S.tq.st}" data-en="${S.tq.end}"></i></span><b class="num" data-end="${S.tq.end}"></b></button>`:''}
+  </div></div>`;
+};
+function tileHTML(p){
+  const b=S.b[p.k],T=BT[p.t],q=S.builds.find(x=>x.k===p.k),hq=p.t==='hq'?' hq':'';
+  if(hqLv()<p.u)return`<div class="tile locked${hq}" role="button" tabindex="0" data-a="locked" data-x="${p.u}"><span class="ti dim">🔒</span><span class="tn">${T.n}</span><span class="ts">المقر ${p.u}</span></div>`;
+  if(!b.lv&&!q)return`<div class="tile empty${hq}" role="button" tabindex="0" data-a="bld" data-x="${p.k}"><span class="ti dim">${T.i}</span><span class="tn">${T.n}</span><span class="ts">+ بناء</span></div>`;
+  const bub=T.prod&&b.lv?`<button class="bub" data-acc="${p.k}" data-a="collect" data-x="${p.k}" hidden>${RES[T.prod].i}<span></span></button>`:'';
+  return`<div class="tile${hq}${q?' busy':''}" role="button" tabindex="0" data-tile="${p.k}" data-a="bld" data-x="${p.k}">${bub}${b.lv?`<span class="lv num">${b.lv}</span>`:''}<span class="ti">${T.i}</span><span class="tn">${T.n}</span>${q?`<span class="tt num" data-end="${q.end}"></span><span class="prog tbar"><i data-bar data-st="${q.st}" data-en="${q.end}"></i></span>`:''}</div>`;
+}
+VIEWS.heroes=()=>{
+  const own=ownedHeroes().sort((a,b)=>heroPower(b)-heroPower(a));
+  const lockd=HEROES.filter(h=>!S.heroes[h.id]).sort((a,b)=>b.r-a.r);
+  const slot=i=>{const id=S.squad[i];return`<button class="slot" data-a="slot" data-x="${i}">${id?avHTML(id):'<span class="empty">+</span>'}<span>${id?HB[id].n:'فارغ'}</span></button>`};
+  return`<div class="pad">
+  <div class="row between"><div><h2>فريق القتال</h2><div class="muted">قوة الفريق <b class="num" style="color:var(--amber)">${fmt(squadPower()*(1+troopBonus()))}</b> · دعم الجنود +${Math.round(troopBonus()*100)}%</div></div>
+  <button class="btn pri" data-a="openRecruit">🎟️ تجنيد${S.inv.ticket?` (${S.inv.ticket})`:''}</button></div>
+  <div class="formation"><div class="flabel">الصف الأمامي · يتلقى الضربات أولاً</div><div class="frow">${slot(0)}${slot(1)}</div><div class="flabel">الصف الخلفي</div><div class="frow">${slot(2)}${slot(3)}${slot(4)}</div></div>
+  <div class="row between"><h3>أبطالك ${own.length}/${HEROES.length}</h3><span class="cc">✨ ${fmt(S.res.exp)}</span></div>
+  <div class="roster">${own.map(id=>{const H=HB[id],h=S.heroes[id];const dot=(h.st<5&&h.sh>=starNeed(h.st))||(h.lv<heroCap(lvOf('tavern'))&&S.res.exp>=lvCost(h.lv));return`<button class="hc r${H.r}" data-a="hero" data-x="${id}">${S.squad.includes(id)?'<span class="in">بالفريق</span>':''}${dot?'<span class="dot"></span>':''}${avHTML(id)}<b>${H.n}</b>${starsHTML(h.st)}<small>Lv ${h.lv} · ${CLS[H.c].i} ${fmt(heroPower(id))}</small></button>`}).join('')}
+  ${lockd.map(H=>`<div class="hc lockd"><span class="av r${H.r}">؟</span><b>${H.n}</b><small style="color:${RAR[H.r].c}">${RAR[H.r].n}</small></div>`).join('')}</div>
+  </div>`;
+};
+function stageWaves(s){
+  const W=[];for(let w=0;w<3;w++){const n=Math.min(28,5+Math.floor(s*.7)+w*2),a=[];
+    for(let i=0;i<n;i++){const r=Math.random();let t='w';if(s>=7&&r<.1)t='br';else if(s>=5&&r<.25)t='sp';else if(s>=3&&r<.45)t='run';a.push(t)}
+    if(w===2&&s%5===0)a.push('boss');W.push(a)}
+  return W;
+}
+function stageReward(s){const m=Math.pow(s,1.35);const r={food:Math.round(200*m),wood:Math.round(200*m),iron:Math.round(90*m),exp:Math.round(120*Math.pow(s,1.3)),gems:s%5===0?120:25};if(s%5===0)r.ticket=1;return r}
+VIEWS.campaign=()=>{
+  const s=S.stage,rp=recPower(s),my=Math.round(squadPower()*(1+troopBonus()));
+  const types=['w'];if(s>=3)types.push('run');if(s>=5)types.push('sp');if(s>=7)types.push('br');if(s%5===0)types.push('boss');
+  const path=[];for(let i=s+3;i>=Math.max(1,s-5);i--)path.push(i);
+  return`<div class="pad">
+  <div class="stagecard">
+    <div class="muted">الحملة · المدينة المنكوبة</div>
+    <div class="big num">${s}</div>
+    <div>${s%5===0?'<span class="tag" style="color:var(--bad)">مرحلة زعيم</span>':'<span class="tag">3 موجات</span>'}</div>
+    <div class="zrow">${types.map(t=>`<span title="${ZT[t].n}">${ZT[t].i}</span>`).join('')}</div>
+    <div class="vs"><div class="stat"><small>قوتك</small><b class="num ${my>=rp?'good':'bad'}">${fmt(my)}</b></div><b class="muted">ضد</b><div class="stat"><small>القوة المقترحة</small><b class="num">${fmt(rp)}</b></div></div>
+    <div><div class="muted" style="font-size:12px;margin-bottom:4px">الجوائز</div>${rewHTML(stageReward(s))}</div>
+    <button class="btn pri wide" data-a="fight" ${S.squad.some(Boolean)?'':'disabled'}>⚔️ ابدأ المعركة</button>
+  </div>
+  <div class="path">${path.map(i=>`<div class="pn ${i<s?'done':i===s?'cur':''} ${i%5===0?'boss':''}"><span class="pi num">${i<s?'✓':i}</span><span>${i%5===0?'👺 زعيم المنطقة':i<s?'تم التطهير':i===s?'المرحلة الحالية':'منطقة مجهولة'}</span><span style="margin-right:auto" class="muted num">${fmt(recPower(i))}</span></div>`).join('')}</div>
+  <p class="muted" style="font-size:13px">نصيحة: طوّر أبطالك بالخبرة، ودرّب جنوداً أكثر لرفع هجوم الفريق، واضغط على بطاقة البطل وقت المعركة لتفعيل مهارته.</p>
+  </div>`;
+};
+VIEWS.alliance=()=>{
+  if(!S.alliance)return`<div class="pad"><h2>انضم إلى تحالف</h2><p class="muted">التحالف يساعدك في تسريع البناء والأبحاث، ويعطيك هدية يومية، وتسولف مع الناجين.</p>
+    ${ALLIES.map((a,i)=>`<div class="panel"><div class="ally"><span class="flag" style="background:${a.col}">${a.tag}</span><div style="flex:1;min-width:0"><b style="font-family:var(--fd);font-size:17px">${a.n}</b><div class="muted">المستوى ${a.lv} · ${10+a.lv} عضو · القوة ${fmt(a.lv*42000)}</div></div><button class="btn pri sm" data-a="join" data-x="${i}">انضمام</button></div></div>`).join('')}</div>`;
+  const a=ALLIES[S.alliance.i];const giftOk=S.alliance.gift!==today();
+  const members=S.alliance.m;
+  return`<div class="pad">
+  <div class="panel"><div class="ally"><span class="flag" style="background:${a.col}">${a.tag}</span><div style="flex:1;min-width:0"><b style="font-family:var(--fd);font-size:18px">${a.n}</b><div class="muted">المستوى ${a.lv} · ${members.length+1} عضو</div></div></div>
+  <div class="grid2"><button class="btn ${giftOk?'gold':''}" data-a="gift" ${giftOk?'':'disabled'}>🎁 ${giftOk?'هدية اليوم':'استلمت اليوم'}</button><button class="btn" data-a="helpAll">🤝 طلب مساعدة للكل</button></div>
+  <p class="muted" style="font-size:13px">كل مساعدة تقلل المؤقت دقيقة أو 5% منه، وحتى 5 مساعدات لكل مؤقت.</p></div>
+  <div class="panel"><h3>دردشة التحالف</h3><div class="chat">${S.chat.slice(-30).map(c=>`<div class="msg ${c.me?'mine':''}"><b>${esc(c.me?S.name:c.u)}</b><span>${esc(c.m)}</span></div>`).join('')||'<div class="muted">لا رسائل بعد</div>'}</div>
+  <form class="row" id="chatf"><input class="field" id="chatin" maxlength="120" placeholder="اكتب رسالة…" autocomplete="off"><button class="btn pri sm" type="submit">إرسال</button></form></div>
+  <div class="panel"><h3>الأعضاء</h3>
+  <div class="mem"><span class="av c-me">${esc((S.name||'ق')[0])}</span><span>${esc(S.name)} <span class="tag">أنت</span></span><span class="p num">${fmt(totalPower())}</span></div>
+  ${members.map((m,i)=>`<div class="mem"><span class="av ${['c-tank','c-atk','c-sup'][i%3]}">${m.n[0]}</span><span>${m.n} ${i===0?'<span class="tag" style="color:var(--amber)">القائد</span>':''}</span><span class="p num">${fmt(m.p)}</span></div>`).join('')}</div>
+  <button class="btn sm" data-a="leave" style="justify-self:start">مغادرة التحالف</button>
+  </div>`;
+};
+
+/* ================= modals ================= */
+function effText(t,lv){
+  const T=BT[t];
+  if(T.prod)return`${fmt(prodRate(t,lv))}/ساعة`;
+  switch(t){
+    case'hq':return`حد المباني ${lv+1}`;
+    case'barracks':return`دفعة ${batchMax(lv)} · حد ${fmt(troopCap(lv))}`;
+    case'hospital':return`سعة ${fmt(hospCap(lv))}`;
+    case'lab':return`أبحاث حتى ${Math.min(10,lv)}`;
+    case'wall':return`دفاع ${fmt(wallDef(lv))}`;
+    case'warehouse':return`حماية ${fmt(protect(lv))}`;
+    case'tavern':return`مستوى الأبطال ${heroCap(lv)}`;
+    case'radar':return`مسيرات ${maxMarch(lv)}`;
+  }return'';
+}
+function speedHTML(ref,q){
+  return`<div class="panel"><div class="row between"><b>جاري التنفيذ</b><b class="num" data-end="${q.end}"></b></div>
+  <div class="prog"><i data-bar data-st="${q.st}" data-en="${q.end}"></i></div>
+  <div class="grid2">
+    <button class="btn sm" data-a="usesp" data-x="${ref}|sp5" ${S.inv.sp5?'':'disabled'}>⏩ 5 دقائق (${S.inv.sp5})</button>
+    <button class="btn sm" data-a="usesp" data-x="${ref}|sp60" ${S.inv.sp60?'':'disabled'}>⏭️ ساعة (${S.inv.sp60})</button>
+    <button class="btn gold sm" data-a="gemfin" data-x="${ref}" data-gem="${q.end}">💎</button>
+    ${S.alliance?(q.hr?`<span class="btn sm" style="pointer-events:none">🤝 مساعدات ${q.h}/5</span>`:`<button class="btn ok sm" data-a="help" data-x="${ref}">🤝 طلب مساعدة</button>`):`<button class="btn sm" data-a="tab" data-x="alliance">🤝 انضم لتحالف</button>`}
+  </div></div>`;
+}
+function mBuilding(k){
+  const p=PLOT[k],t=p.t,T=BT[t],b=S.b[k],q=S.builds.find(x=>x.k===k),to=b.lv+1;
+  let body=`<p class="muted">${T.d}</p>`;
+  if(b.lv||to<=MAXLV)body+=`<div class="eff"><span>${b.lv?effText(t,b.lv):'غير مبني'}</span><span class="arr">←</span><span class="nx">${to<=MAXLV?effText(t,to):'الأقصى'}</span></div>`;
+  if(T.prod&&b.lv){const cap=storeCap(t,b.lv);body+=`<div class="li"><span class="lic">${RES[T.prod].i}</span><div class="lit"><b>المخزون ${fmt(b.acc)} / ${fmt(cap)}</b><small>يتوقف الإنتاج عند امتلاء المخزن (${storeH(lvOf('warehouse'))} ساعات)</small></div><button class="btn gold sm" data-a="collect1" data-x="${k}">جمع</button></div>`}
+  if(q)body+=speedHTML('b:'+k,q);
+  else if(to<=MAXLV){
+    const reqs=bReq(k),c=bCost(t,to),ms=bTime(t,to),ok=reqs.every(r=>r.ok),aff=canPay(c),g=gemCost(ms),busy=S.builds.length>=maxBuilders();
+    body+=`<div class="panel"><div class="row between"><b>${b.lv?`تطوير إلى المستوى ${to}`:'بناء'}</b><span class="cc">⏱ ${fmtT(ms/1000)}</span></div>
+    ${reqs.map(r=>`<div class="req ${r.ok?'yes':'no'}">${r.ok?'✔':'✖'} ${r.t}</div>`).join('')}
+    <div class="row">${costHTML(c)}</div>
+    ${!aff?`<button class="btn sm" data-a="fill" data-x="b:${k}">💎 ${missingGems(c)} شراء الناقص</button>`:''}
+    <div class="grid2"><button class="btn pri" data-a="up" data-x="${k}" ${ok&&aff&&!busy?'':'disabled'}>${busy?'البناؤون مشغولين':b.lv?'⬆️ تطوير':'🔨 بناء'}</button><button class="btn gold" data-a="inst" data-x="${k}" ${ok&&aff?'':'disabled'}>⚡ فوري 💎${g}</button></div></div>`;
+  }
+  if(b.lv){
+    if(t==='barracks')body+=barracksHTML();
+    if(t==='hospital')body+=hospitalHTML();
+    if(t==='lab')body+=labHTML();
+    if(t==='tavern')body+=`<button class="btn wide" data-a="tab" data-x="heroes">🦸 فتح الأبطال</button>`;
+    if(t==='wall')body+=`<div class="li"><span class="lic">🛡️</span><div class="lit"><b>دفاع القاعدة الكلي ${fmt(wallDef(b.lv)+S.troops*10+squadPower()*.5)}</b><small>السور + الجنود + نصف قوة الفريق. الهجوم القادم <span class="num" data-end="${S.siegeAt}"></span></small></div></div>`;
+  }
+  return sheet(T.i,T.n,b.lv?`المستوى ${b.lv}`:'غير مبني',body);
+}
+function barracksHTML(){
+  const L=lvOf('barracks'),max=trainCount();trainN=clamp(trainN,1,Math.max(1,max));
+  const per=trainCostPer(),c={food:per.food*trainN,iron:per.iron*trainN};
+  const tier=['مشاة','رماة','قناصة','مدرعات','نخبة'][Math.min(4,Math.floor((L-1)/5))];
+  let h=`<div class="panel"><div class="row between"><b>الجنود: ${fmt(S.troops)} / ${fmt(troopCap(L))}</b><span class="tag">${tier}</span></div>
+  <small class="muted">كل جندي يرفع هجوم الأبطال. الدعم الحالي +${Math.round(troopBonus()*100)}%</small>`;
+  if(S.tq)h+=speedHTML('t',S.tq).replace('<div class="panel">','<div>');
+  else if(max<1)h+=`<div class="muted">وصلت للحد الأقصى. طوّر الثكنة لرفعه.</div>`;
+  else h+=`<label class="row between" for="trn"><span>العدد</span><b class="num" id="trnv">${trainN}</b></label>
+  <input type="range" id="trn" min="1" max="${max}" value="${trainN}">
+  <div class="row" id="trnc">${costHTML(c)} <span class="cc">⏱ ${fmtT(trainMs(trainN)/1000)}</span></div>
+  <button class="btn pri wide" data-a="train">🎖️ تدريب</button>`;
+  return h+`</div>`;
+}
+function hospitalHTML(){
+  const cap=hospCap(lvOf('hospital'));
+  return`<div class="panel"><div class="row between"><b>الجرحى: ${fmt(S.wounded)} / ${fmt(cap)}</b></div>
+  ${S.wounded?`<div class="row">${costHTML({food:S.wounded*4,wood:S.wounded*2})}</div><button class="btn ok wide" data-a="heal">🏥 علاج الكل</button>`:'<div class="muted">لا يوجد جرحى. الجنود يتصابون في المعارك والهجمات.</div>'}</div>`;
+}
+function labHTML(){
+  const lab=lvOf('lab');
+  let h=`<h3>الأبحاث</h3>`;
+  if(S.rq)h+=`<div class="li"><span class="lic">${TECH[S.rq.k].i}</span><div class="lit"><b>${TECH[S.rq.k].n} ← ${S.rq.to}</b></div></div>`+speedHTML('r',S.rq);
+  h+=Object.keys(TECH).map(k=>{const T=TECH[k],lv=S.tech[k],to=lv+1,c=rCost(to),maxed=to>10,locked=to>lab;
+    return`<div class="li"><span class="lic">${T.i}</span><div class="lit"><b>${T.n} <span class="tag num">${lv}/10</span></b><small>${T.d}</small>${!maxed?`<div class="row">${costHTML(c)} <span class="cc">⏱ ${fmtT(rTime(to)/1000)}</span></div>`:''}</div>
+    ${maxed?'<span class="tag">الأقصى</span>':locked?`<span class="tag">مختبر ${to}</span>`:canPay(c)?`<button class="btn pri sm" data-a="research" data-x="${k}" ${S.rq?'disabled':''}>بحث</button>`:`<button class="btn sm" data-a="fill" data-x="r:${k}">💎${missingGems(c)}</button>`}</div>`}).join('');
+  return h;
+}
+function mHero(id){
+  const H=HB[id],h=S.heroes[id],x=heroStats(id),cap=heroCap(lvOf('tavern')),need=starNeed(h.st),lc=lvCost(h.lv);
+  const inSq=S.squad.includes(id);
+  const body=`<p class="muted">${H.q}</p>
+  <div class="grid2" style="grid-template-columns:repeat(4,1fr)"><div class="stat"><small>هجوم</small><b class="num">${fmt(x.atk)}</b></div><div class="stat"><small>صحة</small><b class="num">${fmt(x.hp)}</b></div><div class="stat"><small>دفاع</small><b class="num">${fmt(x.def)}</b></div><div class="stat"><small>القوة</small><b class="num" style="color:var(--amber)">${fmt(heroPower(id))}</b></div></div>
+  <div class="li"><span class="lic">⚡</span><div class="lit"><b>${H.skn}</b><small>${SKD[H.sk](RM[H.r])}</small></div></div>
+  <div class="panel"><div class="row between"><b>المستوى ${h.lv} / ${cap}</b><span class="cc ${S.res.exp>=lc?'':'lack'}">✨ ${fmt(lc)}</span></div>
+  <div class="grid2"><button class="btn pri" data-a="hlv" data-x="${id}|1" ${h.lv<cap&&S.res.exp>=lc?'':'disabled'}>⬆️ +1</button><button class="btn" data-a="hlv" data-x="${id}|10" ${h.lv<cap&&S.res.exp>=lc?'':'disabled'}>⏫ +10</button></div>
+  ${h.lv>=cap?'<small class="muted">طوّر قاعة الأبطال لرفع الحد.</small>':''}</div>
+  <div class="panel"><div class="row between"><b>النجوم ${starsHTML(h.st)}</b><span class="cc">🧩 ${h.sh}${h.st<5?' / '+need:''}</span></div>
+  ${h.st<5?`<button class="btn gold" data-a="hstar" data-x="${id}" ${h.sh>=need?'':'disabled'}>⭐ ترقية النجمة (+22% لكل الإحصائيات)</button><small class="muted">كل نسخة مكررة من التجنيد تعطي 10 شظايا.</small>`:'<b style="color:var(--amber)">أقصى عدد نجوم</b>'}</div>
+  ${inSq?`<button class="btn wide" data-a="sqrem" data-x="${id}">إخراج من الفريق</button>`:`<button class="btn ok wide" data-a="sqadd" data-x="${id}">إضافة إلى الفريق</button>`}`;
+  return sheet(avHTML(id),H.n,`<span style="color:${RAR[H.r].c};font-weight:800">${RAR[H.r].n}</span> · ${CLS[H.c].i} ${CLS[H.c].n}`,body);
+}
+function mSlot(i){
+  const cur=S.squad[i];const list=ownedHeroes().filter(id=>!S.squad.includes(id)).sort((a,b)=>heroPower(b)-heroPower(a));
+  const body=`${cur?`<div class="li">${avHTML(cur)}<div class="lit"><b>${HB[cur].n}</b><small>القوة ${fmt(heroPower(cur))}</small></div><button class="btn sm" data-a="slotclr" data-x="${i}">إفراغ</button></div>`:''}
+  <h3>اختر بطلاً</h3>${list.length?list.map(id=>`<button class="li" data-a="slotset" data-x="${i}|${id}" style="text-align:right">${avHTML(id)}<div class="lit"><b>${HB[id].n} ${starsHTML(S.heroes[id].st)}</b><small>Lv ${S.heroes[id].lv} · ${CLS[HB[id].c].n} · القوة ${fmt(heroPower(id))}</small></div></button>`).join(''):'<p class="muted">كل أبطالك في الفريق. جنّد المزيد!</p>'}
+  <p class="muted" style="font-size:13px">${i<2?'الصف الأمامي: ضع المدافعين هنا لأنهم يتلقون ضربات الزومبي أولاً.':'الصف الخلفي: مكان مناسب للمهاجمين والداعمين.'}</p>`;
+  return sheet('🪖',i<2?'الصف الأمامي':'الصف الخلفي',`الخانة ${i+1}`,body);
+}
+function mSlotPick(id){
+  return sheet(avHTML(id),'الفريق ممتلئ','اختر من يستبدل',S.squad.map((s,i)=>`<button class="li" data-a="slotset" data-x="${i}|${id}" style="text-align:right">${avHTML(s)}<div class="lit"><b>${HB[s].n}</b><small>القوة ${fmt(heroPower(s))}</small></div><span class="tag">استبدال</span></button>`).join(''));
+}
+function mRecruit(){
+  const t=S.inv.ticket;
+  const body=`<div class="grid2" style="grid-template-columns:repeat(3,1fr)">${[1,2,3].map(r=>`<div class="stat"><small style="color:${RAR[r].c}">${RAR[r].n}</small><b>${[0,70,25,5][r]}%</b></div>`).join('')}</div>
+  <div class="li"><span class="lic">🌟</span><div class="lit"><b>ضمان أسطوري خلال ${40-S.pity} محاولة</b><small>النسخ المكررة تتحول لشظايا لترقية النجوم.</small></div></div>
+  <div class="grid2"><button class="btn pri" data-a="recruit" data-x="1">×1 ${t?'🎟️ 1':'💎 150'}</button><button class="btn gold" data-a="recruit" data-x="10">×10 ${t>=10?'🎟️ 10':'💎 '+(t?(10-Math.min(t,10))*150:1350)}</button></div>
+  ${lastPull.length?`<h3>النتيجة</h3><div class="pull">${lastPull.map(p=>`<div class="hc r${HB[p.id].r}">${p.isNew?'<span class="new">جديد</span>':''}${avHTML(p.id)}<b style="font-size:12px">${HB[p.id].n}</b><small style="color:${RAR[HB[p.id].r].c}">${p.isNew?RAR[HB[p.id].r].n:'+10 🧩'}</small></div>`).join('')}</div>`:''}`;
+  return sheet('🎟️','تجنيد الأبطال',`تذاكر: ${t} · جواهر: ${fmt(S.res.gems)}`,body);
+}
+function mEvents(){
+  ensureDaily();const pts=dailyPoints();const canLogin=S.login.last!==today();
+  const body=`<h3>مكافآت تسجيل الدخول</h3>
+  <div class="days">${LOGIN.map((r,i)=>{const k=Object.keys(r)[0];const d=RES[k]||ITEMS[k];return`<div class="day ${i<S.login.day%7&&!(canLogin&&false)?'got':''} ${i===S.login.day%7&&canLogin?'now':''}"><span>يوم ${i+1}</span><span class="d1">${d.i}</span><span class="num">${fmt(r[k])}</span></div>`}).join('')}</div>
+  <button class="btn gold wide" data-a="login" ${canLogin?'':'disabled'}>${canLogin?'استلام مكافأة اليوم':'عد بكرة لمكافأة جديدة'}</button>
+  <div class="row between"><h3>المهام اليومية</h3><span class="cc">🏅 ${pts} نقطة</span></div>
+  <div class="prog"><i style="width:${Math.min(100,pts/120*100)}%"></i></div>
+  <div class="grid2" style="grid-template-columns:repeat(4,1fr)">${CHESTS.map((c,i)=>{const got=S.daily.c['chest'+i],ok=pts>=c.p;return`<button class="btn sm ${ok&&!got?'gold':''}" data-a="chest" data-x="${i}" ${ok&&!got?'':'disabled'}>${got?'✔':'🎁'} ${c.p}</button>`}).join('')}</div>
+  ${DAILY.map(d=>{const v=S.daily.p[d.k]||0,done=v>=d.g,got=S.daily.c[d.k];return`<div class="li"><div class="lit"><b>${d.n}</b><small class="num">${Math.min(v,d.g)} / ${d.g} · 15 نقطة</small></div>${got?'<span class="tag">✔</span>':done?`<button class="btn gold sm" data-a="dclaim" data-x="${d.k}">استلام</button>`:'<span class="tag muted">قيد التنفيذ</span>'}</div>`}).join('')}`;
+  return sheet('🎁','الفعاليات','تتجدد المهام كل يوم',body);
+}
+function mQuests(){
+  const list=QUESTS.slice(S.quest,S.quest+5);
+  return sheet('📋','المهام الرئيسية',`${S.quest}/${QUESTS.length} مكتملة`,list.length?list.map((q,i)=>`<div class="li"><div class="lit"><b>${q[0]}</b><div class="row">${rewHTML(q[2])}</div></div>${i===0?(q[1]()?'<button class="btn gold sm" data-a="qclaim">استلام</button>':'<button class="btn sm" data-a="qgo">اذهب</button>'):'<span class="tag">قادمة</span>'}</div>`).join(''):'<p>أكملت كل المهام!</p>');
+}
+const SHOP=[
+  {k:'free',n:'صندوق مجاني يومي',i:'🎁',p:0,r:{gems:30,food:2000,wood:2000}},
+  {k:'ticket',n:'تذكرة تجنيد',i:'🎟️',p:150,r:{ticket:1}},
+  {k:'ticket10',n:'10 تذاكر تجنيد',i:'🎫',p:1350,r:{ticket:10}},
+  {k:'sp5',n:'تسريع 5 دقائق',i:'⏩',p:25,r:{sp5:1}},
+  {k:'sp60',n:'تسريع ساعة',i:'⏭️',p:240,r:{sp60:1}},
+  {k:'stam',n:'علبة طاقة',i:'🥫',p:80,r:{stam:1}},
+  {k:'food',n:'10K غذاء',i:'🌽',p:80,r:{food:10000}},
+  {k:'wood',n:'10K خشب',i:'🪵',p:80,r:{wood:10000}},
+  {k:'iron',n:'5K حديد',i:'🔩',p:80,r:{iron:5000}},
+  {k:'fuel',n:'2K وقود',i:'⛽',p:70,r:{fuel:2000}},
+  {k:'exp',n:'5K خبرة أبطال',i:'✨',p:120,r:{exp:5000}},
+];
+function mShop(){
+  const free=S.freeBox!==today();
+  return sheet('🛒','المتجر','كل شيء بالجواهر. تحصل عليها من الحملة والمهام والهجمات',SHOP.map(s=>`<div class="li"><span class="lic">${s.i}</span><div class="lit"><b>${s.n}</b><div class="row">${rewHTML(s.r)}</div></div>${s.k==='free'?`<button class="btn gold sm" data-a="buy" data-x="free" ${free?'':'disabled'}>${free?'مجاناً':'غداً'}</button>`:`<button class="btn sm ${S.res.gems>=s.p?'pri':''}" data-a="buy" data-x="${s.k}">💎 ${s.p}</button>`}</div>`).join(''));
+}
+function mBag(){
+  const body=Object.keys(ITEMS).map(k=>`<div class="li"><span class="lic">${ITEMS[k].i}</span><div class="lit"><b>${ITEMS[k].n} ×${S.inv[k]||0}</b><small>${ITEMS[k].d}</small></div>${k==='stam'?`<button class="btn sm" data-a="useStam" ${S.inv.stam?'':'disabled'}>استخدام</button>`:k==='ticket'?`<button class="btn sm" data-a="openRecruit">تجنيد</button>`:'<span class="tag">من شاشة المؤقت</span>'}</div>`).join('')
+  +`<div class="li"><span class="lic">✨</span><div class="lit"><b>خبرة الأبطال ${fmt(S.res.exp)}</b><small>لرفع مستوى الأبطال</small></div></div>
+  <div class="li"><span class="lic">🪖</span><div class="lit"><b>الجنود ${fmt(S.troops)} · الجرحى ${fmt(S.wounded)}</b><small>من الثكنة والمستشفى</small></div></div>`;
+  return sheet('🎒','الحقيبة','',body);
+}
+let resetArm=0;
+function mSettings(){
+  const body=`<form class="row" id="namef"><input class="field" id="namein" maxlength="16" value="${esc(S.name)}" aria-label="اسم القائد"><button class="btn pri sm" type="submit">حفظ الاسم</button></form>
+  <div class="grid2"><div class="stat"><small>القوة</small><b class="num">${fmt(totalPower())}</b></div><div class="stat"><small>زومبي مقتول</small><b class="num">${fmt(S.stats.kills)}</b></div><div class="stat"><small>انتصارات</small><b class="num">${fmt(S.stats.wins)}</b></div><div class="stat"><small>هجمات صُدّت</small><b class="num">${fmt(S.stats.sieges)}</b></div></div>
+  <div class="li"><span class="lic">☁️</span><div class="lit"><b>${cloud?'الحفظ السحابي شغّال':'الحفظ على هذا الجهاز'}</b><small>${cloud?'تقدمك محفوظ بحسابك ويرجع لك من أي جهاز.':'تقدمك محفوظ في هذا المتصفح.'}</small></div></div>
+  <div class="grid2"><button class="btn ${S.snd?'ok':''}" data-a="tsnd">${S.snd?'🔊 الصوت شغّال':'🔇 الصوت مطفي'}</button><button class="btn ${S.vib?'ok':''}" data-a="tvib">${S.vib?'📳 الاهتزاز شغّال':'📴 الاهتزاز مطفي'}</button></div>
+  <button class="btn wide" data-a="tut">📖 طريقة اللعب</button>
+  <button class="btn wide" data-a="reset" style="${resetArm>now()?'background:var(--bad);color:#fff':''}">${resetArm>now()?'اضغط مرة ثانية للتأكيد: حذف كل التقدم':'🗑️ بدء لعبة جديدة'}</button>`;
+  return sheet(`<span class="av c-me">${esc((S.name||'ق')[0])}</span>`,esc(S.name),'الملف الشخصي',body);
+}
+function mTut(){
+  return sheet('🧟','فجر الناجين','دليل سريع',`<p>المدينة سقطت والزومبي في كل مكان. أنت قائد آخر مجموعة ناجين.</p>
+  <div class="li"><span class="lic">🏚️</span><div class="lit"><b>القاعدة</b><small>اجمع الموارد من الفقاعات فوق المباني، وطوّر المقر لفتح مبانٍ جديدة. عندك بنّاءان.</small></div></div>
+  <div class="li"><span class="lic">🦸</span><div class="lit"><b>الأبطال</b><small>جنّد أبطالاً، ارفع مستواهم بالخبرة ونجومهم بالشظايا. المدافعون في الأمام.</small></div></div>
+  <div class="li"><span class="lic">⚔️</span><div class="lit"><b>الحملة</b><small>معارك موجات زومبي. اضغط على بطاقة البطل لما تلمع عشان يستخدم مهارته.</small></div></div>
+  <div class="li"><span class="lic">🗺️</span><div class="lit"><b>العالم</b><small>اسحب الخريطة. اهزم معسكرات الزومبي بالطاقة، وأرسل مسيرات لجمع الموارد.</small></div></div>
+  <div class="li"><span class="lic">🧱</span><div class="lit"><b>الدفاع</b><small>موجات تهاجم قاعدتك كل فترة. السور والجنود يصدونها، والمستودع يحمي مواردك.</small></div></div>
+  <div class="li"><span class="lic">🤝</span><div class="lit"><b>التحالف</b><small>انضم لتحالف عشان يساعدونك في تسريع البناء، واستلم الهدية اليومية.</small></div></div>
+  <button class="btn pri wide" data-a="close">يلا نبدأ</button>`);
+}
+function mSiege(r){
+  const body=r.win?`<p>صدّت قواتك موجة الزومبي. الناجون يحتفلون!</p><div class="vs"><div class="stat"><small>دفاعك</small><b class="num good" style="color:var(--good)">${fmt(r.def)}</b></div><b>ضد</b><div class="stat"><small>الموجة</small><b class="num">${fmt(r.horde)}</b></div></div><h3>الغنائم</h3><div class="row">${rewHTML(r.r)}</div>`
+  :`<p>اخترق الزومبي السور ونهبوا جزءاً من المخازن.</p><div class="vs"><div class="stat"><small>دفاعك</small><b class="num" style="color:var(--bad)">${fmt(r.def)}</b></div><b>ضد</b><div class="stat"><small>الموجة</small><b class="num">${fmt(r.horde)}</b></div></div>
+   <h3>الخسائر</h3><div class="row">${Object.keys(r.lost).map(k=>`<span class="cc lack">${RES[k].i} −${fmt(r.lost[k])}</span>`).join('')||'<span class="muted">المستودع حمى كل الموارد</span>'}</div>
+   <div class="muted">جرحى: ${fmt(r.w)} · قتلى: ${fmt(r.dead)}</div><p class="muted" style="font-size:13px">طوّر السور، درّب جنوداً، وارفع المستودع للحماية.</p>`;
+  return sheet(r.win?'🛡️':'🔥',r.win?'صددنا الهجوم!':'سقط السور','تقرير الدفاع',body+`<button class="btn pri wide" data-a="close">تمام</button>`);
+}
+
+/* ================= world ================= */
+const TS=64,N=25,C=12;
+let cam=null,wCan=null,wCtx=null,wRaf=0,drag=null,wW=0,wH=0,wDpr=1;
+function freeSpot(R){for(let i=0;i<600;i++){const x=Math.floor(R()*N),y=Math.floor(R()*N);if(Math.abs(x-C)<=1&&Math.abs(y-C)<=1)continue;if(S.world.nodes.some(n=>n.x===x&&n.y===y))continue;return{x,y}}return null}
+function makeNode(k,R){
+  const p=freeSpot(R);if(!p)return null;const d=Math.hypot(p.x-C,p.y-C);
+  const n={id:Math.floor(R()*1e9).toString(36)+S.world.nodes.length,x:p.x,y:p.y,k};
+  if(k==='z')n.L=clamp(Math.round(d*.75+R()*2.5),1,40);
+  if(k==='r'){n.L=clamp(Math.ceil(d/3.2+R()*1.2),1,6);n.rt=['food','wood','iron','fuel'][Math.floor(R()*(n.L>=2?4:3))];n.amt=1500*n.L}
+  if(k==='p'){n.name=BOTS[Math.floor(R()*BOTS.length)];n.pw=Math.round((2000+d*900)*(.6+R()*.8));n.tag=ALLIES[Math.floor(R()*3)].tag}
+  S.world.nodes.push(n);return n;
+}
+function genWorld(){S.world.nodes=[];const R=rng(S.world.seed);for(let i=0;i<70;i++)makeNode('z',R);for(let i=0;i<45;i++)makeNode('r',R);for(let i=0;i<10;i++)makeNode('p',R)}
+const nodeById=id=>S.world.nodes.find(n=>n.id===id);
+const marchSpd=()=>1+.08*S.tech.march;
+function startGather(id){
+  const n=nodeById(id);if(!n)return;
+  if(S.world.marches.length>=maxMarch(lvOf('radar'))){toast('كل المسيرات مشغولة. طوّر الرادار',1);return}
+  if(S.world.marches.some(m=>m.nid===id)){toast('عندك مسيرة هنا',1);return}
+  const d=Math.hypot(n.x-C,n.y-C),travel=d*5000/marchSpd(),gath=n.amt/(40*marchSpd())*1000,t=now();
+  S.world.marches.push({nid:id,x:n.x,y:n.y,rt:n.rt,amt:n.amt,go:t,arr:t+travel,fin:t+travel+gath,back:t+travel*2+gath});
+  toast('انطلقت المسيرة 🚚');closeModal();save();refresh();
+}
+function marchTick(){
+  let ch=false;const t=now();
+  for(const m of S.world.marches.slice()){
+    if(t>=m.back){S.world.marches.splice(S.world.marches.indexOf(m),1);S.res[m.rt]+=m.amt;S.stats.gathered++;track('gather');toast(`عادت المسيرة +${fmt(m.amt)} ${RES[m.rt].i}`);
+      const i=S.world.nodes.findIndex(n=>n.id===m.nid);if(i>=0){S.world.nodes.splice(i,1);makeNode('r',Math.random)}ch=true}
+  }
+  return ch;
+}
+function attackNode(id){
+  const n=nodeById(id);if(!n)return;
+  if(n.L>S.world.maxZ+1){toast(`اهزم زومبي مستوى ${S.world.maxZ+1} أولاً`,1);return}
+  if(S.stam<8){toast('الطاقة غير كافية',1);return}
+  if(!S.squad.some(Boolean)){toast('أضف أبطالاً للفريق',1);return}
+  S.stam-=8;if(S.stam<100&&S.stamAt>now())S.stamAt=now();
+  const L=n.L,sc=1+(L-1)*1.6,cnt=6+L,wave=[];
+  for(let i=0;i<cnt;i++){const r=Math.random();wave.push(L>=6&&r<.12?'br':L>=4&&r<.25?'sp':L>=2&&r<.45?'run':'w')}
+  if(L%5===0)wave.push('boss');
+  closeModal();
+  startBattle({title:`معسكر زومبي مستوى ${L}`,waves:[wave],sc,onEnd:win=>{
+    if(!win)return null;
+    const r={exp:Math.round(90*Math.pow(L,1.35)),food:400*L,wood:400*L,iron:150*L};
+    if(Math.random()<.35)r.sp5=1;if(Math.random()<.06)r.ticket=1;if(L%5===0)r.gems=50;
+    give(r);S.world.maxZ=Math.max(S.world.maxZ,L);
+    const i=S.world.nodes.findIndex(x=>x.id===id);if(i>=0){S.world.nodes.splice(i,1);makeNode('z',Math.random)}
+    return r;
+  }});
+}
+function mNode(id){
+  const n=nodeById(id);if(!n)return sheet('❔','غير موجود','','<p class="muted">اختفى هذا الموقع.</p>');
+  const d=Math.hypot(n.x-C,n.y-C);
+  if(n.k==='z'){
+    const ok=n.L<=S.world.maxZ+1;
+    return sheet('🧟',`معسكر زومبي`,`المستوى ${n.L} · الموقع ${n.x},${n.y}`,`
+    <div class="vs"><div class="stat"><small>قوتك</small><b class="num">${fmt(squadPower()*(1+troopBonus()))}</b></div><b class="muted">ضد</b><div class="stat"><small>القوة المقترحة</small><b class="num">${fmt(recPower(1+(n.L-1)*1.6)*.55)}</b></div></div>
+    <div><div class="muted" style="font-size:12px;margin-bottom:4px">الجوائز المتوقعة</div>${rewHTML({exp:Math.round(90*Math.pow(n.L,1.35)),food:400*n.L,wood:400*n.L,iron:150*n.L})}</div>
+    ${ok?'':`<div class="req no">✖ اهزم مستوى ${S.world.maxZ+1} أولاً</div>`}
+    <button class="btn pri wide" data-a="attackNode" data-x="${id}" ${ok&&S.stam>=8?'':'disabled'}>⚔️ هجوم (⚡ 8 · لديك <span data-stam></span>)</button>`);
+  }
+  if(n.k==='r'){
+    const busy=S.world.marches.some(m=>m.nid===id),travel=d*5000/marchSpd(),gath=n.amt/(40*marchSpd())*1000;
+    return sheet(RES[n.rt].i,`حقل ${RES[n.rt].n}`,`المستوى ${n.L} · الموقع ${n.x},${n.y}`,`
+    <div class="grid2"><div class="stat"><small>الكمية</small><b class="num">${fmt(n.amt)}</b></div><div class="stat"><small>الوقت الكلي</small><b class="num">${fmtT((travel*2+gath)/1000)}</b></div></div>
+    <div class="muted">المسيرات: ${S.world.marches.length}/${maxMarch(lvOf('radar'))}</div>
+    <button class="btn ok wide" data-a="gather" data-x="${id}" ${busy?'disabled':''}>${busy?'المسيرة في الطريق':'🚚 إرسال مسيرة جمع'}</button>`);
+  }
+  return sheet('🏚️',esc(n.name),`قاعدة ناجين · [${n.tag}]`,`<div class="grid2"><div class="stat"><small>القوة</small><b class="num">${fmt(n.pw)}</b></div><div class="stat"><small>المسافة</small><b class="num">${d.toFixed(1)}</b></div></div><p class="muted">ناجون آخرون يحاولون البقاء مثلك. المعارك بين اللاعبين قادمة في تحديث لاحق.</p>`);
+}
+VIEWS.world=()=>{
+  if(!S.world.nodes)genWorld();
+  const ms=S.world.marches;
+  return`<div class="world"><canvas id="wcan" aria-label="خريطة العالم"></canvas>
+  <div class="whud"><div class="chip">⚡ <span data-stam class="num"></span>/100 <span class="muted">·</span> 🚚 ${ms.length}/${maxMarch(lvOf('radar'))} <span class="muted">·</span> 🧟 أعلى ${S.world.maxZ}</div><button class="chip" data-a="recenter">🏰 قاعدتي</button></div>
+  <div class="wmarch">${ms.map(m=>{const t=now(),ph=t<m.arr?['في الطريق',m.go,m.arr]:t<m.fin?['يجمع',m.arr,m.fin]:['عائد',m.fin,m.back];return`<div class="bq"><span>${RES[m.rt].i}</span><span>${ph[0]}</span><span class="prog"><i data-bar data-st="${ph[1]}" data-en="${ph[2]}"></i></span><b class="num" data-end="${ph[2]}"></b></div>`}).join('')}</div></div>`;
+};
+function mountWorld(){
+  wCan=$('#wcan');if(!wCan)return;wCtx=wCan.getContext('2d');
+  if(!cam)cam={x:C*TS+TS/2,y:C*TS+TS/2};
+  sizeWorld();
+  wCan.onpointerdown=e=>{wCan.setPointerCapture(e.pointerId);drag={x:e.clientX,y:e.clientY,cx:cam.x,cy:cam.y,moved:0}};
+  wCan.onpointermove=e=>{if(!drag)return;const dx=e.clientX-drag.x,dy=e.clientY-drag.y;drag.moved=Math.max(drag.moved,Math.hypot(dx,dy));cam.x=clamp(drag.cx-dx,0,N*TS);cam.y=clamp(drag.cy-dy,0,N*TS)};
+  wCan.onpointerup=e=>{if(drag&&drag.moved<8){const r=wCan.getBoundingClientRect();const wx=e.clientX-r.left-wW/2+cam.x,wy=e.clientY-r.top-wH/2+cam.y;const tx=Math.floor(wx/TS),ty=Math.floor(wy/TS);
+    const n=S.world.nodes.find(n=>n.x===tx&&n.y===ty);if(n)openModal(()=>mNode(n.id));else if(Math.abs(tx-C)<=1&&Math.abs(ty-C)<=1){tab='base';render()}}drag=null};
+  wCan.onpointercancel=()=>{drag=null};
+  cancelAnimationFrame(wRaf);const loop=()=>{if(tab!=='world'||!wCan||!wCan.isConnected)return;if(!B)drawWorld();wRaf=requestAnimationFrame(loop)};loop();
+}
+function sizeWorld(){if(!wCan)return;const r=wCan.parentElement.getBoundingClientRect();wW=r.width;wH=r.height;wDpr=Math.min(2,window.devicePixelRatio||1);wCan.width=wW*wDpr;wCan.height=wH*wDpr}
+function stopWorld(){cancelAnimationFrame(wRaf);wCan=null}
+function hash(x,y){let h=x*374761393+y*668265263;h=(h^(h>>13))*1274126177;return((h^(h>>16))>>>0)/4294967296}
+function drawWorld(){
+  const c=wCtx,t=now();if(!c)return;
+  c.setTransform(wDpr,0,0,wDpr,0,0);
+  c.fillStyle='#0b0e10';c.fillRect(0,0,wW,wH);
+  const ox=wW/2-cam.x,oy=wH/2-cam.y;
+  const x0=Math.max(0,Math.floor(-ox/TS)),x1=Math.min(N-1,Math.ceil((wW-ox)/TS)),y0=Math.max(0,Math.floor(-oy/TS)),y1=Math.min(N-1,Math.ceil((wH-oy)/TS));
+  for(let y=y0;y<=y1;y++)for(let x=x0;x<=x1;x++){
+    const h=hash(x,y),px=ox+x*TS,py=oy+y*TS;
+    c.fillStyle=h<.33?'#1b2124':h<.66?'#1e2427':'#191f22';c.fillRect(px,py,TS,TS);
+    if(x===C||y===C){c.fillStyle='#262a2c';c.fillRect(x===C?px+TS*.3:px,y===C?py+TS*.3:py,x===C?TS*.4:TS,y===C?TS*.4:TS);if(x===C&&y===C){c.fillRect(px,py+TS*.3,TS,TS*.4)}}
+    if(h>.86){c.fillStyle='#2b2f2c';c.fillRect(px+h*30,py+20,14,10);c.fillRect(px+10,py+h*40,8,8)}
+    else if(h>.8){c.strokeStyle='#2e3a2a';c.lineWidth=2;c.beginPath();c.moveTo(px+32,py+50);c.lineTo(px+32,py+30);c.lineTo(px+24,py+20);c.moveTo(px+32,py+34);c.lineTo(px+42,py+24);c.stroke()}
+    c.strokeStyle='#ffffff08';c.lineWidth=1;c.strokeRect(px+.5,py+.5,TS,TS);
+  }
+  c.strokeStyle='#6a2a20';c.lineWidth=3;c.strokeRect(ox,oy,N*TS,N*TS);
+  // marches
+  for(const m of S.world.marches){
+    const bx=ox+C*TS+TS/2,by=oy+C*TS+TS/2,mx=ox+m.x*TS+TS/2,my=oy+m.y*TS+TS/2;
+    c.setLineDash([6,6]);c.strokeStyle='#64b66eaa';c.lineWidth=2;c.beginPath();c.moveTo(bx,by);c.lineTo(mx,my);c.stroke();c.setLineDash([]);
+    let f=t<m.arr?(t-m.go)/(m.arr-m.go):t<m.fin?1:1-(t-m.fin)/(m.back-m.fin);f=clamp(f,0,1);
+    c.fillStyle='#64b66e';c.beginPath();c.arc(bx+(mx-bx)*f,by+(my-by)*f,6,0,7);c.fill();
+  }
+  c.textAlign='center';c.textBaseline='middle';
+  // base
+  {const px=ox+C*TS+TS/2,py=oy+C*TS+TS/2;c.fillStyle='#cf6a2c33';c.beginPath();c.arc(px,py,TS*1.3,0,7);c.fill();c.strokeStyle='#cf6a2c';c.lineWidth=2;c.stroke();c.font='54px serif';c.fillText('🏰',px,py-4);
+   c.font='700 13px Changa, sans-serif';c.fillStyle='#ece5d7';c.fillText(S.name,px,py+TS*.9)}
+  for(const n of S.world.nodes){
+    const px=ox+n.x*TS+TS/2,py=oy+n.y*TS+TS/2;if(px<-TS||py<-TS||px>wW+TS||py>wH+TS)continue;
+    if(n.k==='z'){const ok=n.L<=S.world.maxZ+1;c.fillStyle=ok?'#5a1f1888':'#2a1a1888';c.beginPath();c.arc(px,py,24,0,7);c.fill();c.font='30px serif';c.globalAlpha=ok?1:.55;c.fillText(n.L%5===0?'👺':'🧟',px,py-2);c.globalAlpha=1;badge(c,px,py+22,n.L,ok?'#e2513f':'#555')}
+    else if(n.k==='r'){const col={food:'#8a7a2a',wood:'#6a4a2a',iron:'#5a6a7a',fuel:'#3a3a4a'}[n.rt];c.fillStyle=col+'aa';c.beginPath();c.arc(px,py,22,0,7);c.fill();c.font='26px serif';c.fillText({food:'🌽',wood:'🪵',iron:'🔩',fuel:'🛢️'}[n.rt],px,py-2);badge(c,px,py+22,n.L,'#64b66e');if(S.world.marches.some(m=>m.nid===n.id)){c.strokeStyle='#64b66e';c.lineWidth=2;c.beginPath();c.arc(px,py,26,0,7);c.stroke()}}
+    else{c.font='32px serif';c.fillText('🏚️',px,py-4);c.font='700 11px Tajawal, sans-serif';c.fillStyle='#8e99a2';c.fillText(`[${n.tag}] ${n.name}`,px,py+24)}
+  }
+  // fog vignette
+  const g=c.createRadialGradient(wW/2,wH/2,Math.min(wW,wH)*.35,wW/2,wH/2,Math.max(wW,wH)*.75);g.addColorStop(0,'#0000');g.addColorStop(1,'#000c');c.fillStyle=g;c.fillRect(0,0,wW,wH);
+}
+function badge(c,x,y,L,col){c.font='800 11px Changa, sans-serif';const w=Math.max(20,c.measureText(String(L)).width+10);c.fillStyle=col;c.beginPath();c.roundRect?c.roundRect(x-w/2,y-8,w,16,5):c.rect(x-w/2,y-8,w,16);c.fill();c.fillStyle='#fff';c.fillText(String(L),x,y+1)}
+
+/* ================= battle ================= */
+let B=null;
+const stageEl=()=>$('#b-stage');
+function startBattle(cfg){
+  const list=S.squad.map((id,i)=>id?{id,slot:i}:null).filter(Boolean);
+  if(!list.length){toast('أضف أبطالاً إلى الفريق أولاً',1);return}
+  const tb=troopBonus();
+  B={cfg,t:0,z:[],fx:[],wave:0,spawnQ:[],spawnT:0,waveDelay:1,buff:0,done:false,dmgTaken:0,kills:0,shake:0,quitArm:0,
+    zhp:55*Math.pow(1.155,cfg.sc-1),zatk:9*Math.pow(1.125,cfg.sc-1),
+    heroes:list.map(h=>{const st=heroStats(h.id);return{id:h.id,H:HB[h.id],slot:h.slot,atk:st.atk*(1+tb),maxhp:st.hp,hp:st.hp,def:st.def,cd:.3+Math.random()*.6,en:0,shield:0,shT:0,alive:true,x:0,y:0,rapid:0,flash:0}})};
+  B.maxTotal=B.heroes.reduce((a,h)=>a+h.maxhp,0);
+  $('#battle').hidden=false;$('#b-res').hidden=true;$('#b-title').textContent=cfg.title;
+  $('#b-spd').textContent='×'+S.spd;$('#b-spd').classList.toggle('on',S.spd>1);$('#b-auto').classList.toggle('on',S.auto);$('#b-quit').textContent='انسحاب';
+  const cards=$('#b-cards');cards.innerHTML='';
+  for(let i=0;i<5;i++){const h=B.heroes.find(x=>x.slot===i);const el=document.createElement('button');el.className='bc';
+    if(h){el.innerHTML=`${avHTML(h.id)}<span class="bn">${h.H.n}</span><span class="bar hp"><i></i></span><span class="bar en"><i></i></span>`;el.dataset.slot=i;h.card=el;h.hpI=el.querySelector('.hp i');h.enI=el.querySelector('.en i')}
+    else{el.style.visibility='hidden'}
+    cards.appendChild(el)}
+  bResize();bBg();
+  B.last=0;B.raf=requestAnimationFrame(bLoop);
+}
+function bResize(){
+  const r=stageEl().getBoundingClientRect(),cv=$('#bcan');B.W=r.width;B.H=r.height;B.dpr=Math.min(2,window.devicePixelRatio||1);
+  cv.width=B.W*B.dpr;cv.height=B.H*B.dpr;B.ctx=cv.getContext('2d');
+  B.lineY=B.H-Math.min(170,B.H*.36);
+  const pos=[[.36,0],[.64,0],[.18,1],[.5,1],[.82,1]];
+  for(const h of B.heroes){const p=pos[h.slot];h.x=B.W*p[0];h.y=B.lineY+40+p[1]*58}
+}
+function bBg(){
+  const W=B.W,H=B.H,cv=document.createElement('canvas');cv.width=W*B.dpr;cv.height=H*B.dpr;const c=cv.getContext('2d');c.scale(B.dpr,B.dpr);
+  const g=c.createLinearGradient(0,0,0,H);g.addColorStop(0,'#141819');g.addColorStop(1,'#1f2426');c.fillStyle=g;c.fillRect(0,0,W,H);
+  c.fillStyle='#262b2d';c.fillRect(W*.12,0,W*.76,H);
+  c.strokeStyle='#6b5f3a55';c.lineWidth=4;c.setLineDash([24,22]);c.beginPath();c.moveTo(W/2,0);c.lineTo(W/2,B.lineY);c.stroke();c.setLineDash([]);
+  const R=rng(7);
+  for(let i=0;i<40;i++){c.strokeStyle='#0d101166';c.lineWidth=1+R()*1.5;c.beginPath();let x=R()*W,y=R()*B.lineY;c.moveTo(x,y);for(let j=0;j<4;j++){x+=(R()-.5)*40;y+=R()*25;c.lineTo(x,y)}c.stroke()}
+  for(let i=0;i<14;i++){c.fillStyle=R()<.5?'#33302a':'#2b3033';const x=R()<.5?R()*W*.12:W*.88+R()*W*.12;c.fillRect(x,R()*B.lineY,6+R()*14,4+R()*10)}
+  c.font='30px serif';c.textAlign='center';c.globalAlpha=.8;c.fillText('🚗',W*.06,B.lineY*.35);c.fillText('🛢️',W*.94,B.lineY*.6);c.fillText('🚧',W*.92,B.lineY*.15);c.globalAlpha=1;
+  for(let x=10;x<W;x+=26){c.fillStyle='#6b5c3e';c.beginPath();c.ellipse(x,B.lineY+6,15,8,0,0,7);c.fill();c.fillStyle='#584b33';c.beginPath();c.ellipse(x+13,B.lineY-3,15,8,0,0,7);c.fill()}
+  B.bg=cv;
+}
+function spawnZ(type){
+  const T=ZT[type];const hp=B.zhp*T.hp;
+  B.z.push({T,type,x:B.W*(.18+Math.random()*.64),y:-T.r-Math.random()*20,hp,maxhp:hp,atk:B.zatk*T.atk,acd:.5,stun:0,alive:true,ph:Math.random()*6,flash:0});
+}
+function aliveZ(){return B.z.filter(z=>z.alive)}
+function visibleZ(){return B.z.filter(z=>z.alive&&z.y>-5)}
+function nearestZ(){let best=null;for(const z of B.z)if(z.alive&&z.y>-5&&(!best||z.y>best.y))best=z;return best}
+function dmgZ(z,d,crit){
+  if(!z.alive)return;z.hp-=d;z.flash=.1;
+  B.fx.push({k:'txt',x:z.x+(Math.random()-.5)*16,y:z.y-z.T.r,s:fmt(d),col:crit?'#f1b23c':'#fff',big:crit,t:0,life:.7});
+  if(z.hp<=0){z.alive=false;B.kills++;B.fx.push({k:'die',x:z.x,y:z.y,r:z.T.r,t:0,life:.4})}
+}
+function pickHero(z){
+  const al=B.heroes.filter(h=>h.alive);if(!al.length)return null;
+  const front=al.filter(h=>h.slot<2),pool=front.length?front:al;
+  return pool.reduce((a,h)=>Math.abs(h.x-z.x)<Math.abs(a.x-z.x)?h:a);
+}
+function hitHero(h,d){
+  if(!h.alive)return;d=d*(1-h.def/(h.def+150));
+  if(h.shield>0){const a=Math.min(h.shield,d);h.shield-=a;d-=a}
+  h.hp-=d;B.dmgTaken+=d;h.en=Math.min(100,h.en+4);h.flash=.12;SND.hurt();
+  if(d>0)B.fx.push({k:'txt',x:h.x,y:h.y-26,s:'-'+fmt(d),col:'#e2513f',t:0,life:.6});
+  if(h.hp<=0){h.alive=false;h.hp=0;B.fx.push({k:'die',x:h.x,y:h.y,r:20,t:0,life:.6})}
+}
+function cast(h){
+  if(!h.alive||h.en<100||B.done)return;
+  h.en=0;const m=RM[h.H.r],vz=visibleZ();SND.skill();buzz('medium');if(['aoe','air','stun','snipe'].includes(h.H.sk))setTimeout(SND.boom,120);
+  B.fx.push({k:'txt',x:h.x,y:h.y-44,s:h.H.skn,col:'#5aa6d6',big:true,t:0,life:1.1});
+  switch(h.H.sk){
+    case'snipe':{const t=vz.reduce((a,z)=>!a||z.hp>a.hp?z:a,null);if(t){B.fx.push({k:'tr',x:h.x,y:h.y,tx:t.x,ty:t.y,t:0,life:.25,w:5,col:'#f1b23c'});dmgZ(t,h.atk*7*m,true)}break}
+    case'shield':for(const x of B.heroes)if(x.alive){x.shield+=h.maxhp*.3*m;x.shT=6}break;
+    case'heal':for(const x of B.heroes)if(x.alive){const v=h.atk*5*m+x.maxhp*.1;x.hp=Math.min(x.maxhp,x.hp+v);B.fx.push({k:'txt',x:x.x,y:x.y-26,s:'+'+fmt(v),col:'#64b66e',t:0,life:.8});B.fx.push({k:'heal',x:x.x,y:x.y,t:0,life:.6})}break;
+    case'aoe':{const t=nearestZ();if(t){B.fx.push({k:'boom',x:t.x,y:t.y,r:85,t:0,life:.5});for(const z of vz)if(Math.hypot(z.x-t.x,z.y-t.y)<85)dmgZ(z,h.atk*3*m)}break}
+    case'stun':B.shake=.4;for(const z of vz){z.stun=2.5*m;dmgZ(z,h.atk*1.2*m)}break;
+    case'rapid':h.rapid=4*m;break;
+    case'buff':B.buff=6*m;break;
+    case'air':B.shake=.5;for(let i=0;i<6;i++)B.fx.push({k:'boom',x:B.W*(.15+Math.random()*.7),y:B.lineY*(.2+Math.random()*.7),r:60,t:-i*.06,life:.5});for(const z of vz)dmgZ(z,h.atk*3.5*m);break;
+  }
+}
+function bStep(dt){
+  B.t+=dt;if(B.buff>0)B.buff-=dt;if(B.shake>0)B.shake-=dt;
+  const nW=B.cfg.waves.length;
+  if(!B.spawnQ.length&&!aliveZ().length){
+    if(B.wave>=nW)return bEnd(true);
+    B.waveDelay-=dt;if(B.waveDelay<=0){B.spawnQ=B.cfg.waves[B.wave].slice();B.wave++;B.waveDelay=1.5;bBanner(nW>1?`الموجة ${B.wave}/${nW}`:'هجوم!');$('#b-wave').textContent=`الموجة ${B.wave}/${nW}`}
+  }
+  if(B.spawnQ.length){B.spawnT-=dt;if(B.spawnT<=0){spawnZ(B.spawnQ.shift());B.spawnT=.5+Math.random()*.4}}
+  for(const z of B.z){
+    if(!z.alive)continue;if(z.flash>0)z.flash-=dt;
+    if(z.stun>0){z.stun-=dt;continue}
+    const stopY=z.T.range?B.lineY-170:B.lineY-z.T.r+4;
+    if(z.y<stopY){z.y+=z.T.spd*dt;z.x+=Math.sin(B.t*2+z.ph)*8*dt;z.x=clamp(z.x,B.W*.1,B.W*.9)}
+    else{z.y=stopY;z.acd-=dt;if(z.acd<=0){z.acd=z.T.range?2.2:1;const tg=pickHero(z);if(tg){if(z.T.range)B.fx.push({k:'spit',x:z.x,y:z.y,tx:tg.x,ty:tg.y,t:0,life:.5,tg,dmg:z.atk});else{hitHero(tg,z.atk);B.fx.push({k:'claw',x:z.x,y:z.y+z.T.r,t:0,life:.2})}}}}
+  }
+  for(const h of B.heroes){
+    if(!h.alive)continue;if(h.flash>0)h.flash-=dt;
+    if(h.shT>0){h.shT-=dt;if(h.shT<=0)h.shield=0}
+    if(h.rapid>0)h.rapid-=dt;
+    h.cd-=dt;
+    if(h.cd<=0){const tg=nearestZ();
+      if(tg){const rate={tank:1,atk:.6,sup:.9}[h.H.c];h.cd=rate/(h.rapid>0?3:1);let d=h.atk*(B.buff>0?1.4:1);const cr=Math.random()<.12;if(cr)d*=2;
+        B.fx.push({k:'tr',x:h.x,y:h.y-12,tx:tg.x,ty:tg.y,t:0,life:.07,w:2,col:'#ffe9a8'});dmgZ(tg,d,cr);SND.shot();h.en=Math.min(100,h.en+(h.H.c==='sup'?11:8))}
+      else h.cd=.15}
+    if(h.en>=100&&S.auto)cast(h);
+  }
+  for(const f of B.fx){f.t+=dt;if(f.k==='spit'&&!f.hit&&f.t>=f.life){f.hit=true;hitHero(f.tg,f.dmg)}}
+  B.fx=B.fx.filter(f=>f.t<f.life);if(B.fx.length>160)B.fx.splice(0,B.fx.length-160);
+  if(B.z.length>80)B.z=B.z.filter(z=>z.alive);
+  if(!B.heroes.some(h=>h.alive))return bEnd(false);
+  if(B.t>150)return bEnd(false,'انتهى الوقت');
+}
+function bBanner(t){const e=$('#b-banner');e.textContent=t;e.classList.remove('go');void e.offsetWidth;e.classList.add('go')}
+function bDraw(){
+  const c=B.ctx,W=B.W,H=B.H;c.setTransform(B.dpr,0,0,B.dpr,0,0);
+  if(B.shake>0)c.translate((Math.random()-.5)*8,(Math.random()-.5)*8);
+  c.drawImage(B.bg,0,0,W,H);
+  if(B.buff>0){c.fillStyle='#cf6a2c18';c.fillRect(0,B.lineY,W,H-B.lineY)}
+  c.textAlign='center';c.textBaseline='middle';
+  const zs=B.z.filter(z=>z.alive).sort((a,b)=>a.y-b.y);
+  for(const z of zs){
+    const s=z.T.r*2;c.fillStyle='#0006';c.beginPath();c.ellipse(z.x,z.y+z.T.r*.8,z.T.r*.8,z.T.r*.3,0,0,7);c.fill();
+    c.font=`${s}px serif`;const wob=Math.sin(B.t*6+z.ph)*.08;c.save();c.translate(z.x,z.y);c.rotate(z.stun>0?0:wob);c.fillText(z.T.i,0,0);c.restore();
+    if(z.flash>0){c.fillStyle='#fff6';c.beginPath();c.arc(z.x,z.y,z.T.r,0,7);c.fill()}
+    if(z.stun>0){c.font='14px serif';c.fillText('💫',z.x,z.y-z.T.r-10)}
+    if(z.hp<z.maxhp){const w=z.T.r*2;c.fillStyle='#000a';c.fillRect(z.x-w/2,z.y-z.T.r-6,w,4);c.fillStyle=z.type==='boss'?'#e2513f':'#c9453a';c.fillRect(z.x-w/2,z.y-z.T.r-6,w*Math.max(0,z.hp/z.maxhp),4)}
+  }
+  for(const h of B.heroes){
+    const col={tank:'#3f6f96',atk:'#9c3f2f',sup:'#3f8a5c'}[h.H.c],rc=['','#4f8fd6','#a66be0','#e8a62d'][h.H.r];
+    c.globalAlpha=h.alive?1:.25;
+    c.fillStyle='#0008';c.beginPath();c.ellipse(h.x,h.y+18,18,6,0,0,7);c.fill();
+    c.fillStyle=col;c.beginPath();c.arc(h.x,h.y,18,0,7);c.fill();c.lineWidth=3;c.strokeStyle=rc;c.stroke();
+    c.fillStyle='#fff';c.font='800 17px Changa, sans-serif';c.fillText(h.H.n[0],h.x,h.y+1);
+    if(h.flash>0){c.fillStyle='#e2513f66';c.beginPath();c.arc(h.x,h.y,18,0,7);c.fill()}
+    if(h.shield>0){c.strokeStyle='#5aa6d6';c.lineWidth=2;c.globalAlpha=.6+Math.sin(B.t*8)*.2;c.beginPath();c.arc(h.x,h.y,25,0,7);c.stroke();c.globalAlpha=1}
+    if(h.rapid>0){c.strokeStyle='#f1b23c';c.lineWidth=2;c.beginPath();c.arc(h.x,h.y,22,B.t*10,B.t*10+2);c.stroke()}
+    if(h.alive){c.fillStyle='#000a';c.fillRect(h.x-18,h.y+23,36,4);c.fillStyle='#64b66e';c.fillRect(h.x-18,h.y+23,36*h.hp/h.maxhp,4)}
+    c.globalAlpha=1;
+  }
+  for(const f of B.fx){
+    if(f.t<0)continue;const p=f.t/f.life;
+    if(f.k==='tr'){c.strokeStyle=f.col;c.globalAlpha=1-p;c.lineWidth=f.w;c.beginPath();c.moveTo(f.x,f.y);c.lineTo(f.tx,f.ty);c.stroke();c.globalAlpha=1}
+    else if(f.k==='txt'){c.globalAlpha=1-p*p;c.font=`800 ${f.big?17:13}px Changa, sans-serif`;c.lineWidth=3;c.strokeStyle='#000';c.strokeText(f.s,f.x,f.y-p*28);c.fillStyle=f.col;c.fillText(f.s,f.x,f.y-p*28);c.globalAlpha=1}
+    else if(f.k==='die'){c.globalAlpha=1-p;c.fillStyle='#5a7a4a';for(let i=0;i<6;i++){const a=i*1.05;c.beginPath();c.arc(f.x+Math.cos(a)*p*f.r*1.4,f.y+Math.sin(a)*p*f.r*1.4,4*(1-p)+1,0,7);c.fill()}c.globalAlpha=1}
+    else if(f.k==='boom'){c.globalAlpha=1-p;const g=c.createRadialGradient(f.x,f.y,0,f.x,f.y,f.r*(.4+p*.6));g.addColorStop(0,'#fff3c0');g.addColorStop(.4,'#f1b23c');g.addColorStop(1,'#cf6a2c00');c.fillStyle=g;c.beginPath();c.arc(f.x,f.y,f.r*(.4+p*.6),0,7);c.fill();c.globalAlpha=1}
+    else if(f.k==='spit'){const x=f.x+(f.tx-f.x)*p,y=f.y+(f.ty-f.y)*p-Math.sin(p*Math.PI)*40;c.fillStyle='#8fcf3a';c.beginPath();c.arc(x,y,5,0,7);c.fill()}
+    else if(f.k==='heal'){c.globalAlpha=1-p;c.strokeStyle='#64b66e';c.lineWidth=3;c.beginPath();c.arc(f.x,f.y,18+p*20,0,7);c.stroke();c.globalAlpha=1}
+    else if(f.k==='claw'){c.globalAlpha=1-p;c.strokeStyle='#e2513f';c.lineWidth=2;for(let i=-1;i<=1;i++){c.beginPath();c.moveTo(f.x+i*6-6,f.y-6);c.lineTo(f.x+i*6+6,f.y+6);c.stroke()}c.globalAlpha=1}
+  }
+  const fog=c.createLinearGradient(0,0,0,90);fog.addColorStop(0,'#0b0e10');fog.addColorStop(1,'#0b0e1000');c.fillStyle=fog;c.fillRect(0,0,W,90);
+  c.font='700 12px Changa, sans-serif';c.fillStyle='#8e99a2';c.textAlign='left';c.fillText(`⏱ ${Math.max(0,Math.ceil(150-B.t))}`,10,14);c.textAlign='right';c.fillText(`🧟 ${B.kills}`,W-10,14);
+}
+function bCards(){for(const h of B.heroes){if(!h.card)continue;h.hpI.style.width=(h.hp/h.maxhp*100)+'%';h.enI.style.width=h.en+'%';h.card.classList.toggle('ready',h.alive&&h.en>=100&&!S.auto&&!B.done);h.card.classList.toggle('dead',!h.alive)}}
+function bLoop(ts){
+  if(!B)return;const dt=B.last?Math.min(.05,(ts-B.last)/1000):0;B.last=ts;
+  if(!B.done)for(let i=0;i<S.spd&&!B.done;i++)bStep(dt);
+  bDraw();bCards();B.raf=requestAnimationFrame(bLoop);
+}
+function bEnd(win,why){
+  if(B.done)return;B.done=true;
+  const lostFrac=clamp(B.dmgTaken/B.maxTotal,0,1);
+  let wounded=Math.round(S.troops*(.1*lostFrac+(win?0:.06)));S.troops-=wounded;
+  const room=Math.max(0,hospCap(lvOf('hospital'))-S.wounded),kept=Math.min(wounded,room);S.wounded+=kept;const dead=wounded-kept;
+  S.stats.kills+=B.kills;
+  let rew=null;
+  if(win){S.stats.wins++;track('win')}
+  setTimeout(win?SND.win:SND.lose,200);buzz(win?'ok':'bad');
+  rew=B.cfg.onEnd(win,B);
+  save();
+  const el=$('#b-res');el.hidden=false;el.className='result '+(win?'win':'lose');
+  el.innerHTML=`<div class="panel"><h2>${win?'انتصار!':'هزيمة'}</h2><div class="muted">${why||(win?`قتلت ${B.kills} زومبي`:'سقط كل الأبطال')}</div>
+  ${rew?`<div class="row" style="justify-content:center">${rewHTML(rew)}</div>`:''}
+  ${wounded?`<div class="muted" style="font-size:13px">جرحى ${kept} → المستشفى${dead?` · قتلى ${dead}`:''}</div>`:''}
+  ${!win?'<p class="muted" style="font-size:13px">طوّر الأبطال بالخبرة، ارفع النجوم، أو درّب جنوداً أكثر.</p>':''}
+  <div class="grid2" style="width:100%">${win&&B.cfg.next?`<button class="btn" id="b-cont">رجوع</button><button class="btn pri" id="b-next">المرحلة التالية</button>`:`<button class="btn pri" id="b-cont" style="grid-column:1/-1">متابعة</button>`}</div></div>`;
+  $('#b-cont').onclick=closeBattle;
+  const nx=$('#b-next');if(nx)nx.onclick=()=>{closeBattle();startCampaign()};
+}
+function closeBattle(){if(!B)return;cancelAnimationFrame(B.raf);B=null;$('#battle').hidden=true;refresh()}
+function startCampaign(){
+  const s=S.stage;
+  startBattle({title:`الحملة · المرحلة ${s}`,waves:stageWaves(s),sc:s,next:true,onEnd:win=>{if(!win)return null;const r=stageReward(s);give(r);S.stage=s+1;return r}});
+}
+$('#b-cards').addEventListener('click',e=>{const el=e.target.closest('.bc');if(!el||!B)return;const h=B.heroes.find(x=>x.slot===+el.dataset.slot);if(h)cast(h)});
+$('#b-spd').onclick=()=>{S.spd=S.spd===1?2:1;$('#b-spd').textContent='×'+S.spd;$('#b-spd').classList.toggle('on',S.spd>1)};
+$('#b-auto').onclick=()=>{S.auto=!S.auto;$('#b-auto').classList.toggle('on',S.auto)};
+$('#b-quit').onclick=()=>{if(!B||B.done)return;if(B.quitArm>now()){bEnd(false,'انسحبت من المعركة')}else{B.quitArm=now()+2500;$('#b-quit').textContent='متأكد؟';setTimeout(()=>{if(B&&!B.done)$('#b-quit').textContent='انسحاب'},2500)}};
+
+/* ================= action dispatch ================= */
+function claimQuest(){const q=QUESTS[S.quest];if(!q||!q[1]())return;give(q[2]);S.quest++;toast('تم استلام المكافأة 🎉');save();refresh()}
+function goQuest(){const q=QUESTS[S.quest];if(!q)return;const g=q[3];closeModal();if(g.startsWith('#')){tab=g.slice(1);render();return}const p=PLOT[g];if(hqLv()<p.u){toast(`يفتح عند المقر ${p.u}`);openModal(()=>mBuilding('hq'));return}tab='base';render();openModal(()=>mBuilding(g))}
+const ACT={
+  tab:x=>{closeModal();tab=x;render()},
+  close:()=>closeModal(),
+  bld:x=>openModal(()=>mBuilding(x)),
+  locked:x=>toast(`يفتح عند مقر القيادة مستوى ${x}`),
+  collect:(x,el)=>{if(collect(x,el.closest('.tile')))track('collect');tickUI()},
+  collect1:x=>{if(collect(x,document.querySelector(`[data-tile="${x}"]`)))track('collect');refresh()},
+  collectAll:()=>collectAll(),
+  up:x=>upgrade(x,false),inst:x=>upgrade(x,true),fill:x=>fillRes(x),
+  usesp:x=>{const[r,i]=x.split('|');useSpeed(r,i)},gemfin:x=>gemFinish(x),help:x=>askHelp(x),
+  helpAll:()=>{let n=0;for(const q of [...S.builds,S.rq,S.tq])if(q&&!q.hr){q.hr=true;n++}toast(n?`طلبت المساعدة لـ ${n} مؤقت`:'لا توجد مؤقتات تحتاج مساعدة');refresh()},
+  train:()=>doTrain(),heal:()=>doHeal(),research:x=>doResearch(x),
+  hero:x=>openModal(()=>mHero(x)),hlv:x=>{const[id,n]=x.split('|');heroLevelUp(id,+n)},hstar:x=>heroStar(x),
+  sqadd:x=>squadAdd(x),sqrem:x=>squadRem(x),
+  slot:x=>openModal(()=>mSlot(+x)),
+  slotset:x=>{const[i,id]=x.split('|');const j=S.squad.indexOf(id);if(j>=0)S.squad[j]=S.squad[+i];S.squad[+i]=id;save();closeModal();refresh()},
+  slotclr:x=>{if(S.squad.filter(Boolean).length<=1){toast('لازم يبقى بطل واحد على الأقل',1);return}S.squad[+x]=null;save();closeModal();refresh()},
+  openRecruit:()=>{lastPull=[];openModal(mRecruit)},recruit:x=>recruit(+x),
+  fight:()=>startCampaign(),
+  attackNode:x=>attackNode(x),gather:x=>startGather(x),
+  recenter:()=>{cam={x:C*TS+TS/2,y:C*TS+TS/2}},
+  qclaim:()=>claimQuest(),qgo:()=>goQuest(),quests:()=>openModal(mQuests),
+  events:()=>openModal(mEvents),
+  login:()=>{if(S.login.last===today())return;const r=LOGIN[S.login.day%7];give(r);S.login.day++;S.login.last=today();toast('استلمت مكافأة الدخول 🎁');save();refresh()},
+  dclaim:x=>{ensureDaily();const d=DAILY.find(d=>d.k===x);if(!d||S.daily.c[x]||(S.daily.p[x]||0)<d.g)return;S.daily.c[x]=1;S.res.gems+=10;toast('+15 نقطة · +10 💎');save();refresh()},
+  chest:x=>{const c=CHESTS[+x];if(dailyPoints()<c.p||S.daily.c['chest'+x])return;S.daily.c['chest'+x]=1;give(c.r);toast('فتحت صندوق النشاط 🎁');save();refresh()},
+  shop:()=>openModal(mShop),
+  buy:x=>{const s=SHOP.find(s=>s.k===x);if(!s)return;if(x==='free'){if(S.freeBox===today())return;S.freeBox=today()}else{if(S.res.gems<s.p){toast('الجواهر غير كافية',1);return}S.res.gems-=s.p}give(s.r);toast(`تم: ${s.n}`);save();refresh()},
+  bag:()=>openModal(mBag),
+  useStam:()=>{if(!S.inv.stam)return;S.inv.stam--;S.stam=Math.min(150,S.stam+50);toast('+50 طاقة ⚡');save();refresh()},
+  settings:()=>openModal(mSettings),
+  tsnd:()=>{S.snd=!S.snd;save();renderModal();if(S.snd)SND.coin()},
+  tvib:()=>{S.vib=!S.vib;save();renderModal();buzz('medium')},tut:()=>openModal(mTut),
+  reset:()=>{if(resetArm>now()){try{localStorage.removeItem(KEY)}catch(e){}S=newState();S.tut=true;resetArm=0;cam=null;closeModal();tab='base';save(true);refresh();toast('بدأت لعبة جديدة')}else{resetArm=now()+3000;renderModal();setTimeout(()=>{if(modalFn===mSettings)renderModal()},3100)}},
+  join:x=>{const i=+x,a=ALLIES[i];const m=BOTS.slice().sort(()=>Math.random()-.5).slice(0,8+a.lv%4).map((n,j)=>({n,p:Math.round((60000-j*5000)*(.6+Math.random()*.6))})).sort((p,q)=>q.p-p.p);S.alliance={i,m,gift:''};S.chat=[{u:m[0].n,m:`حيّاك الله في ${a.n}! 👋`,t:now()}];S.chatAt=now();toast(`انضممت إلى ${a.n}`);save();refresh()},
+  leave:(x,el)=>{if(el.dataset.arm){S.alliance=null;S.chat=[];toast('غادرت التحالف');save();refresh()}else{el.dataset.arm='1';el.textContent='اضغط مرة ثانية للتأكيد';el.style.background='var(--bad)'}},
+  gift:()=>{if(!S.alliance||S.alliance.gift===today())return;S.alliance.gift=today();const r={gems:60,food:3000,wood:3000,sp5:2};give(r);toast('استلمت هدية التحالف 🎁');save();refresh()},
+};
+document.addEventListener('click',e=>{
+  const m=$('#modal');if(e.target===m){closeModal();return}
+  const el=e.target.closest('[data-a]');if(!el||el.disabled)return;
+  if(el.dataset.a!=='collect')SND.click();
+  const f=ACT[el.dataset.a];if(f){e.stopPropagation();f(el.dataset.x,el,e)}
+});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&modalFn)closeModal();if((e.key==='Enter'||e.key===' ')&&e.target.matches('[role=button][data-a]')){e.preventDefault();e.target.click()}});
+document.addEventListener('input',e=>{
+  if(e.target.id==='trn'){trainN=+e.target.value;$('#trnv').textContent=trainN;const per=trainCostPer();$('#trnc').innerHTML=`${costHTML({food:per.food*trainN,iron:per.iron*trainN})} <span class="cc">⏱ ${fmtT(trainMs(trainN)/1000)}</span>`}
+});
+document.addEventListener('submit',e=>{
+  e.preventDefault();
+  if(e.target.id==='chatf'){const i=$('#chatin');const v=i.value.trim();if(!v)return;S.chat.push({me:true,m:v,t:now()});if(S.chat.length>40)S.chat.shift();i.value='';
+    setTimeout(()=>{if(!S.alliance)return;S.chat.push({u:pick(S.alliance.m).n,m:pick(['😂👍','صح كلامك','تم يا بطل','الله يوفقك','أنا معك','💪💪']),t:now()});if(tab==='alliance')render()},1500+Math.random()*2500);save();render()}
+  if(e.target.id==='namef'){const v=$('#namein').value.trim().slice(0,16);if(v){S.name=v;save();toast('تم حفظ الاسم');refresh()}}
+});
+window.addEventListener('resize',()=>{if(tab==='world')sizeWorld();if(B){bResize();bBg()}});
+
+/* ================= save ================= */
+const KEY='fajr-naajin-save-v1';
+let cloud=null,cloudBusy=false,lastCloud=0,lastLocal=0;
+function save(force){
+  S.savedAt=now();lastLocal=S.savedAt;
+  try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}
+  if(force)pushCloud();
+}
+function autosave(){const t=now();if(t-lastLocal>5000)save();if(cloud&&t-lastCloud>45000)pushCloud()}
+async function pushCloud(){
+  if(!cloud||cloudBusy)return;cloudBusy=true;lastCloud=now();
+  try{await cloud.set({savedAt:S.savedAt,data:JSON.stringify(S)})}catch(e){}
+  cloudBusy=false;
+}
+function loadLocal(){try{const raw=localStorage.getItem(KEY);if(raw)return migrate(JSON.parse(raw))}catch(e){}return null}
+function catchUp(st){
+  const off=clamp(now()-st.savedAt,0,24*3600e3);
+  const prev=S;S=st;produce(off);
+  if(S.siegeAt<now())S.siegeAt=now()+5*60e3;
+  if(off>60000&&prev!==st)return off;return off;
+}
+async function connectCloud(){
+  try{
+    if(!window.claude||typeof window.claude.use!=='function')return;
+    const[d,u]=await Promise.all([window.claude.use('db'),window.claude.use('user')]);
+    if(!d||!u)return;const id=await u.id();if(!id)return;
+    const ref=d.doc(`data/users/${id}/saves/main`);
+    const snap=await ref.get();
+    cloud=ref;
+    if(snap.exists){const r=snap.data();if(r&&r.data&&(r.savedAt||0)>(S.savedAt||0)+3000){try{const st=migrate(JSON.parse(r.data));const off=catchUp(st);lastTick=now();save();refresh();toast('تم تحميل تقدمك من حسابك ☁️');if(off>60000)toast(`المباني أنتجت أثناء غيابك (${fmtT(off/1000)})`)}catch(e){}}}
+    else pushCloud();
+  }catch(e){}
+}
+document.addEventListener('visibilitychange',()=>{if(document.hidden){save();pushCloud()}});
+try{const P=window.Capacitor&&window.Capacitor.Plugins;if(P){if(P.App&&P.App.addListener)P.App.addListener('pause',()=>{save()});if(P.StatusBar&&P.StatusBar.setStyle)P.StatusBar.setStyle({style:'DARK'}).catch(()=>{})}}catch(e){}
+
+/* ================= boot ================= */
+function start(data){
+  let off=0;
+  if(data&&data.S){S=migrate(data.S);if(typeof data.tab==='string')tab=data.tab}
+  else{const st=loadLocal();if(st){off=catchUp(st)}else S=newState()}
+  lastTick=now();ensureDaily();
+  if(!S.world.nodes)genWorld();
+  render();
+  if(!S.tut){S.tut=true;openModal(mTut)}
+  else if(off>60000)toast(`المباني أنتجت أثناء غيابك (${fmtT(off/1000)})`);
+  setInterval(tick,250);
+  connectCloud();
+}
+try{window.claude?.hot?.snapshot?.(()=>({S,tab}))}catch(e){}
+if(window.claude?.hot?.ready)window.claude.hot.ready(start);else start(window.claude?.hot?.data??{});
+})();
+</script>
