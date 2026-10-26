@@ -48,6 +48,11 @@ def _lerp(a, b, t):
     return a + (b - a) * t
 
 
+def _ease_in(t):
+    t = min(max(t, 0.0), 1.0)
+    return t * t * (3 - 2 * t)
+
+
 def _limb(d, points, width, fill, outline_w):
     """A smooth rounded sleeve: an ink stroke with the fabric stroke on top."""
     pts = _s(points)
@@ -58,6 +63,36 @@ def _limb(d, points, width, fill, outline_w):
             d.ellipse((x - r, y - r, x + r, y + r), fill=colour)
 
 
+def _capsule(d, p0, p1, width, fill, outline_w=5):
+    _limb(d, [p0, p1], width, fill, outline_w)
+
+
+def _hand(d, cx, cy, open_: float, side: int = 1):
+    """Cartoon hand (big, like the art style). open_ 0 = relaxed mitten resting down,
+    1 = open palm raised with fingers spread ("listen to this...").
+    side = +1 right hand, -1 left hand."""
+    import math
+    ow = 6 * SS
+    if open_ > 0.05:
+        base = -90                                   # fingers point up
+        length = 20 + 34 * open_
+        for k, spread in enumerate((-28, -10, 9, 27)):
+            a = math.radians(base + spread * side)
+            fl = length * (0.8 if k in (0, 3) else 1.0)
+            x0, y0 = cx + 26 * math.cos(a), cy + 26 * math.sin(a)
+            _capsule(d, (x0, y0), (x0 + fl * math.cos(a), y0 + fl * math.sin(a)), 22, HEAD)
+        a = math.radians(base - 78 * side)           # thumb out to the side
+        x0, y0 = cx + 24 * math.cos(a), cy + 24 * math.sin(a)
+        _capsule(d, (x0, y0), (x0 + 26 * open_ * math.cos(a), y0 + 26 * open_ * math.sin(a)), 23, HEAD)
+        d.ellipse(_b(cx - 40, cy - 36, cx + 40, cy + 40), fill=HEAD, outline=INK, width=ow)
+        d.ellipse(_b(cx - 33, cy - 29, cx + 33, cy + 33), fill=HEAD)   # hide finger roots
+    else:
+        # relaxed mitten with a thumb on the inner side
+        _capsule(d, (cx - 28 * side, cy - 8), (cx - 40 * side, cy + 16), 24, HEAD)
+        d.rounded_rectangle(_b(cx - 34, cy - 36, cx + 34, cy + 42), radius=32 * SS, fill=HEAD, outline=INK, width=ow)
+        d.line(_s([(cx - 10, cy + 22), (cx + 10, cy + 24)]), fill=INK, width=3 * SS)   # knuckle hint
+
+
 def _shrink(img: Image.Image, size) -> Image.Image:
     return img.resize(size, Image.LANCZOS)
 
@@ -66,7 +101,7 @@ def _shrink(img: Image.Image, size) -> Image.Image:
 
 @lru_cache(maxsize=None)
 def body(arm_step: int = 0) -> Image.Image:
-    """Torso and arms. arm_step 0 = hand down, ARM_STEPS-1 = finger raised high."""
+    """Torso and arms. arm_step 0 = hand resting, ARM_STEPS-1 = open palm raised."""
     t = arm_step / (ARM_STEPS - 1)
     img = Image.new("RGBA", (W * SS, H * SS), (0, 0, 0, 0))
     d = ImageDraw.Draw(img)
@@ -83,18 +118,14 @@ def body(arm_step: int = 0) -> Image.Image:
         d.ellipse(_b(x - 12, 652, x + 4, 670), fill=STRING, outline=INK, width=2 * SS)
 
     _limb(d, [(130, 560), (112, 680), (118, 780)], 62, HOODIE, 7)                     # left arm
-    d.ellipse(_b(88, 765, 152, 829), fill=HEAD, outline=INK, width=ow)
+    _hand(d, 118, 808, 0.0, side=-1)
 
-    # right arm: interpolate elbow and hand between "down" and "finger raised"
-    elbow = (_lerp(448, 482, t), _lerp(680, 640, t))
-    hand = (_lerp(442, 506, t), _lerp(797, 479, t))
-    _limb(d, [(430, 560), elbow, hand], 62, HOODIE, 7)
-    if t > 0.45:                                                                         # finger grows in
-        grow = min(1.0, (t - 0.45) / 0.4)
-        top = hand[1] - 30 - 50 * grow
-        d.rounded_rectangle(_b(hand[0] - 9, top, hand[0] + 17, hand[1] - 10), radius=13 * SS,
-                            fill=HEAD, outline=INK, width=thin)
-    d.ellipse(_b(hand[0] - 34, hand[1] - 34, hand[0] + 34, hand[1] + 34), fill=HEAD, outline=INK, width=ow)
+    # right arm: interpolate elbow and hand between "resting" and "open palm raised"
+    elbow = (_lerp(448, 486, t), _lerp(680, 650, t))
+    wrist = (_lerp(442, 500, t), _lerp(785, 520, t))
+    _limb(d, [(430, 560), elbow, wrist], 62, HOODIE, 7)
+    hand_y = _lerp(808, 476, t)
+    _hand(d, _lerp(442, 502, t), hand_y, _ease_in(max(0.0, (t - 0.35) / 0.65)), side=1)
     return _shrink(img, (W, H))
 
 
