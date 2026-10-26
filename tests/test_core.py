@@ -1,6 +1,6 @@
 from shorts import content, history
-from shorts.captions import build_ass, chunk, _ts
-from shorts.voice import Segment
+from shorts.captions import build_ass, pieces, _ts
+from shorts.voice import Segment, join_lines
 
 
 def test_timestamp_format():
@@ -8,20 +8,31 @@ def test_timestamp_format():
     assert _ts(61.257) == "0:01:01.26"
 
 
-def test_chunk_covers_segment_exactly():
-    seg = Segment("واحد اثنان ثلاثة أربعة خمسة ستة سبعة", 2.0, 6.0)
-    pieces = chunk(seg)
-    assert len(pieces) == 4  # 7 words, 2 per caption
-    assert pieces[0].start == 2.0 and pieces[-1].end == 6.0
-    for a, b in zip(pieces, pieces[1:]):
-        assert abs(a.end - b.start) < 1e-9
+def _words(*spec):
+    return [Segment(t, a, b) for t, a, b in spec]
 
 
-def test_ass_has_no_gaps_between_lines():
-    segs = [Segment("مرحبا بكم", 0, 1.0), Segment("في القناة", 1.25, 2.0)]
-    ass = build_ass(segs, 2.6, 1080, 1920, "Font")
-    assert "0:00:00.00,0:00:01.25,Hook" in ass   # first line held through the pause
-    assert "Bar" in ass and "{" not in "".join(s.text for s in segs)
+def test_captions_follow_spoken_words_and_never_gap():
+    words = _words(("واحد", 0.0, 0.3), ("اثنان", 0.35, 0.7), ("ثلاثة", 0.8, 1.1),
+                   ("أربعة", 1.5, 1.9), ("خمسة", 2.0, 2.4))
+    items = pieces(words, [3, 2], 3.0)
+    texts = [seg.text for _, seg in items]
+    assert texts == ["واحد اثنان", "ثلاثة", "أربعة خمسة"]      # never spans two lines
+    assert [li for li, _ in items] == [0, 0, 1]
+    assert items[0][1].start == 0.0 and items[2][1].start == 1.5  # appears exactly when spoken
+    for (_, a), (_, b) in zip(items, items[1:]):
+        assert a.end == b.start                                   # no blank gaps
+    assert items[-1][1].end == 3.0
+
+
+def test_ass_marks_hook_and_has_progress_bar():
+    words = _words(("مرحبا", 0, 0.5), ("بكم", 0.5, 1.0), ("في", 1.2, 1.4), ("القناة", 1.4, 2.0))
+    ass = build_ass(words, [2, 2], 2.4, 1080, 1920, "Font")
+    assert "0:00:00.00,0:00:01.20,Hook" in ass and ",Caption," in ass and ",Bar," in ass
+
+
+def test_join_lines_makes_sentences():
+    assert join_lines(["أهلاً", "كيف حالك؟"]) == "أهلاً. كيف حالك؟"
 
 
 def test_offline_bank_avoids_used_topics():

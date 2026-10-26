@@ -11,7 +11,8 @@ from .voice import Narration
 def render(cfg: Config, narration: Narration, background: Path, workdir: Path, out: Path) -> Path:
     total = narration.length
     ass = workdir / "captions.ass"
-    ass.write_text(build_ass(narration.segments, total, cfg.width, cfg.height, cfg.font_name), encoding="utf-8")
+    ass.write_text(build_ass(narration.words, narration.line_sizes, total,
+                             cfg.width, cfg.height, cfg.font_name), encoding="utf-8")
 
     music = sorted(cfg.music_dir.glob("*.mp3")) if cfg.music_dir.exists() else []
     cmd = ["ffmpeg", "-y", "-stream_loop", "-1", "-i", str(background.resolve()),

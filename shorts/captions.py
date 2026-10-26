@@ -1,10 +1,9 @@
-"""Builds an ASS subtitle file: big animated captions + a progress bar.
-
-libass (inside ffmpeg) shapes Arabic and handles right-to-left text.
-"""
+"""Builds an ASS subtitle file: big captions synced word-by-word to the voice,
+plus a progress bar. libass (inside ffmpeg) shapes Arabic right-to-left."""
 from .voice import Segment
 
 MAX_WORDS = 2
+CAPTION_Y = 0.68  # share of the height: below centre, above YouTube's buttons
 
 
 def _ts(seconds: float) -> str:
@@ -15,26 +14,37 @@ def _ts(seconds: float) -> str:
     return f"{h}:{m:02d}:{s:02d}.{cs:02d}"
 
 
-def chunk(segment: Segment, max_words: int = MAX_WORDS) -> list[Segment]:
-    """Split a spoken line into short caption pieces timed by text length."""
-    words = segment.text.split()
-    groups = [" ".join(words[i:i + max_words]) for i in range(0, len(words), max_words)] or [""]
-    total_chars = sum(len(g) for g in groups) or 1
-    span = segment.end - segment.start
-    out, t = [], segment.start
-    for g in groups:
-        d = span * len(g) / total_chars
-        out.append(Segment(g, t, t + d))
-        t += d
-    out[-1].end = segment.end
-    return out
-
-
 def _escape(text: str) -> str:
     return text.replace("\\", "").replace("{", "(").replace("}", ")").replace("\n", " ")
 
 
-def build_ass(segments: list[Segment], total: float, width: int, height: int, font: str) -> str:
+def split_lines(words: list[Segment], line_sizes: list[int]) -> list[list[Segment]]:
+    """Regroup spoken words into the script's lines (so a caption never spans two sentences)."""
+    if sum(line_sizes) != len(words) or not line_sizes:
+        return [words]
+    out, i = [], 0
+    for n in line_sizes:
+        if n:
+            out.append(words[i:i + n])
+        i += n
+    return out
+
+
+def pieces(words: list[Segment], line_sizes: list[int], total: float) -> list[tuple[int, Segment]]:
+    """(line index, caption) pairs. Each caption appears when its first word is
+    spoken and stays until the next caption starts, so nothing blinks."""
+    items: list[tuple[int, Segment]] = []
+    for li, line in enumerate(split_lines(words, line_sizes)):
+        for k in range(0, len(line), MAX_WORDS):
+            group = line[k:k + MAX_WORDS]
+            items.append((li, Segment(" ".join(w.text for w in group), group[0].start, group[-1].end)))
+    for n, (_, seg) in enumerate(items):
+        seg.end = items[n + 1][1].start if n + 1 < len(items) else total
+    return items
+
+
+def build_ass(words: list[Segment], line_sizes: list[int], total: float,
+              width: int, height: int, font: str) -> str:
     header = f"""[Script Info]
 ScriptType: v4.00+
 PlayResX: {width}
@@ -44,26 +54,19 @@ ScaledBorderAndShadow: yes
 
 [V4+ Styles]
 Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
-Style: Caption,{font},150,&H00FFFFFF,&H00FFFFFF,&H00000000,&H96000000,-1,0,0,0,100,100,0,0,1,12,6,5,70,70,0,1
-Style: Hook,{font},160,&H0000E5FF,&H0000E5FF,&H00000000,&H96000000,-1,0,0,0,100,100,0,0,1,13,7,5,70,70,0,1
+Style: Caption,{font},140,&H00FFFFFF,&H00FFFFFF,&H00000000,&H96000000,-1,0,0,0,100,100,0,0,1,12,6,5,70,70,0,1
+Style: Hook,{font},150,&H0000E5FF,&H0000E5FF,&H00000000,&H96000000,-1,0,0,0,100,100,0,0,1,13,7,5,70,70,0,1
 Style: Bar,{font},20,&H0000E5FF,&H0000E5FF,&H00000000,&H00000000,0,0,0,0,100,100,0,0,1,0,0,7,0,0,0,1
 
 [Events]
 Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
 """
     events = []
-    cy = int(height * 0.58)
-    for i, seg in enumerate(segments):
-        style = "Hook" if i == 0 else "Caption"
-        # Hold the last piece through the pause so captions never blink off.
-        hold_until = segments[i + 1].start if i + 1 < len(segments) else total
-        pieces = chunk(seg)
-        pieces[-1].end = max(pieces[-1].end, hold_until)
-        for piece in pieces:
-            if not piece.text:
-                continue
-            anim = r"{\pos(%d,%d)\fscx80\fscy80\t(0,90,\fscx108\fscy108)\t(90,160,\fscx100\fscy100)}" % (width // 2, cy)
-            events.append(f"Dialogue: 1,{_ts(piece.start)},{_ts(piece.end)},{style},,0,0,0,,{anim}{_escape(piece.text)}")
+    cy = int(height * CAPTION_Y)
+    for line_index, seg in pieces(words, line_sizes, total):
+        style = "Hook" if line_index == 0 else "Caption"
+        anim = r"{\pos(%d,%d)\fscx85\fscy85\t(0,80,\fscx105\fscy105)\t(80,140,\fscx100\fscy100)}" % (width // 2, cy)
+        events.append(f"Dialogue: 1,{_ts(seg.start)},{_ts(seg.end)},{style},,0,0,0,,{anim}{_escape(seg.text)}")
 
     # Progress bar along the bottom edge, grows left -> right over the whole video.
     ms = int(total * 1000)

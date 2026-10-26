@@ -1,11 +1,14 @@
-"""Narration: one audio clip per script line, so captions sync exactly."""
+"""Narration: the whole script is read in one take (natural flow), and the
+voice service reports when each word is spoken so captions match exactly."""
 import asyncio
 from dataclasses import dataclass
 from pathlib import Path
 
-from .media import duration, run
+from .media import run
 
-PAUSE = 0.12  # seconds of silence between lines
+TICKS = 10_000_000  # edge-tts offsets are in 100-nanosecond units
+RATE = "+5%"         # close to natural speech; faster sounds robotic
+PITCH = "+0Hz"
 
 
 @dataclass
@@ -18,56 +21,72 @@ class Segment:
 @dataclass
 class Narration:
     audio: Path
-    segments: list[Segment]
-    silent: bool  # True when TTS was unavailable (never upload these)
+    words: list[Segment]      # every spoken word with its timing
+    line_sizes: list[int]     # how many words each script line has
+    silent: bool              # True when TTS was unavailable (never upload these)
 
     @property
     def length(self) -> float:
-        return self.segments[-1].end + 0.3 if self.segments else 0.0
+        return self.words[-1].end + 0.4 if self.words else 0.0
 
 
-async def _tts(text: str, voice: str, out: Path) -> None:
+def join_lines(lines: list[str]) -> str:
+    """One text for one natural read; every line ends like a sentence."""
+    parts = []
+    for line in lines:
+        line = line.strip()
+        parts.append(line if line[-1:] in ".!?؟،," else line + ".")
+    return " ".join(parts)
+
+
+def _spoken_words(line: str) -> list[str]:
+    return [w for w in line.split() if any(ch.isalnum() for ch in w)]
+
+
+async def _tts(text: str, voice: str, out: Path) -> list[Segment]:
     import edge_tts
-    await edge_tts.Communicate(text, voice, rate="+14%").save(str(out))
+
+    words: list[Segment] = []
+    comm = edge_tts.Communicate(text, voice, rate=RATE, pitch=PITCH, boundary="WordBoundary")
+    with open(out, "wb") as fh:
+        async for chunk in comm.stream():
+            if chunk["type"] == "audio":
+                fh.write(chunk["data"])
+            elif chunk["type"] == "WordBoundary":
+                start = chunk["offset"] / TICKS
+                words.append(Segment(chunk["text"], start, start + chunk["duration"] / TICKS))
+    return words
 
 
-def _silence(seconds: float, out: Path) -> None:
-    run(["ffmpeg", "-y", "-f", "lavfi", "-i", "anullsrc=r=24000:cl=mono",
-         "-t", f"{seconds:.2f}", "-c:a", "libmp3lame", str(out)])
+def _estimate(lines: list[str]) -> list[Segment]:
+    """Fallback timing (~0.38s per word) used only with silent placeholder audio."""
+    words, t = [], 0.0
+    for line in lines:
+        for w in _spoken_words(line):
+            d = 0.2 + 0.035 * len(w)
+            words.append(Segment(w, t, t + d))
+            t += d + 0.04
+        t += 0.25
+    return words
 
 
 def synthesize(lines: list[str], voice: str, workdir: Path) -> Narration:
     workdir.mkdir(parents=True, exist_ok=True)
-    clips: list[Path] = []
+    line_sizes = [len(_spoken_words(line)) for line in lines]
+    raw = workdir / "voice.mp3"
     silent = False
-    for i, line in enumerate(lines):
-        clip = workdir / f"line_{i:02d}.mp3"
-        try:
-            asyncio.run(_tts(line, voice, clip))
-            if not clip.exists() or clip.stat().st_size == 0:
-                raise RuntimeError("empty audio")
-        except Exception as exc:  # network blocked, service down...
-            if not silent:
-                print(f"[voice] TTS unavailable ({type(exc).__name__}); using silent placeholder")
-            silent = True
-            _silence(max(1.2, len(line.split()) * 0.42), clip)
-        clips.append(clip)
-
-    gap = workdir / "gap.mp3"
-    _silence(PAUSE, gap)
-
-    segments: list[Segment] = []
-    concat_list = workdir / "concat.txt"
-    t = 0.0
-    entries = []
-    for line, clip in zip(lines, clips):
-        d = duration(clip)
-        segments.append(Segment(line, t, t + d))
-        t += d + PAUSE
-        entries += [f"file '{clip.resolve()}'", f"file '{gap.resolve()}'"]
-    concat_list.write_text("\n".join(entries), encoding="utf-8")
+    try:
+        words = asyncio.run(_tts(join_lines(lines), voice, raw))
+        if not words or raw.stat().st_size == 0:
+            raise RuntimeError("empty audio")
+    except Exception as exc:  # network blocked, service down...
+        print(f"[voice] TTS unavailable ({type(exc).__name__}); using silent placeholder")
+        silent = True
+        words = _estimate(lines)
+        run(["ffmpeg", "-y", "-f", "lavfi", "-i", "anullsrc=r=24000:cl=mono",
+             "-t", f"{words[-1].end + 0.4:.2f}", "-c:a", "libmp3lame", str(raw)])
 
     audio = workdir / "voice.m4a"
-    run(["ffmpeg", "-y", "-f", "concat", "-safe", "0", "-i", str(concat_list),
-         "-ar", "44100", "-ac", "2", "-c:a", "aac", "-b:a", "160k", str(audio)])
-    return Narration(audio, segments, silent)
+    run(["ffmpeg", "-y", "-i", str(raw), "-ar", "44100", "-ac", "2",
+         "-c:a", "aac", "-b:a", "160k", str(audio)])
+    return Narration(audio, words, line_sizes, silent)
