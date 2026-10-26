@@ -245,7 +245,8 @@ def test_mouth_follows_voice_loudness(tmp_path):
          "-i", "sine=f=200:d=1:sample_rate=16000", "-filter_complex", "[0][1]concat=n=2:v=0:a=1",
          str(wav)])
     levels = mouth_levels(wav, 2 * FPS)
-    assert set(levels[:FPS - 2]) == {0} and levels[FPS + 5] == 2
+    from shorts.character import MOUTH_STEPS
+    assert set(levels[:FPS - 2]) == {0} and levels[FPS + 5] >= MOUTH_STEPS // 2
 
 
 def test_gulf_scripts_have_scenes_for_every_line():

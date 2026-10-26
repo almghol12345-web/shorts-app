@@ -8,6 +8,9 @@ from .config import Config
 from .voice import Narration
 
 
+NARRATOR_SCALE = 1.2   # the storyteller fills the lower half of the frame
+
+
 def drone_source(seconds: float) -> str:
     """A slow, dark ambient pad generated from sine waves (no music licence needed),
     with a low 'boom' under the hook. Commas are escaped for the lavfi parser."""
@@ -53,7 +56,8 @@ def render(cfg: Config, narration: Narration, background: Path, workdir: Path, o
         cmd += ["-i", str(narrator.resolve())]
         # the storyteller stands at the bottom, a little left of centre (clear of YouTube's buttons)
         vf = (f"[0:v]vignette=PI/3.2,noise=alls=3:allf=t[bgv];"
-              f"[bgv][{idx}:v]overlay=x=(W-w)/2-50:y=H-h+30:format=auto,{subs}[v]")
+              f"[{idx}:v]scale=iw*{NARRATOR_SCALE}:-1:flags=lanczos[nar];"
+              f"[bgv][nar]overlay=x=(W-w)/2-40:y=H-h+40:format=auto,{subs}[v]")
     else:
         vf = f"[0:v]vignette=PI/3.2,noise=alls=3:allf=t,{subs}[v]"
     cmd += ["-filter_complex", f"{vf};{af}", "-map", "[v]", "-map", "[a]",
