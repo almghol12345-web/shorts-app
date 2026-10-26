@@ -5,11 +5,22 @@ from datetime import datetime
 from pathlib import Path
 
 from . import background, content, history, render, voice
+from .captions import split_lines
 from .config import Config
 
 
 def _slug(text: str) -> str:
     return re.sub(r"[^a-z0-9]+", "-", text.lower()).strip("-")[:40] or "short"
+
+
+def line_spans(narration: voice.Narration, n_lines: int) -> list[float]:
+    """Seconds each script line is on screen: from its first spoken word to the next line's."""
+    total = narration.length
+    lines = split_lines(narration.words, narration.line_sizes)
+    if len(lines) != n_lines or not all(lines):
+        return [total / n_lines] * n_lines
+    starts = [0.0] + [line[0].start for line in lines[1:]]
+    return [b - a for a, b in zip(starts, starts[1:] + [total])]
 
 
 def make_one(cfg: Config, do_upload: bool, keep_work: bool = False) -> dict:
@@ -25,8 +36,11 @@ def make_one(cfg: Config, do_upload: bool, keep_work: bool = False) -> dict:
     narration = voice.synthesize(script.lines, cfg.voice, work / "voice")
     print(f"[voice] {narration.length:.1f}s{' (silent placeholder)' if narration.silent else ''}")
 
-    bg = background.build(script.search_terms, cfg.pexels_key, narration.length, work / "bg", cfg.width, cfg.height,
-                          pixabay_key=cfg.pixabay_key)
+    bg, credits = background.build(script.visual_plan(), line_spans(narration, len(script.lines)),
+                                   work / "bg", cfg.width, cfg.height,
+                                   pexels_key=cfg.pexels_key, pixabay_key=cfg.pixabay_key)
+    if credits:
+        script.description += "\n\nالصور:\n" + "\n".join(credits)
     video = render.render(cfg, narration, bg, work, cfg.output_dir / f"{name}.mp4")
     print(f"[video] {video}")
 

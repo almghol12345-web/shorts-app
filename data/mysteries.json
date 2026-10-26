@@ -30,6 +30,16 @@
    "sand storm",
    "night desert",
    "mystery"
+  ],
+  "visuals": [
+   "wiki:Al Naslaa rock|desert rock",
+   "wiki:Al Naslaa|desert rock",
+   "wiki:Tayma Saudi Arabia|saudi desert",
+   "wiki:Al Naslaa rock formation|rock split",
+   "wiki:Al Naslaa Tayma|desert rock",
+   "wiki:Saudi Arabia petroglyphs horses|rock carving",
+   "sandstorm desert",
+   "night desert stars"
   ]
  },
  {
@@ -63,6 +73,16 @@
    "dark forest",
    "footprints snow",
    "cold wind"
+  ],
+  "visuals": [
+   "wiki:Dyatlov Pass tent|tent snow",
+   "blizzard mountains night",
+   "wiki:Dyatlov Pass memorial|ural mountains",
+   "snow footprints night",
+   "wiki:Dyatlov pass search 1959|snow forest",
+   "dark snowy forest",
+   "wiki:Kholat Syakhl|snowy mountain",
+   "blizzard night"
   ]
  },
  {
@@ -96,6 +116,16 @@
    "abandoned boat",
    "ship deck",
    "dark waves"
+  ],
+  "visuals": [
+   "wiki:Mary Celeste ship painting|old ship",
+   "stormy ocean",
+   "wiki:Mary Celeste|sailing ship",
+   "wiki:Azores islands|ocean islands",
+   "ship deck",
+   "lifeboat ocean",
+   "fog ocean",
+   "wiki:Mary Celeste brigantine|old ship"
   ]
  },
  {
@@ -129,6 +159,16 @@
    "library dark",
    "old paper",
    "mystery"
+  ],
+  "visuals": [
+   "wiki:Voynich manuscript|old book",
+   "wiki:Voynich manuscript page|ancient manuscript",
+   "wiki:Voynich manuscript botanical|old book",
+   "wiki:Voynich manuscript text|ancient writing",
+   "wiki:Voynich manuscript plants|strange plants",
+   "wiki:Voynich manuscript folio|old paper",
+   "candle library",
+   "wiki:Voynich manuscript astronomical|old book"
   ]
  },
  {
@@ -162,6 +202,16 @@
    "space signal",
    "galaxy",
    "observatory"
+  ],
+  "visuals": [
+   "radio telescope night",
+   "night sky stars",
+   "wiki:Big Ear radio telescope|radio telescope",
+   "wiki:Wow! signal|space signal",
+   "wiki:Wow signal printout Ehman|computer printout",
+   "observatory night",
+   "wiki:Sagittarius constellation|stars galaxy",
+   "night sky stars"
   ]
  },
  {
@@ -195,6 +245,16 @@
    "bronze artifact",
    "museum",
    "deep sea"
+  ],
+  "visuals": [
+   "wiki:Antikythera mechanism|ancient gears",
+   "underwater diver",
+   "wiki:Antikythera island|greek island",
+   "wiki:Antikythera mechanism fragment|bronze artifact",
+   "wiki:Antikythera mechanism|ancient gears",
+   "wiki:Antikythera mechanism reconstruction|gears",
+   "solar eclipse",
+   "wiki:Antikythera mechanism|ancient gears"
   ]
  },
  {
@@ -228,6 +288,16 @@
    "archaeology",
    "sunset ruins",
    "carved stone"
+  ],
+  "visuals": [
+   "wiki:Göbekli Tepe|ancient ruins",
+   "wiki:Göbekli Tepe excavation|archaeology",
+   "wiki:Göbekli Tepe|ancient ruins",
+   "wiki:Göbekli Tepe pillar|carved stone",
+   "wiki:Göbekli Tepe pillar animal relief|carved stone",
+   "wiki:Göbekli Tepe enclosure|stone pillars",
+   "hunter gatherer fire",
+   "wiki:Göbekli Tepe|ancient ruins"
   ]
  },
  {
@@ -261,6 +331,16 @@
    "mist",
    "volcanic lake",
    "silent landscape"
+  ],
+  "visuals": [
+   "fog village night",
+   "wiki:Lake Nyos|volcanic lake",
+   "wiki:Lake Nyos Cameroon|lake",
+   "dark village",
+   "wiki:Lake Nyos disaster|fog valley",
+   "wiki:Lake Nyos|dark lake",
+   "fog valley",
+   "wiki:Lake Nyos degassing|lake"
   ]
  },
  {
@@ -294,6 +374,16 @@
    "night storm",
    "waves crashing",
    "fog"
+  ],
+  "visuals": [
+   "wiki:Flannan Isles Lighthouse|lighthouse",
+   "stormy sea",
+   "wiki:Flannan Isles|rocky island",
+   "lighthouse night",
+   "wiki:Eilean Mòr Flannan|island cliffs",
+   "raincoat hanging",
+   "storm waves crashing",
+   "huge waves rocks"
   ]
  },
  {
@@ -326,6 +416,16 @@
    "carved wood",
    "colonial",
    "dark woods",
+   "fog forest"
+  ],
+  "visuals": [
+   "wiki:Croatoan Roanoke|carved wood",
+   "wiki:Croatoan tree carving|carved wood",
+   "wiki:Roanoke Colony|colonial",
+   "wiki:John White governor Roanoke|old painting",
+   "old sailing ship",
+   "abandoned village fog",
+   "wiki:Croatoan|carved wood",
    "fog forest"
   ]
  },
@@ -360,6 +460,16 @@
    "candle",
    "old church",
    "dark alley"
+  ],
+  "visuals": [
+   "wiki:Dancing mania|medieval dance",
+   "wiki:Dancing plague of 1518|medieval crowd",
+   "wiki:Strasbourg old town|medieval town",
+   "old street night",
+   "wiki:Dancing mania Hondius|medieval painting",
+   "wiki:Choreomania|medieval crowd",
+   "wiki:medieval physician|old book",
+   "candle dark"
   ]
  },
  {
@@ -393,6 +503,16 @@
    "meteor",
    "fire sky",
    "taiga"
+  ],
+  "visuals": [
+   "explosion sky",
+   "wiki:Tunguska event|fallen trees",
+   "wiki:Tunguska event 1908|siberia forest",
+   "fire sky",
+   "wiki:Tunguska event fallen trees|fallen trees",
+   "wiki:Siberia taiga|taiga",
+   "meteor night sky",
+   "wiki:Tunguska event|fallen trees"
   ]
  },
  {
@@ -426,6 +546,16 @@
    "money",
    "rain night",
    "river"
+  ],
+  "visuals": [
+   "airplane night",
+   "wiki:D. B. Cooper|police sketch",
+   "wiki:Northwest Orient Boeing 727|airplane",
+   "money cash",
+   "parachute",
+   "wiki:D. B. Cooper money Columbia River|river",
+   "wiki:D. B. Cooper FBI|police",
+   "dark forest rain"
   ]
  },
  {
@@ -459,6 +589,16 @@
    "museum",
    "iraq desert",
    "copper"
+  ],
+  "visuals": [
+   "wiki:Baghdad Battery|clay jar",
+   "wiki:Baghdad Battery|ancient pottery",
+   "wiki:Baghdad Battery|clay jar",
+   "wiki:Baghdad Battery copper cylinder|copper",
+   "electricity spark",
+   "wiki:Baghdad Battery replica|battery",
+   "museum dark",
+   "wiki:Baghdad Battery|clay jar"
   ]
  },
  {
@@ -492,6 +632,16 @@
    "lonely road",
    "mountains night",
    "silence"
+  ],
+  "visuals": [
+   "desert town night",
+   "sleepless night",
+   "wiki:Taos New Mexico|desert town",
+   "sound waves",
+   "wiki:Taos Pueblo|desert village",
+   "lonely road night",
+   "wiki:Taos New Mexico mountains|mountains night",
+   "silence dark room"
   ]
  },
  {
@@ -525,6 +675,16 @@
    "detective",
    "ocean waves",
    "mystery"
+  ],
+  "visuals": [
+   "wiki:Tamam Shud case|beach",
+   "wiki:Tamam Shud scrap|old paper",
+   "wiki:Somerton Park beach|beach night",
+   "wiki:Somerton man|old photo",
+   "wiki:Rubaiyat of Omar Khayyam|old book",
+   "wiki:Tamam Shud code|cipher",
+   "dna laboratory",
+   "ocean waves night"
   ]
  },
  {
@@ -558,6 +718,16 @@
    "forest island",
    "old map",
    "flooded tunnel"
+  ],
+  "visuals": [
+   "wiki:Oak Island Nova Scotia|island",
+   "wiki:Oak Island money pit|digging",
+   "wiki:Oak Island|forest island",
+   "wiki:Oak Island money pit|digging",
+   "digging tunnel",
+   "flooded tunnel",
+   "money treasure",
+   "fog island"
   ]
  },
  {
@@ -591,6 +761,16 @@
    "drone desert",
    "ancient",
    "mountains"
+  ],
+  "visuals": [
+   "wiki:Nazca lines|desert aerial",
+   "wiki:Nazca lines hummingbird|desert lines",
+   "wiki:Nazca Desert|desert",
+   "wiki:Nazca lines monkey|desert lines",
+   "wiki:Nazca lines spider|desert lines",
+   "airplane over desert",
+   "wiki:Nazca lines aerial|desert aerial",
+   "wiki:Nazca lines|desert aerial"
   ]
  },
  {
@@ -624,6 +804,16 @@
    "desert night",
    "wind desert",
    "stars desert"
+  ],
+  "visuals": [
+   "wiki:Sailing stones Racetrack Playa|desert rocks",
+   "wiki:Racetrack Playa|dry lake",
+   "wiki:Death Valley|desert",
+   "wiki:Racetrack Playa rock|desert rocks",
+   "wiki:Racetrack Playa trail|dry lake",
+   "wiki:Racetrack Playa|dry lake",
+   "thin ice wind",
+   "wiki:Sailing stones|desert rocks"
   ]
  },
  {
@@ -657,6 +847,16 @@
    "sonar",
    "ocean waves",
    "abyss"
+  ],
+  "visuals": [
+   "deep ocean dark",
+   "underwater dark",
+   "wiki:Hydrophone|sonar",
+   "wiki:Pacific Ocean|ocean waves",
+   "sound waves",
+   "deep sea creature",
+   "iceberg cracking",
+   "deep ocean dark"
   ]
  },
  {
@@ -690,6 +890,16 @@
    "glowing light",
    "snow valley",
    "stars"
+  ],
+  "visuals": [
+   "glowing light night",
+   "night valley",
+   "wiki:Hessdalen|snow valley",
+   "wiki:Hessdalen lights|glowing light",
+   "glowing light night",
+   "wiki:Hessdalen observatory|observatory",
+   "mountains night fog",
+   "night sky stars"
   ]
  },
  {
@@ -723,6 +933,16 @@
    "clouds night",
    "airport",
    "dark sea"
+  ],
+  "visuals": [
+   "wiki:Malaysia Airlines Flight 370|airplane",
+   "wiki:9M-MRO|airplane",
+   "wiki:Kuala Lumpur International Airport|airport",
+   "radar screen",
+   "wiki:Inmarsat satellite|satellite",
+   "wiki:Indian Ocean|dark sea",
+   "wiki:MH370 flaperon|ocean beach",
+   "dark sea storm"
   ]
  },
  {
@@ -756,6 +976,16 @@
    "police",
    "typewriter",
    "fog street"
+  ],
+  "visuals": [
+   "wiki:Zodiac Killer letter|old newspaper",
+   "wiki:Zodiac Killer cipher|cipher",
+   "wiki:San Francisco 1969|night city",
+   "wiki:Zodiac Killer|police sketch",
+   "wiki:Z340 cipher|cipher",
+   "wiki:Zodiac Killer cipher|cipher",
+   "computer code",
+   "fog street night"
   ]
  },
  {
@@ -789,6 +1019,16 @@
    "crete",
    "archaeology",
    "old artifact"
+  ],
+  "visuals": [
+   "wiki:Phaistos Disc|ancient clay",
+   "wiki:Phaistos Disc|ancient clay",
+   "wiki:Phaistos palace Crete|ruins",
+   "wiki:Phaistos Disc side A|symbols",
+   "wiki:Phaistos Disc signs|symbols",
+   "wiki:Phaistos Disc side B|ancient clay",
+   "museum dark",
+   "wiki:Phaistos Disc|ancient clay"
   ]
  },
  {
@@ -822,6 +1062,16 @@
    "archaeology",
    "seal",
    "dust"
+  ],
+  "visuals": [
+   "wiki:Mohenjo-daro|ancient city",
+   "wiki:Indus script seal|seal",
+   "wiki:Mohenjo-daro ruins|ruins",
+   "wiki:Mohenjo-daro street drainage|ruins",
+   "wiki:Indus Valley seals|seal",
+   "wiki:Indus script|ancient writing",
+   "wiki:Harappa|ancient ruins",
+   "wiki:Indus seal unicorn|seal"
   ]
  },
  {
@@ -855,6 +1105,16 @@
    "countryside",
    "clouds",
    "old house"
+  ],
+  "visuals": [
+   "clear blue sky",
+   "raw meat",
+   "wiki:Kentucky meat shower|countryside",
+   "wiki:Bath County Kentucky|farm",
+   "clear blue sky",
+   "countryside field",
+   "vultures flying",
+   "clouds sky"
   ]
  },
  {
@@ -888,6 +1148,16 @@
    "stars",
    "comet",
    "dark space"
+  ],
+  "visuals": [
+   "wiki:ʻOumuamua|asteroid",
+   "space stars",
+   "wiki:Pan-STARRS telescope|telescope",
+   "wiki:ʻOumuamua artist impression|asteroid",
+   "wiki:ʻOumuamua trajectory|solar system",
+   "comet space",
+   "asteroid space",
+   "dark space stars"
   ]
  },
  {
@@ -921,6 +1191,16 @@
    "television",
    "dark room",
    "vhs"
+  ],
+  "visuals": [
+   "old tv static",
+   "wiki:Max Headroom signal hijacking|tv glitch",
+   "wiki:WGN-TV Chicago|television",
+   "tv glitch",
+   "wiki:Max Headroom broadcast signal intrusion|tv glitch",
+   "old tv static",
+   "wiki:Federal Communications Commission|government",
+   "dark room tv"
   ]
  },
  {
@@ -954,6 +1234,16 @@
    "children",
    "fog field",
    "old church"
+  ],
+  "visuals": [
+   "wiki:Green children of Woolpit|village sign",
+   "wiki:Woolpit village sign|village",
+   "wiki:Ralph of Coggeshall|old manuscript",
+   "wiki:Woolpit|medieval village",
+   "broad beans",
+   "wiki:Woolpit church|old church",
+   "dark forest twilight",
+   "fog field"
   ]
  },
  {
@@ -987,6 +1277,16 @@
    "ancient wood",
    "sunset statues",
    "pacific"
+  ],
+  "visuals": [
+   "wiki:Easter Island moai|moai statues",
+   "wiki:Rongorongo|ancient wood",
+   "wiki:Easter Island|ocean island",
+   "wiki:Rongorongo tablet|ancient wood",
+   "wiki:Rongorongo glyphs|symbols",
+   "wiki:Rongorongo Tablet B|ancient wood",
+   "wiki:Easter Island moai sunset|sunset statues",
+   "wiki:Rongorongo|ancient wood"
   ]
  }
 ]

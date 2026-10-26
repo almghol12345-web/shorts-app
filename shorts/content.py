@@ -18,6 +18,14 @@ class Script:
     description: str
     tags: list[str] = field(default_factory=list)
     search_terms: list[str] = field(default_factory=list)  # English, for stock footage
+    visuals: list[str] = field(default_factory=list)       # one per line, see background.py
+
+    def visual_plan(self) -> list[str]:
+        """One visual per line; scripts without a plan cycle through their search terms."""
+        if len(self.visuals) == len(self.lines):
+            return self.visuals
+        terms = self.search_terms or ["dark fog"]
+        return [terms[i % len(terms)] for i in range(len(self.lines))]
 
     @property
     def narration(self) -> str:
@@ -33,8 +41,9 @@ SCHEMA = {
         "description": {"type": "string"},
         "tags": {"type": "array", "items": {"type": "string"}},
         "search_terms": {"type": "array", "items": {"type": "string"}},
+        "visuals": {"type": "array", "items": {"type": "string"}},
     },
-    "required": ["topic", "title", "lines", "description", "tags", "search_terms"],
+    "required": ["topic", "title", "lines", "description", "tags", "search_terms", "visuals"],
     "additionalProperties": False,
 }
 
@@ -61,6 +70,10 @@ Write ONE new Short. Rules:
 - tags: 8 short tags in the video language.
 - search_terms: 6 simple English stock-footage keywords with a dark, moody look
   (fog, night, abandoned, storm...), one per visual moment, in order.
+- visuals: exactly one entry per line, showing what that line talks about.
+  Use "wiki:<English Wikimedia Commons search>|<stock fallback>" when a real photo of the
+  subject likely exists (the place, object, document, person, ship...), otherwise a short
+  English stock-video query for the mood (e.g. "stormy sea night").
 - Do NOT reuse any of these previous topics: {used}
 """
 
