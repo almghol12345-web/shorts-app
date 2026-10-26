@@ -8,7 +8,7 @@ from .config import Config
 from .voice import Narration
 
 
-NARRATOR_SCALE = 1.2   # the storyteller fills the lower half of the frame
+NARRATOR_SCALE = 0.95  # the storyteller stands bottom-left, leaving the scene art visible
 
 
 def drone_source(seconds: float) -> str:
@@ -57,7 +57,7 @@ def render(cfg: Config, narration: Narration, background: Path, workdir: Path, o
         # the storyteller stands at the bottom, a little left of centre (clear of YouTube's buttons)
         vf = (f"[0:v]vignette=PI/3.2,noise=alls=3:allf=t[bgv];"
               f"[{idx}:v]scale=iw*{NARRATOR_SCALE}:-1:flags=lanczos[nar];"
-              f"[bgv][nar]overlay=x=(W-w)/2-40:y=H-h+40:format=auto,{subs}[v]")
+              f"[bgv][nar]overlay=x=40:y=H-h+50:format=auto,{subs}[v]")
     else:
         vf = f"[0:v]vignette=PI/3.2,noise=alls=3:allf=t,{subs}[v]"
     cmd += ["-filter_complex", f"{vf};{af}", "-map", "[v]", "-map", "[a]",

@@ -3,7 +3,7 @@ plus a progress bar. libass (inside ffmpeg) shapes Arabic right-to-left."""
 from .voice import Segment
 
 MAX_WORDS = 2
-CAPTION_Y = 0.36  # share of the height: above the narrator's head
+CAPTION_Y = 0.30  # share of the height: above the narrator's head
 
 
 def _ts(seconds: float) -> str:
