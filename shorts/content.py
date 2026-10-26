@@ -222,9 +222,20 @@ FALLBACK_BANK = [
 ]
 
 
+def load_bank() -> list[Script]:
+    """Built-in scripts plus the larger hand-checked bank in data/facts.json."""
+    from .config import ROOT
+    bank = list(FALLBACK_BANK)
+    extra = ROOT / "data" / "facts.json"
+    if extra.exists():
+        bank += [Script(**item) for item in json.loads(extra.read_text(encoding="utf-8"))]
+    return bank
+
+
 def generate_offline(used: list[str]) -> Script:
-    fresh = [s for s in FALLBACK_BANK if s.topic not in used]
-    return random.choice(fresh or FALLBACK_BANK)
+    bank = load_bank()
+    fresh = [s for s in bank if s.topic not in used]
+    return random.choice(fresh or bank)
 
 
 def generate(cfg: Config, used: list[str]) -> Script:

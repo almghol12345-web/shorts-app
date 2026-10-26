@@ -25,8 +25,9 @@ def test_ass_has_no_gaps_between_lines():
 
 
 def test_offline_bank_avoids_used_topics():
-    used = [s.topic for s in content.FALLBACK_BANK[1:]]
-    assert content.generate_offline(used).topic == content.FALLBACK_BANK[0].topic
+    bank = content.load_bank()
+    used = [s.topic for s in bank[1:]]
+    assert content.generate_offline(used).topic == bank[0].topic
 
 
 def test_offline_bank_is_well_formed():
@@ -85,3 +86,12 @@ def test_pixabay_picks_hd_file(monkeypatch, tmp_path):
     monkeypatch.setattr(background, "_download", lambda url, out: got.append(url))
     clips = background.fetch_pixabay(["sea"], "key", tmp_path, want=1)
     assert len(clips) == 1 and got == ["M"]
+
+
+def test_fact_bank_is_well_formed_and_unique():
+    bank = content.load_bank()
+    topics = [s.topic for s in bank]
+    assert len(bank) >= 50 and len(topics) == len(set(topics))
+    for s in bank:
+        assert s.title.endswith("#shorts") and len(s.title) <= 100
+        assert 5 <= len(s.lines) <= 10 and s.search_terms
