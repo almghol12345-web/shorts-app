@@ -1,96 +1,182 @@
-# بيانات صفحة المتجر — فجر الناجين
+# بيانات صفحة المتجر · App Store listing
 
-انسخ هذه النصوص في App Store Connect عند إنشاء صفحة التطبيق.
+انسخ هذه النصوص في App Store Connect. أضف اللغتين: **Arabic** (أساسية) و**English (U.S.)**.
 
 | الحقل | القيمة |
 |---|---|
-| الاسم (30 حرف كحد أقصى) | فجر الناجين |
-| العنوان الفرعي (30 حرف) | ابنِ قاعدتك واصمد ضد الزومبي |
-| اللغة الأساسية | العربية |
-| الفئة الأساسية | الألعاب ← استراتيجية |
-| الفئة الثانوية | الألعاب ← أكشن |
-| السعر | مجاني |
-| معرّف الحزمة (Bundle ID) | com.almghol.fajrsurvivors |
-| SKU | FAJR001 |
-| حقوق النشر | 2026 فجر الناجين |
+| Bundle ID | `com.almghol.fajrsurvivors` |
+| SKU | `FAJR001` |
+| الفئة الأساسية · Primary category | Games ← Strategy |
+| الفئة الثانوية · Secondary | Games ← Action |
+| السعر · Price | مجاني · Free (with In-App Purchases) |
+| حقوق النشر · Copyright | 2026 Fajr Survivors |
 
-## الكلمات المفتاحية (100 حرف كحد أقصى)
+---
 
+## العربية
+
+**الاسم (30):** `فجر الناجين`
+
+**العنوان الفرعي (30):** `ابنِ قاعدتك واصمد ضد الزومبي`
+
+**الكلمات المفتاحية (100):**
 ```
-زومبي,بقاء,استراتيجية,قاعدة,أبطال,حرب,تحالف,بناء,دفاع,معركة,ناجين,أكشن
+زومبي,بقاء,استراتيجية,قاعدة,أبطال,حرب,تحالف,بناء,دفاع,معركة,ناجين,أكشن,عربي
 ```
 
-## النص الترويجي (170 حرف)
-
+**النص الترويجي (170):**
 ```
 المدينة سقطت والزومبي في كل مكان. ابنِ آخر ملجأ للناجين، جنّد أبطالاً أسطوريين، واصمد أمام الموجات!
 ```
 
-## الوصف
-
+**الوصف:**
 ```
 المدينة سقطت. الزومبي يملؤون الشوارع، وأنت قائد آخر مجموعة ناجين.
 
 فجر الناجين لعبة استراتيجية وبقاء: تبني قاعدتك من الخراب، تجنّد الأبطال، وتقود فريقك ضد موجات لا تنتهي من الزومبي.
 
 ◆ ابنِ قاعدتك
-19 مبنى تطوّرها حتى المستوى 30: مقر القيادة، المزارع، المناشر، مناجم الحديد، مصافي الوقود، الثكنة، المستشفى، مختبر الأبحاث، السور، المستودع، ورادار المراقبة.
+19 مبنى تطوّرها حتى المستوى 30: مقر القيادة، المزارع، المناشر، المناجم، مصافي الوقود، الثكنة، المستشفى، المختبر، السور، المستودع، والرادار.
 
 ◆ جنّد الأبطال
-12 بطلاً بثلاث درجات ندرة: نادر، ملحمي، وأسطوري. لكل بطل دور (مدافع، مهاجم، داعم) ومهارة خاصة. ارفع مستوياتهم، طوّر نجومهم، ورتّب تشكيلتك في صفين.
+16 بطلاً بثلاث درجات ندرة، لكل واحد دور ومهارة: ضربة جوية، قنبلة حارقة، جدار حديد، إسعاف ميداني، هزة أرض، وغيرها. ارفع مستوياتهم ونجومهم ورتّب تشكيلتك.
 
 ◆ معارك حية
-واجه الزاحفين والعدّائين والباصقين والمتوحشين وزعماء المناطق. اضغط على بطاقة البطل لإطلاق مهارته في اللحظة المناسبة: ضربة جوية، قنبلة حارقة، درع حديدي، إسعاف ميداني، وغيرها.
+زاحفون وعدّاؤون وباصقون ومتوحشون وزعماء. اضغط على بطاقة البطل لإطلاق مهارته في اللحظة المناسبة.
 
-◆ استكشف العالم
-خريطة مدمّرة مليئة بمعسكرات الزومبي وحقول الموارد. أرسل مسيرات الجمع، واهزم معسكرات أقوى كل مرة.
+◆ عالم ضخم
+خريطة مدمّرة تكبّرها وتصغّرها بإصبعين، فيها 200 معسكر زومبي وحقول موارد. أرسل المسيرات واهزم معسكرات أقوى كل مرة.
+
+◆ الزعيم العالمي
+العملاق يهاجم كل يوم. كل ضربة تعطيك جوائز.
+
+◆ جوائز كل يوم
+تذكرة معركة موسمية، عجلة حظ، مهام يومية، مكافآت دخول، إنجازات، ومستويات VIP.
 
 ◆ دافع عن قاعدتك
-موجات الزومبي تهاجم قاعدتك كل فترة. قوِّ السور، درّب الجنود، واحمِ مواردك في المستودع.
+موجات الزومبي تهاجم قاعدتك. قوِّ السور، درّب الجنود، واحمِ مواردك.
 
-◆ والمزيد
-• 10 أبحاث تقوّي الإنتاج والقتال
-• مهام رئيسية ويومية وصناديق نشاط
-• مكافآت تسجيل دخول لسبعة أيام
-• تحالف مع هدية يومية ومساعدات لتسريع البناء
-• القاعدة تنتج الموارد حتى وأنت خارج اللعبة
-• تعمل بدون إنترنت، وبدون إعلانات
+◆ عربي وإنجليزي
+اللعبة كاملة باللغتين.
 
 هل تصمد حتى الفجر؟
 ```
 
-## ما الجديد (الإصدار 1.0)
+**ما الجديد:** `الإصدار الأول من فجر الناجين. ابدأ ببناء قاعدتك اليوم!`
 
+---
+
+## English
+
+**Name (30):** `Fajr Survivors`
+
+**Subtitle (30):** `Build, defend, outlast the dead`
+
+**Keywords (100):**
 ```
-الإصدار الأول من فجر الناجين. ابدأ ببناء قاعدتك اليوم!
+zombie,survival,strategy,base,heroes,war,alliance,build,defense,battle,apocalypse,idle,arabic
 ```
 
-## التصنيف العمري (Age Rating)
+**Promotional text (170):**
+```
+The city has fallen and the dead walk the streets. Build the last shelter, recruit legendary heroes and hold back the horde!
+```
 
-أجب في استبيان التصنيف هكذا:
+**Description:**
+```
+The city has fallen. The dead fill the streets, and you lead the last group of survivors.
 
-| السؤال | الإجابة |
+Fajr Survivors is a survival strategy game: rebuild your base from the ruins, recruit heroes and lead your squad against endless zombie waves.
+
+◆ BUILD YOUR BASE
+19 buildings to upgrade up to level 30: HQ, farms, sawmills, mines, refineries, barracks, hospital, lab, walls, warehouse and radar.
+
+◆ RECRUIT HEROES
+16 heroes across three rarities, each with a role and a skill: airstrikes, firebombs, iron walls, field medics, quake slams and more. Level them up, star them up and build your lineup.
+
+◆ LIVE BATTLES
+Walkers, runners, spitters, brutes and bosses. Tap a hero card to fire their skill at the perfect moment.
+
+◆ A HUGE WORLD
+A ruined map you can pinch to zoom, with 200 zombie camps and resource fields. Send marches and take on stronger camps every day.
+
+◆ WORLD BOSS
+The Colossus attacks daily. Every hit earns rewards.
+
+◆ REWARDS EVERY DAY
+Seasonal Battle Pass, Lucky Wheel, daily tasks, login rewards, achievements and VIP levels.
+
+◆ DEFEND YOUR BASE
+Hordes raid your base. Upgrade walls, train troops and protect your stock.
+
+◆ ARABIC & ENGLISH
+Fully playable in both languages.
+
+Will you survive until dawn?
+```
+
+**What’s New:** `The first release of Fajr Survivors. Start building your base today!`
+
+---
+
+## In-App Purchases
+
+النوع كلها **Consumable**. All are **Consumable**.
+
+| Product ID | Price | Display name (AR / EN) | Description (AR / EN) |
+|---|---|---|---|
+| `com.almghol.fajrsurvivors.gems1` | $0.99 | حفنة جواهر / Handful of Gems | 100 جوهرة / 100 gems |
+| `com.almghol.fajrsurvivors.gems2` | $4.99 | كيس جواهر / Bag of Gems | 550 جوهرة / 550 gems |
+| `com.almghol.fajrsurvivors.gems3` | $9.99 | حقيبة جواهر / Satchel of Gems | 1,200 جوهرة / 1,200 gems |
+| `com.almghol.fajrsurvivors.gems4` | $19.99 | صندوق جواهر / Case of Gems | 2,600 جوهرة / 2,600 gems |
+| `com.almghol.fajrsurvivors.gems5` | $49.99 | خزنة جواهر / Vault of Gems | 7,000 جوهرة / 7,000 gems |
+| `com.almghol.fajrsurvivors.gems6` | $99.99 | بنك الجواهر / Gem Bank | 15,000 جوهرة / 15,000 gems |
+| `com.almghol.fajrsurvivors.starter` | $1.99 | حزمة المبتدئين / Starter Pack | البطلة ريم + 500 جوهرة + تذاكر / Hero Reem + 500 gems + tickets |
+| `com.almghol.fajrsurvivors.monthly` | $4.99 | البطاقة الشهرية / Monthly Card | 300 جوهرة + 100 يومياً لمدة 30 يوماً / 300 gems + 100 daily for 30 days |
+| `com.almghol.fajrsurvivors.pass` | $9.99 | التذكرة المميزة / Premium Pass | المسار المميز للموسم الحالي / Premium track for the current season |
+
+صورة المراجعة لكل منتج: لقطة شاشة من متجر اللعبة (تبويب الجواهر أو العروض).
+
+---
+
+## التصنيف العمري · Age Rating
+
+| Question | Answer |
 |---|---|
-| Cartoon or Fantasy Violence | Frequent/Intense (زومبي) |
-| Realistic Violence | None |
+| Cartoon or Fantasy Violence | Frequent/Intense |
 | Horror/Fear Themes | Infrequent/Mild |
-| باقي الأسئلة | None / No |
+| Realistic Violence, Sexual content, Profanity, Drugs, Gambling | None |
+| Simulated Gambling | None (the lucky wheel and hero recruit use in-game currency only and cannot be cashed out) |
+| Contests | None |
 | Unrestricted Web Access | No |
-| Gambling / Contests | No |
+| In-App Purchases | Yes |
 
-النتيجة المتوقعة: **12+**. ملاحظة: التجنيد العشوائي للأبطال يكون بالجواهر المجانية داخل اللعبة فقط، ولا يوجد شراء بأموال حقيقية.
+النتيجة المتوقعة · Expected: **12+**.
 
-## خصوصية التطبيق (App Privacy)
+---
 
-اختر: **Data Not Collected** (لا نجمع أي بيانات).
-رابط سياسة الخصوصية: ارفع ملف `docs/privacy.html` على أي رابط عام (انظر README).
+## خصوصية التطبيق · App Privacy
 
-## لقطات الشاشة
+**إذا ربطت السيرفر (Supabase):**
 
-الملفات في `docs/screenshots/` بمقاس 1290×2796، وهو مقاس iPhone 6.7 / 6.9 بوصة المطلوب. ارفعها بالترتيب 01 إلى 05.
+| Data type | Collected | Linked to user | Tracking | Purpose |
+|---|---|---|---|---|
+| Identifiers → User ID | Yes | Yes | No | App Functionality |
+| Purchases → Purchase History | Yes | Yes | No | App Functionality |
+| User Content → Other User Content (player name) | Yes | Yes | No | App Functionality |
+| Usage Data → Product Interaction (game progress) | Yes | Yes | No | App Functionality |
 
-## ملاحظات للمراجِع (Review Notes)
+Everything else: **Not collected**. No tracking, no ads, no analytics SDKs.
+
+**إذا ما ربطت السيرفر:** اختر **Data Not Collected**.
+
+---
+
+## ملاحظات للمراجِع · Review notes
 
 ```
-The game is fully offline and needs no account. Alliance members and chat are simulated characters for single-player play; no user content is shared with anyone. All currency is earned in-game; there are no in-app purchases.
+No account is required; each player gets an anonymous game account automatically.
+Alliance members and alliance chat are simulated in-game characters for single-player play; text typed in chat stays on the device and is not shared.
+All digital goods are sold through Apple In-App Purchase. Hero recruitment and the lucky wheel use only in-game currency; odds are shown in the recruit screen.
+The admin panel is hidden and only opens for staff accounts created on our server.
 ```

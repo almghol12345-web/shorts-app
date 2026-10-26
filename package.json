@@ -6,7 +6,12 @@
     "build": "node scripts/build-web.mjs",
     "sync": "npm run build && npx cap sync ios",
     "assets": "npx capacitor-assets generate --ios --iconBackgroundColor \"#0b0f14\" --splashBackgroundColor \"#0b0f14\"",
-    "test": "node scripts/smoke-test.cjs"
+    "test": "node scripts/smoke-test.cjs",
+    "check": "node scripts/check-i18n.cjs",
+    "test:db": "node scripts/test-db.mjs",
+    "test:online": "node scripts/e2e-online.mjs",
+    "test:all": "npm run build && npm run check && npm test && npm run test:db && npm run test:online",
+    "screenshots": "node scripts/screenshots.cjs"
   },
   "license": "UNLICENSED",
   "dependencies": {
@@ -14,12 +19,15 @@
     "@capacitor/core": "8.5.3",
     "@capacitor/haptics": "8.0.2",
     "@capacitor/ios": "8.5.3",
+    "@capacitor/local-notifications": "^8.3.1",
     "@capacitor/splash-screen": "8.0.2",
-    "@capacitor/status-bar": "8.0.4"
+    "@capacitor/status-bar": "8.0.4",
+    "@capgo/native-purchases": "^8.9.6"
   },
   "devDependencies": {
     "@capacitor/assets": "3.0.5",
     "@capacitor/cli": "8.5.3",
+    "@electric-sql/pglite": "0.3.15",
     "@fontsource/changa": "5.3.0",
     "@fontsource/tajawal": "5.3.0",
     "playwright": "1.63.0"

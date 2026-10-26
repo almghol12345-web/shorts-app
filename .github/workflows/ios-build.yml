@@ -18,10 +18,13 @@ jobs:
       - run: npm ci
       - run: npx playwright install --with-deps chromium
       - run: npm run build
+      - run: npm run check
       - run: npm test
+      - run: npm run test:db
+      - run: npm run test:online
 
   ios-build:
-    runs-on: macos-15
+    runs-on: macos-26
     timeout-minutes: 40
     steps:
       - uses: actions/checkout@v4
@@ -29,6 +32,8 @@ jobs:
         with:
           node-version: 22
           cache: npm
+      - name: Show Xcode version
+        run: xcodebuild -version
       - run: npm ci
       - run: npm run build
       - run: npx cap sync ios

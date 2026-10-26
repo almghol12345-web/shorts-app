@@ -1,0 +1,26 @@
+<div id="app">
+  <header class="top">
+    <div class="top-r">
+      <button class="me" data-a="settings" aria-label="Profile"><span class="avw"><span class="av c-me" id="pav">C</span><span class="clv num" id="clv">1</span></span><span class="me-t"><b id="pname"></b><small><span id="powl"></span> <span id="ppow" class="num">0</span></small><span class="xpb"><i id="xpi"></i></span></span></button>
+      <div class="topbtns"><button class="vipb" id="vipb" data-a="vip">VIP 0</button><button class="gem" data-a="shop" aria-label="Shop">💎 <span id="r-gems" class="num">0</span><i>+</i></button></div>
+    </div>
+    <div class="resrow">
+      <div class="rc">🌽<span id="r-food" class="num">0</span></div>
+      <div class="rc">🪵<span id="r-wood" class="num">0</span></div>
+      <div class="rc">🔩<span id="r-iron" class="num">0</span></div>
+      <div class="rc">⛽<span id="r-fuel" class="num">0</span></div>
+    </div>
+  </header>
+  <main id="view"></main>
+  <nav class="tabs" id="tabs"></nav>
+</div>
+<div id="modal" hidden></div>
+<div id="toasts"></div>
+<div id="battle" hidden>
+  <div class="b-top">
+    <div><b id="b-title"></b><small id="b-wave"></small></div>
+    <div class="b-ctl"><button id="b-spd">×1</button><button id="b-auto"></button><button id="b-quit"></button></div>
+  </div>
+  <div class="b-stage" id="b-stage"><canvas id="bcan"></canvas><div id="b-banner"></div><div id="b-res" hidden></div></div>
+  <div class="b-cards" id="b-cards"></div>
+</div>
