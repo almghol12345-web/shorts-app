@@ -106,3 +106,21 @@ def test_fact_bank_is_well_formed_and_unique():
     for s in bank:
         assert s.title.endswith("#shorts") and len(s.title) <= 100
         assert 5 <= len(s.lines) <= 10 and s.search_terms
+
+
+def test_stock_footage_pipeline_runs_ffmpeg(monkeypatch, tmp_path):
+    """Exercises the real ffmpeg filters used on downloaded clips."""
+    import shutil
+
+    import pytest
+
+    from shorts import background
+    from shorts.media import duration, run
+
+    if not shutil.which("ffmpeg"):
+        pytest.skip("ffmpeg not installed")
+    src = tmp_path / "src.mp4"
+    run(["ffmpeg", "-y", "-f", "lavfi", "-i", "testsrc2=s=640x360:d=2", "-pix_fmt", "yuv420p", str(src)])
+    monkeypatch.setattr(background, "fetch_pixabay", lambda *a, **k: [src])
+    out = background.build(["x"], "", 3.0, tmp_path, 360, 640, pixabay_key="k")
+    assert duration(out) >= 3.0

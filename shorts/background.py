@@ -114,7 +114,7 @@ def build(terms: list[str], pexels_key: str, seconds: float, workdir: Path, widt
         run(["ffmpeg", "-y", "-stream_loop", "-1", "-i", str(clip), "-t", f"{per_clip:.2f}", "-an",
              "-vf", f"scale={width}:{height}:force_original_aspect_ratio=increase,crop={width}:{height},"
                     "setsar=1,fps=30,eq=brightness=-0.09:saturation=0.6:contrast=1.08,"
-                    "colorbalance=bs=0.10:ms=0.04,"
+                    "colorbalance=bs=0.10:bm=0.04,"
                     f"zoompan=z='min(1+0.0015*on,1.15)':x='iw/2-iw/zoom/2':y='ih/2-ih/zoom/2':d=1:s={width}x{height}:fps=30",
              "-c:v", "libx264", "-preset", "veryfast", "-pix_fmt", "yuv420p", str(part)])
         parts.append(part)

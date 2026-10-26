@@ -39,8 +39,8 @@ def main() -> None:
         "country": "SA",
     })
 
-    banner = ROOT / "assets" / "channel" / "banner.png"
-    upload = yt.channelBanners().insert(media_body=MediaFileUpload(str(banner), mimetype="image/png")).execute()
+    banner = ROOT / "assets" / "channel" / "banner.jpg"
+    upload = yt.channelBanners().insert(media_body=MediaFileUpload(str(banner), mimetype="image/jpeg")).execute()
     branding.setdefault("image", {})["bannerExternalUrl"] = upload["url"]
 
     yt.channels().update(part="brandingSettings",
