@@ -19,13 +19,19 @@ class Script:
     tags: list[str] = field(default_factory=list)
     search_terms: list[str] = field(default_factory=list)  # English, for stock footage
     visuals: list[str] = field(default_factory=list)       # one per line, see background.py
+    scenes: list[str] = field(default_factory=list)        # one illustration prompt per line
 
     def visual_plan(self) -> list[str]:
-        """One visual per line; scripts without a plan cycle through their search terms."""
+        """One visual per line: an AI illustration of the scene when the script has
+        scene prompts (real photo / stock as the fallback), else photos and stock."""
         if len(self.visuals) == len(self.lines):
-            return self.visuals
-        terms = self.search_terms or ["dark fog"]
-        return [terms[i % len(terms)] for i in range(len(self.lines))]
+            base = self.visuals
+        else:
+            terms = self.search_terms or ["dark fog"]
+            base = [terms[i % len(terms)] for i in range(len(self.lines))]
+        if len(self.scenes) == len(self.lines):
+            return [f"ai:{scene} >> {fallback}" for scene, fallback in zip(self.scenes, base)]
+        return base
 
     @property
     def narration(self) -> str:
@@ -42,8 +48,9 @@ SCHEMA = {
         "tags": {"type": "array", "items": {"type": "string"}},
         "search_terms": {"type": "array", "items": {"type": "string"}},
         "visuals": {"type": "array", "items": {"type": "string"}},
+        "scenes": {"type": "array", "items": {"type": "string"}},
     },
-    "required": ["topic", "title", "lines", "description", "tags", "search_terms", "visuals"],
+    "required": ["topic", "title", "lines", "description", "tags", "search_terms", "visuals", "scenes"],
     "additionalProperties": False,
 }
 
@@ -74,6 +81,9 @@ Write ONE new Short. Rules:
   Use "wiki:<English Wikimedia Commons search>|<stock fallback>" when a real photo of the
   subject likely exists (the place, object, document, person, ship...), otherwise a short
   English stock-video query for the mood (e.g. "stormy sea night").
+- scenes: exactly one English illustration prompt per line describing what the viewer
+  should SEE during that line (setting, characters, action, era). Keep characters consistent
+  across lines, no gore, no style words (the style is added automatically).
 - Do NOT reuse any of these previous topics: {used}
 """
 

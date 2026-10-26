@@ -184,3 +184,39 @@ def test_photo_relevance_rejects_lookalike_results():
     assert not relevant("File:Iraqi police in Baghdad 2004.jpg", q)
     assert relevant("File:Göbekli_Tepe,_Urfa.jpg", "Göbekli Tepe pillar")
     assert relevant("File:Tayma oasis.jpg", "Tayma")
+
+
+def test_scenes_become_ai_shots_with_fallback():
+    s = content.Script("t", "t #shorts", ["a", "b"], "d", visuals=["wiki:x|y", "sea"],
+                       scenes=["a ship in fog", "a lighthouse"])
+    assert s.visual_plan() == ["ai:a ship in fog >> wiki:x|y", "ai:a lighthouse >> sea"]
+
+
+def test_ai_failure_falls_back(monkeypatch, tmp_path):
+    import shutil
+
+    import pytest
+
+    from shorts import background
+    from shorts.media import duration, run
+
+    if not shutil.which("ffmpeg"):
+        pytest.skip("ffmpeg not installed")
+    art = tmp_path / "art.png"
+    run(["ffmpeg", "-y", "-f", "lavfi", "-i", "testsrc2=s=540x960", "-frames:v", "1", str(art)])
+    calls = []
+
+    def fake_ai(scene, out, src, w, h, attempts=3):
+        calls.append(scene)
+        if "fail" in scene:
+            return False
+        shutil.copy(art, out)
+        src.ai_images += 1
+        return True
+
+    monkeypatch.setattr(background, "fetch_ai_image", fake_ai)
+    out, credits = background.build(["ai:a ship >> sea", "ai:fail here >> sea"], [1.0, 1.0],
+                                    tmp_path / "w", 270, 480)
+    assert calls == ["a ship", "fail here"]
+    assert abs(duration(out) - 2.0) < 0.2
+    assert credits[0].startswith("رسومات")

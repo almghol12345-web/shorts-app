@@ -1,6 +1,9 @@
 """Visuals that follow the narration: one shot per spoken line.
 
 Each line has a visual spec:
+  "ai:<scene> >> <fallback spec>" an illustration generated for that exact scene, in one
+                                 consistent dark anime/cinematic style per video; if the
+                                 generator fails, the fallback spec below is used.
   "wiki:<search>|<stock query>"  a real photo of the subject from Wikimedia Commons
                                  (free licences, credited in the description), shown
                                  with a slow zoom; falls back to the stock query.
@@ -10,8 +13,10 @@ Anything that cannot be fetched falls back to a dark animated gradient.
 import html
 import random
 import re
+import time
 from dataclasses import dataclass, field
 from pathlib import Path
+from urllib.parse import quote
 
 import requests
 
@@ -29,6 +34,12 @@ PALETTES = [  # dark, cold tones for a mysterious mood
 ]
 
 
+# One look for the whole channel: illustrated, dark and cinematic (clearly not photoreal).
+ART_STYLE = ("dark cinematic anime illustration, painterly digital art, dramatic moody lighting, "
+             "deep shadows, muted colors with a red accent, highly detailed, atmospheric fog, "
+             "vertical composition, no watermark")
+
+
 @dataclass
 class Sources:
     pexels_key: str = ""
@@ -36,6 +47,8 @@ class Sources:
     credits: list[str] = field(default_factory=list)
     used_ids: set = field(default_factory=set)
     last_credit: str = ""
+    seed: int = field(default_factory=lambda: random.randint(1, 10**6))
+    ai_images: int = 0
 
 
 def _download(link: str, out: Path) -> None:
@@ -115,6 +128,40 @@ def photo_clip(image: Path, seconds: float, out: Path, width: int, height: int,
          "-t", f"{seconds:.3f}", *ENCODE, str(out)])
 
 
+# ---------- AI illustrations ----------
+
+def fetch_ai_image(scene: str, out: Path, src: Sources, width: int, height: int,
+                   attempts: int = 3) -> bool:
+    """Free image generation (Pollinations, no key). Same seed for the whole
+    video keeps the look consistent from shot to shot."""
+    url = (f"https://image.pollinations.ai/prompt/{quote(f'{scene}, {ART_STYLE}')}"
+           f"?width={width}&height={height}&seed={src.seed}&model=flux&nologo=true&private=true")
+    for attempt in range(attempts):
+        try:
+            resp = requests.get(url, headers=UA, timeout=150)
+            if resp.ok and resp.headers.get("content-type", "").startswith("image/") and len(resp.content) > 20_000:
+                out.write_bytes(resp.content)
+                src.ai_images += 1
+                return True
+            print(f"[visual] ai image attempt {attempt + 1}: HTTP {resp.status_code}")
+        except requests.RequestException as exc:
+            print(f"[visual] ai image attempt {attempt + 1}: {type(exc).__name__}")
+        time.sleep(5 * (attempt + 1))
+    return False
+
+
+def art_clip(image: Path, seconds: float, out: Path, width: int, height: int, index: int) -> None:
+    """Full-screen illustration with a slow push-in or pull-out and a gentle drift."""
+    frames = int(seconds * 30) + 1
+    zoom = "min(1+0.0012*on,1.18)" if index % 2 == 0 else "max(1.18-0.0012*on,1)"
+    drift = "+on*0.15" if index % 3 == 0 else "-on*0.15" if index % 3 == 1 else ""
+    vf = (f"scale={width * 2}:{height * 2}:force_original_aspect_ratio=increase,"
+          f"crop={width * 2}:{height * 2},setsar=1,"
+          f"zoompan=z='{zoom}':x='iw/2-iw/zoom/2{drift}':y='ih/2-ih/zoom/2'"
+          f":d={frames}:s={width}x{height}:fps=30,eq=contrast=1.05:saturation=0.9")
+    run(["ffmpeg", "-y", "-i", str(image), "-vf", vf, "-t", f"{seconds:.3f}", *ENCODE, str(out)])
+
+
 # ---------- Stock video: mood shots ----------
 
 def _pick_pexels_file(video: dict) -> str | None:
@@ -186,6 +233,14 @@ def shot(spec: str, seconds: float, out: Path, src: Sources, width: int, height:
          index: int = 0) -> None:
     """Make one shot for one line, trying the best source first."""
     raw = out.with_suffix(".src")
+    if spec.startswith("ai:"):
+        scene, _, fallback = spec[3:].partition(" >> ")
+        if fetch_ai_image(scene.strip(), raw, src, width, height):
+            art_clip(raw, seconds, out, width, height, index)
+            print(f"[visual] {out.stem}: ai art for '{scene.strip()[:60]}'")
+            return
+        print(f"[visual] {out.stem}: ai art failed, using fallback")
+        spec = fallback.strip() or MOOD_FALLBACK
     stock = spec
     if spec.startswith("wiki:"):
         wiki, _, stock = spec[5:].partition("|")
@@ -213,7 +268,7 @@ def shot(spec: str, seconds: float, out: Path, src: Sources, width: int, height:
 def build(visuals: list[str], spans: list[float], workdir: Path, width: int, height: int,
           pexels_key: str = "", pixabay_key: str = "") -> tuple[Path, list[str]]:
     """One shot per line (spans = seconds each line is on screen). Returns the
-    joined background video and the photo credits for the description."""
+    joined background video and the credit lines for the description."""
     workdir.mkdir(parents=True, exist_ok=True)
     src = Sources(pexels_key=pexels_key, pixabay_key=pixabay_key)
     parts = []
@@ -225,4 +280,7 @@ def build(visuals: list[str], spans: list[float], workdir: Path, width: int, hei
     listing.write_text("\n".join(f"file '{p.resolve()}'" for p in parts), encoding="utf-8")
     out = workdir / "bg.mp4"
     run(["ffmpeg", "-y", "-f", "concat", "-safe", "0", "-i", str(listing), "-c", "copy", str(out)])
-    return out, src.credits
+    credits = list(src.credits)
+    if src.ai_images:
+        credits.insert(0, "رسومات المشاهد مولّدة بالذكاء الاصطناعي.")
+    return out, credits
