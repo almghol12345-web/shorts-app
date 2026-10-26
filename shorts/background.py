@@ -48,6 +48,10 @@ def _download(link: str, out: Path) -> None:
 
 STOP = {"the", "and", "with", "from", "for", "dark", "night", "old"}
 MOOD_FALLBACK = "dark fog night"
+# Graphic/abstract clips break the documentary mood.
+BANNED_TAGS = {"abstract", "neon", "animation", "animated", "background", "backgrounds", "loop",
+               "render", "particles", "cartoon", "graphic", "graphics", "geometric", "vj", "3d",
+               "motion", "wallpaper", "glitch", "hologram", "futuristic"}
 
 
 def _words(text: str) -> set[str]:
@@ -129,6 +133,8 @@ def fetch_pixabay(query: str, out: Path, src: Sources) -> bool:
     best, best_score = None, -1
     for hit in resp.json().get("hits", []):  # already ordered by relevance
         if hit["id"] in src.used_ids or not 3 <= hit.get("duration", 0) <= 60:
+            continue
+        if _words(hit.get("tags", "")) & BANNED_TAGS and not _words(query) & BANNED_TAGS:
             continue
         score = len(want & _words(hit.get("tags", "")))
         if score > best_score:
