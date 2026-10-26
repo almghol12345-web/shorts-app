@@ -165,6 +165,7 @@ def shot(spec: str, seconds: float, out: Path, src: Sources, width: int, height:
         try:
             if fetch_commons(wiki, raw, src):
                 photo_clip(raw, seconds, out, width, height)
+                print(f"[visual] {out.stem}: photo {src.credits[-1]!r} for '{wiki}'")
                 return
         except Exception as exc:
             print(f"[visual] commons '{wiki}' failed: {exc}")
@@ -174,6 +175,7 @@ def shot(spec: str, seconds: float, out: Path, src: Sources, width: int, height:
         try:
             if fetch(stock, raw, src):
                 video_clip(raw, seconds, out, width, height)
+                print(f"[visual] {out.stem}: stock video for '{stock}'")
                 return
         except Exception as exc:
             print(f"[visual] stock '{stock}' failed: {exc}")

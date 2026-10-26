@@ -45,13 +45,35 @@ def render(cfg: Config, narration: Narration, background: Path, workdir: Path, o
           f"[bed][v2]sidechaincompress=threshold=0.04:ratio=5:attack=20:release=500[duck];"
           f"[v1][duck]amix=inputs=2:normalize=0:duration=longest,alimiter=limit=0.95[a]")
     # Dark, grainy look: stronger vignette and film grain on top of the graded footage.
-    vf = (f"[0:v]vignette=PI/3.2,noise=alls=9:allf=t,"
+    vf = (f"[0:v]vignette=PI/3.2,noise=alls=3:allf=t,"
           f"subtitles=captions.ass:fontsdir={cfg.font_dir.resolve()}[v]")
     cmd += ["-filter_complex", f"{vf};{af}", "-map", "[v]", "-map", "[a]",
             "-t", f"{total:.2f}", "-r", "30",
-            "-c:v", "libx264", "-preset", "medium", "-crf", "20", "-pix_fmt", "yuv420p",
+            "-c:v", "libx264", "-preset", "medium", "-crf", "21", "-maxrate", "8M", "-bufsize", "16M",
+            "-pix_fmt", "yuv420p",
             "-c:a", "aac", "-b:a", "192k", "-movflags", "+faststart", str(out.resolve())]
     result = subprocess.run(cmd, cwd=workdir, capture_output=True, text=True)
     if result.returncode != 0:
         raise RuntimeError(f"render failed:\n{result.stderr[-3000:]}")
+    return out
+
+
+def contact_sheet(video: Path, times: list[float], out: Path) -> Path:
+    """One small frame per shot, tiled, so a run can be checked at a glance."""
+    from .media import run
+    frames = []
+    for i, t in enumerate(times):
+        f = out.with_name(f"{out.stem}_{i}.jpg")
+        run(["ffmpeg", "-y", "-ss", f"{t:.2f}", "-i", str(video), "-frames:v", "1",
+             "-vf", "scale=270:480", str(f)])
+        frames.append(f)
+    cols = min(len(frames), 4)
+    rows = (len(frames) + cols - 1) // cols
+    inputs = sum((["-i", str(f)] for f in frames), [])
+    layout = "|".join(f"{(i % cols) * 270}_{(i // cols) * 480}" for i in range(len(frames)))
+    run(["ffmpeg", "-y", *inputs, "-filter_complex",
+         f"xstack=inputs={len(frames)}:layout={layout}:fill=black" if len(frames) > 1 else "null",
+         "-frames:v", "1", "-q:v", "4", str(out)])
+    for f in frames:
+        f.unlink(missing_ok=True)
     return out

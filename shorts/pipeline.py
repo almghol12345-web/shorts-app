@@ -43,6 +43,9 @@ def make_one(cfg: Config, do_upload: bool, keep_work: bool = False) -> dict:
         script.description += "\n\nالصور:\n" + "\n".join(credits)
     video = render.render(cfg, narration, bg, work, cfg.output_dir / f"{name}.mp4")
     print(f"[video] {video}")
+    spans = line_spans(narration, len(script.lines))
+    mids = [sum(spans[:i]) + spans[i] / 2 for i in range(len(spans))]
+    render.contact_sheet(video, mids, cfg.output_dir / "preview.jpg")
 
     video_id = None
     if do_upload:
