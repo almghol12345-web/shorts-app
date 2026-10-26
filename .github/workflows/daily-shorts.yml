@@ -35,7 +35,14 @@ jobs:
           cache: pip
 
       - name: Install ffmpeg
-        run: sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg fonts-dejavu-core
+        timeout-minutes: 8
+        run: |
+          # Runner images usually have a fresh package index; only refresh it if needed.
+          for i in 1 2 3; do
+            sudo timeout 150 apt-get install -y -qq --no-install-recommends ffmpeg fonts-dejavu-core && break
+            sudo timeout 150 apt-get update -qq || true
+          done
+          ffmpeg -hide_banner -version | head -1
 
       - name: Install dependencies
         run: pip install -r requirements.txt
