@@ -38,26 +38,29 @@ SCHEMA = {
     "additionalProperties": False,
 }
 
-PROMPT = """You write scripts for a faceless YouTube Shorts channel. Your only goal is
-retention: viewers must watch to the very last second and replay.
+PROMPT = """You write scripts for a faceless YouTube Shorts channel about REAL mysteries:
+unexplained events, disappearances, undeciphered writings, strange places and eerie history.
+Your only goal is retention: viewers must watch to the last second and replay.
 
 Niche: {niche}
-Language of the video: {language} (use simple, spoken, energetic language)
+Language of the video: {language} (simple, spoken, suspenseful storytelling)
 
 Write ONE new Short. Rules:
-- The fact must be true and verifiable. No myths, no exaggeration, no medical or financial advice.
-- Line 1 (the hook, spoken in under 2 seconds): a shocking claim, a "you" question, or a
-  pattern break. Never start with greetings, "did you know", or the channel name.
-- Line 2 opens a loop: promise a payoff that only comes at the end (e.g. "but the reason is stranger").
-- Middle lines: build tension; every line adds a new surprising detail (a number, place, or date).
-- The payoff/reveal comes in the second-to-last line, never earlier.
-- Last line must flow naturally back into line 1 so the video loops seamlessly when it restarts
-  (it can end mid-thought that line 1 completes). NO "follow us", "like", or "subscribe" line.
-- 6 to 8 lines, each 3 to 9 words, total spoken length 20-30 seconds.
-- title: under 60 characters, creates curiosity without giving away the answer, ends with " #shorts".
-- description: one curiosity sentence, then "تابع القناة لحقيقة جديدة كل يوم", then 3 hashtags.
+- Only real, documented cases. State facts accurately (dates, places, numbers). If a case has
+  a likely explanation, mention it honestly, then the part that is still unexplained.
+  Never invent details, never claim the supernatural is proven.
+- Avoid famous school facts; pick cases most viewers have never heard of.
+- Line 1 (under 3 seconds): the most disturbing or impossible-sounding detail of the case.
+- Line 2 opens a loop (what nobody can explain / a detail revealed at the end).
+- Middle lines: when and where, then escalating details, one per line.
+- End on the open question, phrased so it flows back into line 1 when the video loops.
+  NO "follow", "like" or "subscribe" lines.
+- 7 to 9 lines, each 3 to 12 words, spoken in about 30-40 seconds.
+- title: under 55 characters, mysterious, does not reveal the answer, ends with " #shorts".
+- description: the hook sentence, then "تابع القناة.. لغز حقيقي جديد كل يوم 🔍", then 3 hashtags.
 - tags: 8 short tags in the video language.
-- search_terms: 6 simple English keywords for stock footage, one per visual moment, in order.
+- search_terms: 6 simple English stock-footage keywords with a dark, moody look
+  (fog, night, abandoned, storm...), one per visual moment, in order.
 - Do NOT reuse any of these previous topics: {used}
 """
 
@@ -222,20 +225,27 @@ FALLBACK_BANK = [
 ]
 
 
-def load_bank() -> list[Script]:
-    """Built-in scripts plus the larger hand-checked bank in data/facts.json."""
+def _load_json(name: str) -> list[Script]:
     from .config import ROOT
-    bank = list(FALLBACK_BANK)
-    extra = ROOT / "data" / "facts.json"
-    if extra.exists():
-        bank += [Script(**item) for item in json.loads(extra.read_text(encoding="utf-8"))]
-    return bank
+    path = ROOT / "data" / name
+    if not path.exists():
+        return []
+    return [Script(**item) for item in json.loads(path.read_text(encoding="utf-8"))]
+
+
+def load_bank() -> list[Script]:
+    """Hand-checked scripts: real mysteries first, general facts as a reserve."""
+    return _load_json("mysteries.json") + _load_json("facts.json") + list(FALLBACK_BANK)
 
 
 def generate_offline(used: list[str]) -> Script:
     bank = load_bank()
     fresh = [s for s in bank if s.topic not in used]
-    return random.choice(fresh or bank)
+    if not fresh:
+        return random.choice(bank)
+    # Keep the bank's order of preference: the first unused mystery comes before any fact.
+    preferred = [s for s in fresh if s in _load_json("mysteries.json")]
+    return random.choice(preferred or fresh)
 
 
 def generate(cfg: Config, used: list[str]) -> Script:

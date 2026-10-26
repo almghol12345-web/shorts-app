@@ -6,12 +6,11 @@ import requests
 
 from .media import run
 
-PALETTES = [
-    ("0x0f2027", "0x2c5364", "0x203a43"),
-    ("0x1a002e", "0x5b247a", "0x1bcedf"),
-    ("0x000428", "0x004e92", "0x00203f"),
-    ("0x141e30", "0x243b55", "0x3a1c71"),
-    ("0x0b3d2e", "0x11998e", "0x062a1f"),
+PALETTES = [  # dark, cold tones for a mysterious mood
+    ("0x05070d", "0x14213a", "0x0a0f1c"),
+    ("0x0a0612", "0x2a1438", "0x07040c"),
+    ("0x03100f", "0x0f2d2a", "0x020807"),
+    ("0x100505", "0x2e0d0d", "0x080303"),
 ]
 
 
@@ -114,7 +113,8 @@ def build(terms: list[str], pexels_key: str, seconds: float, workdir: Path, widt
         part = workdir / f"norm_{i}.mp4"
         run(["ffmpeg", "-y", "-stream_loop", "-1", "-i", str(clip), "-t", f"{per_clip:.2f}", "-an",
              "-vf", f"scale={width}:{height}:force_original_aspect_ratio=increase,crop={width}:{height},"
-                    "setsar=1,fps=30,eq=brightness=-0.06:saturation=1.15,"
+                    "setsar=1,fps=30,eq=brightness=-0.09:saturation=0.6:contrast=1.08,"
+                    "colorbalance=bs=0.10:ms=0.04,"
                     f"zoompan=z='min(1+0.0015*on,1.15)':x='iw/2-iw/zoom/2':y='ih/2-ih/zoom/2':d=1:s={width}x{height}:fps=30",
              "-c:v", "libx264", "-preset", "veryfast", "-pix_fmt", "yuv420p", str(part)])
         parts.append(part)

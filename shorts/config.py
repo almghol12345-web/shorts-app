@@ -26,7 +26,7 @@ def _env(name: str, default: str = "") -> str:
 
 @dataclass
 class Config:
-    niche: str = field(default_factory=lambda: _env("SHORTS_NICHE", "حقائق مدهشة وغريبة عن العالم والعلم والتاريخ"))
+    niche: str = field(default_factory=lambda: _env("SHORTS_NICHE", "ألغاز وأحداث حقيقية غامضة لم تُحل"))
     language: str = field(default_factory=lambda: _env("SHORTS_LANGUAGE", "ar"))
     voice: str = field(default_factory=lambda: _env("SHORTS_VOICE", "ar-SA-HamedNeural"))
     privacy: str = field(default_factory=lambda: _env("SHORTS_PRIVACY", "public"))
