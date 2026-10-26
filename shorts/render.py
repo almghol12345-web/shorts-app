@@ -21,7 +21,8 @@ def drone_source(seconds: float) -> str:
     return f"aevalsrc={expr}:s=44100:d={seconds:.2f}"
 
 
-def render(cfg: Config, narration: Narration, background: Path, workdir: Path, out: Path) -> Path:
+def render(cfg: Config, narration: Narration, background: Path, workdir: Path, out: Path,
+           narrator: Path | None = None) -> Path:
     total = narration.length
     ass = workdir / "captions.ass"
     ass.write_text(build_ass(narration.words, narration.line_sizes, total,
@@ -30,6 +31,7 @@ def render(cfg: Config, narration: Narration, background: Path, workdir: Path, o
     music = sorted(cfg.music_dir.glob("*.mp3")) if cfg.music_dir.exists() else []
     cmd = ["ffmpeg", "-y", "-stream_loop", "-1", "-i", str(background.resolve()),
            "-i", str(narration.audio.resolve())]
+    # inputs: 0 background, 1 voice, 2..3 music bed, last: the narrator overlay (optional)
     if music:
         cmd += ["-stream_loop", "-1", "-i", str(random.choice(music).resolve())]
         bed = "[2:a]volume=0.12"
@@ -45,8 +47,15 @@ def render(cfg: Config, narration: Narration, background: Path, workdir: Path, o
           f"[bed][v2]sidechaincompress=threshold=0.04:ratio=5:attack=20:release=500[duck];"
           f"[v1][duck]amix=inputs=2:normalize=0:duration=longest,alimiter=limit=0.95[a]")
     # Dark, grainy look: stronger vignette and film grain on top of the graded footage.
-    vf = (f"[0:v]vignette=PI/3.2,noise=alls=3:allf=t,"
-          f"subtitles=captions.ass:fontsdir={cfg.font_dir.resolve()}[v]")
+    subs = f"subtitles=captions.ass:fontsdir={cfg.font_dir.resolve()}"
+    if narrator:
+        idx = 3 if music else 4
+        cmd += ["-i", str(narrator.resolve())]
+        # the storyteller stands at the bottom, a little left of centre (clear of YouTube's buttons)
+        vf = (f"[0:v]vignette=PI/3.2,noise=alls=3:allf=t[bgv];"
+              f"[bgv][{idx}:v]overlay=x=(W-w)/2-50:y=H-h+30:format=auto,{subs}[v]")
+    else:
+        vf = f"[0:v]vignette=PI/3.2,noise=alls=3:allf=t,{subs}[v]"
     cmd += ["-filter_complex", f"{vf};{af}", "-map", "[v]", "-map", "[a]",
             "-t", f"{total:.2f}", "-r", "30",
             "-c:v", "libx264", "-preset", "medium", "-crf", "21", "-maxrate", "8M", "-bufsize", "16M",

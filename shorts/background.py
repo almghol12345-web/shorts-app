@@ -36,7 +36,8 @@ PALETTES = [  # dark, cold tones for a mysterious mood
 
 # One look for the whole channel: illustrated, dark and cinematic (clearly not photoreal).
 ART_STYLE = ("cinematic anime illustration, painterly digital art, moody dramatic lighting, "
-             "dark muted colors, highly detailed, vertical composition, no watermark")
+             "dark muted colors, highly detailed, vertical composition, main subject in the upper half "
+             "of the frame, no watermark")
 AI_GAP = 20       # seconds between requests: the free tier answers 402 when called too fast
 _last_ai_call = [0.0]
 

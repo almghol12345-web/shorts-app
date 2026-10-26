@@ -7,8 +7,8 @@ from pathlib import Path
 from .media import run
 
 TICKS = 10_000_000  # edge-tts offsets are in 100-nanosecond units
-RATE = "-3%"         # unhurried storytelling pace; faster sounds robotic
-PITCH = "-6Hz"       # a little deeper for a darker, suspenseful tone
+RATE = "+0%"         # natural storytelling pace for the Gulf-dialect scripts
+PITCH = "-3Hz"       # slightly deeper, warm narrator tone
 
 
 @dataclass

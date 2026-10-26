@@ -220,3 +220,34 @@ def test_ai_failure_falls_back(monkeypatch, tmp_path):
     assert calls == ["a ship", "fail here"]
     assert abs(duration(out) - 2.0) < 0.2
     assert credits[0].startswith("رسومات")
+
+
+def test_narrator_poses_differ_and_are_transparent():
+    from shorts.character import pose
+    closed, talking = pose(0, False, False), pose(2, False, True)
+    assert closed.mode == "RGBA" and closed.getpixel((2, 2))[3] == 0
+    assert closed.tobytes() != talking.tobytes()
+
+
+def test_mouth_follows_voice_loudness(tmp_path):
+    import shutil
+
+    import pytest
+
+    from shorts.animate import FPS, mouth_levels
+    from shorts.media import run
+
+    if not shutil.which("ffmpeg"):
+        pytest.skip("ffmpeg not installed")
+    wav = tmp_path / "v.wav"
+    # 1 s of silence then 1 s of a loud tone
+    run(["ffmpeg", "-y", "-f", "lavfi", "-i", "anullsrc=r=16000:cl=mono:d=1", "-f", "lavfi",
+         "-i", "sine=f=200:d=1:sample_rate=16000", "-filter_complex", "[0][1]concat=n=2:v=0:a=1",
+         str(wav)])
+    levels = mouth_levels(wav, 2 * FPS)
+    assert set(levels[:FPS - 2]) == {0} and levels[FPS + 5] == 2
+
+
+def test_gulf_scripts_have_scenes_for_every_line():
+    for s in content._load_json("mysteries.json"):
+        assert len(s.lines) == len(s.scenes) == len(s.visuals)
