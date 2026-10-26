@@ -174,3 +174,13 @@ def test_real_ffmpeg_shots_join(monkeypatch, tmp_path):
     out, credits = background.build(["wiki:x|y", "sea", "fog"], [1.0, 1.5, 0.8], tmp_path / "w",
                                     360, 640, pixabay_key="k")
     assert abs(duration(out) - 3.3) < 0.25
+
+
+def test_photo_relevance_rejects_lookalike_results():
+    from shorts.background import relevant
+    q = "Baghdad Battery copper cylinder"
+    assert relevant("File:Baghdad Battery parts.jpg", q)
+    assert not relevant("File:Statue of Liberty copper.jpg", q)
+    assert not relevant("File:Iraqi police in Baghdad 2004.jpg", q)
+    assert relevant("File:Göbekli_Tepe,_Urfa.jpg", "Göbekli Tepe pillar")
+    assert relevant("File:Tayma oasis.jpg", "Tayma")

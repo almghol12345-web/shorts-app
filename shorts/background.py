@@ -35,6 +35,7 @@ class Sources:
     pixabay_key: str = ""
     credits: list[str] = field(default_factory=list)
     used_ids: set = field(default_factory=set)
+    last_credit: str = ""
 
 
 def _download(link: str, out: Path) -> None:
@@ -45,8 +46,20 @@ def _download(link: str, out: Path) -> None:
                 fh.write(part)
 
 
+STOP = {"the", "and", "with", "from", "for", "dark", "night", "old"}
+MOOD_FALLBACK = "dark fog night"
+
+
 def _words(text: str) -> set[str]:
-    return {w for w in re.findall(r"[a-z]+", text.lower()) if len(w) > 2}
+    return {w for w in re.findall(r"[^\W_]+", text.lower()) if len(w) > 2 and w not in STOP}
+
+
+def relevant(title: str, query: str) -> bool:
+    """A photo counts only if its file name names the subject, e.g. both
+    'baghdad' and 'battery' for "Baghdad Battery copper cylinder"."""
+    want = [w for w in re.findall(r"[^\W_]+", query.lower()) if len(w) > 2 and w not in STOP]
+    need = min(2, len(want))
+    return len(set(want) & _words(title)) >= need
 
 
 # ---------- Wikimedia Commons: real photos of the subject ----------
@@ -59,25 +72,32 @@ def fetch_commons(query: str, out: Path, src: Sources) -> bool:
     })
     resp.raise_for_status()
     pages = sorted(resp.json().get("query", {}).get("pages", {}).values(), key=lambda p: p.get("index", 99))
-    for page in pages:
-        info = (page.get("imageinfo") or [{}])[0]
-        if info.get("mime") not in ("image/jpeg", "image/png") or info.get("width", 0) < 500:
-            continue
-        if page["title"] in src.used_ids:
-            continue
+    good = [p for p in pages
+            if (p.get("imageinfo") or [{}])[0].get("mime") in ("image/jpeg", "image/png")
+            and (p.get("imageinfo") or [{}])[0].get("width", 0) >= 500
+            and relevant(p["title"], query)]
+    # Prefer a photo not used yet; otherwise reuse a relevant one rather than show something unrelated.
+    fresh = [p for p in good if p["title"] not in src.used_ids]
+    for page in (fresh or good)[:1]:
+        info = page["imageinfo"][0]
         _download(info.get("thumburl") or info["url"], out)
         meta = info.get("extmetadata", {})
         artist = re.sub(r"<[^>]+>", "", html.unescape(meta.get("Artist", {}).get("value", ""))).strip()
         licence = meta.get("LicenseShortName", {}).get("value", "")
-        src.credits.append(f"{page['title'].removeprefix('File:')} — {artist or 'Unknown'} ({licence}), Wikimedia Commons")
+        credit = f"{page['title'].removeprefix('File:')} — {artist or 'Unknown'} ({licence}), Wikimedia Commons"
+        if credit not in src.credits:
+            src.credits.append(credit)
+        src.last_credit = credit
         src.used_ids.add(page["title"])
         return True
     return False
 
 
-def photo_clip(image: Path, seconds: float, out: Path, width: int, height: int) -> None:
-    """Photo on a blurred copy of itself, with a slow zoom (Ken Burns)."""
+def photo_clip(image: Path, seconds: float, out: Path, width: int, height: int,
+               zoom_in: bool = True) -> None:
+    """Photo on a blurred copy of itself, with a slow zoom in or out (Ken Burns)."""
     frames = int(seconds * 30) + 1
+    zoom = "min(1+0.0011*on,1.2)" if zoom_in else "max(1.2-0.0011*on,1)"
     vf = (f"[0:v]split=2[a][b];"
           f"[a]scale={width}:{height}:force_original_aspect_ratio=increase,crop={width}:{height},"
           f"boxblur=25:2,eq=brightness=-0.25[bg];"
@@ -85,7 +105,7 @@ def photo_clip(image: Path, seconds: float, out: Path, width: int, height: int) 
           f"[b]scale={width}:{int(height * 0.66)}:force_original_aspect_ratio=increase,"
           f"crop='min(iw,{width})':'min(ih,{int(height * 0.66)})'[fg];"
           f"[bg][fg]overlay=(W-w)/2:(H-h)/2,setsar=1,"
-          f"zoompan=z='min(1+0.0011*on,1.2)':x='iw/2-iw/zoom/2':y='ih/2-ih/zoom/2'"
+          f"zoompan=z='{zoom}':x='iw/2-iw/zoom/2':y='ih/2-ih/zoom/2'"
           f":d={frames}:s={width}x{height}:fps=30,{GRADE}[v]")
     run(["ffmpeg", "-y", "-i", str(image), "-filter_complex", vf, "-map", "[v]",
          "-t", f"{seconds:.3f}", *ENCODE, str(out)])
@@ -113,7 +133,7 @@ def fetch_pixabay(query: str, out: Path, src: Sources) -> bool:
         score = len(want & _words(hit.get("tags", "")))
         if score > best_score:
             best, best_score = hit, score
-    if not best:
+    if not best or best_score < 1:  # nothing actually tagged like the query
         return False
     sizes = [v for v in best.get("videos", {}).values() if v.get("url") and v.get("height", 0) >= 720]
     if not sizes:
@@ -156,7 +176,8 @@ def gradient(seconds: float, out: Path, width: int, height: int) -> None:
 
 # ---------- Timeline ----------
 
-def shot(spec: str, seconds: float, out: Path, src: Sources, width: int, height: int) -> None:
+def shot(spec: str, seconds: float, out: Path, src: Sources, width: int, height: int,
+         index: int = 0) -> None:
     """Make one shot for one line, trying the best source first."""
     raw = out.with_suffix(".src")
     stock = spec
@@ -164,21 +185,22 @@ def shot(spec: str, seconds: float, out: Path, src: Sources, width: int, height:
         wiki, _, stock = spec[5:].partition("|")
         try:
             if fetch_commons(wiki, raw, src):
-                photo_clip(raw, seconds, out, width, height)
-                print(f"[visual] {out.stem}: photo {src.credits[-1]!r} for '{wiki}'")
+                photo_clip(raw, seconds, out, width, height, zoom_in=index % 2 == 0)
+                print(f"[visual] {out.stem}: photo {src.last_credit!r} for '{wiki}'")
                 return
         except Exception as exc:
             print(f"[visual] commons '{wiki}' failed: {exc}")
-    for key, fetch in ((src.pixabay_key, fetch_pixabay), (src.pexels_key, fetch_pexels)):
-        if not key or not stock:
-            continue
-        try:
-            if fetch(stock, raw, src):
-                video_clip(raw, seconds, out, width, height)
-                print(f"[visual] {out.stem}: stock video for '{stock}'")
-                return
-        except Exception as exc:
-            print(f"[visual] stock '{stock}' failed: {exc}")
+    for query in dict.fromkeys(q for q in (stock, MOOD_FALLBACK) if q):
+        for key, fetch in ((src.pixabay_key, fetch_pixabay), (src.pexels_key, fetch_pexels)):
+            if not key:
+                continue
+            try:
+                if fetch(query, raw, src):
+                    video_clip(raw, seconds, out, width, height)
+                    print(f"[visual] {out.stem}: stock video for '{query}'")
+                    return
+            except Exception as exc:
+                print(f"[visual] stock '{query}' failed: {exc}")
     gradient(seconds, out, width, height)
 
 
@@ -191,7 +213,7 @@ def build(visuals: list[str], spans: list[float], workdir: Path, width: int, hei
     parts = []
     for i, (spec, seconds) in enumerate(zip(visuals, spans)):
         part = workdir / f"shot_{i:02d}.mp4"
-        shot(spec, max(seconds, 0.5), part, src, width, height)
+        shot(spec, max(seconds, 0.5), part, src, width, height, index=i)
         parts.append(part)
     listing = workdir / "shots.txt"
     listing.write_text("\n".join(f"file '{p.resolve()}'" for p in parts), encoding="utf-8")
