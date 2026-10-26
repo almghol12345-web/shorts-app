@@ -35,9 +35,10 @@ PALETTES = [  # dark, cold tones for a mysterious mood
 
 
 # One look for the whole channel: illustrated, dark and cinematic (clearly not photoreal).
-ART_STYLE = ("dark cinematic anime illustration, painterly digital art, dramatic moody lighting, "
-             "deep shadows, muted colors with a red accent, highly detailed, atmospheric fog, "
-             "vertical composition, no watermark")
+ART_STYLE = ("cinematic anime illustration, painterly digital art, moody dramatic lighting, "
+             "dark muted colors, highly detailed, vertical composition, no watermark")
+AI_GAP = 20       # seconds between requests: the free tier answers 402 when called too fast
+_last_ai_call = [0.0]
 
 
 @dataclass
@@ -131,22 +132,33 @@ def photo_clip(image: Path, seconds: float, out: Path, width: int, height: int,
 # ---------- AI illustrations ----------
 
 def fetch_ai_image(scene: str, out: Path, src: Sources, width: int, height: int,
-                   attempts: int = 3) -> bool:
-    """Free image generation (Pollinations, no key). Same seed for the whole
-    video keeps the look consistent from shot to shot."""
+                   attempts: int = 4) -> bool:
+    """Free image generation (Pollinations). Same seed for the whole video keeps the
+    look consistent. Requests are spaced out to stay inside the free limits; an
+    optional POLLINATIONS_TOKEN (free account) raises those limits."""
+    import os
     url = (f"https://image.pollinations.ai/prompt/{quote(f'{scene}, {ART_STYLE}')}"
            f"?width={width}&height={height}&seed={src.seed}&model=flux&nologo=true&private=true")
+    headers = dict(UA)
+    token = os.environ.get("POLLINATIONS_TOKEN", "").strip()
+    if token:
+        headers["Authorization"] = f"Bearer {token}"
     for attempt in range(attempts):
+        wait = _last_ai_call[0] + AI_GAP - time.time()
+        if wait > 0:
+            time.sleep(wait)
+        _last_ai_call[0] = time.time()
         try:
-            resp = requests.get(url, headers=UA, timeout=150)
+            resp = requests.get(url, headers=headers, timeout=150)
             if resp.ok and resp.headers.get("content-type", "").startswith("image/") and len(resp.content) > 20_000:
                 out.write_bytes(resp.content)
                 src.ai_images += 1
                 return True
             print(f"[visual] ai image attempt {attempt + 1}: HTTP {resp.status_code}")
+            if resp.status_code in (402, 429):
+                time.sleep(30 * (attempt + 1))  # back off harder when rate-limited
         except requests.RequestException as exc:
             print(f"[visual] ai image attempt {attempt + 1}: {type(exc).__name__}")
-        time.sleep(5 * (attempt + 1))
     return False
 
 
