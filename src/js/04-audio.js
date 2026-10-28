@@ -35,6 +35,6 @@ function buzz(kind) {
   try {
     const Hp = plugin('Haptics');
     if (Hp) { if (kind === 'ok') Hp.notification({ type: 'SUCCESS' }); else if (kind === 'bad') Hp.notification({ type: 'ERROR' }); else Hp.impact({ style: kind === 'heavy' ? 'HEAVY' : kind === 'medium' ? 'MEDIUM' : 'LIGHT' }); return; }
-    if (navigator.vibrate) navigator.vibrate(kind === 'heavy' ? 40 : kind === 'medium' ? 20 : kind === 'ok' ? [20, 40, 20] : kind === 'bad' ? [60, 40, 60] : 8);
+    if (navigator.vibrate && (!navigator.userActivation || navigator.userActivation.hasBeenActive)) navigator.vibrate(kind === 'heavy' ? 40 : kind === 'medium' ? 20 : kind === 'ok' ? [20, 40, 20] : kind === 'bad' ? [60, 40, 60] : 8);
   } catch (e) { }
 }

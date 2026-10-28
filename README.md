@@ -55,7 +55,7 @@
 | `com.almghol.fajrsurvivors.gems4` | $19.99 | 2,600 جوهرة |
 | `com.almghol.fajrsurvivors.gems5` | $49.99 | 7,000 جوهرة |
 | `com.almghol.fajrsurvivors.gems6` | $99.99 | 15,000 جوهرة |
-| `com.almghol.fajrsurvivors.starter` | $1.99 | حزمة المبتدئين (ريم + 500 جوهرة + تذاكر) |
+| `com.almghol.fajrsurvivors.starter` | $1.99 | حزمة المبتدئين (الشبح + 500 جوهرة + تذاكر) |
 | `com.almghol.fajrsurvivors.monthly` | $4.99 | البطاقة الشهرية (300 + 100 يومياً × 30) |
 | `com.almghol.fajrsurvivors.pass` | $9.99 | تذكرة المعركة المميزة للموسم |
 

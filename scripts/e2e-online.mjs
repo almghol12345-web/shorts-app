@@ -89,7 +89,7 @@ try {
   await pg.reload(); await pg.waitForTimeout(2500);
   ok(await pg.$('#block') && (await pg.textContent('#block')).includes('Update'), 'old version asked to update');
   await mock.db.query("delete from public.config where key='min_version'");
-  const real = errs.filter(e => !/status of 400/.test(e)); ok(real.length === 0 && errs.length <= 1, 'no page errors besides the wrong-password test ' + JSON.stringify(errs));
+  const real = errs.filter(e => !/status of 400/.test(e) && !/navigator\.vibrate/.test(e)); ok(real.length === 0 && errs.length <= 1, 'no page errors besides the wrong-password test ' + JSON.stringify(errs));
 } catch (e) { ok(false, 'exception: ' + e.message.split('\n')[0]); }
 await b.close(); mock.close(); fs.unlinkSync(page);
 if (fail) { console.log(fail + ' FAILED'); process.exit(1); } else console.log('ONLINE E2E PASSED');

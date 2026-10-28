@@ -347,6 +347,27 @@ input[type=range]{width:100%;accent-color:var(--rust)}
 .block .panel{max-width:360px}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 
+/* hero portraits */
+.av{overflow:hidden;padding:0}
+.av img{width:100%;height:100%;display:block;border-radius:50%;object-fit:cover;pointer-events:none}
+.pcard{position:relative;display:block;width:100%;aspect-ratio:4/5;max-width:100%;border-radius:10px;overflow:hidden;border:2px solid var(--r1);box-shadow:inset 0 0 0 1px #0006}
+.pcard.r2{border-color:var(--r2)}
+.pcard.r3{border-color:var(--r3);box-shadow:0 0 12px #e8a62d55}
+.pcard img{width:100%;height:100%;object-fit:cover;object-position:50% 20%;display:block;pointer-events:none}
+.pcard::after{content:"";position:absolute;inset:auto 0 0 0;height:35%;background:linear-gradient(180deg,#0000,#000a)}
+.pcard .pcl{position:absolute;top:4px;inset-inline-end:4px;z-index:1;font-size:12px;background:#0d1114cc;border-radius:6px;padding:1px 4px;line-height:1.3}
+.pcard .plv{position:absolute;bottom:4px;inset-inline-start:5px;z-index:1;font-family:var(--fd);font-weight:800;font-size:11px;color:#fff;text-shadow:0 1px 2px #000}
+.pcard .plock{position:absolute;inset:0;display:grid;place-items:center;font-size:24px;z-index:1}
+.hc .pcard{width:86%}
+.hc.lockd .pcard img{filter:grayscale(1) brightness(.35) blur(1px)}
+.pull .hc .pcard{width:100%}
+.hero-hero{display:grid;grid-template-columns:120px 1fr;gap:14px;align-items:center;background:radial-gradient(ellipse at 20% 50%,#ffffff10,#0000 60%),#10161a;border:1px solid #27323b;border-radius:14px;padding:10px}
+.hero-hero img{width:120px;height:150px;object-fit:cover;object-position:50% 20%;border-radius:12px;border:3px solid var(--r1)}
+.hero-hero.r2 img{border-color:var(--r2)}
+.hero-hero.r3 img{border-color:var(--r3);box-shadow:0 0 18px #e8a62d66}
+.hh-info{display:grid;gap:6px;justify-items:start;min-width:0}
+.hh-info b{font-family:var(--fd);font-size:24px;font-weight:800;line-height:1.1}
+
 </style>
 </head>
 <body>
@@ -462,7 +483,7 @@ ar: {
   tab_base: 'القاعدة', tab_heroes: 'الأبطال', tab_campaign: 'الحملة', tab_world: 'العالم', tab_alliance: 'التحالف',
   sc_events: 'الفعاليات', sc_quests: 'المهام', sc_wheel: 'العجلة', sc_pass: 'التذكرة', sc_shop: 'المتجر', sc_rank: 'الترتيب', sc_achs: 'الإنجازات', sc_mail: 'البريد', sc_bag: 'الحقيبة', sc_collect: 'جمع الكل',
   close: 'إغلاق', claim: 'استلام', go: 'اذهب', quest: 'مهمة', quests_done: 'أكملت كل المهام الرئيسية. أنت أسطورة الناجين.',
-  siege_in: 'موجة زومبي تهاجم القاعدة خلال', starter_banner: 'عرض المبتدئين: ريم الأسطورية + جواهر', builders: 'البناؤون', builders_idle: 'البناؤون متفرغون. اضغط على أي مبنى لتطويره.', training_n: 'تدريب {0}',
+  siege_in: 'موجة زومبي تهاجم القاعدة خلال', starter_banner: 'عرض المبتدئين: الشبح الأسطورية + جواهر', builders: 'البناؤون', builders_idle: 'البناؤون متفرغون. اضغط على أي مبنى لتطويره.', training_n: 'تدريب {0}',
   hq_short: 'المقر {0}', build: 'بناء', empty: 'فارغ', squad: 'فريق القتال', squad_power: 'قوة الفريق', troop_bonus: 'دعم الجنود', recruit: 'تجنيد',
   front_row: 'الصف الأمامي · يتلقى الضربات أولاً', back_row: 'الصف الخلفي', auto_squad: 'أفضل تشكيلة', your_heroes: 'أبطالك', in_squad: 'بالفريق',
   campaign_area: 'الحملة · المدينة المنكوبة', boss_stage: 'مرحلة زعيم', waves3: '3 موجات', rewards: 'الجوائز', your_power: 'قوتك', vs: 'ضد', rec_power: 'القوة المقترحة', start_battle: 'ابدأ المعركة',
@@ -488,7 +509,7 @@ ar: {
   starter_pack: 'حزمة المبتدئين', once: 'مرة واحدة', monthly_card: 'البطاقة الشهرية', active_days: 'فعّالة · {0} يوم', monthly_desc: '{0} جوهرة فوراً، ثم {1} جوهرة كل يوم لمدة {2} يوماً.', premium_pass: 'تذكرة المعركة المميزة', pass_desc: 'افتح المسار المميز لهذا الموسم: جواهر وتذاكر وبطلين أسطوريين حصريين.', owned: 'مملوكة',
   discount_on: 'خصم {0}% على المتجر الآن!', free: 'مجاناً', tomorrow: 'غداً', shop: 'المتجر', gems_have: 'لديك {0} جوهرة',
   g_free: 'صندوق مجاني يومي', g_ticket: 'تذكرة تجنيد', g_ticket10: '10 تذاكر تجنيد', g_sp5: 'تسريع 5 دقائق', g_sp60: 'تسريع ساعة', g_stam: 'علبة طاقة', g_spin: 'دورة عجلة', g_food: '10K غذاء', g_wood: '10K خشب', g_iron: '5K حديد', g_fuel: '2K وقود', g_exp: '5K خبرة أبطال',
-  starter_sub: 'عرض لمرة واحدة', starter_hero: 'احصل على ريم الأسطورية فوراً', starter_value: 'قيمة تتجاوز 10 أضعاف السعر', later: 'لاحقاً',
+  starter_sub: 'عرض لمرة واحدة', starter_hero: 'احصل على الشبح الأسطورية فوراً', starter_value: 'قيمة تتجاوز 10 أضعاف السعر', later: 'لاحقاً',
   use: 'استخدام', from_timer: 'من شاشة المؤقت', hero_xp: 'خبرة الأبطال', hero_xp_note: 'لرفع مستوى الأبطال', troops_where: 'من الثكنة والمستشفى', bag: 'الحقيبة',
   you_won: 'ربحت!', spin_free: 'لف مجاناً', spin_item: 'لف (دورات: {0})', spin_gems: 'لف 💎 {0}', wheel_note: 'متبقي {0} دورة مدفوعة اليوم', lucky_wheel: 'عجلة الحظ', wheel_limit: 'وصلت لحد الدورات اليوم',
   tier_n: 'المرحلة {0} / {1}', season_ends: 'ينتهي الموسم خلال', pass_how: 'اجمع نقاط التذكرة من المهام اليومية والمعارك وتسجيل الدخول.', claim_all: 'استلام الكل', premium: 'مميز', unlock_premium: 'افتح المميز', free_track: 'مجاني', premium_track: 'مميز', battle_pass: 'تذكرة المعركة', season_n: 'الموسم {0}',
@@ -545,7 +566,7 @@ en: {
   tab_base: 'Base', tab_heroes: 'Heroes', tab_campaign: 'Campaign', tab_world: 'World', tab_alliance: 'Alliance',
   sc_events: 'Events', sc_quests: 'Quests', sc_wheel: 'Wheel', sc_pass: 'Pass', sc_shop: 'Shop', sc_rank: 'Ranking', sc_achs: 'Awards', sc_mail: 'Mail', sc_bag: 'Bag', sc_collect: 'Collect',
   close: 'Close', claim: 'Claim', go: 'Go', quest: 'Quest', quests_done: 'All main quests done. You are a survivor legend.',
-  siege_in: 'A zombie horde hits your base in', starter_banner: 'Starter offer: Legendary Reem + gems', builders: 'Builders', builders_idle: 'Builders are free. Tap any building to upgrade it.', training_n: 'Training {0}',
+  siege_in: 'A zombie horde hits your base in', starter_banner: 'Starter offer: Legendary Ghost + gems', builders: 'Builders', builders_idle: 'Builders are free. Tap any building to upgrade it.', training_n: 'Training {0}',
   hq_short: 'HQ {0}', build: 'Build', empty: 'Empty', squad: 'Battle Squad', squad_power: 'Squad power', troop_bonus: 'Troop bonus', recruit: 'Recruit',
   front_row: 'Front row · takes hits first', back_row: 'Back row', auto_squad: 'Best lineup', your_heroes: 'Your heroes', in_squad: 'Squad',
   campaign_area: 'Campaign · The Fallen City', boss_stage: 'Boss stage', waves3: '3 waves', rewards: 'Rewards', your_power: 'Your power', vs: 'vs', rec_power: 'Recommended', start_battle: 'Start Battle',
@@ -571,7 +592,7 @@ en: {
   starter_pack: 'Starter Pack', once: 'One time', monthly_card: 'Monthly Card', active_days: 'Active · {0} days', monthly_desc: '{0} gems now, then {1} gems every day for {2} days.', premium_pass: 'Premium Battle Pass', pass_desc: 'Unlock this season’s premium track: gems, tickets and two exclusive legendary heroes.', owned: 'Owned',
   discount_on: '{0}% off the shop right now!', free: 'Free', tomorrow: 'Tomorrow', shop: 'Shop', gems_have: 'You have {0} gems',
   g_free: 'Free daily box', g_ticket: 'Recruit ticket', g_ticket10: '10 recruit tickets', g_sp5: '5-min speedup', g_sp60: '1-hour speedup', g_stam: 'Energy can', g_spin: 'Wheel spin', g_food: '10K food', g_wood: '10K wood', g_iron: '5K iron', g_fuel: '2K fuel', g_exp: '5K hero XP',
-  starter_sub: 'One-time offer', starter_hero: 'Get Legendary Reem instantly', starter_value: 'Over 10× the value', later: 'Later',
+  starter_sub: 'One-time offer', starter_hero: 'Get Legendary Ghost instantly', starter_value: 'Over 10× the value', later: 'Later',
   use: 'Use', from_timer: 'From a timer', hero_xp: 'Hero XP', hero_xp_note: 'Used to level up heroes', troops_where: 'From Barracks and Hospital', bag: 'Bag',
   you_won: 'You won!', spin_free: 'Spin free', spin_item: 'Spin ({0} left)', spin_gems: 'Spin 💎 {0}', wheel_note: '{0} paid spins left today', lucky_wheel: 'Lucky Wheel', wheel_limit: 'Daily spin limit reached',
   tier_n: 'Tier {0} / {1}', season_ends: 'Season ends in', pass_how: 'Earn pass points from daily tasks, battles and logging in.', claim_all: 'Claim all', premium: 'Premium', unlock_premium: 'Unlock premium', free_track: 'Free', premium_track: 'Premium', battle_pass: 'Battle Pass', season_n: 'Season {0}',
@@ -680,23 +701,42 @@ const RAR = [null, { n: { ar: 'نادر', en: 'Rare' }, c: 'var(--r1)' }, { n: {
 const RM = [0, .7, 1, 1.35];
 const H = (id, ar, en, r, c, sk, skar, sken, qar, qen) => ({ id, n: { ar, en }, r, c, sk, skn: { ar: skar, en: sken }, q: { ar: qar, en: qen } });
 const HEROES = [
-  H('reem', 'ريم', 'Reem', 3, 'atk', 'snipe', 'رصاصة الموت', 'Death Shot', 'قناصة سابقة في القوات الخاصة. لا تطلق مرتين على نفس الهدف.', 'Ex special-forces sniper. Never needs a second shot.'),
-  H('saqr', 'صقر', 'Saqr', 3, 'tank', 'shield', 'جدار الحديد', 'Iron Wall', 'حارس المعبر الشمالي. يقف أمام الموجة ولا يتراجع.', 'Guardian of the north gate. He stands in front of the horde and never steps back.'),
-  H('layla', 'ليلى', 'Layla', 3, 'sup', 'heal', 'إسعاف ميداني', 'Field Medic', 'طبيبة الطوارئ الوحيدة التي نجت من المستشفى المركزي.', 'The only ER doctor who made it out of Central Hospital.'),
-  H('noura', 'نورة', 'Noura', 3, 'atk', 'air', 'ضربة جوية', 'Airstrike', 'مهندسة اتصالات تملك شيفرة آخر طائرة مسيّرة.', 'A comms engineer holding the codes to the last drone.'),
-  H('khalid', 'خالد', 'Khalid', 3, 'tank', 'stun', 'هزة الأرض', 'Quake Slam', 'قائد كتيبة سابق. حين يضرب الأرض يتجمد الزومبي.', 'A former battalion commander. When he hits the ground, the dead freeze.'),
-  H('dana', 'دانة', 'Dana', 3, 'sup', 'buff', 'نداء النصر', 'Victory Call', 'صوتها على اللاسلكي يجمع الناجين من كل مكان.', 'Her voice on the radio brings survivors from everywhere.'),
-  H('jaser', 'جاسر', 'Jaser', 2, 'atk', 'aoe', 'قنبلة حارقة', 'Firebomb', 'يصنع المتفجرات من أي شيء يجده.', 'Builds explosives out of anything he finds.'),
-  H('nimr', 'نمر', 'Nimr', 2, 'tank', 'stun', 'زلزال', 'Earthquake', 'مصارع سابق. ضربته على الأرض توقف الزومبي في مكانهم.', 'A former wrestler. His slam stops zombies in their tracks.'),
-  H('hala', 'هالة', 'Hala', 2, 'atk', 'rapid', 'وابل رصاص', 'Bullet Storm', 'سريعة اليد، تفرّغ المخزن قبل أن ترمش.', 'Fastest hands alive. Empties a clip before you blink.'),
-  H('fares', 'فارس', 'Fares', 2, 'sup', 'buff', 'صرخة القائد', 'Battle Cry', 'ضابط متقاعد. صوته وحده يرفع معنويات الفريق.', 'A retired officer. His voice alone lifts the squad.'),
-  H('omar', 'عمر', 'Omar', 2, 'atk', 'snipe', 'عين الصقر', 'Hawk Eye', 'رامي سهام بطولي تحوّل للبندقية.', 'A champion archer who switched to rifles.'),
-  H('salem', 'سالم', 'Salem', 1, 'atk', 'snipe', 'طلقة دقيقة', 'Precise Shot', 'صياد من البادية، عينه لا تخيب.', 'A desert hunter whose aim never fails.'),
-  H('mona', 'منى', 'Mona', 1, 'sup', 'heal', 'ضمادات', 'Bandages', 'ممرضة متطوعة، حقيبتها لا تفرغ.', 'A volunteer nurse whose bag never runs empty.'),
-  H('badr', 'بدر', 'Badr', 1, 'tank', 'shield', 'درع مؤقت', 'Makeshift Shield', 'عامل بناء يحمل باباً حديدياً كدرع.', 'A builder who carries a steel door as a shield.'),
-  H('ziad', 'زياد', 'Ziad', 1, 'atk', 'aoe', 'قنبلة يدوية', 'Grenade', 'شاب متهور يحب الانفجارات أكثر من اللازم.', 'A reckless kid who loves explosions a bit too much.'),
-  H('sara', 'سارة', 'Sara', 1, 'sup', 'heal', 'إسعافات أولية', 'First Aid', 'طالبة طب لم تكمل دراستها، لكنها أنقذت العشرات.', 'A med student who never graduated but has saved dozens.'),
+  H('reem', 'الشبح', 'Ghost', 3, 'atk', 'snipe', 'رصاصة الموت', 'Death Shot', 'قناصة القوات الخاصة. ما أحد شاف وجهها، وما أحد نجا من طلقتها.', 'Special-forces sniper. Nobody has seen her face, nobody survives her shot.'),
+  H('saqr', 'الحصن', 'Bastion', 3, 'tank', 'shield', 'جدار الحديد', 'Iron Wall', 'حارس المعبر الشمالي. يقف أمام الموجة ولا يتراجع خطوة.', 'Guardian of the north gate. Stands in front of the horde and never steps back.'),
+  H('layla', 'الملاك', 'Angel', 3, 'sup', 'heal', 'إسعاف ميداني', 'Field Medic', 'طبيبة الطوارئ الوحيدة اللي طلعت حية من المستشفى المركزي.', 'The only ER doctor who made it out of Central Hospital alive.'),
+  H('noura', 'العاصفة', 'Storm', 3, 'atk', 'air', 'ضربة جوية', 'Airstrike', 'مهندسة اتصالات تملك شيفرة آخر طائرة مسيّرة.', 'A comms engineer holding the codes to the last drone.'),
+  H('khalid', 'الزلزال', 'Quake', 3, 'tank', 'stun', 'هزة الأرض', 'Quake Slam', 'قائد كتيبة سابق. حين يضرب الأرض يتجمد الزومبي.', 'A former battalion commander. When he hits the ground, the dead freeze.'),
+  H('dana', 'الصدى', 'Echo', 3, 'sup', 'buff', 'نداء النصر', 'Victory Call', 'صوتها على اللاسلكي يجمع الناجين من كل مكان.', 'Her voice on the radio brings survivors from everywhere.'),
+  H('jaser', 'اللهب', 'Blaze', 2, 'atk', 'aoe', 'قنبلة حارقة', 'Firebomb', 'يصنع المتفجرات من أي شيء يلقاه.', 'Builds explosives out of anything he finds.'),
+  H('nimr', 'الجبل', 'Boulder', 2, 'tank', 'stun', 'زلزال', 'Earthquake', 'مصارع سابق. ضربته على الأرض توقف الزومبي في مكانهم.', 'A former wrestler. His slam stops zombies in their tracks.'),
+  H('hala', 'الإعصار', 'Cyclone', 2, 'atk', 'rapid', 'وابل رصاص', 'Bullet Storm', 'أسرع يد في المدينة، تفرّغ المخزن قبل لا ترمش.', 'Fastest hands in the city. Empties a clip before you blink.'),
+  H('fares', 'الذيب', 'Wolf', 2, 'sup', 'buff', 'صرخة القائد', 'Battle Cry', 'ضابط متقاعد. صوته وحده يرفع معنويات الفريق.', 'A retired officer. His voice alone lifts the squad.'),
+  H('omar', 'الصقر', 'Hawk', 2, 'atk', 'snipe', 'عين الصقر', 'Hawk Eye', 'صياد صحراء يشوف الهدف قبل لا يشوفه.', 'A desert hunter who spots the target before it spots him.'),
+  H('salem', 'العقرب', 'Scorpion', 1, 'atk', 'snipe', 'لدغة قاتلة', 'Deadly Sting', 'هادئ وصبور، وضربته وحدة.', 'Quiet, patient, and he only needs one hit.'),
+  H('mona', 'الإبرة', 'Needle', 1, 'sup', 'heal', 'ضمادات', 'Bandages', 'ممرضة متطوعة، حقيبتها ما تفرغ.', 'A volunteer nurse whose bag never runs empty.'),
+  H('badr', 'الصخرة', 'Rock', 1, 'tank', 'shield', 'درع مؤقت', 'Makeshift Shield', 'عامل بناء يشيل باب حديد كدرع.', 'A builder who carries a steel door as a shield.'),
+  H('ziad', 'الشرارة', 'Spark', 1, 'atk', 'aoe', 'قنبلة يدوية', 'Grenade', 'شاب متهور يحب الانفجارات أكثر من اللازم.', 'A reckless kid who loves explosions a bit too much.'),
+  H('sara', 'النبض', 'Pulse', 1, 'sup', 'heal', 'إسعافات أولية', 'First Aid', 'طالبة طب ما كملت دراستها، لكنها أنقذت العشرات.', 'A med student who never graduated but has saved dozens.'),
 ];
+const LOOKS = {
+  reem: { fem: 1, skin: 'b', head: 'hood', gear: '#2f3a2c', mask: 'skull', weapon: 'sniper', eye: '#3f7a4a', vest: '#3a4a32', camo: 1, acc: '#64b66e' },
+  saqr: { skin: 'c', head: 'helmetNvg', gear: '#3a4048', beard: 1, hair: '#1a1410', weapon: 'shield', vest: '#2d3a48', patch: 'flag', acc: '#5aa6d6' },
+  layla: { fem: 1, skin: 'a', hair: '#5a3420', hairStyle: 'long', head: 'headset', weapon: 'medic', vest: '#4f5f66', patch: 'cross', eye: '#4a6a8a', acc: '#c9302c' },
+  noura: { fem: 1, skin: 'b', hair: '#141010', hairStyle: 'pony', glasses: 'goggles', earpiece: 1, weapon: 'antenna', vest: '#4a3a2a', acc: '#5aa6d6', scarfNeck: '#2a2d30' },
+  khalid: { skin: 'd', head: 'helmet', cover: 1, gear: '#4d5238', beard: 1, hair: '#57504a', scar: 1, weapon: 'launcher', vest: '#4a4a36', camo: 1, acc: '#e0b04a' },
+  dana: { fem: 1, skin: 'c', hair: '#1e1410', hairStyle: 'pony', head: 'beret', beretCol: '#7a1f22', weapon: 'smg', vest: '#363a48', eye: '#5a3a20', acc: '#e0b04a' },
+  jaser: { skin: 'b', hair: '#a0461e', hairStyle: 'mohawk', mask: 'gas', weapon: 'launcher', vest: '#4a2a1e', acc: '#e07a2a' },
+  nimr: { skin: 'e', hair: '#0d0a08', hairStyle: 'buzz', beard: 1, paint: '#cf6a2c', weapon: 'shield', vest: '#3a3a30', camo: 1, grin: 1 },
+  hala: { fem: 1, skin: 'a', hair: '#c9a25a', hairStyle: 'pony', head: 'cap', gear: '#2a3a4a', glasses: 'shades', weapon: 'smg', vest: '#2a3a4a', acc: '#e2513f' },
+  fares: { skin: 'b', hair: '#6a645c', head: 'beret', beretCol: '#3b5a2a', beard: 1, weapon: 'rifle', vest: '#3a4a32', camo: 1, acc: '#e0b04a' },
+  omar: { skin: 'c', head: 'cap', gear: '#5a4a30', mask: 'shemagh', maskCol: '#d8c8a8', weapon: 'sniper', vest: '#5a4a30', eye: '#2a1a10', acc: '#cf6a2c' },
+  salem: { skin: 'c', hair: '#1a1410', hairStyle: 'short', mask: 'shemagh', maskCol: '#b8443a', weapon: 'rifle', vest: '#6a5a3a', stubble: 1, acc: '#e2513f' },
+  mona: { fem: 1, skin: 'b', hair: '#2a1810', hairStyle: 'long', weapon: 'medic', vest: '#4a5a5a', patch: 'cross', acc: '#c9302c' },
+  badr: { skin: 'd', head: 'helmet', gear: '#4a5040', stubble: 1, hair: '#1a1410', weapon: 'shield', vest: '#4a4a3a' },
+  ziad: { skin: 'a', hair: '#3a2414', hairStyle: 'short', head: 'bandana', bandCol: '#2a4a8a', grin: 1, paint: '#e07a2a', weapon: 'smg', vest: '#3a4048' },
+  sara: { fem: 1, skin: 'd', hair: '#0d0a08', hairStyle: 'pony', head: 'headset', weapon: 'medic', vest: '#4a4458', patch: 'cross', acc: '#c9302c' },
+};
+HEROES.forEach(h => h.look = LOOKS[h.id]);
 const HB = Object.fromEntries(HEROES.map(h => [h.id, h]));
 const ZT = {
   w: { i: '🧟', n: { ar: 'زاحف', en: 'Walker' }, hp: 1, atk: 1, spd: 30, r: 15 },
@@ -706,7 +746,7 @@ const ZT = {
   boss: { i: '👺', n: { ar: 'زعيم', en: 'Boss' }, hp: 22, atk: 3, spd: 15, r: 32 },
   wb: { i: '🦍', n: { ar: 'العملاق', en: 'The Colossus' }, hp: 1, atk: 2.2, spd: 24, r: 48 },
 };
-const BOTS = [['أبو فهد', 'Abu Fahad'], ['سلطان', 'Sultan'], ['غيمة', 'Ghaima'], ['مشعل', 'Mishal'], ['الذيب', 'Al-Theeb'], ['نوف', 'Nouf'], ['عبدالعزيز', 'Abdulaziz'], ['ريان', 'Rayan'], ['شهد', 'Shahad'], ['تركي', 'Turki'], ['لمى', 'Lama'], ['حمد', 'Hamad'], ['جود', 'Joud'], ['بندر', 'Bandar']].map(([ar, en]) => ({ ar, en }));
+const BOTS = [['أبو فهد', 'Abu Fahad'], ['سلطان', 'Sultan'], ['غيمة', 'Ghaima'], ['مشعل', 'Mishal'], ['سعود', 'Saud'], ['نوف', 'Nouf'], ['عبدالعزيز', 'Abdulaziz'], ['ريان', 'Rayan'], ['شهد', 'Shahad'], ['تركي', 'Turki'], ['لمى', 'Lama'], ['حمد', 'Hamad'], ['جود', 'Joud'], ['بندر', 'Bandar']].map(([ar, en]) => ({ ar, en }));
 const ALLIES = [
   { n: { ar: 'نسور الصحراء', en: 'Desert Eagles' }, tag: 'NSR', lv: 7, col: '#a9521f' },
   { n: { ar: 'ذئاب الليل', en: 'Night Wolves' }, tag: 'DHB', lv: 5, col: '#3f6f96' },
@@ -714,9 +754,9 @@ const ALLIES = [
 ];
 const CHATL = [
   ['أحد يساعدني في البناء؟ 🙏', 'Anyone help me with my build? 🙏'], ['الموجة اليوم قوية انتبهوا', 'The horde is strong today, watch out'], ['وصلت المرحلة الجديدة 🔥', 'Just reached a new stage 🔥'],
-  ['مين عنده ريم؟ تستاهل', 'Who has Reem? She is worth it'], ['لا تنسون هدية التحالف', 'Don’t forget the alliance gift'], ['الله يعطيكم العافية يا شباب', 'Good work, everyone'],
+  ['مين عنده الشبح؟ تستاهل', 'Who has Ghost? She is worth it'], ['لا تنسون هدية التحالف', 'Don’t forget the alliance gift'], ['الله يعطيكم العافية يا شباب', 'Good work, everyone'],
   ['فيه معسكر زومبي مستوى عالي قرب الطريق الشرقي', 'High-level zombie camp near the east road'], ['طوروا السور قبل الهجوم', 'Upgrade your wall before the raid'], ['ساعدتكم كلكم 💪', 'Helped all of you 💪'],
-  ['صباح الخير يا ناجين', 'Morning, survivors'], ['أحد جرب نمر مع ليلى؟ تشكيلة قوية', 'Tried Nimr with Layla? Strong combo'], ['الزعيم العالمي اليوم سهل 😎', 'World boss is easy today 😎'],
+  ['صباح الخير يا ناجين', 'Morning, survivors'], ['أحد جرب الجبل مع الملاك؟ تشكيلة قوية', 'Tried Boulder with Angel? Strong combo'], ['الزعيم العالمي اليوم سهل 😎', 'World boss is easy today 😎'],
 ].map(([ar, en]) => ({ ar, en }));
 const CHATR = [['😂👍', '😂👍'], ['صح كلامك', 'True'], ['تم يا بطل', 'Done, hero'], ['الله يوفقك', 'Good luck'], ['أنا معك', 'I’m with you'], ['💪💪', '💪💪']].map(([ar, en]) => ({ ar, en }));
 const DAILY = [
@@ -764,6 +804,113 @@ const ACH = [
   { k: 'boss', i: '🦍', v: () => S.stats.bossDmg, tiers: [100000, 1000000, 10000000, 100000000] },
 ];
 const achReward = tier => ({ gems: [50, 100, 200, 400, 800, 1500][tier] || 1500 });
+
+/* ---- 02b-portraits.js ---- */
+/* ================= hero portraits: layered SVG soldiers drawn in code =================
+ * Each hero has a spec (skin, hair, headgear, face gear, vest, weapon...). portraitSVG(spec)
+ * builds a 100x100 bust. Images are cached as data URIs for <img> tags and canvas drawing.
+ */
+const SKIN = { a: ['#f1c9a5', '#d9a37f'], b: ['#d8a578', '#b98358'], c: ['#b57b4f', '#94603a'], d: ['#8a5a3a', '#6d4429'], e: ['#5e3b26', '#48291a'] };
+const RAR_BG = [null, ['#2b4a6e', '#101a26'], ['#4b2f6e', '#170f24'], ['#7a5420', '#24170a']];
+function shade(hex, f) { const n = parseInt(hex.slice(1), 16); let r = n >> 16, g = n >> 8 & 255, b = n & 255; r = clamp(Math.round(r * f), 0, 255); g = clamp(Math.round(g * f), 0, 255); b = clamp(Math.round(b * f), 0, 255); return '#' + ((1 << 24) | (r << 16) | (g << 8) | b).toString(16).slice(1); }
+function portraitSVG(p, rar) {
+  const [sk, skd] = SKIN[p.skin || 'b'], hair = p.hair || '#2a1d14', vest = p.vest || '#4a5a3a', vd = shade(vest, .7), vl = shade(vest, 1.25), [bg1, bg2] = RAR_BG[rar || 1];
+  const fem = !!p.fem, eye = p.eye || '#3b2a1c', gear = p.gear || '#2d3236', gd = shade(gear, .7), gl = shade(gear, 1.35), acc = p.acc || '#cf6a2c';
+  let s = `<defs><radialGradient id="bg" cx=".5" cy=".38" r=".75"><stop offset="0" stop-color="${bg1}"/><stop offset="1" stop-color="${bg2}"/></radialGradient>
+  <linearGradient id="vg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${vl}"/><stop offset="1" stop-color="${vd}"/></linearGradient>
+  <linearGradient id="fg" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="${skd}"/><stop offset=".35" stop-color="${sk}"/><stop offset=".7" stop-color="${sk}"/><stop offset="1" stop-color="${skd}"/></linearGradient>
+  <linearGradient id="hg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${gl}"/><stop offset="1" stop-color="${gd}"/></linearGradient>
+  <clipPath id="cl"><rect width="100" height="100"/></clipPath></defs><g clip-path="url(#cl)">
+  <rect width="100" height="100" fill="url(#bg)"/>
+  <g opacity=".18" fill="#fff"><circle cx="18" cy="22" r="9"/><circle cx="84" cy="30" r="12"/><circle cx="72" cy="12" r="6"/></g>
+  <path d="M0 78 L14 70 L22 74 L30 64 L40 70 L52 60 L62 68 L74 58 L86 66 L100 60 L100 100 L0 100Z" fill="#000" opacity=".35"/>`;
+  // weapon behind the shoulder
+  const w = p.weapon;
+  if (w === 'rifle') s += `<g transform="rotate(-35 78 70)"><rect x="60" y="66" width="46" height="6" rx="1.5" fill="#1b1d1f"/><rect x="70" y="72" width="5" height="10" fill="#1b1d1f"/><rect x="82" y="72" width="4" height="8" fill="#1b1d1f"/><rect x="64" y="62" width="12" height="4" fill="#2a2d30"/></g>`;
+  if (w === 'sniper') s += `<g transform="rotate(-40 76 72)"><rect x="52" y="68" width="62" height="4" rx="1" fill="#1b1d1f"/><rect x="66" y="62" width="16" height="5" rx="2.5" fill="#2a2d30"/><circle cx="82" cy="64.5" r="2.5" fill="#5aa6d6" opacity=".7"/><rect x="58" y="72" width="10" height="6" fill="#3a2a1c"/></g>`;
+  if (w === 'launcher') s += `<g transform="rotate(-30 76 70)"><rect x="56" y="62" width="50" height="11" rx="5" fill="#3b4a2a"/><rect x="52" y="60" width="8" height="15" rx="2" fill="#1b1d1f"/><rect x="72" y="73" width="5" height="8" fill="#1b1d1f"/></g>`;
+  if (w === 'smg') s += `<g transform="rotate(-25 74 74)"><rect x="62" y="70" width="32" height="7" rx="2" fill="#1b1d1f"/><rect x="72" y="77" width="4" height="10" fill="#1b1d1f"/><rect x="92" y="72" width="8" height="3" fill="#1b1d1f"/></g>`;
+  if (w === 'shield') s += `<path d="M70 60 L98 64 L96 100 L72 100Z" fill="#1d2b36"/><path d="M73 64 L95 67 L93 98 L75 98Z" fill="#2f4558"/><rect x="76" y="70" width="16" height="3" fill="#5aa6d6" opacity=".6"/><rect x="78" y="80" width="12" height="2" fill="#cfd8de" opacity=".5"/><rect x="78" y="84" width="12" height="2" fill="#cfd8de" opacity=".5"/>`;
+  if (w === 'antenna') s += `<rect x="72" y="20" width="1.6" height="52" fill="#1b1d1f"/><circle cx="72.8" cy="20" r="2" fill="${acc}"/><rect x="64" y="66" width="20" height="16" rx="2" fill="#2a2d30"/>`;
+  if (w === 'medic') s += `<rect x="66" y="62" width="26" height="22" rx="4" fill="#e8e2d6"/><rect x="76" y="65" width="6" height="16" fill="#c9302c"/><rect x="71" y="70" width="16" height="6" fill="#c9302c"/>`;
+  // long hair falls behind the head
+  if (fem && p.hairStyle === 'long') s += `<path d="M33 40 Q30 64 36 76 L64 76 Q70 64 67 40 Q66 22 50 22 Q34 22 33 40Z" fill="${hair}"/>`;
+  // shoulders, shirt and plate carrier
+  s += `<path d="M4 100 C6 80 22 70 50 69 C78 70 94 80 96 100Z" fill="${shade(vest, .85)}"/>
+  <path d="M4 100 C6 84 14 76 26 73 L30 100Z M96 100 C94 84 86 76 74 73 L70 100Z" fill="${p.sleeve || shade(vest, 1.05)}"/>`;
+  if (p.camo) s += `<g opacity=".45" fill="${shade(vest, .55)}"><ellipse cx="14" cy="88" rx="5" ry="3"/><ellipse cx="22" cy="80" rx="4" ry="2.5"/><ellipse cx="84" cy="86" rx="5" ry="3"/><ellipse cx="78" cy="94" rx="4" ry="2"/><ellipse cx="90" cy="95" rx="3" ry="2"/><ellipse cx="9" cy="96" rx="3" ry="2"/></g>`;
+  s += `<path d="M27 100 L29 75 Q50 84 71 75 L73 100Z" fill="url(#vg)"/>
+  <path d="M29 75 L36 70 M71 75 L64 70" stroke="${vd}" stroke-width="4" stroke-linecap="round"/>
+  <rect x="31" y="85" width="10" height="11" rx="1.5" fill="${vd}"/><rect x="45" y="86" width="10" height="11" rx="1.5" fill="${vd}"/><rect x="59" y="85" width="10" height="11" rx="1.5" fill="${vd}"/>
+  <rect x="31" y="85" width="10" height="3" fill="${vl}" opacity=".6"/><rect x="45" y="86" width="10" height="3" fill="${vl}" opacity=".6"/><rect x="59" y="85" width="10" height="3" fill="${vl}" opacity=".6"/>
+  <rect x="58" y="77" width="9" height="6" rx="1" fill="${acc}"/><rect x="33" y="78" width="9" height="5" rx="1" fill="#0d1114" opacity=".7"/>`;
+  if (p.patch === 'flag') s += `<rect x="33.5" y="78.5" width="8" height="4" fill="#3b6e3b"/><rect x="33.5" y="79.8" width="8" height="1.4" fill="#e8e2d6"/>`;
+  if (p.patch === 'cross') s += `<rect x="33.5" y="78.5" width="8" height="4" fill="#e8e2d6"/><rect x="36.6" y="78.5" width="1.8" height="4" fill="#c9302c"/><rect x="33.5" y="79.7" width="8" height="1.6" fill="#c9302c"/>`;
+  if (p.scarfNeck) s += `<path d="M36 66 Q50 76 64 66 L66 72 Q50 82 34 72Z" fill="${p.scarfNeck}"/>`;
+  // neck & head
+  s += `<path d="M43 56 L43 70 Q50 74 57 70 L57 56Z" fill="${skd}"/>
+  <ellipse cx="35.5" cy="44" rx="3" ry="4.5" fill="${skd}"/><ellipse cx="64.5" cy="44" rx="3" ry="4.5" fill="${skd}"/>
+  <path d="M35 40 Q35 23 50 23 Q65 23 65 40 Q65 54 58 60 Q50 65 42 60 Q35 54 35 40Z" fill="url(#fg)"/>`;
+  if (fem) s += `<path d="M38 52 Q42 61 50 63 Q58 61 62 52" fill="none" stroke="${skd}" stroke-width=".6" opacity=".6"/>`;
+  else s += `<path d="M37 50 Q40 60 50 63 Q60 60 63 50" fill="none" stroke="${skd}" stroke-width="1" opacity=".5"/>`;
+  // eyes, brows, nose, mouth
+  const ey = 42;
+  if (!p.balaclava || true) {
+    s += `<ellipse cx="44" cy="${ey}" rx="3" ry="${fem ? 2.1 : 1.7}" fill="#f4efe6"/><ellipse cx="56" cy="${ey}" rx="3" ry="${fem ? 2.1 : 1.7}" fill="#f4efe6"/>
+    <circle cx="44.3" cy="${ey}" r="1.5" fill="${eye}"/><circle cx="56.3" cy="${ey}" r="1.5" fill="${eye}"/><circle cx="44.8" cy="${ey - .5}" r=".45" fill="#fff"/><circle cx="56.8" cy="${ey - .5}" r=".45" fill="#fff"/>
+    <path d="M40 ${ey - 4.2} Q44 ${ey - (fem ? 6.2 : 5.4)} 48 ${ey - 4}" stroke="${shade(hair, .9)}" stroke-width="${fem ? 1 : 1.6}" fill="none" stroke-linecap="round"/><path d="M52 ${ey - 4} Q56 ${ey - (fem ? 6.2 : 5.4)} 60 ${ey - 4.2}" stroke="${shade(hair, .9)}" stroke-width="${fem ? 1 : 1.6}" fill="none" stroke-linecap="round"/>`;
+    if (fem) s += `<path d="M40.5 ${ey - 1.6} L42 ${ey - 2.4} M59.5 ${ey - 1.6} L58 ${ey - 2.4}" stroke="#1a1210" stroke-width=".7"/>`;
+  }
+  s += `<path d="M50 44 L48 51 Q50 52.5 52 51" fill="none" stroke="${skd}" stroke-width="1.1" stroke-linecap="round"/>`;
+  s += fem ? `<path d="M46 56 Q50 58 54 56" stroke="#9a4a42" stroke-width="1.6" fill="none" stroke-linecap="round"/>` : `<path d="M45.5 56 Q50 ${p.grin ? 59 : 57} 54.5 56" stroke="#5a3628" stroke-width="1.3" fill="none" stroke-linecap="round"/>`;
+  if (p.paint) s += `<path d="M39 46 L47 47 M53 47 L61 46" stroke="#111" stroke-width="2" opacity=".75"/><path d="M39 48.5 L46 49.5 M54 49.5 L61 48.5" stroke="${p.paint}" stroke-width="1.2" opacity=".8"/>`;
+  if (p.scar) s += `<path d="M58 36 L61 49" stroke="#7a3a2e" stroke-width="1.1"/><path d="M58.5 39 L60.5 39 M59.3 42 L61.3 42 M60 45 L62 45" stroke="#7a3a2e" stroke-width=".6"/>`;
+  if (p.beard) s += `<path d="M36 46 Q37 60 50 65 Q63 60 64 46 Q62 55 57 57 Q50 60 43 57 Q38 55 36 46Z" fill="${hair}"/><path d="M45 54.5 Q50 53 55 54.5 Q50 56.5 45 54.5Z" fill="${hair}"/><path d="M45.5 56 Q50 57.5 54.5 56" stroke="#3a2418" stroke-width="1" fill="none"/>`;
+  if (p.stubble) s += `<path d="M37 48 Q38 60 50 64 Q62 60 63 48 Q60 58 50 60 Q40 58 37 48Z" fill="${hair}" opacity=".28"/>`;
+  // hair (short) when nothing covers it
+  const hs = p.hairStyle;
+  if (hs === 'short') s += `<path d="M34.5 40 Q33 22 50 21 Q67 22 65.5 40 Q63 29 50 28.5 Q37 29 34.5 40Z" fill="${hair}"/>`;
+  if (hs === 'buzz') s += `<path d="M35 38 Q35 23 50 22.5 Q65 23 65 38 Q62 28 50 27.5 Q38 28 35 38Z" fill="${hair}" opacity=".85"/>`;
+  if (hs === 'long' || hs === 'pony') s += `<path d="M34 42 Q32 21 50 20 Q68 21 66 42 Q64 30 56 27 Q50 32 40 30 Q36 34 34 42Z" fill="${hair}"/>`;
+  if (hs === 'pony') s += `<path d="M62 26 Q76 30 72 52 Q70 40 64 34Z" fill="${hair}"/>`;
+  if (hs === 'mohawk') s += `<path d="M44 30 Q46 12 50 11 Q54 12 56 30Z" fill="${hair}"/><path d="M35 38 Q36 27 44 26 M65 38 Q64 27 56 26" stroke="${hair}" stroke-width="1.5" fill="none" opacity=".5"/>`;
+  // face gear
+  if (p.mask === 'gas') s += `<path d="M38 47 Q38 63 50 66 Q62 63 62 47 Q56 50 50 50 Q44 50 38 47Z" fill="#1f2326"/><circle cx="50" cy="60" r="5.5" fill="#3a3f44"/><circle cx="50" cy="60" r="3.5" fill="#1a1d20"/><g stroke="#55606a" stroke-width=".6"><line x1="47" y1="60" x2="53" y2="60"/><line x1="50" y1="57" x2="50" y2="63"/></g><circle cx="40" cy="56" r="3" fill="#2d3236"/><circle cx="60" cy="56" r="3" fill="#2d3236"/><path d="M36 46 L30 48 M64 46 L70 48" stroke="#1a1d20" stroke-width="2"/>`;
+  if (p.mask === 'shemagh') s += `<path d="M35 46 Q36 64 50 67 Q64 64 65 46 Q58 52 50 52 Q42 52 35 46Z" fill="${p.maskCol || '#c8b89a'}"/><g stroke="${shade(p.maskCol || '#c8b89a', .7)}" stroke-width=".8" opacity=".8"><path d="M37 52 L63 52 M38 56 L62 56 M40 60 L60 60"/><path d="M42 50 L44 64 M50 52 L50 66 M58 50 L56 64"/></g>`;
+  if (p.mask === 'skull') s += `<path d="M37 47 Q38 63 50 66 Q62 63 63 47 Q56 51 50 51 Q44 51 37 47Z" fill="#141617"/><g fill="#d8d2c4"><rect x="42" y="55" width="2.6" height="5" rx=".6"/><rect x="45.5" y="55.5" width="2.6" height="5.5" rx=".6"/><rect x="49" y="55.5" width="2.6" height="5.8" rx=".6"/><rect x="52.5" y="55.5" width="2.6" height="5.5" rx=".6"/><rect x="56" y="55" width="2.6" height="5" rx=".6"/></g>`;
+  if (p.glasses === 'shades') s += `<path d="M39 39.5 L49 39.5 L48 45 Q44 46.5 40 45Z M51 39.5 L61 39.5 L60 45 Q56 46.5 52 45Z" fill="#0d1114"/><path d="M49 40.5 L51 40.5" stroke="#0d1114" stroke-width="1.3"/><path d="M40.5 41 L44 41" stroke="#5aa6d6" stroke-width=".8" opacity=".7"/><path d="M52.5 41 L56 41" stroke="#5aa6d6" stroke-width=".8" opacity=".7"/>`;
+  if (p.glasses === 'patch') s += `<ellipse cx="56" cy="42" rx="4.5" ry="3.8" fill="#0d1114"/><path d="M35 36 L61 41 M51 42 L65 47" stroke="#0d1114" stroke-width="1.1"/>`;
+  if (p.glasses === 'goggles') s += `<rect x="37" y="37" width="26" height="9" rx="4.5" fill="#1b1d1f"/><ellipse cx="44" cy="41.5" rx="5" ry="3.6" fill="${acc}" opacity=".85"/><ellipse cx="56" cy="41.5" rx="5" ry="3.6" fill="${acc}" opacity=".85"/><path d="M41 40 L44 39.5" stroke="#fff" stroke-width=".9" opacity=".6"/><path d="M35 41 L37 41 M63 41 L65 41" stroke="#1b1d1f" stroke-width="2.5"/>`;
+  // headgear
+  const hg = p.head;
+  if (hg === 'helmet' || hg === 'helmetNvg') {
+    s += `<path d="M32 40 Q31 17 50 16 Q69 17 68 40 L65 40 Q64.5 28 50 27.5 Q35.5 28 35 40Z" fill="url(#hg)"/><path d="M33 33 Q50 27 67 33" stroke="${gd}" stroke-width="1.2" fill="none"/>
+    <path d="M35 40 Q36 50 40 56 M65 40 Q64 50 60 56" stroke="#1b1d1f" stroke-width="1.4" fill="none"/>`;
+    if (p.cover) s += `<g opacity=".5" fill="${shade(gear, .55)}"><ellipse cx="40" cy="24" rx="4" ry="2"/><ellipse cx="55" cy="21" rx="5" ry="2.2"/><ellipse cx="62" cy="30" rx="3" ry="2"/><ellipse cx="44" cy="31" rx="3" ry="1.5"/></g>`;
+    if (hg === 'helmetNvg') s += `<rect x="45" y="17" width="10" height="7" rx="1.5" fill="#1b1d1f"/><rect x="43" y="11" width="6" height="7" rx="2" fill="#2a2d30"/><rect x="51" y="11" width="6" height="7" rx="2" fill="#2a2d30"/><circle cx="46" cy="12" r="1.6" fill="#64e06e"/><circle cx="54" cy="12" r="1.6" fill="#64e06e"/>`;
+    else s += `<rect x="46" y="18" width="8" height="4" rx="1" fill="#1b1d1f"/>`;
+    if (p.helmetGoggles) s += `<rect x="36" y="25" width="28" height="6" rx="3" fill="#1b1d1f"/><ellipse cx="44" cy="28" rx="4.5" ry="2.6" fill="${acc}" opacity=".8"/><ellipse cx="56" cy="28" rx="4.5" ry="2.6" fill="${acc}" opacity=".8"/>`;
+    s += `<rect x="30" y="34" width="4" height="9" rx="1.5" fill="#1b1d1f"/><rect x="66" y="34" width="4" height="9" rx="1.5" fill="#1b1d1f"/>`;
+  }
+  if (hg === 'beret') s += `<path d="M33 33 Q30 20 46 18 Q64 16 69 26 Q66 31 58 30 Q46 28 36 34Z" fill="${p.beretCol || '#7a1f22'}"/><path d="M34 33 Q50 27 66 30" stroke="#1b1d1f" stroke-width="2.4" fill="none"/><circle cx="40" cy="27" r="2.6" fill="#e0b04a"/>`;
+  if (hg === 'cap') s += `<path d="M34 34 Q34 18 50 18 Q66 18 66 34Z" fill="url(#hg)"/><path d="M34 33 Q50 30 66 33 Q72 34 78 36 Q66 38 50 36 Q40 36 34 35Z" fill="${gd}"/><rect x="45" y="23" width="10" height="5" rx="1" fill="${acc}" opacity=".85"/>`;
+  if (hg === 'bandana') s += `<path d="M34 36 Q35 21 50 21 Q65 21 66 36 Q58 31 50 31 Q42 31 34 36Z" fill="${p.bandCol || '#a02a24'}"/><path d="M34 35 Q50 29 66 35" stroke="${shade(p.bandCol || '#a02a24', .7)}" stroke-width="2"/><path d="M64 33 Q72 36 74 44 Q70 40 66 38 Q71 43 70 48 Q66 41 63 37Z" fill="${p.bandCol || '#a02a24'}"/><g fill="#fff" opacity=".5"><circle cx="42" cy="27" r=".8"/><circle cx="50" cy="25" r=".8"/><circle cx="58" cy="27" r=".8"/></g>`;
+  if (hg === 'hood') s += `<path d="M28 60 Q24 16 50 14 Q76 16 72 60 L66 70 Q66 46 64 36 Q60 26 50 26 Q40 26 36 36 Q34 46 34 70Z" fill="url(#hg)"/><path d="M34 70 Q34 46 36 36 Q40 26 50 26 Q60 26 64 36 Q66 46 66 70" stroke="${gd}" stroke-width="1.5" fill="none"/>`;
+  if (hg === 'headset') s += `<path d="M34 38 Q34 18 50 18 Q66 18 66 38" stroke="#1b1d1f" stroke-width="2.6" fill="none"/><rect x="30" y="37" width="7" height="11" rx="3" fill="#2a2d30"/><rect x="63" y="37" width="7" height="11" rx="3" fill="#2a2d30"/><path d="M34 47 Q36 56 45 57" stroke="#1b1d1f" stroke-width="1.2" fill="none"/><circle cx="45.5" cy="57" r="1.4" fill="#1b1d1f"/>`;
+  if (p.earpiece) s += `<path d="M64 42 Q68 46 66 54" stroke="#1b1d1f" stroke-width="1" fill="none"/><circle cx="64.5" cy="43" r="1.5" fill="#1b1d1f"/>`;
+  // rim light & vignette
+  s += `<rect width="100" height="100" fill="none" stroke="#000" stroke-opacity=".35" stroke-width="6"/></g>`;
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">${s}</svg>`;
+}
+const PORTRAIT = {}, PORTRAIT_IMG = {};
+function portraitURI(id) {
+  if (!PORTRAIT[id]) { const h = HB[id]; PORTRAIT[id] = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(portraitSVG(h.look || {}, h.r)); }
+  return PORTRAIT[id];
+}
+function portraitImg(id) {
+  if (!PORTRAIT_IMG[id]) { const im = new Image(); im.src = portraitURI(id); PORTRAIT_IMG[id] = im; }
+  return PORTRAIT_IMG[id];
+}
 
 /* ---- 03-state.js ---- */
 /* ================= state ================= */
@@ -916,7 +1063,7 @@ function buzz(kind) {
   try {
     const Hp = plugin('Haptics');
     if (Hp) { if (kind === 'ok') Hp.notification({ type: 'SUCCESS' }); else if (kind === 'bad') Hp.notification({ type: 'ERROR' }); else Hp.impact({ style: kind === 'heavy' ? 'HEAVY' : kind === 'medium' ? 'MEDIUM' : 'LIGHT' }); return; }
-    if (navigator.vibrate) navigator.vibrate(kind === 'heavy' ? 40 : kind === 'medium' ? 20 : kind === 'ok' ? [20, 40, 20] : kind === 'bad' ? [60, 40, 60] : 8);
+    if (navigator.vibrate && (!navigator.userActivation || navigator.userActivation.hasBeenActive)) navigator.vibrate(kind === 'heavy' ? 40 : kind === 'medium' ? 20 : kind === 'ok' ? [20, 40, 20] : kind === 'bad' ? [60, 40, 60] : 8);
   } catch (e) { }
 }
 
@@ -1483,7 +1630,8 @@ function closeModal() { modalFn = null; renderModal(); setTimeout(nextPopup, 250
 function refresh() { render(); if (modalFn) renderModal(); tickUI(); }
 function sheet(icon, title, sub, body) { return `<div class="sh-h"><div class="hi">${icon}</div><div class="htx"><h2>${title}</h2>${sub ? `<div class="muted">${sub}</div>` : ''}</div><button class="x" data-a="close" aria-label="${t('close')}">✕</button></div><div class="sh-b">${body}</div>`; }
 const hname = id => L(HB[id].n);
-const avHTML = (id, cls = '') => { const h = HB[id]; return `<span class="av c-${h.c} r${h.r} ${cls}">${esc(hname(id)[0])}</span>`; };
+const avHTML = (id, cls = '') => { const h = HB[id]; return `<span class="av c-${h.c} r${h.r} ${cls}"><img src="${portraitURI(id)}" alt="${esc(hname(id))}" draggable="false"></span>`; };
+const cardHTML = (id, inner) => { const h = HB[id]; return `<span class="pcard r${h.r}"><img src="${portraitURI(id)}" alt="" draggable="false"><span class="pcl">${CLS[h.c].i}</span>${inner || ''}</span>`; };
 const starsHTML = st => `<span class="stars">${'★'.repeat(st)}<span class="off">${'★'.repeat(5 - st)}</span></span>`;
 function hasEventDot() {
   ensureDaily(); if (S.login.last !== today()) return true;
@@ -1538,8 +1686,8 @@ VIEWS.heroes = () => {
   <div class="formation"><div class="flabel">${t('front_row')}</div><div class="frow">${slot(0)}${slot(1)}</div><div class="flabel">${t('back_row')}</div><div class="frow">${slot(2)}${slot(3)}${slot(4)}</div>
   <button class="btn sm" data-a="autoSquad" style="justify-self:center">✨ ${t('auto_squad')}</button></div>
   <div class="row between"><h3>${t('your_heroes')} ${own.length}/${HEROES.length}</h3><span class="cc">✨ ${fmt(S.res.exp)}</span></div>
-  <div class="roster">${own.map(id => { const Hh = HB[id], h = S.heroes[id]; const dot = (h.st < 5 && h.sh >= starNeed(h.st)) || (h.lv < heroCap(lvOf('tavern')) && S.res.exp >= lvCost(h.lv)); return `<button class="hc r${Hh.r}" data-a="hero" data-x="${id}">${S.squad.includes(id) ? `<span class="in">${t('in_squad')}</span>` : ''}${dot ? '<span class="dot"></span>' : ''}${avHTML(id)}<b>${esc(hname(id))}</b>${starsHTML(h.st)}<small>Lv ${h.lv} · ${CLS[Hh.c].i} ${fmt(heroPower(id))}</small></button>`; }).join('')}
-  ${lockd.map(Hh => `<div class="hc lockd"><span class="av r${Hh.r}">?</span><b>${esc(L(Hh.n))}</b><small style="color:${RAR[Hh.r].c}">${L(RAR[Hh.r].n)}</small></div>`).join('')}</div>
+  <div class="roster">${own.map(id => { const Hh = HB[id], h = S.heroes[id]; const dot = (h.st < 5 && h.sh >= starNeed(h.st)) || (h.lv < heroCap(lvOf('tavern')) && S.res.exp >= lvCost(h.lv)); return `<button class="hc r${Hh.r}" data-a="hero" data-x="${id}">${S.squad.includes(id) ? `<span class="in">${t('in_squad')}</span>` : ''}${dot ? '<span class="dot"></span>' : ''}${cardHTML(id, `<span class="plv num">Lv ${h.lv}</span>`)}<b>${esc(hname(id))}</b>${starsHTML(h.st)}<small>💪 ${fmt(heroPower(id))}</small></button>`; }).join('')}
+  ${lockd.map(Hh => `<div class="hc lockd">${cardHTML(Hh.id, '<span class="plock">🔒</span>')}<b>${esc(L(Hh.n))}</b><small style="color:${RAR[Hh.r].c}">${L(RAR[Hh.r].n)}</small></div>`).join('')}</div>
   </div>`;
 };
 function stageWaves(s) {
@@ -1675,7 +1823,8 @@ function skillText(sk, m) {
 function mHero(id) {
   const Hh = HB[id], h = S.heroes[id], x = heroStats(id), cap = heroCap(lvOf('tavern')), need = starNeed(h.st), lc = lvCost(h.lv);
   const inSq = S.squad.includes(id);
-  const body = `<p class="muted">${L(Hh.q)}</p>
+  const body = `<div class="hero-hero r${Hh.r}"><img src="${portraitURI(id)}" alt=""><div class="hh-info"><b>${esc(hname(id))}</b>${starsHTML(h.st)}<span class="tag" style="color:${RAR[Hh.r].c}">${L(RAR[Hh.r].n)} · ${CLS[Hh.c].i} ${L(CLS[Hh.c].n)}</span><span class="num" style="color:var(--amber);font-family:var(--fd);font-weight:800">💪 ${fmt(heroPower(id))}</span></div></div>
+  <p class="muted">${L(Hh.q)}</p>
   <div class="grid4"><div class="stat"><small>${t('atk')}</small><b class="num">${fmt(x.atk)}</b></div><div class="stat"><small>${t('hp')}</small><b class="num">${fmt(x.hp)}</b></div><div class="stat"><small>${t('def')}</small><b class="num">${fmt(x.def)}</b></div><div class="stat"><small>${t('power')}</small><b class="num" style="color:var(--amber)">${fmt(heroPower(id))}</b></div></div>
   <div class="li"><span class="lic">⚡</span><div class="lit"><b>${L(Hh.skn)}</b><small>${skillText(Hh.sk, RM[Hh.r])}</small></div></div>
   <div class="panel"><div class="row between"><b>${t('level_of', h.lv, cap)}</b><span class="cc ${S.res.exp >= lc ? '' : 'lack'}">✨ ${fmt(lc)}</span></div>
@@ -1701,7 +1850,7 @@ function mRecruit() {
   const body = `<div class="grid3">${[1, 2, 3].map(r => `<div class="stat"><small style="color:${RAR[r].c}">${L(RAR[r].n)}</small><b>${[0, 70, 25, 5][r]}%</b></div>`).join('')}</div>
   <div class="li"><span class="lic">🌟</span><div class="lit"><b>${t('pity', 40 - S.pity)}</b><small>${t('dupes_note')}</small></div></div>
   <div class="grid2"><button class="btn pri" data-a="recruit" data-x="1">×1 ${tk ? '🎟️ 1' : '💎 150'}</button><button class="btn gold" data-a="recruit" data-x="10">×10 ${tk >= 10 ? '🎟️ 10' : '💎 ' + (tk ? (10 - Math.min(tk, 10)) * 150 : 1350)}</button></div>
-  ${lastPull.length ? `<h3>${t('result')}</h3><div class="pull">${lastPull.map((p, i) => `<div class="hc r${HB[p.id].r}" style="animation-delay:${i * .08}s">${p.isNew ? `<span class="new">${t('new')}</span>` : ''}${avHTML(p.id)}<b style="font-size:12px">${esc(hname(p.id))}</b><small style="color:${RAR[HB[p.id].r].c}">${p.isNew ? L(RAR[HB[p.id].r].n) : '+10 🧩'}</small></div>`).join('')}</div>` : ''}`;
+  ${lastPull.length ? `<h3>${t('result')}</h3><div class="pull">${lastPull.map((p, i) => `<div class="hc r${HB[p.id].r}" style="animation-delay:${i * .08}s">${p.isNew ? `<span class="new">${t('new')}</span>` : ''}${cardHTML(p.id)}<b style="font-size:12px">${esc(hname(p.id))}</b><small style="color:${RAR[HB[p.id].r].c}">${p.isNew ? L(RAR[HB[p.id].r].n) : '+10 🧩'}</small></div>`).join('')}</div>` : ''}`;
   return sheet('🎟️', t('recruit_heroes'), t('tickets_gems', tk, fmt(S.res.gems)), body);
 }
 function mEvents() {
@@ -2117,6 +2266,7 @@ function startBattle(cfg) {
     else el.style.visibility = 'hidden';
     cards.appendChild(el);
   }
+  B.heroes.forEach(h => portraitImg(h.id));
   bResize(); bBg();
   B.last = 0; B.raf = requestAnimationFrame(bLoop);
 }
@@ -2241,12 +2391,14 @@ function bDraw() {
     const col = { tank: '#3f6f96', atk: '#9c3f2f', sup: '#3f8a5c' }[h.H.c], rc = ['', '#4f8fd6', '#a66be0', '#e8a62d'][h.H.r];
     c.globalAlpha = h.alive ? 1 : .25;
     c.fillStyle = '#0008'; c.beginPath(); c.ellipse(h.x, h.y + 18, 18, 6, 0, 0, 7); c.fill();
-    c.fillStyle = col; c.beginPath(); c.arc(h.x, h.y, 18, 0, 7); c.fill(); c.lineWidth = 3; c.strokeStyle = rc; c.stroke();
-    c.fillStyle = '#fff'; c.font = '800 17px Changa, sans-serif'; c.fillText(hname(h.id)[0], h.x, h.y + 1);
+    const im = portraitImg(h.id);
+    c.fillStyle = col; c.beginPath(); c.arc(h.x, h.y, 21, 0, 7); c.fill();
+    if (im.complete && im.naturalWidth) { c.save(); c.beginPath(); c.arc(h.x, h.y, 20, 0, 7); c.clip(); c.drawImage(im, h.x - 22, h.y - 20, 44, 44); c.restore(); }
+    c.lineWidth = 3; c.strokeStyle = rc; c.beginPath(); c.arc(h.x, h.y, 21, 0, 7); c.stroke();
     if (h.flash > 0) { c.fillStyle = '#e2513f66'; c.beginPath(); c.arc(h.x, h.y, 18, 0, 7); c.fill(); }
-    if (h.shield > 0) { c.strokeStyle = '#5aa6d6'; c.lineWidth = 2; c.globalAlpha = .6 + Math.sin(B.t * 8) * .2; c.beginPath(); c.arc(h.x, h.y, 25, 0, 7); c.stroke(); c.globalAlpha = 1; }
+    if (h.shield > 0) { c.strokeStyle = '#5aa6d6'; c.lineWidth = 2; c.globalAlpha = .6 + Math.sin(B.t * 8) * .2; c.beginPath(); c.arc(h.x, h.y, 27, 0, 7); c.stroke(); c.globalAlpha = 1; }
     if (h.rapid > 0) { c.strokeStyle = '#f1b23c'; c.lineWidth = 2; c.beginPath(); c.arc(h.x, h.y, 22, B.t * 10, B.t * 10 + 2); c.stroke(); }
-    if (h.alive) { c.fillStyle = '#000a'; c.fillRect(h.x - 18, h.y + 23, 36, 4); c.fillStyle = '#64b66e'; c.fillRect(h.x - 18, h.y + 23, 36 * h.hp / h.maxhp, 4); }
+    if (h.alive) { c.fillStyle = '#000a'; c.fillRect(h.x - 20, h.y + 25, 40, 4); c.fillStyle = '#64b66e'; c.fillRect(h.x - 20, h.y + 25, 40 * h.hp / h.maxhp, 4); }
     c.globalAlpha = 1;
   }
   for (const f of B.fx) {

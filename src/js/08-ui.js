@@ -44,7 +44,8 @@ function closeModal() { modalFn = null; renderModal(); setTimeout(nextPopup, 250
 function refresh() { render(); if (modalFn) renderModal(); tickUI(); }
 function sheet(icon, title, sub, body) { return `<div class="sh-h"><div class="hi">${icon}</div><div class="htx"><h2>${title}</h2>${sub ? `<div class="muted">${sub}</div>` : ''}</div><button class="x" data-a="close" aria-label="${t('close')}">✕</button></div><div class="sh-b">${body}</div>`; }
 const hname = id => L(HB[id].n);
-const avHTML = (id, cls = '') => { const h = HB[id]; return `<span class="av c-${h.c} r${h.r} ${cls}">${esc(hname(id)[0])}</span>`; };
+const avHTML = (id, cls = '') => { const h = HB[id]; return `<span class="av c-${h.c} r${h.r} ${cls}"><img src="${portraitURI(id)}" alt="${esc(hname(id))}" draggable="false"></span>`; };
+const cardHTML = (id, inner) => { const h = HB[id]; return `<span class="pcard r${h.r}"><img src="${portraitURI(id)}" alt="" draggable="false"><span class="pcl">${CLS[h.c].i}</span>${inner || ''}</span>`; };
 const starsHTML = st => `<span class="stars">${'★'.repeat(st)}<span class="off">${'★'.repeat(5 - st)}</span></span>`;
 function hasEventDot() {
   ensureDaily(); if (S.login.last !== today()) return true;
@@ -99,8 +100,8 @@ VIEWS.heroes = () => {
   <div class="formation"><div class="flabel">${t('front_row')}</div><div class="frow">${slot(0)}${slot(1)}</div><div class="flabel">${t('back_row')}</div><div class="frow">${slot(2)}${slot(3)}${slot(4)}</div>
   <button class="btn sm" data-a="autoSquad" style="justify-self:center">✨ ${t('auto_squad')}</button></div>
   <div class="row between"><h3>${t('your_heroes')} ${own.length}/${HEROES.length}</h3><span class="cc">✨ ${fmt(S.res.exp)}</span></div>
-  <div class="roster">${own.map(id => { const Hh = HB[id], h = S.heroes[id]; const dot = (h.st < 5 && h.sh >= starNeed(h.st)) || (h.lv < heroCap(lvOf('tavern')) && S.res.exp >= lvCost(h.lv)); return `<button class="hc r${Hh.r}" data-a="hero" data-x="${id}">${S.squad.includes(id) ? `<span class="in">${t('in_squad')}</span>` : ''}${dot ? '<span class="dot"></span>' : ''}${avHTML(id)}<b>${esc(hname(id))}</b>${starsHTML(h.st)}<small>Lv ${h.lv} · ${CLS[Hh.c].i} ${fmt(heroPower(id))}</small></button>`; }).join('')}
-  ${lockd.map(Hh => `<div class="hc lockd"><span class="av r${Hh.r}">?</span><b>${esc(L(Hh.n))}</b><small style="color:${RAR[Hh.r].c}">${L(RAR[Hh.r].n)}</small></div>`).join('')}</div>
+  <div class="roster">${own.map(id => { const Hh = HB[id], h = S.heroes[id]; const dot = (h.st < 5 && h.sh >= starNeed(h.st)) || (h.lv < heroCap(lvOf('tavern')) && S.res.exp >= lvCost(h.lv)); return `<button class="hc r${Hh.r}" data-a="hero" data-x="${id}">${S.squad.includes(id) ? `<span class="in">${t('in_squad')}</span>` : ''}${dot ? '<span class="dot"></span>' : ''}${cardHTML(id, `<span class="plv num">Lv ${h.lv}</span>`)}<b>${esc(hname(id))}</b>${starsHTML(h.st)}<small>💪 ${fmt(heroPower(id))}</small></button>`; }).join('')}
+  ${lockd.map(Hh => `<div class="hc lockd">${cardHTML(Hh.id, '<span class="plock">🔒</span>')}<b>${esc(L(Hh.n))}</b><small style="color:${RAR[Hh.r].c}">${L(RAR[Hh.r].n)}</small></div>`).join('')}</div>
   </div>`;
 };
 function stageWaves(s) {
@@ -236,7 +237,8 @@ function skillText(sk, m) {
 function mHero(id) {
   const Hh = HB[id], h = S.heroes[id], x = heroStats(id), cap = heroCap(lvOf('tavern')), need = starNeed(h.st), lc = lvCost(h.lv);
   const inSq = S.squad.includes(id);
-  const body = `<p class="muted">${L(Hh.q)}</p>
+  const body = `<div class="hero-hero r${Hh.r}"><img src="${portraitURI(id)}" alt=""><div class="hh-info"><b>${esc(hname(id))}</b>${starsHTML(h.st)}<span class="tag" style="color:${RAR[Hh.r].c}">${L(RAR[Hh.r].n)} · ${CLS[Hh.c].i} ${L(CLS[Hh.c].n)}</span><span class="num" style="color:var(--amber);font-family:var(--fd);font-weight:800">💪 ${fmt(heroPower(id))}</span></div></div>
+  <p class="muted">${L(Hh.q)}</p>
   <div class="grid4"><div class="stat"><small>${t('atk')}</small><b class="num">${fmt(x.atk)}</b></div><div class="stat"><small>${t('hp')}</small><b class="num">${fmt(x.hp)}</b></div><div class="stat"><small>${t('def')}</small><b class="num">${fmt(x.def)}</b></div><div class="stat"><small>${t('power')}</small><b class="num" style="color:var(--amber)">${fmt(heroPower(id))}</b></div></div>
   <div class="li"><span class="lic">⚡</span><div class="lit"><b>${L(Hh.skn)}</b><small>${skillText(Hh.sk, RM[Hh.r])}</small></div></div>
   <div class="panel"><div class="row between"><b>${t('level_of', h.lv, cap)}</b><span class="cc ${S.res.exp >= lc ? '' : 'lack'}">✨ ${fmt(lc)}</span></div>
@@ -262,7 +264,7 @@ function mRecruit() {
   const body = `<div class="grid3">${[1, 2, 3].map(r => `<div class="stat"><small style="color:${RAR[r].c}">${L(RAR[r].n)}</small><b>${[0, 70, 25, 5][r]}%</b></div>`).join('')}</div>
   <div class="li"><span class="lic">🌟</span><div class="lit"><b>${t('pity', 40 - S.pity)}</b><small>${t('dupes_note')}</small></div></div>
   <div class="grid2"><button class="btn pri" data-a="recruit" data-x="1">×1 ${tk ? '🎟️ 1' : '💎 150'}</button><button class="btn gold" data-a="recruit" data-x="10">×10 ${tk >= 10 ? '🎟️ 10' : '💎 ' + (tk ? (10 - Math.min(tk, 10)) * 150 : 1350)}</button></div>
-  ${lastPull.length ? `<h3>${t('result')}</h3><div class="pull">${lastPull.map((p, i) => `<div class="hc r${HB[p.id].r}" style="animation-delay:${i * .08}s">${p.isNew ? `<span class="new">${t('new')}</span>` : ''}${avHTML(p.id)}<b style="font-size:12px">${esc(hname(p.id))}</b><small style="color:${RAR[HB[p.id].r].c}">${p.isNew ? L(RAR[HB[p.id].r].n) : '+10 🧩'}</small></div>`).join('')}</div>` : ''}`;
+  ${lastPull.length ? `<h3>${t('result')}</h3><div class="pull">${lastPull.map((p, i) => `<div class="hc r${HB[p.id].r}" style="animation-delay:${i * .08}s">${p.isNew ? `<span class="new">${t('new')}</span>` : ''}${cardHTML(p.id)}<b style="font-size:12px">${esc(hname(p.id))}</b><small style="color:${RAR[HB[p.id].r].c}">${p.isNew ? L(RAR[HB[p.id].r].n) : '+10 🧩'}</small></div>`).join('')}</div>` : ''}`;
   return sheet('🎟️', t('recruit_heroes'), t('tickets_gems', tk, fmt(S.res.gems)), body);
 }
 function mEvents() {

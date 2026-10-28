@@ -131,7 +131,7 @@ Will you survive until dawn?
 | `com.almghol.fajrsurvivors.gems4` | $19.99 | صندوق جواهر / Case of Gems | 2,600 جوهرة / 2,600 gems |
 | `com.almghol.fajrsurvivors.gems5` | $49.99 | خزنة جواهر / Vault of Gems | 7,000 جوهرة / 7,000 gems |
 | `com.almghol.fajrsurvivors.gems6` | $99.99 | بنك الجواهر / Gem Bank | 15,000 جوهرة / 15,000 gems |
-| `com.almghol.fajrsurvivors.starter` | $1.99 | حزمة المبتدئين / Starter Pack | البطلة ريم + 500 جوهرة + تذاكر / Hero Reem + 500 gems + tickets |
+| `com.almghol.fajrsurvivors.starter` | $1.99 | حزمة المبتدئين / Starter Pack | البطلة الشبح + 500 جوهرة + تذاكر / Hero Ghost + 500 gems + tickets |
 | `com.almghol.fajrsurvivors.monthly` | $4.99 | البطاقة الشهرية / Monthly Card | 300 جوهرة + 100 يومياً لمدة 30 يوماً / 300 gems + 100 daily for 30 days |
 | `com.almghol.fajrsurvivors.pass` | $9.99 | التذكرة المميزة / Premium Pass | المسار المميز للموسم الحالي / Premium track for the current season |
 

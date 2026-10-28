@@ -53,23 +53,42 @@ const RAR = [null, { n: { ar: 'نادر', en: 'Rare' }, c: 'var(--r1)' }, { n: {
 const RM = [0, .7, 1, 1.35];
 const H = (id, ar, en, r, c, sk, skar, sken, qar, qen) => ({ id, n: { ar, en }, r, c, sk, skn: { ar: skar, en: sken }, q: { ar: qar, en: qen } });
 const HEROES = [
-  H('reem', 'ريم', 'Reem', 3, 'atk', 'snipe', 'رصاصة الموت', 'Death Shot', 'قناصة سابقة في القوات الخاصة. لا تطلق مرتين على نفس الهدف.', 'Ex special-forces sniper. Never needs a second shot.'),
-  H('saqr', 'صقر', 'Saqr', 3, 'tank', 'shield', 'جدار الحديد', 'Iron Wall', 'حارس المعبر الشمالي. يقف أمام الموجة ولا يتراجع.', 'Guardian of the north gate. He stands in front of the horde and never steps back.'),
-  H('layla', 'ليلى', 'Layla', 3, 'sup', 'heal', 'إسعاف ميداني', 'Field Medic', 'طبيبة الطوارئ الوحيدة التي نجت من المستشفى المركزي.', 'The only ER doctor who made it out of Central Hospital.'),
-  H('noura', 'نورة', 'Noura', 3, 'atk', 'air', 'ضربة جوية', 'Airstrike', 'مهندسة اتصالات تملك شيفرة آخر طائرة مسيّرة.', 'A comms engineer holding the codes to the last drone.'),
-  H('khalid', 'خالد', 'Khalid', 3, 'tank', 'stun', 'هزة الأرض', 'Quake Slam', 'قائد كتيبة سابق. حين يضرب الأرض يتجمد الزومبي.', 'A former battalion commander. When he hits the ground, the dead freeze.'),
-  H('dana', 'دانة', 'Dana', 3, 'sup', 'buff', 'نداء النصر', 'Victory Call', 'صوتها على اللاسلكي يجمع الناجين من كل مكان.', 'Her voice on the radio brings survivors from everywhere.'),
-  H('jaser', 'جاسر', 'Jaser', 2, 'atk', 'aoe', 'قنبلة حارقة', 'Firebomb', 'يصنع المتفجرات من أي شيء يجده.', 'Builds explosives out of anything he finds.'),
-  H('nimr', 'نمر', 'Nimr', 2, 'tank', 'stun', 'زلزال', 'Earthquake', 'مصارع سابق. ضربته على الأرض توقف الزومبي في مكانهم.', 'A former wrestler. His slam stops zombies in their tracks.'),
-  H('hala', 'هالة', 'Hala', 2, 'atk', 'rapid', 'وابل رصاص', 'Bullet Storm', 'سريعة اليد، تفرّغ المخزن قبل أن ترمش.', 'Fastest hands alive. Empties a clip before you blink.'),
-  H('fares', 'فارس', 'Fares', 2, 'sup', 'buff', 'صرخة القائد', 'Battle Cry', 'ضابط متقاعد. صوته وحده يرفع معنويات الفريق.', 'A retired officer. His voice alone lifts the squad.'),
-  H('omar', 'عمر', 'Omar', 2, 'atk', 'snipe', 'عين الصقر', 'Hawk Eye', 'رامي سهام بطولي تحوّل للبندقية.', 'A champion archer who switched to rifles.'),
-  H('salem', 'سالم', 'Salem', 1, 'atk', 'snipe', 'طلقة دقيقة', 'Precise Shot', 'صياد من البادية، عينه لا تخيب.', 'A desert hunter whose aim never fails.'),
-  H('mona', 'منى', 'Mona', 1, 'sup', 'heal', 'ضمادات', 'Bandages', 'ممرضة متطوعة، حقيبتها لا تفرغ.', 'A volunteer nurse whose bag never runs empty.'),
-  H('badr', 'بدر', 'Badr', 1, 'tank', 'shield', 'درع مؤقت', 'Makeshift Shield', 'عامل بناء يحمل باباً حديدياً كدرع.', 'A builder who carries a steel door as a shield.'),
-  H('ziad', 'زياد', 'Ziad', 1, 'atk', 'aoe', 'قنبلة يدوية', 'Grenade', 'شاب متهور يحب الانفجارات أكثر من اللازم.', 'A reckless kid who loves explosions a bit too much.'),
-  H('sara', 'سارة', 'Sara', 1, 'sup', 'heal', 'إسعافات أولية', 'First Aid', 'طالبة طب لم تكمل دراستها، لكنها أنقذت العشرات.', 'A med student who never graduated but has saved dozens.'),
+  H('reem', 'الشبح', 'Ghost', 3, 'atk', 'snipe', 'رصاصة الموت', 'Death Shot', 'قناصة القوات الخاصة. ما أحد شاف وجهها، وما أحد نجا من طلقتها.', 'Special-forces sniper. Nobody has seen her face, nobody survives her shot.'),
+  H('saqr', 'الحصن', 'Bastion', 3, 'tank', 'shield', 'جدار الحديد', 'Iron Wall', 'حارس المعبر الشمالي. يقف أمام الموجة ولا يتراجع خطوة.', 'Guardian of the north gate. Stands in front of the horde and never steps back.'),
+  H('layla', 'الملاك', 'Angel', 3, 'sup', 'heal', 'إسعاف ميداني', 'Field Medic', 'طبيبة الطوارئ الوحيدة اللي طلعت حية من المستشفى المركزي.', 'The only ER doctor who made it out of Central Hospital alive.'),
+  H('noura', 'العاصفة', 'Storm', 3, 'atk', 'air', 'ضربة جوية', 'Airstrike', 'مهندسة اتصالات تملك شيفرة آخر طائرة مسيّرة.', 'A comms engineer holding the codes to the last drone.'),
+  H('khalid', 'الزلزال', 'Quake', 3, 'tank', 'stun', 'هزة الأرض', 'Quake Slam', 'قائد كتيبة سابق. حين يضرب الأرض يتجمد الزومبي.', 'A former battalion commander. When he hits the ground, the dead freeze.'),
+  H('dana', 'الصدى', 'Echo', 3, 'sup', 'buff', 'نداء النصر', 'Victory Call', 'صوتها على اللاسلكي يجمع الناجين من كل مكان.', 'Her voice on the radio brings survivors from everywhere.'),
+  H('jaser', 'اللهب', 'Blaze', 2, 'atk', 'aoe', 'قنبلة حارقة', 'Firebomb', 'يصنع المتفجرات من أي شيء يلقاه.', 'Builds explosives out of anything he finds.'),
+  H('nimr', 'الجبل', 'Boulder', 2, 'tank', 'stun', 'زلزال', 'Earthquake', 'مصارع سابق. ضربته على الأرض توقف الزومبي في مكانهم.', 'A former wrestler. His slam stops zombies in their tracks.'),
+  H('hala', 'الإعصار', 'Cyclone', 2, 'atk', 'rapid', 'وابل رصاص', 'Bullet Storm', 'أسرع يد في المدينة، تفرّغ المخزن قبل لا ترمش.', 'Fastest hands in the city. Empties a clip before you blink.'),
+  H('fares', 'الذيب', 'Wolf', 2, 'sup', 'buff', 'صرخة القائد', 'Battle Cry', 'ضابط متقاعد. صوته وحده يرفع معنويات الفريق.', 'A retired officer. His voice alone lifts the squad.'),
+  H('omar', 'الصقر', 'Hawk', 2, 'atk', 'snipe', 'عين الصقر', 'Hawk Eye', 'صياد صحراء يشوف الهدف قبل لا يشوفه.', 'A desert hunter who spots the target before it spots him.'),
+  H('salem', 'العقرب', 'Scorpion', 1, 'atk', 'snipe', 'لدغة قاتلة', 'Deadly Sting', 'هادئ وصبور، وضربته وحدة.', 'Quiet, patient, and he only needs one hit.'),
+  H('mona', 'الإبرة', 'Needle', 1, 'sup', 'heal', 'ضمادات', 'Bandages', 'ممرضة متطوعة، حقيبتها ما تفرغ.', 'A volunteer nurse whose bag never runs empty.'),
+  H('badr', 'الصخرة', 'Rock', 1, 'tank', 'shield', 'درع مؤقت', 'Makeshift Shield', 'عامل بناء يشيل باب حديد كدرع.', 'A builder who carries a steel door as a shield.'),
+  H('ziad', 'الشرارة', 'Spark', 1, 'atk', 'aoe', 'قنبلة يدوية', 'Grenade', 'شاب متهور يحب الانفجارات أكثر من اللازم.', 'A reckless kid who loves explosions a bit too much.'),
+  H('sara', 'النبض', 'Pulse', 1, 'sup', 'heal', 'إسعافات أولية', 'First Aid', 'طالبة طب ما كملت دراستها، لكنها أنقذت العشرات.', 'A med student who never graduated but has saved dozens.'),
 ];
+const LOOKS = {
+  reem: { fem: 1, skin: 'b', head: 'hood', gear: '#2f3a2c', mask: 'skull', weapon: 'sniper', eye: '#3f7a4a', vest: '#3a4a32', camo: 1, acc: '#64b66e' },
+  saqr: { skin: 'c', head: 'helmetNvg', gear: '#3a4048', beard: 1, hair: '#1a1410', weapon: 'shield', vest: '#2d3a48', patch: 'flag', acc: '#5aa6d6' },
+  layla: { fem: 1, skin: 'a', hair: '#5a3420', hairStyle: 'long', head: 'headset', weapon: 'medic', vest: '#4f5f66', patch: 'cross', eye: '#4a6a8a', acc: '#c9302c' },
+  noura: { fem: 1, skin: 'b', hair: '#141010', hairStyle: 'pony', glasses: 'goggles', earpiece: 1, weapon: 'antenna', vest: '#4a3a2a', acc: '#5aa6d6', scarfNeck: '#2a2d30' },
+  khalid: { skin: 'd', head: 'helmet', cover: 1, gear: '#4d5238', beard: 1, hair: '#57504a', scar: 1, weapon: 'launcher', vest: '#4a4a36', camo: 1, acc: '#e0b04a' },
+  dana: { fem: 1, skin: 'c', hair: '#1e1410', hairStyle: 'pony', head: 'beret', beretCol: '#7a1f22', weapon: 'smg', vest: '#363a48', eye: '#5a3a20', acc: '#e0b04a' },
+  jaser: { skin: 'b', hair: '#a0461e', hairStyle: 'mohawk', mask: 'gas', weapon: 'launcher', vest: '#4a2a1e', acc: '#e07a2a' },
+  nimr: { skin: 'e', hair: '#0d0a08', hairStyle: 'buzz', beard: 1, paint: '#cf6a2c', weapon: 'shield', vest: '#3a3a30', camo: 1, grin: 1 },
+  hala: { fem: 1, skin: 'a', hair: '#c9a25a', hairStyle: 'pony', head: 'cap', gear: '#2a3a4a', glasses: 'shades', weapon: 'smg', vest: '#2a3a4a', acc: '#e2513f' },
+  fares: { skin: 'b', hair: '#6a645c', head: 'beret', beretCol: '#3b5a2a', beard: 1, weapon: 'rifle', vest: '#3a4a32', camo: 1, acc: '#e0b04a' },
+  omar: { skin: 'c', head: 'cap', gear: '#5a4a30', mask: 'shemagh', maskCol: '#d8c8a8', weapon: 'sniper', vest: '#5a4a30', eye: '#2a1a10', acc: '#cf6a2c' },
+  salem: { skin: 'c', hair: '#1a1410', hairStyle: 'short', mask: 'shemagh', maskCol: '#b8443a', weapon: 'rifle', vest: '#6a5a3a', stubble: 1, acc: '#e2513f' },
+  mona: { fem: 1, skin: 'b', hair: '#2a1810', hairStyle: 'long', weapon: 'medic', vest: '#4a5a5a', patch: 'cross', acc: '#c9302c' },
+  badr: { skin: 'd', head: 'helmet', gear: '#4a5040', stubble: 1, hair: '#1a1410', weapon: 'shield', vest: '#4a4a3a' },
+  ziad: { skin: 'a', hair: '#3a2414', hairStyle: 'short', head: 'bandana', bandCol: '#2a4a8a', grin: 1, paint: '#e07a2a', weapon: 'smg', vest: '#3a4048' },
+  sara: { fem: 1, skin: 'd', hair: '#0d0a08', hairStyle: 'pony', head: 'headset', weapon: 'medic', vest: '#4a4458', patch: 'cross', acc: '#c9302c' },
+};
+HEROES.forEach(h => h.look = LOOKS[h.id]);
 const HB = Object.fromEntries(HEROES.map(h => [h.id, h]));
 const ZT = {
   w: { i: '🧟', n: { ar: 'زاحف', en: 'Walker' }, hp: 1, atk: 1, spd: 30, r: 15 },
@@ -79,7 +98,7 @@ const ZT = {
   boss: { i: '👺', n: { ar: 'زعيم', en: 'Boss' }, hp: 22, atk: 3, spd: 15, r: 32 },
   wb: { i: '🦍', n: { ar: 'العملاق', en: 'The Colossus' }, hp: 1, atk: 2.2, spd: 24, r: 48 },
 };
-const BOTS = [['أبو فهد', 'Abu Fahad'], ['سلطان', 'Sultan'], ['غيمة', 'Ghaima'], ['مشعل', 'Mishal'], ['الذيب', 'Al-Theeb'], ['نوف', 'Nouf'], ['عبدالعزيز', 'Abdulaziz'], ['ريان', 'Rayan'], ['شهد', 'Shahad'], ['تركي', 'Turki'], ['لمى', 'Lama'], ['حمد', 'Hamad'], ['جود', 'Joud'], ['بندر', 'Bandar']].map(([ar, en]) => ({ ar, en }));
+const BOTS = [['أبو فهد', 'Abu Fahad'], ['سلطان', 'Sultan'], ['غيمة', 'Ghaima'], ['مشعل', 'Mishal'], ['سعود', 'Saud'], ['نوف', 'Nouf'], ['عبدالعزيز', 'Abdulaziz'], ['ريان', 'Rayan'], ['شهد', 'Shahad'], ['تركي', 'Turki'], ['لمى', 'Lama'], ['حمد', 'Hamad'], ['جود', 'Joud'], ['بندر', 'Bandar']].map(([ar, en]) => ({ ar, en }));
 const ALLIES = [
   { n: { ar: 'نسور الصحراء', en: 'Desert Eagles' }, tag: 'NSR', lv: 7, col: '#a9521f' },
   { n: { ar: 'ذئاب الليل', en: 'Night Wolves' }, tag: 'DHB', lv: 5, col: '#3f6f96' },
@@ -87,9 +106,9 @@ const ALLIES = [
 ];
 const CHATL = [
   ['أحد يساعدني في البناء؟ 🙏', 'Anyone help me with my build? 🙏'], ['الموجة اليوم قوية انتبهوا', 'The horde is strong today, watch out'], ['وصلت المرحلة الجديدة 🔥', 'Just reached a new stage 🔥'],
-  ['مين عنده ريم؟ تستاهل', 'Who has Reem? She is worth it'], ['لا تنسون هدية التحالف', 'Don’t forget the alliance gift'], ['الله يعطيكم العافية يا شباب', 'Good work, everyone'],
+  ['مين عنده الشبح؟ تستاهل', 'Who has Ghost? She is worth it'], ['لا تنسون هدية التحالف', 'Don’t forget the alliance gift'], ['الله يعطيكم العافية يا شباب', 'Good work, everyone'],
   ['فيه معسكر زومبي مستوى عالي قرب الطريق الشرقي', 'High-level zombie camp near the east road'], ['طوروا السور قبل الهجوم', 'Upgrade your wall before the raid'], ['ساعدتكم كلكم 💪', 'Helped all of you 💪'],
-  ['صباح الخير يا ناجين', 'Morning, survivors'], ['أحد جرب نمر مع ليلى؟ تشكيلة قوية', 'Tried Nimr with Layla? Strong combo'], ['الزعيم العالمي اليوم سهل 😎', 'World boss is easy today 😎'],
+  ['صباح الخير يا ناجين', 'Morning, survivors'], ['أحد جرب الجبل مع الملاك؟ تشكيلة قوية', 'Tried Boulder with Angel? Strong combo'], ['الزعيم العالمي اليوم سهل 😎', 'World boss is easy today 😎'],
 ].map(([ar, en]) => ({ ar, en }));
 const CHATR = [['😂👍', '😂👍'], ['صح كلامك', 'True'], ['تم يا بطل', 'Done, hero'], ['الله يوفقك', 'Good luck'], ['أنا معك', 'I’m with you'], ['💪💪', '💪💪']].map(([ar, en]) => ({ ar, en }));
 const DAILY = [
