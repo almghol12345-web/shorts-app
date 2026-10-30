@@ -39,7 +39,7 @@
 19 مبنى تطوّرها حتى المستوى 30: مقر القيادة، المزارع، المناشر، المناجم، مصافي الوقود، الثكنة، المستشفى، المختبر، السور، المستودع، والرادار.
 
 ◆ جنّد الأبطال
-16 بطلاً بثلاث درجات ندرة، لكل واحد دور ومهارة: ضربة جوية، قنبلة حارقة، جدار حديد، إسعاف ميداني، هزة أرض، وغيرها. ارفع مستوياتهم ونجومهم ورتّب تشكيلتك.
+10 أبطال أسطوريين بثلاث درجات ندرة: الملك الأحمر، المدمر، النار، الفرسان، البرق، الظل، الطبيب، الجبل، الصقر، والريح. لكل واحد دور ومهارة مدمّرة. ارفع مستوياتهم ونجومهم ورتّب تشكيلتك.
 
 ◆ معارك حية
 زاحفون وعدّاؤون وباصقون ومتوحشون وزعماء. اضغط على بطاقة البطل لإطلاق مهارته في اللحظة المناسبة.
@@ -92,7 +92,7 @@ Fajr Survivors is a survival strategy game: rebuild your base from the ruins, re
 19 buildings to upgrade up to level 30: HQ, farms, sawmills, mines, refineries, barracks, hospital, lab, walls, warehouse and radar.
 
 ◆ RECRUIT HEROES
-16 heroes across three rarities, each with a role and a skill: airstrikes, firebombs, iron walls, field medics, quake slams and more. Level them up, star them up and build your lineup.
+10 heroes across three rarities: Red King, Destroyer, Inferno, Knight, Lightning, Shadow, Medic, Mountain, Hawk and Gale, each with a role and a devastating skill. Level them up, star them up and build your lineup.
 
 ◆ LIVE BATTLES
 Walkers, runners, spitters, brutes and bosses. Tap a hero card to fire their skill at the perfect moment.

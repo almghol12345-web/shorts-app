@@ -145,15 +145,16 @@ function bDraw() {
   for (const h of B.heroes) {
     const col = { tank: '#3f6f96', atk: '#9c3f2f', sup: '#3f8a5c' }[h.H.c], rc = ['', '#4f8fd6', '#a66be0', '#e8a62d'][h.H.r];
     c.globalAlpha = h.alive ? 1 : .25;
-    c.fillStyle = '#0008'; c.beginPath(); c.ellipse(h.x, h.y + 18, 18, 6, 0, 0, 7); c.fill();
-    const im = portraitImg(h.id);
-    c.fillStyle = col; c.beginPath(); c.arc(h.x, h.y, 21, 0, 7); c.fill();
-    if (im.complete && im.naturalWidth) { c.save(); c.beginPath(); c.arc(h.x, h.y, 20, 0, 7); c.clip(); c.drawImage(im, h.x - 22, h.y - 20, 44, 44); c.restore(); }
-    c.lineWidth = 3; c.strokeStyle = rc; c.beginPath(); c.arc(h.x, h.y, 21, 0, 7); c.stroke();
-    if (h.flash > 0) { c.fillStyle = '#e2513f66'; c.beginPath(); c.arc(h.x, h.y, 18, 0, 7); c.fill(); }
-    if (h.shield > 0) { c.strokeStyle = '#5aa6d6'; c.lineWidth = 2; c.globalAlpha = .6 + Math.sin(B.t * 8) * .2; c.beginPath(); c.arc(h.x, h.y, 27, 0, 7); c.stroke(); c.globalAlpha = 1; }
+    c.fillStyle = '#0008'; c.beginPath(); c.ellipse(h.x, h.y + 23, 20, 6, 0, 0, 7); c.fill();
+    const im = portraitImg(h.id), cw = 38, ch = 52, cx = h.x - cw / 2, cy = h.y - ch / 2 - 4, rr = (x, y, w, hh, r) => { c.beginPath(); if (c.roundRect) c.roundRect(x, y, w, hh, r); else c.rect(x, y, w, hh); };
+    if (h.alive && h.H.r === 3) { c.fillStyle = '#f1b23c22'; rr(cx - 4, cy - 4, cw + 8, ch + 8, 9); c.fill(); }
+    c.fillStyle = col; rr(cx, cy, cw, ch, 6); c.fill();
+    if (im.complete && im.naturalWidth) { const sh = im.naturalWidth * ch / cw; c.save(); rr(cx, cy, cw, ch, 6); c.clip(); c.drawImage(im, 0, 0, im.naturalWidth, Math.min(im.naturalHeight, sh), cx, cy, cw, ch); c.restore(); }
+    c.lineWidth = 2.5; c.strokeStyle = rc; rr(cx, cy, cw, ch, 6); c.stroke();
+    if (h.flash > 0) { c.fillStyle = '#e2513f66'; rr(cx, cy, cw, ch, 6); c.fill(); }
+    if (h.shield > 0) { c.strokeStyle = '#5aa6d6'; c.lineWidth = 2; c.globalAlpha = .6 + Math.sin(B.t * 8) * .2; rr(cx - 5, cy - 5, cw + 10, ch + 10, 10); c.stroke(); c.globalAlpha = 1; }
     if (h.rapid > 0) { c.strokeStyle = '#f1b23c'; c.lineWidth = 2; c.beginPath(); c.arc(h.x, h.y, 22, B.t * 10, B.t * 10 + 2); c.stroke(); }
-    if (h.alive) { c.fillStyle = '#000a'; c.fillRect(h.x - 20, h.y + 25, 40, 4); c.fillStyle = '#64b66e'; c.fillRect(h.x - 20, h.y + 25, 40 * h.hp / h.maxhp, 4); }
+    if (h.alive) { c.fillStyle = '#000a'; c.fillRect(h.x - 20, h.y + 25, 40, 5); c.fillStyle = '#64b66e'; c.fillRect(h.x - 20, h.y + 25, 40 * h.hp / h.maxhp, 5); }
     c.globalAlpha = 1;
   }
   for (const f of B.fx) {

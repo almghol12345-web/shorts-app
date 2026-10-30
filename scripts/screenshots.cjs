@@ -6,8 +6,8 @@ const fs = require('fs');
 const KEY = 'fajr-naajin-save-v1';
 const d64 = (f, t) => `data:${t};base64,` + fs.readFileSync(f).toString('base64');
 const CAP = {
-  ar: [['ابنِ قاعدتك وسط الخراب', '19 مبنى ودفاعات ضد الموجات'], ['اصمد أمام الزومبي', 'معارك حية ومهارات بلمسة'], ['جنّد أبطالاً أسطوريين', '16 بطلاً بقدرات مختلفة'], ['استكشف عالماً مدمّراً', 'خريطة ضخمة تكبّرها بإصبعين'], ['جوائز كل يوم', 'تذكرة المعركة وعجلة الحظ']],
-  en: [['Build your base in the ruins', '19 buildings and raid defenses'], ['Hold back the horde', 'Live battles, one-tap skills'], ['Recruit legendary heroes', '16 heroes, unique skills'], ['Explore a ruined world', 'A huge map you can pinch-zoom'], ['Rewards every day', 'Battle Pass and Lucky Wheel']],
+  ar: [['ابنِ قاعدتك وسط الخراب', '19 مبنى ودفاعات ضد الموجات'], ['اصمد أمام الزومبي', 'معارك حية ومهارات بلمسة'], ['جنّد أبطالاً أسطوريين', 'أبطال أسطوريين بقدرات مدمّرة'], ['استكشف عالماً مدمّراً', 'خريطة ضخمة تكبّرها بإصبعين'], ['جوائز كل يوم', 'تذكرة المعركة وعجلة الحظ']],
+  en: [['Build your base in the ruins', '19 buildings and raid defenses'], ['Hold back the horde', 'Live battles, one-tap skills'], ['Recruit legendary heroes', 'Legendary heroes, devastating skills'], ['Explore a ruined world', 'A huge map you can pinch-zoom'], ['Rewards every day', 'Battle Pass and Lucky Wheel']],
 };
 const SHOTS = ['base', 'battle', 'heroes', 'world', 'pass'];
 (async () => {
@@ -23,8 +23,8 @@ const SHOTS = ['base', 'battle', 'heroes', 'world', 'pass'];
     for (const k in L) s.b[k].lv = L[k];
     for (const k of ['farm1', 'saw1', 'mine1', 'farm2', 'oil1']) s.b[k].acc = 6000;
     s.res = { food: 284300, wood: 196500, iron: 88200, fuel: 21400, gems: 2480, exp: 46000 };
-    s.heroes = { reem: { lv: 34, st: 3, sh: 12 }, saqr: { lv: 33, st: 3, sh: 4 }, layla: { lv: 32, st: 2, sh: 8 }, noura: { lv: 30, st: 2, sh: 0 }, khalid: { lv: 30, st: 2, sh: 0 }, nimr: { lv: 31, st: 4, sh: 20 }, hala: { lv: 28, st: 3, sh: 0 }, jaser: { lv: 26, st: 2, sh: 0 }, fares: { lv: 25, st: 2, sh: 0 }, omar: { lv: 22, st: 2, sh: 0 }, salem: { lv: 20, st: 4, sh: 0 }, mona: { lv: 18, st: 3, sh: 0 }, badr: { lv: 18, st: 3, sh: 0 } };
-    s.squad = ['saqr', 'khalid', 'reem', 'layla', 'noura'];
+    s.heroes = { redking: { lv: 34, st: 3, sh: 12 }, destroyer: { lv: 33, st: 3, sh: 4 }, fire: { lv: 32, st: 2, sh: 8 }, knight: { lv: 31, st: 4, sh: 20 }, lightning: { lv: 30, st: 3, sh: 0 }, shadow: { lv: 28, st: 3, sh: 0 }, medic: { lv: 30, st: 2, sh: 0 }, mountain: { lv: 22, st: 4, sh: 0 }, hawk: { lv: 20, st: 4, sh: 0 }, wind: { lv: 20, st: 3, sh: 0 } };
+    s.squad = ['redking', 'knight', 'fire', 'medic', 'destroyer'];
     s.stage = 44; s.troops = 1900; s.quest = 22; s.tut = true; s.lang = lang; s.name = lang === 'ar' ? 'أبو سلطان' : 'Sultan'; s.auto = false;
     s.cmd = { lv: 23, xp: 900 }; s.vip = { pts: 1600, chest: '' };
     s.tech = { food: 5, wood: 4, iron: 4, fuel: 2, build: 5, train: 3, atk: 6, hp: 5, def: 4, march: 3 };

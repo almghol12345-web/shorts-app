@@ -96,6 +96,7 @@ function portraitSVG(p, rar) {
 }
 const PORTRAIT = {}, PORTRAIT_IMG = {};
 function portraitURI(id) {
+  if (!PORTRAIT[id] && typeof HERO_ART !== 'undefined' && HERO_ART[id]) PORTRAIT[id] = HERO_ART[id];
   if (!PORTRAIT[id]) { const h = HB[id]; PORTRAIT[id] = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(portraitSVG(h.look || {}, h.r)); }
   return PORTRAIT[id];
 }

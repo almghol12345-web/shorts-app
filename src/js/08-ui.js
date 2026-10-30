@@ -100,7 +100,7 @@ VIEWS.heroes = () => {
   <div class="formation"><div class="flabel">${t('front_row')}</div><div class="frow">${slot(0)}${slot(1)}</div><div class="flabel">${t('back_row')}</div><div class="frow">${slot(2)}${slot(3)}${slot(4)}</div>
   <button class="btn sm" data-a="autoSquad" style="justify-self:center">✨ ${t('auto_squad')}</button></div>
   <div class="row between"><h3>${t('your_heroes')} ${own.length}/${HEROES.length}</h3><span class="cc">✨ ${fmt(S.res.exp)}</span></div>
-  <div class="roster">${own.map(id => { const Hh = HB[id], h = S.heroes[id]; const dot = (h.st < 5 && h.sh >= starNeed(h.st)) || (h.lv < heroCap(lvOf('tavern')) && S.res.exp >= lvCost(h.lv)); return `<button class="hc r${Hh.r}" data-a="hero" data-x="${id}">${S.squad.includes(id) ? `<span class="in">${t('in_squad')}</span>` : ''}${dot ? '<span class="dot"></span>' : ''}${cardHTML(id, `<span class="plv num">Lv ${h.lv}</span>`)}<b>${esc(hname(id))}</b>${starsHTML(h.st)}<small>💪 ${fmt(heroPower(id))}</small></button>`; }).join('')}
+  <div class="roster">${own.map(id => { const Hh = HB[id], h = S.heroes[id]; const dot = (h.st < 5 && h.sh >= starNeed(h.st)) || (h.lv < heroCap(lvOf('tavern')) && S.res.exp >= lvCost(h.lv)); return `<button class="hc r${Hh.r}" data-a="hero" data-x="${id}">${S.squad.includes(id) ? `<span class="in">${t('in_squad')}</span>` : ''}${dot ? '<span class="dot"></span>' : ''}${cardHTML(id, `<span class="plv num">Lv ${h.lv}</span>`)}<b>${esc(hname(id))}</b><small class="role">${esc(L(Hh.role))}</small>${starsHTML(h.st)}<small>💪 ${fmt(heroPower(id))}</small></button>`; }).join('')}
   ${lockd.map(Hh => `<div class="hc lockd">${cardHTML(Hh.id, '<span class="plock">🔒</span>')}<b>${esc(L(Hh.n))}</b><small style="color:${RAR[Hh.r].c}">${L(RAR[Hh.r].n)}</small></div>`).join('')}</div>
   </div>`;
 };
@@ -237,7 +237,7 @@ function skillText(sk, m) {
 function mHero(id) {
   const Hh = HB[id], h = S.heroes[id], x = heroStats(id), cap = heroCap(lvOf('tavern')), need = starNeed(h.st), lc = lvCost(h.lv);
   const inSq = S.squad.includes(id);
-  const body = `<div class="hero-hero r${Hh.r}"><img src="${portraitURI(id)}" alt=""><div class="hh-info"><b>${esc(hname(id))}</b>${starsHTML(h.st)}<span class="tag" style="color:${RAR[Hh.r].c}">${L(RAR[Hh.r].n)} · ${CLS[Hh.c].i} ${L(CLS[Hh.c].n)}</span><span class="num" style="color:var(--amber);font-family:var(--fd);font-weight:800">💪 ${fmt(heroPower(id))}</span></div></div>
+  const body = `<div class="hero-hero r${Hh.r}"><img src="${portraitURI(id)}" alt=""><div class="hh-info"><b>${esc(hname(id))}</b>${starsHTML(h.st)}<span class="tag" style="color:${RAR[Hh.r].c}">${L(RAR[Hh.r].n)} · ${CLS[Hh.c].i} ${esc(L(Hh.role))}</span><span class="num" style="color:var(--amber);font-family:var(--fd);font-weight:800">💪 ${fmt(heroPower(id))}</span></div></div>
   <p class="muted">${L(Hh.q)}</p>
   <div class="grid4"><div class="stat"><small>${t('atk')}</small><b class="num">${fmt(x.atk)}</b></div><div class="stat"><small>${t('hp')}</small><b class="num">${fmt(x.hp)}</b></div><div class="stat"><small>${t('def')}</small><b class="num">${fmt(x.def)}</b></div><div class="stat"><small>${t('power')}</small><b class="num" style="color:var(--amber)">${fmt(heroPower(id))}</b></div></div>
   <div class="li"><span class="lic">⚡</span><div class="lit"><b>${L(Hh.skn)}</b><small>${skillText(Hh.sk, RM[Hh.r])}</small></div></div>
@@ -327,7 +327,7 @@ function mShop() {
 }
 function mStarter() {
   const st = IAPB.starter;
-  return sheet('🎁', t('starter_pack'), t('starter_sub'), `<div class="hero-offer"><div style="display:flex;justify-content:center">${avHTML('reem')}</div><b style="font-family:var(--fd);font-size:18px">${t('starter_hero')}</b><div class="row" style="justify-content:center">${rewHTML(st.r)}</div><div class="muted sm">${t('starter_value')}</div><button class="btn gold wide" data-a="buy" data-x="starter" ${S.starter.bought ? 'disabled' : ''}>${S.starter.bought ? t('owned') : priceStr(st)}</button></div><button class="btn wide" data-a="close">${t('later')}</button>`);
+  return sheet('🎁', t('starter_pack'), t('starter_sub'), `<div class="hero-offer"><div style="display:flex;justify-content:center">${avHTML('fire')}</div><b style="font-family:var(--fd);font-size:18px">${t('starter_hero')}</b><div class="row" style="justify-content:center">${rewHTML(st.r)}</div><div class="muted sm">${t('starter_value')}</div><button class="btn gold wide" data-a="buy" data-x="starter" ${S.starter.bought ? 'disabled' : ''}>${S.starter.bought ? t('owned') : priceStr(st)}</button></div><button class="btn wide" data-a="close">${t('later')}</button>`);
 }
 function mBag() {
   const body = Object.keys(ITEMS).map(k => `<div class="li"><span class="lic">${ITEMS[k].i}</span><div class="lit"><b>${L(ITEMS[k].n)} ×${S.inv[k] || 0}</b><small>${L(ITEMS[k].d)}</small></div>${k === 'stam' ? `<button class="btn sm" data-a="useStam" ${S.inv.stam ? '' : 'disabled'}>${t('use')}</button>` : k === 'ticket' ? `<button class="btn sm" data-a="openRecruit">${t('recruit')}</button>` : k === 'spin' ? `<button class="btn sm" data-a="wheel">${t('sc_wheel')}</button>` : `<span class="tag">${t('from_timer')}</span>`}</div>`).join('')

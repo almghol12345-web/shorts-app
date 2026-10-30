@@ -68,7 +68,7 @@ try {
   ok(mail.includes('Thanks for buying') && mail.includes('Eid gift'), 'gift notes saved in mail');
   await closeAll();
   ok((await pg.textContent('#view')).includes('Triple rewards'), 'event banner shows on base');
-  await pg.click('[data-x=campaign]'); ok((await pg.textContent('#view')).includes('×3'), 'campaign shows ×3 rewards');
+  await pg.click('[data-x=campaign]'); { const v = await pg.textContent('#view'); ok(v.includes('×3') || v.includes('×6'), 'campaign shows ×3 rewards (×6 on weekends)'); }
   await pg.click('[data-x=base]'); await pg.click('[data-a=mail]'); await pg.waitForTimeout(300);
   ok((await pg.textContent('.sh-b')).includes('Season 2 is here'), 'news shows in mail'); await closeAll();
   // purchase (dev mode) → logged, VIP up, first-buy double with admin amount

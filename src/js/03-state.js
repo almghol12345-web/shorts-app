@@ -8,8 +8,8 @@ function newState() {
     res: { food: 1500, wood: 1500, iron: 900, fuel: 200, gems: 600, exp: 600 },
     b, builds: [], tech: Object.fromEntries(Object.keys(TECH).map(k => [k, 0])), rq: null,
     troops: 120, wounded: 0, tq: null,
-    heroes: { salem: { lv: 1, st: 1, sh: 0 }, badr: { lv: 1, st: 1, sh: 0 }, mona: { lv: 1, st: 1, sh: 0 } },
-    squad: ['badr', null, 'salem', 'mona', null], pity: 0,
+    heroes: { mountain: { lv: 1, st: 1, sh: 0 }, hawk: { lv: 1, st: 1, sh: 0 }, wind: { lv: 1, st: 1, sh: 0 } },
+    squad: ['mountain', null, 'hawk', 'wind', null], pity: 0,
     stage: 1, stam: 100, stamAt: now(), auto: true, spd: 1,
     inv: { ticket: 3, sp5: 5, sp60: 1, stam: 1, spin: 0 },
     world: { seed: (Math.random() * 1e9) | 0, nodes: null, maxZ: 0, marches: [], v: 2 },
@@ -33,6 +33,14 @@ function migrate(o) {
     }
   }
   if (o.world.v !== 2) { o.world.nodes = null; o.world.marches = []; o.world.v = 2; }
+  // heroes from older versions map onto the current roster (levels kept, shards added)
+  const hs = {};
+  for (const id in o.heroes) { const nid = HB[id] ? id : OLD_HERO[id]; if (!nid) continue; const h = o.heroes[id], cur = hs[nid]; hs[nid] = cur ? { lv: Math.max(cur.lv, h.lv), st: Math.max(cur.st, h.st), sh: cur.sh + h.sh + 10 } : { lv: h.lv, st: h.st, sh: h.sh }; }
+  if (!Object.keys(hs).length) Object.assign(hs, d.heroes);
+  o.heroes = hs;
+  const sq = []; o.squad = (o.squad || []).map(id => { const nid = id && (HB[id] ? id : OLD_HERO[id]); if (!nid || !hs[nid] || sq.includes(nid)) return null; sq.push(nid); return nid; });
+  while (o.squad.length < 5) o.squad.push(null);
+  if (!o.squad.some(Boolean)) o.squad = d.squad.map(id => id && hs[id] ? id : null);
   o.v = 2;
   return o;
 }

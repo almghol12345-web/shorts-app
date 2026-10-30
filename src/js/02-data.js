@@ -51,44 +51,20 @@ const TECH = {
 const CLS = { tank: { n: { ar: 'مدافع', en: 'Tank' }, i: '🛡️' }, atk: { n: { ar: 'مهاجم', en: 'Attacker' }, i: '⚔️' }, sup: { n: { ar: 'داعم', en: 'Support' }, i: '✚' } };
 const RAR = [null, { n: { ar: 'نادر', en: 'Rare' }, c: 'var(--r1)' }, { n: { ar: 'ملحمي', en: 'Epic' }, c: 'var(--r2)' }, { n: { ar: 'أسطوري', en: 'Legendary' }, c: 'var(--r3)' }];
 const RM = [0, .7, 1, 1.35];
-const H = (id, ar, en, r, c, sk, skar, sken, qar, qen) => ({ id, n: { ar, en }, r, c, sk, skn: { ar: skar, en: sken }, q: { ar: qar, en: qen } });
+const H = (id, ar, en, r, c, sk, skar, sken, qar, qen, rar, ren) => ({ id, n: { ar, en }, r, c, sk, skn: { ar: skar, en: sken }, q: { ar: qar, en: qen }, role: { ar: rar, en: ren } });
 const HEROES = [
-  H('reem', 'الشبح', 'Ghost', 3, 'atk', 'snipe', 'رصاصة الموت', 'Death Shot', 'قناصة القوات الخاصة. ما أحد شاف وجهها، وما أحد نجا من طلقتها.', 'Special-forces sniper. Nobody has seen her face, nobody survives her shot.'),
-  H('saqr', 'الحصن', 'Bastion', 3, 'tank', 'shield', 'جدار الحديد', 'Iron Wall', 'حارس المعبر الشمالي. يقف أمام الموجة ولا يتراجع خطوة.', 'Guardian of the north gate. Stands in front of the horde and never steps back.'),
-  H('layla', 'الملاك', 'Angel', 3, 'sup', 'heal', 'إسعاف ميداني', 'Field Medic', 'طبيبة الطوارئ الوحيدة اللي طلعت حية من المستشفى المركزي.', 'The only ER doctor who made it out of Central Hospital alive.'),
-  H('noura', 'العاصفة', 'Storm', 3, 'atk', 'air', 'ضربة جوية', 'Airstrike', 'مهندسة اتصالات تملك شيفرة آخر طائرة مسيّرة.', 'A comms engineer holding the codes to the last drone.'),
-  H('khalid', 'الزلزال', 'Quake', 3, 'tank', 'stun', 'هزة الأرض', 'Quake Slam', 'قائد كتيبة سابق. حين يضرب الأرض يتجمد الزومبي.', 'A former battalion commander. When he hits the ground, the dead freeze.'),
-  H('dana', 'الصدى', 'Echo', 3, 'sup', 'buff', 'نداء النصر', 'Victory Call', 'صوتها على اللاسلكي يجمع الناجين من كل مكان.', 'Her voice on the radio brings survivors from everywhere.'),
-  H('jaser', 'اللهب', 'Blaze', 2, 'atk', 'aoe', 'قنبلة حارقة', 'Firebomb', 'يصنع المتفجرات من أي شيء يلقاه.', 'Builds explosives out of anything he finds.'),
-  H('nimr', 'الجبل', 'Boulder', 2, 'tank', 'stun', 'زلزال', 'Earthquake', 'مصارع سابق. ضربته على الأرض توقف الزومبي في مكانهم.', 'A former wrestler. His slam stops zombies in their tracks.'),
-  H('hala', 'الإعصار', 'Cyclone', 2, 'atk', 'rapid', 'وابل رصاص', 'Bullet Storm', 'أسرع يد في المدينة، تفرّغ المخزن قبل لا ترمش.', 'Fastest hands in the city. Empties a clip before you blink.'),
-  H('fares', 'الذيب', 'Wolf', 2, 'sup', 'buff', 'صرخة القائد', 'Battle Cry', 'ضابط متقاعد. صوته وحده يرفع معنويات الفريق.', 'A retired officer. His voice alone lifts the squad.'),
-  H('omar', 'الصقر', 'Hawk', 2, 'atk', 'snipe', 'عين الصقر', 'Hawk Eye', 'صياد صحراء يشوف الهدف قبل لا يشوفه.', 'A desert hunter who spots the target before it spots him.'),
-  H('salem', 'العقرب', 'Scorpion', 1, 'atk', 'snipe', 'لدغة قاتلة', 'Deadly Sting', 'هادئ وصبور، وضربته وحدة.', 'Quiet, patient, and he only needs one hit.'),
-  H('mona', 'الإبرة', 'Needle', 1, 'sup', 'heal', 'ضمادات', 'Bandages', 'ممرضة متطوعة، حقيبتها ما تفرغ.', 'A volunteer nurse whose bag never runs empty.'),
-  H('badr', 'الصخرة', 'Rock', 1, 'tank', 'shield', 'درع مؤقت', 'Makeshift Shield', 'عامل بناء يشيل باب حديد كدرع.', 'A builder who carries a steel door as a shield.'),
-  H('ziad', 'الشرارة', 'Spark', 1, 'atk', 'aoe', 'قنبلة يدوية', 'Grenade', 'شاب متهور يحب الانفجارات أكثر من اللازم.', 'A reckless kid who loves explosions a bit too much.'),
-  H('sara', 'النبض', 'Pulse', 1, 'sup', 'heal', 'إسعافات أولية', 'First Aid', 'طالبة طب ما كملت دراستها، لكنها أنقذت العشرات.', 'A med student who never graduated but has saved dozens.'),
+  H('redking', 'الملك الأحمر', 'Red King', 3, 'tank', 'stun', 'غضب الملك', 'King’s Wrath', 'آخر ملوك المدينة. سيفه المشتعل يهز الأرض تحت أقدام الموتى.', 'The last king of the city. His burning blade shakes the ground beneath the dead.', 'محارب ضخم', 'Juggernaut'),
+  H('destroyer', 'المدمر', 'Destroyer', 3, 'atk', 'air', 'عاصفة الفراغ', 'Void Storm', 'ساحر من ظلام الأبراج القديمة. يفتح السماء على أعدائه.', 'A sorcerer from the dark old towers. He tears the sky open on his enemies.', 'ساحر', 'Mage'),
+  H('fire', 'النار', 'Inferno', 3, 'atk', 'aoe', 'الجحيم', 'Hellfire', 'وُلد من رماد المدينة المحترقة. كل خطوة منه تترك حريقاً.', 'Born from the ashes of the burning city. Every step leaves a fire behind.', 'مدمر', 'Ravager'),
+  H('knight', 'الفرسان', 'Knight', 2, 'tank', 'shield', 'درع الشرف', 'Oath Shield', 'قائد فرسان الحصن. درعه يحمي الفريق كله.', 'Captain of the fortress knights. His oath shields the whole squad.', 'محارب', 'Warrior'),
+  H('lightning', 'البرق', 'Lightning', 2, 'atk', 'snipe', 'طلقة البرق', 'Lightning Shot', 'قناص القوات الخاصة. طلقته أسرع من صوتها.', 'Special-forces sniper. His bullet lands before you hear it.', 'قناص', 'Sniper'),
+  H('shadow', 'الظل', 'Shadow', 2, 'atk', 'rapid', 'رقصة الخناجر', 'Blade Dance', 'قاتلة تتحرك في الليل. ما أحد يسمعها لين يفوت الأوان.', 'An assassin who moves by night. No one hears her until it is too late.', 'قاتل', 'Assassin'),
+  H('medic', 'الطبيب', 'Medic', 2, 'sup', 'heal', 'نور الشفاء', 'Healing Light', 'طبيبة الميدان. يدها الخضراء ترجّع الأبطال للقتال.', 'The field doctor. Her green light brings heroes back into the fight.', 'معالج', 'Healer'),
+  H('mountain', 'الجبل', 'Mountain', 1, 'tank', 'stun', 'ضربة الجبل', 'Mountain Slam', 'محارب من الجبال الثلجية. فأسه يكسر الصخر.', 'A warrior from the snowy peaks. His axe splits stone.', 'مقاتل', 'Fighter'),
+  H('hawk', 'الصقر', 'Hawk', 1, 'atk', 'snipe', 'سهم الصقر', 'Hawk Arrow', 'رامٍ ملثّم يرافقه صقره. سهمه ما يخطئ.', 'A masked archer with his hawk. His arrow never misses.', 'رامي', 'Archer'),
+  H('wind', 'الريح', 'Gale', 1, 'sup', 'buff', 'اندفاع الريح', 'Wind Rush', 'مبارز سريع كالريح. يشعل حماس الفريق ويضاعف سرعتهم.', 'A swordsman swift as the wind. He fires up the squad and speeds them on.', 'مسرع', 'Swift'),
 ];
-const LOOKS = {
-  reem: { fem: 1, skin: 'b', head: 'hood', gear: '#2f3a2c', mask: 'skull', weapon: 'sniper', eye: '#3f7a4a', vest: '#3a4a32', camo: 1, acc: '#64b66e' },
-  saqr: { skin: 'c', head: 'helmetNvg', gear: '#3a4048', beard: 1, hair: '#1a1410', weapon: 'shield', vest: '#2d3a48', patch: 'flag', acc: '#5aa6d6' },
-  layla: { fem: 1, skin: 'a', hair: '#5a3420', hairStyle: 'long', head: 'headset', weapon: 'medic', vest: '#4f5f66', patch: 'cross', eye: '#4a6a8a', acc: '#c9302c' },
-  noura: { fem: 1, skin: 'b', hair: '#141010', hairStyle: 'pony', glasses: 'goggles', earpiece: 1, weapon: 'antenna', vest: '#4a3a2a', acc: '#5aa6d6', scarfNeck: '#2a2d30' },
-  khalid: { skin: 'd', head: 'helmet', cover: 1, gear: '#4d5238', beard: 1, hair: '#57504a', scar: 1, weapon: 'launcher', vest: '#4a4a36', camo: 1, acc: '#e0b04a' },
-  dana: { fem: 1, skin: 'c', hair: '#1e1410', hairStyle: 'pony', head: 'beret', beretCol: '#7a1f22', weapon: 'smg', vest: '#363a48', eye: '#5a3a20', acc: '#e0b04a' },
-  jaser: { skin: 'b', hair: '#a0461e', hairStyle: 'mohawk', mask: 'gas', weapon: 'launcher', vest: '#4a2a1e', acc: '#e07a2a' },
-  nimr: { skin: 'e', hair: '#0d0a08', hairStyle: 'buzz', beard: 1, paint: '#cf6a2c', weapon: 'shield', vest: '#3a3a30', camo: 1, grin: 1 },
-  hala: { fem: 1, skin: 'a', hair: '#c9a25a', hairStyle: 'pony', head: 'cap', gear: '#2a3a4a', glasses: 'shades', weapon: 'smg', vest: '#2a3a4a', acc: '#e2513f' },
-  fares: { skin: 'b', hair: '#6a645c', head: 'beret', beretCol: '#3b5a2a', beard: 1, weapon: 'rifle', vest: '#3a4a32', camo: 1, acc: '#e0b04a' },
-  omar: { skin: 'c', head: 'cap', gear: '#5a4a30', mask: 'shemagh', maskCol: '#d8c8a8', weapon: 'sniper', vest: '#5a4a30', eye: '#2a1a10', acc: '#cf6a2c' },
-  salem: { skin: 'c', hair: '#1a1410', hairStyle: 'short', mask: 'shemagh', maskCol: '#b8443a', weapon: 'rifle', vest: '#6a5a3a', stubble: 1, acc: '#e2513f' },
-  mona: { fem: 1, skin: 'b', hair: '#2a1810', hairStyle: 'long', weapon: 'medic', vest: '#4a5a5a', patch: 'cross', acc: '#c9302c' },
-  badr: { skin: 'd', head: 'helmet', gear: '#4a5040', stubble: 1, hair: '#1a1410', weapon: 'shield', vest: '#4a4a3a' },
-  ziad: { skin: 'a', hair: '#3a2414', hairStyle: 'short', head: 'bandana', bandCol: '#2a4a8a', grin: 1, paint: '#e07a2a', weapon: 'smg', vest: '#3a4048' },
-  sara: { fem: 1, skin: 'd', hair: '#0d0a08', hairStyle: 'pony', head: 'headset', weapon: 'medic', vest: '#4a4458', patch: 'cross', acc: '#c9302c' },
-};
-HEROES.forEach(h => h.look = LOOKS[h.id]);
+const OLD_HERO = { reem: 'lightning', saqr: 'knight', layla: 'medic', noura: 'destroyer', khalid: 'redking', dana: 'wind', jaser: 'fire', nimr: 'mountain', hala: 'shadow', fares: 'wind', omar: 'hawk', salem: 'hawk', mona: 'medic', badr: 'mountain', ziad: 'fire', sara: 'medic' };
 const HB = Object.fromEntries(HEROES.map(h => [h.id, h]));
 const ZT = {
   w: { i: '🧟', n: { ar: 'زاحف', en: 'Walker' }, hp: 1, atk: 1, spd: 30, r: 15 },
@@ -106,9 +82,9 @@ const ALLIES = [
 ];
 const CHATL = [
   ['أحد يساعدني في البناء؟ 🙏', 'Anyone help me with my build? 🙏'], ['الموجة اليوم قوية انتبهوا', 'The horde is strong today, watch out'], ['وصلت المرحلة الجديدة 🔥', 'Just reached a new stage 🔥'],
-  ['مين عنده الشبح؟ تستاهل', 'Who has Ghost? She is worth it'], ['لا تنسون هدية التحالف', 'Don’t forget the alliance gift'], ['الله يعطيكم العافية يا شباب', 'Good work, everyone'],
+  ['مين عنده النار؟ قوي مرة', 'Who has Inferno? He is a beast'], ['لا تنسون هدية التحالف', 'Don’t forget the alliance gift'], ['الله يعطيكم العافية يا شباب', 'Good work, everyone'],
   ['فيه معسكر زومبي مستوى عالي قرب الطريق الشرقي', 'High-level zombie camp near the east road'], ['طوروا السور قبل الهجوم', 'Upgrade your wall before the raid'], ['ساعدتكم كلكم 💪', 'Helped all of you 💪'],
-  ['صباح الخير يا ناجين', 'Morning, survivors'], ['أحد جرب الجبل مع الملاك؟ تشكيلة قوية', 'Tried Boulder with Angel? Strong combo'], ['الزعيم العالمي اليوم سهل 😎', 'World boss is easy today 😎'],
+  ['صباح الخير يا ناجين', 'Morning, survivors'], ['أحد جرب الملك الأحمر مع الطبيب؟ تشكيلة قوية', 'Tried Red King with Medic? Strong combo'], ['الزعيم العالمي اليوم سهل 😎', 'World boss is easy today 😎'],
 ].map(([ar, en]) => ({ ar, en }));
 const CHATR = [['😂👍', '😂👍'], ['صح كلامك', 'True'], ['تم يا بطل', 'Done, hero'], ['الله يوفقك', 'Good luck'], ['أنا معك', 'I’m with you'], ['💪💪', '💪💪']].map(([ar, en]) => ({ ar, en }));
 const DAILY = [
@@ -125,8 +101,8 @@ const VIPT = [0, 100, 300, 700, 1500, 3000, 6000, 12000, 25000, 50000, 100000];
 const PASS_TIERS = 30, PASS_XP = 100;
 function passReward(tier, prem) {
   if (!prem) { if (tier % 5 === 0) return { ticket: 1, gems: 50 }; return [{ gems: 30 + tier * 2 }, { food: 2000 + tier * 300 }, { sp5: 2 }, { exp: 1500 + tier * 200 }][tier % 4]; }
-  if (tier === PASS_TIERS) return { hero: 'khalid', gems: 1000 };
-  if (tier === 15) return { hero: 'dana', gems: 500 };
+  if (tier === PASS_TIERS) return { hero: 'redking', gems: 1000 };
+  if (tier === 15) return { hero: 'destroyer', gems: 500 };
   if (tier % 3 === 0) return { ticket: 2, gems: 100 };
   if (tier % 4 === 0) return { sp60: 2, gems: 80 };
   return { gems: 80 + tier * 5, exp: 3000 + tier * 300 };
@@ -139,7 +115,7 @@ const IAP = [
   { id: 'gems4', kind: 'gems', gems: 2600, usd: 19.99, i: '🧳', vip: 2000 },
   { id: 'gems5', kind: 'gems', gems: 7000, usd: 49.99, i: '🗃️', vip: 5000 },
   { id: 'gems6', kind: 'gems', gems: 15000, usd: 99.99, i: '🏦', vip: 10000, tag: 'best' },
-  { id: 'starter', kind: 'starter', usd: 1.99, i: '🎁', vip: 200, r: { gems: 500, ticket: 5, sp60: 3, food: 50000, wood: 50000, hero: 'reem' } },
+  { id: 'starter', kind: 'starter', usd: 1.99, i: '🎁', vip: 200, r: { gems: 500, ticket: 5, sp60: 3, food: 50000, wood: 50000, hero: 'fire' } },
   { id: 'monthly', kind: 'monthly', usd: 4.99, i: '📅', vip: 500, gems: 300, daily: 100, days: 30 },
   { id: 'pass', kind: 'pass', usd: 9.99, i: '🎖️', vip: 1000 },
 ];
@@ -147,7 +123,7 @@ const IAPB = Object.fromEntries(IAP.map(p => [p.id, p]));
 const ACH = [
   { k: 'kills', i: '🧟', v: () => S.stats.kills, tiers: [100, 1000, 10000, 100000] },
   { k: 'stage', i: '⚔️', v: () => S.stage - 1, tiers: [10, 25, 50, 100] },
-  { k: 'heroes', i: '🦸', v: () => ownedHeroes().length, tiers: [5, 9, 13, 16] },
+  { k: 'heroes', i: '🦸', v: () => ownedHeroes().length, tiers: [4, 6, 8, 10] },
   { k: 'power', i: '💪', v: () => totalPower(), tiers: [10000, 50000, 200000, 1000000] },
   { k: 'sieges', i: '🛡️', v: () => S.stats.sieges, tiers: [5, 25, 100, 300] },
   { k: 'recruits', i: '🎟️', v: () => S.stats.recruits, tiers: [10, 50, 200, 500] },
