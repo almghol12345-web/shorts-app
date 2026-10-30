@@ -252,3 +252,40 @@ def test_mouth_follows_voice_loudness(tmp_path):
 def test_gulf_scripts_have_scenes_for_every_line():
     for s in content._load_json("mysteries.json"):
         assert len(s.lines) == len(s.scenes) == len(s.visuals)
+
+
+def test_elevenlabs_alignment_becomes_words():
+    from shorts.eleven import words_from_alignment
+    text = "تخيل.. صخرة! ؟"
+    al = {"characters": list(text),
+          "character_start_times_seconds": [i * 0.1 for i in range(len(text))],
+          "character_end_times_seconds": [i * 0.1 + 0.1 for i in range(len(text))]}
+    words = words_from_alignment(al)
+    assert [w[0] for w in words] == ["تخيل..", "صخرة!"]          # punctuation-only token dropped
+    assert words[0][1] == 0.0 and abs(words[1][1] - 0.7) < 1e-9
+
+
+def test_elevenlabs_failure_falls_back_to_free_voice(monkeypatch, tmp_path):
+    import shutil
+
+    import pytest
+
+    from shorts import eleven, voice
+
+    if not shutil.which("ffmpeg"):
+        pytest.skip("ffmpeg not installed")
+    monkeypatch.setenv("ELEVENLABS_API_KEY", "k")
+
+    def boom(*a, **k):
+        raise RuntimeError("quota")
+
+    async def fake_free(text, v, out):
+        from shorts.media import run
+        run(["ffmpeg", "-y", "-f", "lavfi", "-i", "anullsrc=r=24000:cl=mono", "-t", "1",
+             "-c:a", "libmp3lame", str(out)])
+        return [voice.Segment("أهلا", 0.0, 0.5)]
+
+    monkeypatch.setattr(eleven, "synthesize", boom)
+    monkeypatch.setattr(voice, "_tts", fake_free)
+    n = voice.synthesize(["أهلا"], "v", tmp_path)
+    assert not n.silent and [w.text for w in n.words] == ["أهلا"]

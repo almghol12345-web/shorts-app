@@ -1,6 +1,7 @@
 """Narration: the whole script is read in one take (natural flow), and the
 voice service reports when each word is spoken so captions match exactly."""
 import asyncio
+import os
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -75,8 +76,21 @@ def synthesize(lines: list[str], voice: str, workdir: Path) -> Narration:
     line_sizes = [len(_spoken_words(line)) for line in lines]
     raw = workdir / "voice.mp3"
     silent = False
+    words = None
+    key = os.environ.get("ELEVENLABS_API_KEY", "").strip()
+    if key:
+        # natural human voice first; the free voice below is the fallback
+        try:
+            from . import eleven
+            timed = eleven.synthesize(join_lines(lines), raw, key)
+            if timed and raw.stat().st_size > 0:
+                words = [Segment(t, a, b) for t, a, b in timed]
+                print("[voice] ElevenLabs natural voice")
+        except Exception as exc:
+            print(f"[voice] ElevenLabs failed ({type(exc).__name__}: {str(exc)[:200]}); using the free voice")
     try:
-        words = asyncio.run(_tts(join_lines(lines), voice, raw))
+        if words is None:
+            words = asyncio.run(_tts(join_lines(lines), voice, raw))
         if not words or raw.stat().st_size == 0:
             raise RuntimeError("empty audio")
     except Exception as exc:  # network blocked, service down...
