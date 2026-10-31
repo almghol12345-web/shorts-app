@@ -1,3 +1,4 @@
+import { L, t as T, tr } from '../i18n.js';
 import { pixelRatio } from '../platform.js';
 // Plays back a combat log with animated squads, projectiles, skill banners and damage numbers.
 import { heroPortrait, drawSoldier, drawZombie, drawBuggy } from './art.js';
@@ -39,7 +40,7 @@ export class BattleView {
         break;
       case 'heal': if (d) { d.hp = Math.min(d.max, d.hp + e.v); if (!silent) this.nums.push({ x: d.x, y: d.y - 30, text: '+' + fmt(e.v), col: '#6dff8a', t: 0 }); if (!silent) this.fx.push({ kind: 'heal', to: d, t: 0 }); } break;
       case 'shield': if (s) { s.shield = e.v; if (!silent) this.fx.push({ kind: 'shield', to: s, t: 0 }); } break;
-      case 'skill': if (!silent && s) { this.banner = { text: e.n, side: s.side, t: 0, hero: s.heroId }; this.sfx?.('skill'); } break;
+      case 'skill': if (!silent && s) { this.banner = { text: tr(e.n), side: s.side, t: 0, hero: s.heroId }; this.sfx?.('skill'); } break;
       case 'stun': if (s) s.stun = true; break;
       case 'stunned': if (s) s.stun = false; break;
       case 'buff': if (!silent && s) this.fx.push({ kind: 'buff', to: s, t: 0 }); break;
@@ -87,8 +88,8 @@ export class BattleView {
       ctx.fillStyle = u.side === 'a' ? '#2a3a4a' : '#4a2a26'; ctx.beginPath(); ctx.arc(0, 0, R + 3, 0, 7); ctx.fill();
       ctx.save(); ctx.beginPath(); ctx.arc(0, 0, R, 0, 7); ctx.clip();
       if (u.heroId && this.imgs[u.heroId]?.complete) ctx.drawImage(this.imgs[u.heroId], -R, -R * 1.1, R * 2, R * 2.4);
-      else { ctx.fillStyle = u.color || '#555'; ctx.fillRect(-R, -R, R * 2, R * 2); ctx.font = `${R}px sans-serif`; ctx.textAlign = 'center'; ctx.fillText(u.icon || '?', 0, R * 0.35); }
-      if (u.flash > 0) { ctx.fillStyle = `rgba(255,60,40,${u.flash * 0.6})`; ctx.fillRect(-R, -R, R * 2, R * 2); }
+      else { ctx.fillStyle = u.color || '#555'; ctx.fillRect(-R, -R, R * 2, R * 2); ctx.font = L`${R}px sans-serif`; ctx.textAlign = 'center'; ctx.fillText(u.icon || '?', 0, R * 0.35); }
+      if (u.flash > 0) { ctx.fillStyle = L`rgba(255,60,40,${u.flash * 0.6})`; ctx.fillRect(-R, -R, R * 2, R * 2); }
       ctx.restore();
       ctx.strokeStyle = u.side === 'a' ? '#5fd3ff' : '#ff6a4a'; ctx.lineWidth = 2.5; ctx.beginPath(); ctx.arc(0, 0, R + 1, 0, 7); ctx.stroke();
       if (u.shield > 0) { ctx.strokeStyle = 'rgba(120,200,255,0.8)'; ctx.lineWidth = 3; ctx.beginPath(); ctx.arc(0, 0, R + 7, 0, 7); ctx.stroke(); }
@@ -96,7 +97,7 @@ export class BattleView {
       // HP bar
       const f = u.hp / u.max; ctx.fillStyle = 'rgba(0,0,0,0.7)'; roundRect(ctx, -R - 4, R + 5, R * 2 + 8, 7, 3); ctx.fill();
       ctx.fillStyle = f > 0.5 ? '#5fd35f' : f > 0.25 ? '#e8c03a' : '#e85a3a'; roundRect(ctx, -R - 3, R + 6, (R * 2 + 6) * f, 5, 2); ctx.fill();
-      ctx.font = 'bold 9px system-ui'; ctx.textAlign = 'center'; ctx.fillStyle = '#fff'; ctx.fillText(short(u.name), 0, R + 22);
+      ctx.font = 'bold 9px system-ui'; ctx.textAlign = 'center'; ctx.fillStyle = '#fff'; ctx.fillText(short(tr(u.name)), 0, R + 22);
       ctx.restore(); ctx.globalAlpha = 1;
     }
     // effects
@@ -104,16 +105,16 @@ export class BattleView {
     for (const f of this.fx) {
       if ((f.kind === 'shot' || f.kind === 'big' || f.kind === 'slash') && f.from && f.to) {
         const x = f.from.x + (f.to.x - f.from.x) * f.t, y = f.from.y + (f.to.y - f.from.y) * f.t;
-        if (f.kind === 'slash') { ctx.strokeStyle = `rgba(255,255,255,${1 - f.t})`; ctx.lineWidth = 3; ctx.beginPath(); ctx.arc(f.to.x, f.to.y, 26, -0.8 + f.t * 2, 0.4 + f.t * 2); ctx.stroke(); }
-        else { ctx.fillStyle = f.kind === 'big' ? '#ff8a3c' : '#ffe9a0'; ctx.shadowColor = ctx.fillStyle; ctx.shadowBlur = 12; ctx.beginPath(); ctx.arc(x, y, f.kind === 'big' ? 8 : 3.5, 0, 7); ctx.fill(); ctx.shadowBlur = 0; if (f.kind === 'big' && f.t > 0.8) { ctx.fillStyle = `rgba(255,140,40,${(1 - f.t) * 3})`; ctx.beginPath(); ctx.arc(f.to.x, f.to.y, 40 * f.t, 0, 7); ctx.fill(); } }
-      } else if (f.kind === 'heal') { ctx.fillStyle = `rgba(100,255,140,${0.5 * (1 - f.t)})`; ctx.beginPath(); ctx.arc(f.to.x, f.to.y, 30 + f.t * 15, 0, 7); ctx.fill(); }
-      else if (f.kind === 'shield') { ctx.strokeStyle = `rgba(120,200,255,${1 - f.t})`; ctx.lineWidth = 4; ctx.beginPath(); ctx.arc(f.to.x, f.to.y, 28 + f.t * 20, 0, 7); ctx.stroke(); }
-      else if (f.kind === 'buff') { ctx.fillStyle = `rgba(255,200,60,${1 - f.t})`; ctx.font = 'bold 16px system-ui'; ctx.textAlign = 'center'; ctx.fillText('▲ATK', f.to.x, f.to.y - 34 - f.t * 20); }
-      else if (f.kind === 'debuff') { ctx.fillStyle = `rgba(180,120,255,${1 - f.t})`; ctx.font = 'bold 14px system-ui'; ctx.textAlign = 'center'; ctx.fillText('▼ATK', f.to.x, f.to.y - 34 - f.t * 20); }
-      else if (f.kind === 'taunt') { ctx.strokeStyle = `rgba(255,80,60,${1 - f.t})`; ctx.lineWidth = 5; ctx.beginPath(); ctx.arc(f.to.x, f.to.y, 30 + f.t * 40, 0, 7); ctx.stroke(); }
+        if (f.kind === 'slash') { ctx.strokeStyle = L`rgba(255,255,255,${1 - f.t})`; ctx.lineWidth = 3; ctx.beginPath(); ctx.arc(f.to.x, f.to.y, 26, -0.8 + f.t * 2, 0.4 + f.t * 2); ctx.stroke(); }
+        else { ctx.fillStyle = f.kind === 'big' ? '#ff8a3c' : '#ffe9a0'; ctx.shadowColor = ctx.fillStyle; ctx.shadowBlur = 12; ctx.beginPath(); ctx.arc(x, y, f.kind === 'big' ? 8 : 3.5, 0, 7); ctx.fill(); ctx.shadowBlur = 0; if (f.kind === 'big' && f.t > 0.8) { ctx.fillStyle = L`rgba(255,140,40,${(1 - f.t) * 3})`; ctx.beginPath(); ctx.arc(f.to.x, f.to.y, 40 * f.t, 0, 7); ctx.fill(); } }
+      } else if (f.kind === 'heal') { ctx.fillStyle = L`rgba(100,255,140,${0.5 * (1 - f.t)})`; ctx.beginPath(); ctx.arc(f.to.x, f.to.y, 30 + f.t * 15, 0, 7); ctx.fill(); }
+      else if (f.kind === 'shield') { ctx.strokeStyle = L`rgba(120,200,255,${1 - f.t})`; ctx.lineWidth = 4; ctx.beginPath(); ctx.arc(f.to.x, f.to.y, 28 + f.t * 20, 0, 7); ctx.stroke(); }
+      else if (f.kind === 'buff') { ctx.fillStyle = L`rgba(255,200,60,${1 - f.t})`; ctx.font = 'bold 16px system-ui'; ctx.textAlign = 'center'; ctx.fillText(T('▲ATK'), f.to.x, f.to.y - 34 - f.t * 20); }
+      else if (f.kind === 'debuff') { ctx.fillStyle = L`rgba(180,120,255,${1 - f.t})`; ctx.font = 'bold 14px system-ui'; ctx.textAlign = 'center'; ctx.fillText(T('▼ATK'), f.to.x, f.to.y - 34 - f.t * 20); }
+      else if (f.kind === 'taunt') { ctx.strokeStyle = L`rgba(255,80,60,${1 - f.t})`; ctx.lineWidth = 5; ctx.beginPath(); ctx.arc(f.to.x, f.to.y, 30 + f.t * 40, 0, 7); ctx.stroke(); }
     }
     this.nums = this.nums.filter((n) => (n.t += dt * this.speed) < 1.1);
-    for (const n of this.nums) { ctx.globalAlpha = Math.min(1, 2 - n.t * 1.8); ctx.font = `bold ${n.big ? 17 : 13}px system-ui`; ctx.textAlign = 'center'; ctx.lineWidth = 3; ctx.strokeStyle = '#000'; ctx.strokeText(n.text, n.x, n.y - n.t * 30); ctx.fillStyle = n.col; ctx.fillText(n.text, n.x, n.y - n.t * 30); ctx.globalAlpha = 1; }
+    for (const n of this.nums) { ctx.globalAlpha = Math.min(1, 2 - n.t * 1.8); ctx.font = L`bold ${n.big ? 17 : 13}px system-ui`; ctx.textAlign = 'center'; ctx.lineWidth = 3; ctx.strokeStyle = '#000'; ctx.strokeText(n.text, n.x, n.y - n.t * 30); ctx.fillStyle = n.col; ctx.fillText(n.text, n.x, n.y - n.t * 30); ctx.globalAlpha = 1; }
     if (this.banner) {
       const b = this.banner; b.t += dt * this.speed;
       if (b.t > 1.2) this.banner = null;

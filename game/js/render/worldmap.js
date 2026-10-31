@@ -1,3 +1,4 @@
+import { L, t as T, tr } from '../i18n.js';
 import { pixelRatio } from '../platform.js';
 // Top-down world map: procedural terrain, alliance territory, objects, marches.
 import { WORLD_SIZE } from '../data/config.js';
@@ -48,7 +49,7 @@ export class WorldView {
       ctx.fillStyle = '#4a4640'; ctx.fillRect(px, py + 14, TS, 12); ctx.fillStyle = 'rgba(230,200,90,0.5)'; ctx.fillRect(px + 4, py + 19, 12, 2); ctx.fillRect(px + 24, py + 19, 12, 2);
       if (r > 0.85) { ctx.fillStyle = '#7a3a2a'; ctx.fillRect(px + 12, py + 12, 14, 8); ctx.fillStyle = '#222'; ctx.fillRect(px + 14, py + 19, 3, 3); ctx.fillRect(px + 22, py + 19, 3, 3); }
     } else if (tt === 5) {
-      ctx.fillStyle = `rgba(150,220,60,${0.15 + Math.sin(t * 2 + r * 10) * 0.08})`; ctx.fillRect(px, py, TS, TS);
+      ctx.fillStyle = L`rgba(150,220,60,${0.15 + Math.sin(t * 2 + r * 10) * 0.08})`; ctx.fillRect(px, py, TS, TS);
       if (r > 0.6) { ctx.fillStyle = '#9bd04a'; ctx.beginPath(); ctx.arc(px + 20, py + 20, 4, 0, 7); ctx.fill(); }
     }
   }
@@ -68,7 +69,7 @@ export class WorldView {
       ctx.fillStyle = a.color + (mine ? '30' : '1c'); ctx.beginPath(); ctx.arc((a.x + 0.5) * TS, (a.y + 0.5) * TS, TERRITORY_R * TS, 0, 7); ctx.fill();
       ctx.strokeStyle = a.color + 'aa'; ctx.lineWidth = 3; ctx.setLineDash([12, 8]); ctx.stroke(); ctx.setLineDash([]);
       drawFortress(ctx, a.x, a.y, a.color, 1.4, t);
-      label(ctx, `[${a.tag}] ${a.name} HQ`, (a.x + 0.5) * TS, (a.y + 2.2) * TS, a.color);
+      label(ctx, L`[${a.tag}] ${a.name} HQ`, (a.x + 0.5) * TS, (a.y + 2.2) * TS, a.color);
     }
     // objects
     this.objs = g.visibleObjects(x0, y0, x1, y1);
@@ -85,14 +86,14 @@ export class WorldView {
         if (st.occupied) { ctx.font = '12px sans-serif'; ctx.fillText('⛏️', cx - 14, cy - 8); }
       }
       else if (o.kind === 'camp') { drawCamp(ctx, cx, cy, t); badge(ctx, cx, cy - 20, o.lvl, '#b0563a'); }
-      else if (o.kind === 'rival') { drawFortress(ctx, o.x, o.y, o.remote ? '#5fd3ff' : '#9a8a7a', 0.9, t); if (showLabels) label(ctx, `${o.tag ? '[' + o.tag + '] ' : ''}${o.name}${o.remote ? '' : ' (AI)'}`, cx, cy + 34, o.remote ? '#5fd3ff' : '#ddd'); badge(ctx, cx + 22, cy - 22, o.hq, '#777'); }
+      else if (o.kind === 'rival') { drawFortress(ctx, o.x, o.y, o.remote ? '#5fd3ff' : '#9a8a7a', 0.9, t); if (showLabels) label(ctx, L`${o.tag ? '[' + o.tag + '] ' : ''}${o.name}${o.remote ? '' : ' (AI)'}`, cx, cy + 34, o.remote ? '#5fd3ff' : '#ddd'); badge(ctx, cx + 22, cy - 22, o.hq, '#777'); }
       if (this.sel && this.sel.id === o.id) { ctx.strokeStyle = '#ffd27a'; ctx.lineWidth = 2.5; ctx.beginPath(); ctx.arc(cx, cy, 26 + Math.sin(t * 6) * 2, 0, 7); ctx.stroke(); }
     }
     // my base
     const bp = g.basePos();
     if (g.now() < g.s.shieldUntil) { ctx.fillStyle = 'rgba(95,211,255,0.12)'; ctx.strokeStyle = 'rgba(95,211,255,0.6)'; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc((bp.x + 0.5) * TS, (bp.y + 0.5) * TS, 56, 0, 7); ctx.fill(); ctx.stroke(); }
     drawFortress(ctx, bp.x, bp.y, '#ffd27a', 1.3, t);
-    label(ctx, `${g.s.alliance ? '[' + g.s.alliance.tag + '] ' : ''}${g.s.player.name}`, (bp.x + 0.5) * TS, (bp.y + 2.3) * TS, '#ffd27a');
+    label(ctx, L`${g.s.alliance ? '[' + g.s.alliance.tag + '] ' : ''}${g.s.player.name}`, (bp.x + 0.5) * TS, (bp.y + 2.3) * TS, '#ffd27a');
     // marches
     for (const m of g.s.marches) {
       const p = g.marchPos(m), sx = (bp.x + 0.5) * TS, sy = (bp.y + 0.5) * TS, tx = (m.tx + 0.5) * TS, ty = (m.ty + 0.5) * TS;
@@ -116,7 +117,7 @@ function badge(ctx, x, y, n, col) {
   ctx.fillStyle = '#fff'; ctx.font = 'bold 10px system-ui'; ctx.textAlign = 'center'; ctx.fillText(n, x, y + 3);
 }
 function label(ctx, txt, x, y, col) {
-  ctx.font = 'bold 11px system-ui'; ctx.textAlign = 'center'; const w = ctx.measureText(txt).width + 10;
+  txt = tr(txt); ctx.font = 'bold 11px system-ui'; ctx.textAlign = 'center'; const w = ctx.measureText(txt).width + 10;
   ctx.fillStyle = 'rgba(10,10,10,0.75)'; roundRect(ctx, x - w / 2, y - 10, w, 15, 4); ctx.fill();
   ctx.fillStyle = col; ctx.fillText(txt, x, y + 1);
 }

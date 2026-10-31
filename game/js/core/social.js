@@ -1,3 +1,4 @@
+import { L, t as T, tr } from '../i18n.js';
 // Alliance (local AI-simulated mode; online mode is handled by net.js + server), Arena, Shop, Mail.
 // Everything simulated is clearly flagged with `ai: true` so the UI can label it honestly.
 import { NPC_ALLIANCES } from './world.js';
@@ -34,7 +35,7 @@ export const social = {
     if (this.s.alliance) return { ok: false, msg: 'Leave your current alliance first' };
     const a = NPC_ALLIANCES.find((x) => x.id === id); if (!a) return { ok: false };
     this.s.alliance = this.makeLocalAlliance(a.name, a.tag, a.color, id, 16);
-    this.allianceSay(null, `${this.s.player.name} joined the alliance!`, true);
+    this.allianceSay(null, L`${this.s.player.name} joined the alliance!`, true);
     return { ok: true };
   },
   createLocalAlliance(name, tag) {
@@ -89,7 +90,7 @@ export const social = {
     if (!this.spend({ [res]: amt })) return { ok: false, msg: 'Not enough resources' };
     a.techXp[key] = (a.techXp[key] || 0) + 100;
     a.coins += 20; this.track('donate', 1);
-    if (a.techXp[key] >= techCost(lvl)) { a.techXp[key] -= techCost(lvl); a.tech[key] = lvl + 1; this.allianceSay(null, `Alliance tech ${ALLIANCE_TECH.find((t) => t.key === key).name} reached Lv ${lvl + 1}!`, true); }
+    if (a.techXp[key] >= techCost(lvl)) { a.techXp[key] -= techCost(lvl); a.tech[key] = lvl + 1; this.allianceSay(null, L`Alliance tech ${ALLIANCE_TECH.find((t) => t.key === key).name} reached Lv ${lvl + 1}!`, true); }
     return { ok: true };
   },
   buyAllianceShop(id) {
@@ -98,7 +99,7 @@ export const social = {
     a.coins -= it.coins; this.give({ [it.item]: 1 }); return { ok: true };
   },
   // One huge target: HP is the shared pool, attack scales with boss level
-  bossSquads(b) { const v = virtual(2 + b.lvl * 3); return [{ name: `Alliance Behemoth Lv ${b.lvl}`, icon: BOSSES.behemoth.icon, color: BOSSES.behemoth.color, zombie: true, boss: true, row: 0, atk: v.atk * 0.55, def: v.def * 0.8, hp: b.hp, troops: v.n * 4, skill: BOSSES.behemoth.skill }]; },
+  bossSquads(b) { const v = virtual(2 + b.lvl * 3); return [{ name: L`Alliance Behemoth Lv ${b.lvl}`, icon: BOSSES.behemoth.icon, color: BOSSES.behemoth.color, zombie: true, boss: true, row: 0, atk: v.atk * 0.55, def: v.def * 0.8, hp: b.hp, troops: v.n * 4, skill: BOSSES.behemoth.skill }]; },
   rallyBoss() {
     const a = this.s.alliance; if (!a) return { ok: false, msg: 'Join an alliance first' };
     this.refreshBoss();
@@ -116,9 +117,9 @@ export const social = {
     b.hp -= aiDmg;
     const reward = { parts: 5 + Math.floor(bossDmg / 40000), manual: 1, gems: 10 + Math.floor(bossDmg / 100000) };
     let killed = false;
-    if (b.hp <= 0) { killed = true; reward.eliteTicket = 1; reward.gems += 100; this.allianceSay(null, `The Behemoth Lv ${b.lvl} has fallen!`, true); b.lvl++; b.max = BOSS_HP(b.lvl); b.hp = b.max; a.gifts.push({ id: this.now(), name: 'Behemoth Spoils', reward: { gems: 50, parts: 20, speed1h: 1 } }); }
+    if (b.hp <= 0) { killed = true; reward.eliteTicket = 1; reward.gems += 100; this.allianceSay(null, L`The Behemoth Lv ${b.lvl} has fallen!`, true); b.lvl++; b.max = BOSS_HP(b.lvl); b.hp = b.max; a.gifts.push({ id: this.now(), name: 'Behemoth Spoils', reward: { gems: 50, parts: 20, speed1h: 1 } }); }
     this.give(reward); this.track('boss', 1); a.coins += 50;
-    this.addReport({ type: 'boss', title: `Alliance rally vs Behemoth`, win: killed, rewards: reward, a: squads, b: enemy, seed, maxTurns: 12, summary: { a: res.a, b: res.b, turns: res.turns }, note: `You dealt ${bossDmg.toLocaleString()} damage. AI allies dealt ${aiDmg.toLocaleString()}.` });
+    this.addReport({ type: 'boss', title: L`Alliance rally vs Behemoth`, win: killed, rewards: reward, a: squads, b: enemy, seed, maxTurns: 12, summary: { a: res.a, b: res.b, turns: res.turns }, note: L`You dealt ${bossDmg.toLocaleString()} damage. AI allies dealt ${aiDmg.toLocaleString()}.` });
     return { ok: true, result: res, a: squads, b: enemy, bossDmg, aiDmg, killed, reward, dmg, maxTurns: 12 };
   },
   refreshBoss() { const b = this.s.alliance?.boss; if (b && b.day !== dayKey(this.now())) { b.day = dayKey(this.now()); b.attacks = 0; b.myDmg = 0; } },
@@ -147,8 +148,8 @@ export const social = {
       if (r < 0.12) this.allianceSay(m.name, AI_LINES[Math.floor(Math.random() * AI_LINES.length)]);
       else if (r < 0.45 && a.requests.length < 12) a.requests.push({ from: m.name, what: ['Upgrade Barracks', 'Research Smelting', 'Upgrade Command Center', 'Heal troops', 'Upgrade Hydro Farm'][Math.floor(Math.random() * 5)] });
       else if (r < 0.5) { const t = ALLIANCE_TECH[Math.floor(Math.random() * ALLIANCE_TECH.length)]; const lvl = a.tech[t.key] || 0; if (lvl < 10) { a.techXp[t.key] = (a.techXp[t.key] || 0) + 60; if (a.techXp[t.key] >= techCost(lvl)) { a.techXp[t.key] -= techCost(lvl); a.tech[t.key] = lvl + 1; } } }
-      else if (r < 0.515 && a.gifts.length < 10) a.gifts.push({ id: now + i, name: `Gift from ${m.name}`, reward: [{ gems: 10 }, { speed5m: 2 }, { parts: 5 }, { food: 2000 }, { manual: 1 }][Math.floor(Math.random() * 5)] });
-      else if (r < 0.53 && a.mode === 'local' && a.leader && a.members.length < 30) { const nm = AI_NAMES[Math.floor(Math.random() * 20)] + Math.floor(Math.random() * 99); a.members.push({ name: nm, power: Math.round(15000 + Math.random() * 150000), rank: 1, ai: true, hero: HEROES[Math.floor(Math.random() * 30)].id }); this.allianceSay(null, `${nm} joined the alliance`, true); }
+      else if (r < 0.515 && a.gifts.length < 10) a.gifts.push({ id: now + i, name: L`Gift from ${m.name}`, reward: [{ gems: 10 }, { speed5m: 2 }, { parts: 5 }, { food: 2000 }, { manual: 1 }][Math.floor(Math.random() * 5)] });
+      else if (r < 0.53 && a.mode === 'local' && a.leader && a.members.length < 30) { const nm = AI_NAMES[Math.floor(Math.random() * 20)] + Math.floor(Math.random() * 99); a.members.push({ name: nm, power: Math.round(15000 + Math.random() * 150000), rank: 1, ai: true, hero: HEROES[Math.floor(Math.random() * 30)].id }); this.allianceSay(null, L`${nm} joined the alliance`, true); }
     }
     this.refreshBoss();
   },
@@ -190,7 +191,7 @@ export const social = {
     const rewards = win ? { gems: 15, food: 1500 } : { food: 500 };
     this.give(rewards); this.track('arena', 1);
     this.s.arena.opponents = this.s.arena.opponents.filter((o) => o.id !== opId);
-    this.addReport({ type: 'arena', title: `Arena vs ${op.name}${op.ai ? ' (AI)' : ''}`, win, rewards, delta, a: squads, b: enemy, seed: res.seed ?? seed, summary: { a: res.a, b: res.b, turns: res.turns } });
+    this.addReport({ type: 'arena', title: L`Arena vs ${op.name}${op.ai ? ' (AI)' : ''}`, win, rewards, delta, a: squads, b: enemy, seed: res.seed ?? seed, summary: { a: res.a, b: res.b, turns: res.turns } });
     return { ok: true, win, result: res, a: squads, b: enemy, delta, rewards };
   },
   localLeaderboard() {

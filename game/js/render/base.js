@@ -1,3 +1,4 @@
+import { L, t as T, tr } from '../i18n.js';
 import { pixelRatio, getQuality } from '../platform.js';
 // Isometric base view: terrain, buildings by depth, construction, collect bubbles, ambient life & lighting.
 import { BASE_LAYOUT, BUILDINGS } from '../data/buildings.js';
@@ -66,8 +67,8 @@ export class BaseView {
       const inside = i >= 0 && j >= 0 && i < GRID && j < GRID;
       const n = Math.sin(i * 12.9898 + j * 78.233) * 43758.5453 % 1;
       const r = Math.abs(n);
-      let col = inside ? `hsl(35,${14 + r * 6}%,${27 + r * 5}%)` : `hsl(${70 + r * 20},${9 + r * 8}%,${18 + r * 5}%)`;
-      if (inside && (i === 10 || j === 11 || (j === 7 && i > 3 && i < 18) || (j === 15 && i > 3 && i < 18))) col = `hsl(30,6%,${33 + r * 3}%)`;
+      let col = inside ? L`hsl(35,${14 + r * 6}%,${27 + r * 5}%)` : L`hsl(${70 + r * 20},${9 + r * 8}%,${18 + r * 5}%)`;
+      if (inside && (i === 10 || j === 11 || (j === 7 && i > 3 && i < 18) || (j === 15 && i > 3 && i < 18))) col = L`hsl(30,6%,${33 + r * 3}%)`;
       const p = iso(i, j);
       poly(x, [{ x: p.x, y: p.y - TH / 2 }, { x: p.x + TW / 2, y: p.y }, { x: p.x, y: p.y + TH / 2 }, { x: p.x - TW / 2, y: p.y }], col);
       if (!inside && r > 0.85) { x.fillStyle = '#3a3226'; x.fillRect(p.x - 2, p.y - 8, 3, 8); x.fillStyle = 'rgba(60,70,40,0.8)'; x.beginPath(); x.arc(p.x, p.y - 10, 5, 0, 7); x.fill(); }
@@ -151,7 +152,7 @@ export class BaseView {
     for (const f of this.floaters) { ctx.globalAlpha = 1 - f.t / 1.6; ctx.font = 'bold 14px system-ui'; ctx.textAlign = 'center'; ctx.lineWidth = 3; ctx.strokeStyle = '#000'; ctx.strokeText(f.text, f.x, f.y - f.t * 40); ctx.fillStyle = f.color || '#fff'; ctx.fillText(f.text, f.x, f.y - f.t * 40); ctx.globalAlpha = 1; }
     // lighting overlay
     ctx.setTransform(1, 0, 0, 1, 0, 0);
-    if (dark > 0.02) { ctx.fillStyle = `rgba(10,14,40,${dark})`; ctx.fillRect(0, 0, W, H); }
+    if (dark > 0.02) { ctx.fillStyle = L`rgba(10,14,40,${dark})`; ctx.fillRect(0, 0, W, H); }
     const warm = ctx.createLinearGradient(0, 0, W, H); warm.addColorStop(0, 'rgba(255,140,60,0.08)'); warm.addColorStop(1, 'rgba(0,0,0,0)'); ctx.fillStyle = warm; ctx.fillRect(0, 0, W, H);
     // ash
     ctx.fillStyle = 'rgba(220,210,200,0.5)';

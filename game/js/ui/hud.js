@@ -1,3 +1,4 @@
+import { L, t as T, tr } from '../i18n.js';
 import { h, fmt, fmtTime, tickTimers, modal } from './dom.js';
 import { A } from './app.js';
 import { RES_INFO, VIGOR_MAX } from '../data/config.js';
@@ -35,7 +36,7 @@ export function buildHud() {
   updateHud(true);
 }
 function openMore() {
-  const item = (icon, label, fn) => h('button.li', { style: { width: '100%' }, onclick: () => { m.close(); fn(); } }, h('span.ic', {}, icon), h('b.grow', { style: { textAlign: 'left' } }, label), '›');
+  const item = (icon, label, fn) => h('button.li', { style: { width: '100%' }, onclick: () => { m.close(); fn(); } }, h('span.ic', {}, icon), h('b.grow', { style: { textAlign: 'start' } }, label), h('span.flip', {}, '›'));
   const m = modal({ title: 'More', icon: '☰', cls: 'small', render: () => [item('🎖️', 'Commander profile', openProfile), item('🏆', 'Rankings', openRanking), item('🎒', 'Backpack', openBag), item('🚩', 'Marches', openMarches), item('⚙️', 'Settings & account', openSettings)] });
 }
 let lastTimers = '';
@@ -44,19 +45,19 @@ function syncHudHeight() { const hh = document.getElementById('hud').offsetHeigh
 export function updateHud(full) {
   const g = A.g; if (!els.name) return;
   const p = g.s.player;
-  els.avatar.style.backgroundImage = `url(${A.portrait(p.avatar, 96)})`;
+  els.avatar.style.backgroundImage = L`url(${A.portrait(p.avatar, 96)})`;
   els.lv.textContent = p.level;
   els.name.replaceChildren(p.name, h('span.vip', {}, 'VIP ' + g.vipLevel()));
   els.pow.textContent = '⚡ ' + fmt(g.power());
   for (const r of ['food', 'wood', 'metal', 'fuel']) els.res[r].lastChild.textContent = fmt(g.s.res[r]);
   els.gems.lastChild.textContent = fmt(g.s.gems);
-  els.vigor.textContent = `⚡ ${g.vigor()}/${VIGOR_MAX + g.vip().vigor}`;
+  els.vigor.textContent = L`⚡ ${g.vigor()}/${VIGOR_MAX + g.vip().vigor}`;
   const sh = (g.s.shieldUntil - g.now()) / 1000;
-  els.shield.textContent = sh > 0 ? `🛡️ ${sh > 86400 ? Math.floor(sh / 86400) + 'd ' + Math.floor(sh % 86400 / 3600) + 'h' : sh > 3600 ? Math.floor(sh / 3600) + 'h ' + Math.floor(sh % 3600 / 60) + 'm' : fmtTime(sh)}` : '🛡️ —'; els.shield.style.color = sh > 0 ? '#5fd3ff' : '#a99a88';
-  els.net.textContent = A.net.user ? '🟢 Online' : A.net.online ? '🟡 Guest' : '⚪ Offline';
+  els.shield.textContent = sh > 0 ? L`🛡️ ${sh > 86400 ? Math.floor(sh / 86400) + 'd ' + Math.floor(sh % 86400 / 3600) + 'h' : sh > 3600 ? Math.floor(sh / 3600) + 'h ' + Math.floor(sh % 3600 / 60) + 'm' : fmtTime(sh)}` : '🛡️ —'; els.shield.style.color = sh > 0 ? '#5fd3ff' : '#a99a88';
+  els.net.textContent = tr(A.net.user ? '🟢 Online' : A.net.online ? '🟡 Guest' : '⚪ Offline');
   els.net.onclick = () => openSettings();
   els.vigor.onclick = () => openBag();
-  if (g.s.incoming) { els.alert.classList.remove('hidden'); els.alert.textContent = `⚠️ ${g.s.incoming.name} attacking in ${fmtTime((g.s.incoming.arrive - g.now()) / 1000)}!`; els.alert.onclick = () => import('./heroes.js').then((m) => m.openFormation('defense')); }
+  if (g.s.incoming) { els.alert.classList.remove('hidden'); els.alert.textContent = L`⚠️ ${g.s.incoming.name} attacking in ${fmtTime((g.s.incoming.arrive - g.now()) / 1000)}!`; els.alert.onclick = () => import('./heroes.js').then((m) => m.openFormation('defense')); }
   else els.alert.classList.add('hidden');
   // badges
   const dot = (k, n) => { const d = els['dot_' + k]; if (!d) return; d.classList.toggle('hidden', !n); d.textContent = n > 9 ? '9+' : n; };
@@ -78,14 +79,14 @@ export function updateHud(full) {
     for (let i = g.s.queues.build.length; i < g.buildQueueCap(); i++) chips.push(h('div.tchip.idle', { onclick: () => suggestBuild() }, '🔨', h('span.tl', {}, 'Builder idle')));
     for (const t of timers) chips.push(h('div.tchip', { onclick: () => openTimer(t.kind, t.key, t.label) }, t.icon, h('span.tl', {}, t.label), h('span.tt', { 'data-end': t.q.end }, '')));
     if (!g.s.queues.research.length && g.lvl('research')) chips.push(h('div.tchip.idle', { onclick: () => openBuilding('research') }, '🔬', h('span.tl', {}, 'Lab idle')));
-    if (g.s.marches.length) chips.push(h('div.tchip', { onclick: () => openMarches() }, '🚩', h('span.tl', {}, `${g.s.marches.length} march${g.s.marches.length > 1 ? 'es' : ''}`)));
+    if (g.s.marches.length) chips.push(h('div.tchip', { onclick: () => openMarches() }, '🚩', h('span.tl', {}, L`${g.s.marches.length} march${g.s.marches.length > 1 ? 'es' : ''}`)));
     els.timers.replaceChildren(h('div.timers', {}, ...chips));
   }
   // quest bar
   const q = g.storyQuest();
   if (q && A.screen === 'base') {
     els.quest.classList.remove('hidden');
-    els.quest.replaceChildren(h('span.qi', {}, q.done ? '🎁' : '📌'), h('div.qt', {}, h('b', {}, `Story ${q.i + 1}/${STORY.length}`), q.text, ` (${fmt(q.have)}/${fmt(q.need)})`),
+    els.quest.replaceChildren(h('span.qi', {}, q.done ? '🎁' : '📌'), h('div.qt', {}, h('b', {}, L`Story ${q.i + 1}/${STORY.length}`), q.text, L` (${fmt(q.have)}/${fmt(q.need)})`),
       h('button.btn.sm' + (q.done ? '.green' : ''), { onclick: () => { if (q.done) { g.claimStory(); A.sfx('success'); A.toast('Story reward claimed!', 'good'); updateHud(true); } else goQuest(q); } }, q.done ? 'Claim' : 'Go'));
   } else els.quest.classList.add('hidden');
   tickTimers(g.now());

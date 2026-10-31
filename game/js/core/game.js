@@ -1,8 +1,10 @@
+import { L, t as T, tr } from '../i18n.js';
 // The Game facade: owns the save state and mixes in every subsystem.
 // Pure logic only (no DOM) so it runs in the browser, in Node tests, and on the server.
 import { createState, migrate, dayKey, weekIndex } from './state.js';
 import { RESOURCES, VIP_LEVELS, commanderXpFor, VIGOR_MAX, VIGOR_REGEN_SEC } from '../data/config.js';
 import { ITEMS } from '../data/items.js';
+const RES_NAME = { food: 'Food', wood: 'Wood', metal: 'Metal', fuel: 'Fuel' };
 import { RESEARCH_BY_ID } from '../data/research.js';
 import { economy } from './economy.js';
 import { heroes } from './heroes.js';
@@ -67,7 +69,7 @@ export class Game {
       p.xp -= commanderXpFor(p.level); p.level++;
       this.s.gems += 20 + p.level * 5; this.s.items.speed5m = (this.s.items.speed5m || 0) + 2;
       this.emit('levelup', p.level);
-      this.toast(`Commander level ${p.level}! +${20 + p.level * 5} 💎`, 'good');
+      this.toast(L`Commander level ${p.level}! +${20 + p.level * 5} 💎`, 'good');
     }
   }
   vipLevel() { let l = 0; VIP_LEVELS.forEach((v, i) => { if (this.s.player.vipPts >= v.pts) l = i; }); return l; }
@@ -108,7 +110,7 @@ export class Game {
   useItem(id, target) {
     const it = ITEMS[id];
     if (!it || !(this.s.items[id] > 0)) return { ok: false, msg: 'You have none.' };
-    if (it.kind === 'res') { this.s.items[id]--; this.s.res[it.res] += it.amount; this.toast(`+${it.amount.toLocaleString()} ${it.res}`, 'good'); }
+    if (it.kind === 'res') { this.s.items[id]--; this.s.res[it.res] += it.amount; this.toast(L`+${it.amount.toLocaleString()} ${RES_NAME[it.res]}`, 'good'); }
     else if (it.kind === 'vigor') { this.s.items[id]--; this.vigor(); this.s.vigor.v += it.amount; }
     else if (it.kind === 'shield') { this.s.items[id]--; this.s.shieldUntil = Math.max(this.now(), this.s.shieldUntil) + it.sec * 1000; this.toast('Peace Shield active', 'good'); }
     else if (it.kind === 'xp') { if (!target || !this.s.heroes[target]) return { ok: false, msg: 'Choose a hero.' }; this.s.items[id]--; this.heroAddXp(target, it.xp); }

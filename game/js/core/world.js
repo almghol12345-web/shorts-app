@@ -1,3 +1,4 @@
+import { L, t as T, tr } from '../i18n.js';
 // Deterministic world map. Every client generates the same map from WORLD_SEED, so a server
 // only has to store diffs (cleared objects, depleted nodes, player positions).
 import { WORLD_SIZE, MARCH_SPEED } from '../data/config.js';
@@ -94,7 +95,7 @@ export function objectById(id) {
 export function rivalSquads(o) {
   const lvl = o.lvl + Math.floor(o.hq / 3);
   const sq = zombieSquads(lvl, { kinds: ['raider'], count: Math.min(5, 2 + Math.floor(o.hq / 5)) });
-  sq.forEach((s, i) => { s.zombie = false; s.name = `${o.name}'s Squad ${i + 1}`; s.troopType = ['infantry', 'ranged', 'vehicle'][i % 3]; });
+  sq.forEach((s, i) => { s.zombie = false; s.name = L`${o.name}'s Squad ${i + 1}`; s.troopType = ['infantry', 'ranged', 'vehicle'][i % 3]; });
   sq.push({ name: 'Barricade', icon: '🧱', color: '#8a7a6a', row: 0, structure: true, atk: 20 * o.hq, def: 400 * o.hq, hp: Math.round(4000 * Math.pow(1.32, o.hq - 1)), troops: 0 });
   return sq;
 }
@@ -148,7 +149,7 @@ export const worldSys = {
   sendMarch(kind, targetId, heroIds = []) {
     const o = objectById(targetId); if (!o) return { ok: false, msg: 'Target not found' };
     if (this.objectState(o).gone) return { ok: false, msg: 'Target is gone' };
-    if (this.s.marches.length >= this.marchSlots()) return { ok: false, msg: `All ${this.marchSlots()} march slots in use` };
+    if (this.s.marches.length >= this.marchSlots()) return { ok: false, msg: L`All ${this.marchSlots()} march slots in use` };
     const now = this.now();
     if (kind === 'scout') {
       const cost = { food: 200 * Math.max(1, o.lvl) };
@@ -164,7 +165,7 @@ export const worldSys = {
     if (kind === 'attack' && o.kind === 'node') return { ok: false, msg: 'Use Gather on resource nodes' };
     if (kind === 'attack' && o.kind === 'rival' && o.ai === false) return { ok: false, msg: 'Use online PvP for real players' };
     const vc = kind === 'attack' ? this.vigorCost(o) : 0;
-    if (vc && this.vigor() < vc) return { ok: false, msg: `Need ${vc} Vigor` };
+    if (vc && this.vigor() < vc) return { ok: false, msg: L`Need ${vc} Vigor` };
     const formation = this.autoFormation(heroIds);
     const { squads, used } = this.buildSquads(formation, this.s.troops);
     if (!Object.keys(used).length) return { ok: false, msg: 'No troops available at home' };
@@ -212,7 +213,7 @@ export const worldSys = {
       const sq = targetSquads(o);
       this.s.world.scouted[o.id] = this.now();
       this.track('scout', 1);
-      this.addReport({ type: 'scout', title: `Scout report: ${o.name || labelOf(o)}`, win: true, intel: { power: sidePower(sq), squads: sq.map((s) => ({ name: s.name, troops: s.troops, icon: s.icon })), loot: o.kind === 'rival' ? this.rivalLoot(o) : null }, target: o.id });
+      this.addReport({ type: 'scout', title: L`Scout report: ${o.name || labelOf(o)}`, win: true, intel: { power: sidePower(sq), squads: sq.map((s) => ({ name: s.name, troops: s.troops, icon: s.icon })), loot: o.kind === 'rival' ? this.rivalLoot(o) : null }, target: o.id });
       goHome(); return;
     }
     if (m.kind === 'gather') {
@@ -242,7 +243,7 @@ export const worldSys = {
       m.loot = rewards;
       m.heroes.forEach((h) => this.heroAddXp(h, 100 + o.lvl * 40));
     }
-    this.addReport({ type: o.kind === 'rival' ? 'pvp' : 'pve', title: `${win ? 'Victory' : 'Defeat'} vs ${o.name || labelOf(o)} (Lv ${o.lvl})`, win, rewards: m.loot, wounded, dead, a: squads, b: enemy, seed, summary: { a: res.a, b: res.b, turns: res.turns } });
+    this.addReport({ type: o.kind === 'rival' ? 'pvp' : 'pve', title: L`${win ? 'Victory' : 'Defeat'} vs ${o.name || labelOf(o)} (Lv ${o.lvl})`, win, rewards: m.loot, wounded, dead, a: squads, b: enemy, seed, summary: { a: res.a, b: res.b, turns: res.turns } });
     this.emit('battle', { march: m, win });
     if (!Object.keys(survived).length && !m.heroes.length) { this.s.marches = this.s.marches.filter((x) => x !== m); return; }
     goHome();
@@ -250,7 +251,7 @@ export const worldSys = {
   rivalLoot(o) { const k = 1500 + o.hq * o.hq * 220; return { food: k, wood: k, metal: Math.round(k * 0.4), fuel: o.hq > 6 ? Math.round(k * 0.15) : 0 }; },
   homecoming(m) {
     for (const [k, n] of Object.entries(m.troops)) this.s.troops[k] = (this.s.troops[k] || 0) + n;
-    if (m.loot && Object.keys(m.loot).length) { this.give(m.loot); this.toast(`March returned with loot`, 'good'); }
+    if (m.loot && Object.keys(m.loot).length) { this.give(m.loot); this.toast(L`March returned with loot`, 'good'); }
     this.s.marches = this.s.marches.filter((x) => x !== m);
     this.emit('change');
   },
@@ -273,7 +274,7 @@ export const worldSys = {
       const lvl = Math.max(1, Math.round(hq * 1.1));
       const squads = zombieSquads(lvl, { kinds: ['raider'], count: Math.min(5, 2 + Math.floor(hq / 5)) }).map((q) => ({ ...q, zombie: false, troopType: ['infantry', 'ranged', 'vehicle'][Math.floor(rng() * 3)] }));
       s.incoming = { name, hq, squads, arrive: now + 90000, power: enemyPower(squads) };
-      this.toast(`⚠️ ${name} is marching on your bastion!`, 'bad');
+      this.toast(L`⚠️ ${name} is marching on your bastion!`, 'bad');
       this.emit('incoming', s.incoming);
     }
     if (s.incoming && now >= s.incoming.arrive) this.resolveRaid(s.incoming, now);
@@ -295,8 +296,8 @@ export const worldSys = {
       for (const r of ['food', 'wood', 'metal', 'fuel']) { const v = Math.floor(Math.max(0, s.res[r] - prot) * 0.2); if (v) { s.res[r] -= v; plundered[r] = v; } }
       s.shieldUntil = now + 30 * 60000; // short protection after being hit
     } else this.addXp(50 * inc.hq);
-    this.addReport({ type: 'defense', title: defWin ? `Repelled ${inc.name}!` : `${inc.name} raided your bastion`, win: defWin, plundered, wounded, dead, a: inc.squads, b: def, seed: now & 0xffff, defender: true, summary: { a: res.a, b: res.b, turns: res.turns } });
-    this.toast(defWin ? `Defense held against ${inc.name}!` : `${inc.name} broke through and looted resources`, defWin ? 'good' : 'bad');
+    this.addReport({ type: 'defense', title: defWin ? L`Repelled ${inc.name}!` : L`${inc.name} raided your bastion`, win: defWin, plundered, wounded, dead, a: inc.squads, b: def, seed: now & 0xffff, defender: true, summary: { a: res.a, b: res.b, turns: res.turns } });
+    this.toast(defWin ? L`Defense held against ${inc.name}!` : L`${inc.name} broke through and looted resources`, defWin ? 'good' : 'bad');
   },
 };
 export function labelOf(o) {

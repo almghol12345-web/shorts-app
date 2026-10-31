@@ -3,6 +3,7 @@ import { RES_INFO, RESOURCES } from '../data/config.js';
 import { ITEMS } from '../data/items.js';
 import { sfx } from '../audio.js';
 import { haptic } from '../platform.js';
+import { tr, L } from '../i18n.js';
 
 export function h(tag, attrs = {}, ...kids) {
   const [t, ...cls] = tag.split('.');
@@ -16,10 +17,11 @@ export function h(tag, attrs = {}, ...kids) {
     else if (k === 'style' && typeof v === 'object') Object.assign(el.style, v);
     else if (k === 'class') el.className += ' ' + v;
     else if (k === 'html') el.innerHTML = v;
+    else if (k === 'placeholder' || k === 'title' || k === 'aria-label') el.setAttribute(k, tr(String(v)));
     else if (k in el && typeof v !== 'string') el[k] = v;
     else el.setAttribute(k, v);
   }
-  for (const k of kids.flat(Infinity)) if (k != null && k !== false) el.append(k.nodeType ? k : document.createTextNode(String(k)));
+  for (const k of kids.flat(Infinity)) if (k != null && k !== false) el.append(k.nodeType ? k : document.createTextNode(typeof k === 'string' ? tr(k) : String(k)));
   return el;
 }
 export function fmt(n) {
@@ -61,13 +63,13 @@ export function modal({ title, render, cls = '', onClose, live = false, tabs = n
   const body = h('div.mbody');
   const tabBar = tabs ? h('div.tabs') : null;
   const m = { tab, live, render, body, close: () => close(m), refresh: () => {
-    const st = body.scrollTop; body.replaceChildren(); const out = render(m); if (out) body.append(...[out].flat()); body.scrollTop = st;
+    const st = body.scrollTop; body.replaceChildren(); const out = render(m); if (out) body.append(...[out].flat(Infinity).filter((x) => x != null && x !== false).map((x) => (x.nodeType ? x : document.createTextNode(tr(String(x)))))); body.scrollTop = st;
     if (tabBar) [...tabBar.children].forEach((b, i) => b.classList.toggle('on', i === m.tab));
   } };
   if (tabs) tabs.forEach((t, i) => tabBar.append(h('button.tab', { onclick: () => { m.tab = i; body.scrollTop = 0; m.refresh(); } }, t)));
   const titleEl = h('div.mtitle', {}, h('span.micon', {}, icon), h('span', {}, title), h('button.x', { onclick: () => close(m), 'aria-label': 'Close' }, '✕'));
   m.el = h('div.modal ' + cls, { onclick: (e) => { if (e.target === m.el) close(m); } }, h('div.panel', {}, titleEl, tabBar, body));
-  m.setTitle = (t) => { titleEl.children[1].textContent = t; };
+  m.setTitle = (t) => { titleEl.children[1].textContent = tr(t); };
   m.onClose = onClose;
   root.append(m.el); stack.push(m); m.refresh(); sfx('open');
   requestAnimationFrame(() => m.el.classList.add('show'));

@@ -1,3 +1,4 @@
+import { L, t as T, tr, setLang, getLang, LANGS } from './i18n.js';
 // Bootstrap: load/create save, wire views, run the game loop, autosave, sync with server.
 import { Game } from './core/game.js';
 import { A } from './ui/app.js';
@@ -39,11 +40,27 @@ A.haptic = haptic;
 
 // ---------- splash ----------
 function embers() { const e = document.getElementById('embers'); for (let i = 0; i < 40; i++) { const s = h('i'); s.style.left = Math.random() * 100 + '%'; s.style.animationDuration = 4 + Math.random() * 6 + 's'; s.style.animationDelay = -Math.random() * 8 + 's'; e.append(s); } }
+export function applyLang(l) {
+  setLang(l);
+  document.documentElement.lang = getLang();
+  document.documentElement.dir = getLang() === 'ar' ? 'rtl' : 'ltr';
+  document.title = T('Ashfall: Last Bastion');
+}
+function initialLang() {
+  const saved = storage.get('ashfall.lang');
+  if (saved) return saved;
+  return (navigator.languages || [navigator.language || 'en']).some((x) => /^ar\b/i.test(x)) ? 'ar' : 'en';
+}
 function splash(existing) {
   embers();
   const form = document.getElementById('splashForm');
+  const sp = document.getElementById('splash');
+  sp.querySelector('h2').textContent = T('THE LAST'); sp.querySelector('h1').textContent = T('ASHFALL'); sp.querySelectorAll('h2')[1].textContent = T('BASTION');
+  sp.querySelector('p').textContent = T('The dead walk. The cities burn. Build your bastion, rally survivors, and take back the wasteland.');
+  const langRow = h('div.row.c', { style: { position: 'absolute', top: 'calc(14px + var(--safe-t))', insetInlineEnd: '14px' } }, ...Object.entries(LANGS).map(([k, v]) => h('button.btn.sm' + (getLang() === k ? '' : '.gray'), { onclick: () => { storage.set('ashfall.lang', k); location.reload(); } }, v)));
+  sp.append(langRow);
   if (existing) {
-    form.append(h('button.btn', { style: { fontSize: '18px', padding: '14px 40px' }, onclick: () => start(existing) }, '▶  CONTINUE'), h('div.muted', { style: { marginTop: '8px' } }, `${existing.player.name} · Commander Lv ${existing.player.level}`));
+    form.append(h('button.btn', { style: { fontSize: '18px', padding: '14px 40px' }, onclick: () => start(existing) }, '▶  CONTINUE'), h('div.muted', { style: { marginTop: '8px' } }, L`${existing.player.name} · Commander Lv ${existing.player.level}`));
   } else {
     const name = h('input.txt', { placeholder: 'Commander name', maxlength: 16, value: 'Survivor' + Math.floor(Math.random() * 900 + 100), style: { textAlign: 'center', marginBottom: '10px' } });
     form.append(name, h('button.btn', { style: { fontSize: '18px', padding: '14px 40px', width: '100%' }, onclick: () => start(null, name.value.trim() || 'Survivor') }, '▶  BEGIN'));
@@ -63,8 +80,8 @@ function start(state, name) {
   document.getElementById('splash').remove();
   g.on('toast', ({ msg, kind }) => toast(msg, kind));
   g.on('incoming', () => { A.sfx('alarm'); haptic('warning'); });
-  g.on('built', (q) => { A.sfx('success'); A.views.base?.float(`Lv ${q.toLvl}!`, q.slot, '#ffd27a'); });
-  g.on('helped', ({ by }) => { if (Math.random() < 0.3) toast(`🤝 ${by} helped you`); });
+  g.on('built', (q) => { A.sfx('success'); A.views.base?.float(L`Lv ${q.toLvl}!`, q.slot, '#ffd27a'); });
+  g.on('helped', ({ by }) => { if (Math.random() < 0.3) toast(L`🤝 ${by} helped you`); });
   g.on('report', (r) => { if (r.type === 'pve' && r.title.startsWith('Campaign')) return; if (r.type !== 'arena' && r.type !== 'boss') toast((r.win ? '✅ ' : '❌ ') + r.title, r.win ? 'good' : 'bad'); });
   g.basePos();
   // offline progress summary
@@ -75,7 +92,7 @@ function start(state, name) {
     g.addMail('Field Guide', 'Tip: tap the bubbles over farms and lumber yards to collect. Idle builders are shown on the left — keep them busy! On the World Map, attack zombie hordes (costs Vigor), gather at resource nodes, and scout rivals before raiding them.', null);
   } else if (away > 120) {
     let prod = {}; for (const id of Object.keys(g.s.buildings)) { const b = g.s.buildings[id]; const r = BUILDINGS[b.type].produces; if (r) prod[r] = (prod[r] || 0) + g.pending(id); }
-    setTimeout(() => toast(`Welcome back! While away (${Math.round(away / 60)} min): ${Object.entries(prod).filter(([, v]) => v).map(([k, v]) => RES_INFO[k].icon + fmt(v)).join(' ') || 'nothing produced'} ready to collect`, 'good'), 600);
+    setTimeout(() => toast(L`Welcome back! While away (${Math.round(away / 60)} min): ${Object.entries(prod).filter(([, v]) => v).map(([k, v]) => RES_INFO[k].icon + fmt(v)).join(' ') || 'nothing produced'} ready to collect`, 'good'), 600);
   }
   const base = new BaseView(document.getElementById('baseCanvas'), g, { onSelect: (slot) => openSlot(slot), sfx: A.sfx, forceDay: () => g.s.settings.alwaysDay });
   const world = new WorldView(document.getElementById('worldCanvas'), g, { onSelect: (sel) => showTileInfo(sel), onMarch: () => openMarches() });
@@ -110,7 +127,7 @@ function start(state, name) {
     const t = now / 1000;
     if (!document.getElementById('battle').classList.contains('hidden')) { /* battle renders itself */ }
     else if (A.screen === 'base') base.render(t);
-    else { world.render(t); const c = world.centerTile(); coord.textContent = `X:${c.x} Y:${c.y}`; }
+    else { world.render(t); const c = world.centerTile(); coord.textContent = L`X:${c.x} Y:${c.y}`; }
   };
   requestAnimationFrame(loop);
   // Logic tick
@@ -125,7 +142,7 @@ function start(state, name) {
   let saveTimer = 0; g.on('change', () => { clearTimeout(saveTimer); saveTimer = setTimeout(save, 800); });
   onBack(() => {
     const battle = document.getElementById('battle');
-    if (!battle.classList.contains('hidden')) { const btn = [...battle.querySelectorAll('button')].find((b) => /Continue|Skip/.test(b.textContent)); btn?.click(); return true; }
+    if (!battle.classList.contains('hidden')) { const btn = battle.querySelector('[data-back="2"]') || battle.querySelector('[data-back="1"]'); btn?.click(); return true; }
     if (topModal()) { topModal().close(); return true; }
     if (!document.getElementById('tileinfo').classList.contains('hidden')) { showTileInfo(null); return true; }
     if (A.screen !== 'base') { A.switchScreen('base'); return true; }
@@ -171,9 +188,9 @@ function applyServerEffect(e) {
     for (const [k, v] of Object.entries(e.loot || {})) g.s.res[k] = Math.max(0, g.s.res[k] - v);
     for (const [k, v] of Object.entries(e.losses || {})) g.s.troops[k] = Math.max(0, (g.s.troops[k] || 0) - v);
     const { wounded } = g.addWounded(e.losses || {});
-    g.addReport({ type: 'defense', title: e.win ? `${e.by} raided your bastion (online)` : `Repelled ${e.by} (online)`, win: !e.win, plundered: e.loot, wounded, a: e.a, b: e.b, seed: e.seed, defender: true, summary: e.summary });
+    g.addReport({ type: 'defense', title: e.win ? L`${e.by} raided your bastion (online)` : L`Repelled ${e.by} (online)`, win: !e.win, plundered: e.loot, wounded, a: e.a, b: e.b, seed: e.seed, defender: true, summary: e.summary });
     if (e.win) g.s.shieldUntil = Math.max(g.s.shieldUntil, Date.now() + 30 * 60000);
-    toast(e.win ? `⚠️ ${e.by} raided you while you were away` : `🛡️ You repelled ${e.by}`, e.win ? 'bad' : 'good');
+    toast(e.win ? L`⚠️ ${e.by} raided you while you were away` : L`🛡️ You repelled ${e.by}`, e.win ? 'bad' : 'good');
   } else if (e.type === 'arena') {
     g.s.arena.points = e.points ?? g.s.arena.points;
   } else if (e.type === 'mail') g.addMail(e.title, e.body, e.reward);
@@ -184,4 +201,4 @@ window.ashfall = A; // handy for debugging from the console
 window.addEventListener('ashfall-toast', (e) => toast(e.detail));
 document.addEventListener('contextmenu', (e) => e.preventDefault());
 document.addEventListener('gesturestart', (e) => e.preventDefault()); // iOS pinch-zooming the page
-(async () => { await initPlatform(); hideSplash(); splash(await loadSave()); })();
+(async () => { await initPlatform(); applyLang(initialLang()); hideSplash(); splash(await loadSave()); })();

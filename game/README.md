@@ -7,6 +7,16 @@ game ships with no image or audio files.
 
 ![Ashfall screenshots](docs/preview.png)
 
+## Languages / اللغات
+
+The game is fully bilingual: **English** and **Arabic (العربية)** with a right-to-left layout.
+Phones set to Arabic start in Arabic automatically; switch any time on the start screen or in
+⚙️ Settings. Every menu, building, hero (names, bios, skills), mission, event and message is
+translated — 1,200+ phrases in `js/i18n/ar.js`, keyed by the English text. A test fails if any game
+content is missing a translation.
+
+![Arabic screens](docs/arabic.png)
+
 ## Run it
 
 ```bash
@@ -101,6 +111,7 @@ game/
   index.html, css/, manifest.webmanifest, sw.js   # client shell (PWA, offline cache)
   android/, ios/   # native app projects (Capacitor)
   capacitor.config.json, scripts/build.mjs, scripts/make-icons.cjs, icons/
+  js/i18n.js, js/i18n/ar.js   # translation layer + Arabic dictionary
   js/platform.js   # native bridge: storage, haptics, back button, status bar, quality
   js/data/     # all balance data: buildings, troops, heroes, research, items, missions, enemies
   js/core/     # pure game logic (no DOM) — shared by client, server and tests

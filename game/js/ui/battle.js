@@ -1,3 +1,4 @@
+import { L, t as T, tr } from '../i18n.js';
 import { h, fmt } from './dom.js';
 import { A } from './app.js';
 import { BattleView } from '../render/battleview.js';
@@ -13,7 +14,7 @@ export function openBattle(opts) {
   const canvas = h('canvas.view');
   const speedBtn = h('button.btn.sm.gray', { onclick: () => { view.speed = view.speed >= 4 ? 1 : view.speed * 2; speedBtn.textContent = 'x' + view.speed; } }, 'x1');
   const ui = h('div.bui', {}, h('div.coord', {}, '🔵 ', fmt(sidePower(opts.a))), h('b.gold', { style: { textShadow: '0 2px 4px #000' } }, opts.title || 'Battle'), h('div.coord', {}, '🔴 ', fmt(sidePower(opts.b))));
-  const ctl = h('div.bctl', {}, speedBtn, h('button.btn.sm', { onclick: () => view.skip() }, 'Skip ⏭'));
+  const ctl = h('div.bctl', {}, speedBtn, h('button.btn.sm', { 'data-back': '1', onclick: () => view.skip() }, 'Skip ⏭'));
   root.append(canvas, ui, ctl);
   view = new BattleView(canvas, A.sfx);
   view.resize(); view.load(opts.a, opts.b, opts.result);
@@ -41,14 +42,14 @@ function showResult(root, opts) {
   const rows = (arr) => arr.map((s) => h('tr', {}, h('td', {}, s.name), h('td', {}, s.troopType ? TROOP_TYPES[s.troopType]?.icon : ''), h('td', {}, fmt(s.troops)), h('td.bad', {}, s.lost ? '-' + fmt(s.lost) : '0'), h('td', {}, fmt(s.dealt)), h('td.good', {}, s.healed ? fmt(s.healed) : '')));
   const box = h('div.box', {},
     h('h1.' + (win ? 'win' : 'lose'), {}, win ? 'VICTORY' : 'DEFEAT'),
-    h('div.muted', {}, `${r.turns} rounds`),
-    mvp && mvp.dealt ? h('div', { style: { margin: '8px 0' } }, '🏅 MVP: ', h('b.gold', {}, mvp.name), ` — ${fmt(mvp.dealt)} damage`) : null,
+    h('div.muted', {}, L`${r.turns} rounds`),
+    mvp && mvp.dealt ? h('div', { style: { margin: '8px 0' } }, '🏅 MVP: ', h('b.gold', {}, mvp.name), L` — ${fmt(mvp.dealt)} damage`) : null,
     opts.extra ? h('div', { style: { margin: '6px 0' } }, opts.extra) : null,
     opts.rewards && Object.keys(opts.rewards).length ? [h('div.sec', {}, 'Rewards'), h('div.row.c', {}, rewardChips(opts.rewards))] : null,
     h('div.sec', {}, 'Your squads'), h('table.tbl', {}, h('tr', {}, ...['Squad', '', 'Troops', 'Lost', 'Damage', 'Heal'].map((x) => h('th', {}, x))), rows(r.a)),
     h('div.sec', {}, 'Enemy'), h('table.tbl', {}, h('tr', {}, ...['Squad', '', 'Troops', 'Lost', 'Damage', 'Heal'].map((x) => h('th', {}, x))), rows(r.b)),
     !win ? h('p.muted', {}, 'Tips: train higher-tier troops, level & star up heroes, put tanks in front, research Military tech, and use troop counters (Infantry › Vehicles › Ranged › Infantry).') : null,
-    h('div.row', { style: { marginTop: '12px' } }, h('button.btn.gray.grow', { onclick: () => { root.querySelector('.bres')?.remove(); view.load(opts.a, opts.b, opts.result); setTimeout(() => watchEnd(root, opts), 50); } }, '↻ Replay'), h('button.btn.grow', { onclick: () => close(opts) }, 'Continue')));
+    h('div.row', { style: { marginTop: '12px' } }, h('button.btn.gray.grow', { onclick: () => { root.querySelector('.bres')?.remove(); view.load(opts.a, opts.b, opts.result); setTimeout(() => watchEnd(root, opts), 50); } }, '↻ Replay'), h('button.btn.grow', { 'data-back': '2', onclick: () => close(opts) }, 'Continue')));
   root.append(h('div.bres', {}, box));
 }
 function watchEnd(root, opts) { const iv = setInterval(() => { if (view.done) { clearInterval(iv); setTimeout(() => showResult(root, opts), 500); } }, 200); }

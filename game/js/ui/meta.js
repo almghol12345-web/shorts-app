@@ -1,3 +1,4 @@
+import { L, t as T, tr } from '../i18n.js';
 import { h, fmt, fmtTime, modal, result, toast, rewardChips, ago, confirmBox } from './dom.js';
 import { A } from './app.js';
 import { EVENTS } from '../data/missions.js';
@@ -9,6 +10,7 @@ import { setSfx, setMusic } from '../audio.js';
 import { goEvent } from './hud.js';
 import { storage, setHaptics, isNative, platform, setQuality } from '../platform.js';
 import { CONFIG } from '../config.js';
+import { LANGS, getLang } from '../i18n.js';
 
 const claimBtn = (ready, claimed, fn, ev) => claimed ? h('b.good', {}, '✓') : ready ? h('button.btn.sm.green', { onclick: fn }, 'Claim') : ev ? h('button.btn.sm.gray', { onclick: () => goEvent(ev) }, 'Go') : h('span.muted', {}, '🔒');
 function claimed(r, m) { if (r.ok) { A.sfx('success'); toast('Reward claimed!', 'good'); m.refresh(); A.refreshHud(); } }
@@ -19,17 +21,17 @@ export function openMissions(tab = 0) {
     if (m.tab === 0) {
       const q = g.storyQuest();
       if (!q) return h('p.good', {}, 'All story missions complete — more in future chapters!');
-      return [h('div.card.hl', {}, h('div.muted', {}, `Story mission ${q.i + 1}`), h('b', { style: { fontSize: '16px' } }, q.text), h('div.bar', { style: { margin: '8px 0' } }, h('div', { style: { width: (q.have / q.need * 100) + '%' } })), h('div.row.sp', {}, h('span.muted', {}, `${fmt(q.have)} / ${fmt(q.need)}`), claimBtn(q.done, false, () => claimed(g.claimStory(), m), q.ev || (q.kind === 'stage' ? 'pve' : q.kind === 'alliance' ? 'help' : q.kind === 'star' ? 'heroLevel' : 'build'))), h('div.sec', {}, 'Reward'), rewardChips(q.reward))];
+      return [h('div.card.hl', {}, h('div.muted', {}, L`Story mission ${q.i + 1}`), h('b', { style: { fontSize: '16px' } }, q.text), h('div.bar', { style: { margin: '8px 0' } }, h('div', { style: { width: (q.have / q.need * 100) + '%' } })), h('div.row.sp', {}, h('span.muted', {}, L`${fmt(q.have)} / ${fmt(q.need)}`), claimBtn(q.done, false, () => claimed(g.claimStory(), m), q.ev || (q.kind === 'stage' ? 'pve' : q.kind === 'alliance' ? 'help' : q.kind === 'star' ? 'heroLevel' : 'build'))), h('div.sec', {}, 'Reward'), rewardChips(q.reward))];
     }
     if (m.tab === 1) {
       const pts = g.dailyPoints();
-      return [h('div.card', {}, h('div.row.sp', {}, h('b', {}, 'Activity'), h('b.gold', {}, `${pts} / 100`)), h('div.bar', { style: { margin: '6px 0' } }, h('div', { style: { width: Math.min(100, pts) + '%' } })),
-        h('div.row', { style: { justifyContent: 'space-around' } }, ...g.chestList().map((c) => h('div', { style: { textAlign: 'center' }, onclick: () => { if (c.ready && !c.claimed) claimed(g.claimChest(c.i), m); else toast(`Reach ${c.pts} activity`); } }, h('div', { style: { fontSize: '26px', filter: c.claimed ? 'grayscale(1)' : c.ready ? 'drop-shadow(0 0 6px #ffd27a)' : 'brightness(.6)' } }, c.claimed ? '📭' : '🎁'), h('div.muted', {}, c.pts))))),
-        h('div.muted', {}, `Resets in `, h('span', { 'data-end': (Math.floor(g.now() / 86400000) + 1) * 86400000 }, '')),
-        ...g.dailyList().map((d) => h('div.li' + (d.claimed ? '.done' : ''), {}, h('div.grow', {}, h('b', {}, `${EVENTS[d.ev]} (${fmt(d.have)}/${fmt(d.n)})`), h('div.row', {}, h('span.chip', {}, `+${d.pts} activity`), rewardChips(d.reward))), claimBtn(d.done, d.claimed, () => claimed(g.claimDaily(d.id), m), d.ev)))];
+      return [h('div.card', {}, h('div.row.sp', {}, h('b', {}, 'Activity'), h('b.gold', {}, L`${pts} / 100`)), h('div.bar', { style: { margin: '6px 0' } }, h('div', { style: { width: Math.min(100, pts) + '%' } })),
+        h('div.row', { style: { justifyContent: 'space-around' } }, ...g.chestList().map((c) => h('div', { style: { textAlign: 'center' }, onclick: () => { if (c.ready && !c.claimed) claimed(g.claimChest(c.i), m); else toast(L`Reach ${c.pts} activity`); } }, h('div', { style: { fontSize: '26px', filter: c.claimed ? 'grayscale(1)' : c.ready ? 'drop-shadow(0 0 6px #ffd27a)' : 'brightness(.6)' } }, c.claimed ? '📭' : '🎁'), h('div.muted', {}, c.pts))))),
+        h('div.muted', {}, L`Resets in `, h('span', { 'data-end': (Math.floor(g.now() / 86400000) + 1) * 86400000 }, '')),
+        ...g.dailyList().map((d) => h('div.li' + (d.claimed ? '.done' : ''), {}, h('div.grow', {}, h('b', {}, L`${EVENTS[d.ev]} (${fmt(d.have)}/${fmt(d.n)})`), h('div.row', {}, h('span.chip', {}, L`+${d.pts} activity`), rewardChips(d.reward))), claimBtn(d.done, d.claimed, () => claimed(g.claimDaily(d.id), m), d.ev)))];
     }
-    if (m.tab === 2) return g.weeklyList().map((d) => h('div.li', {}, h('div.grow', {}, h('b', {}, `${EVENTS[d.ev]} (${fmt(d.have)}/${fmt(d.n)})`), h('div.bar', { style: { margin: '4px 0' } }, h('div', { style: { width: (d.have / d.n * 100) + '%' } })), rewardChips(d.reward)), claimBtn(d.done, d.claimed, () => claimed(g.claimWeekly(d.id), m), d.ev)));
-    return g.achList().map((a) => h('div.li', {}, h('span.ic', {}, '🏅'), h('div.grow', {}, h('b', {}, `${a.name} ${'I II III IV V VI'.split(' ')[Math.min(a.tier, a.tiers.length - 1)]}`), h('div.muted', {}, a.maxed ? 'Completed' : `${fmt(a.value)} / ${fmt(a.target)}`), a.maxed ? null : rewardChips(a.reward)), a.maxed ? h('b.good', {}, '★') : claimBtn(a.ready, false, () => claimed(g.claimAch(a.id), m), a.ev || ({ hq: 'build', power: 'build', heroes: 'recruit', stage: 'pve' })[a.calc])));
+    if (m.tab === 2) return g.weeklyList().map((d) => h('div.li', {}, h('div.grow', {}, h('b', {}, L`${EVENTS[d.ev]} (${fmt(d.have)}/${fmt(d.n)})`), h('div.bar', { style: { margin: '4px 0' } }, h('div', { style: { width: (d.have / d.n * 100) + '%' } })), rewardChips(d.reward)), claimBtn(d.done, d.claimed, () => claimed(g.claimWeekly(d.id), m), d.ev)));
+    return g.achList().map((a) => h('div.li', {}, h('span.ic', {}, '🏅'), h('div.grow', {}, h('b', {}, h('span', {}, T(a.name)), ' ', h('span.ltr', {}, 'I II III IV V VI'.split(' ')[Math.min(a.tier, a.tiers.length - 1)])), h('div.muted', {}, a.maxed ? 'Completed' : L`${fmt(a.value)} / ${fmt(a.target)}`), a.maxed ? null : rewardChips(a.reward)), a.maxed ? h('b.good', {}, '★') : claimBtn(a.ready, false, () => claimed(g.claimAch(a.id), m), a.ev || ({ hq: 'build', power: 'build', heroes: 'recruit', stage: 'pve' })[a.calc])));
   } });
 }
 
@@ -39,15 +41,15 @@ export function openEvents() {
     if (m.tab === 1) return loginBody(m);
     const e = g.currentEvent(), st = g.eventState();
     return [h('div.card.hl', { style: { background: 'linear-gradient(135deg,#5a2a10,#2a1a10)' } }, h('div', { style: { fontSize: '40px' } }, e.def.icon), h('div.big.gold', {}, e.def.name), h('p', {}, e.def.desc), h('div.muted', {}, 'Ends in ', h('b', { 'data-end': e.ends }, fmtTime((e.ends - g.now()) / 1000)))),
-      h('div.card', {}, h('div.row.sp', {}, h('b', {}, 'Your points'), h('b.gold.big', {}, fmt(st.pts))), h('div.muted', {}, 'Earn: ' + Object.entries(e.def.score).map(([k, v]) => `${EVENTS[k]} (+${v})`).join(' · '))),
-      ...e.def.milestones.map(([pts, rw], i) => h('div.li', {}, h('span.ic', {}, st.claimed.includes(i) ? '✅' : st.pts >= pts ? '🎁' : '🔒'), h('div.grow', {}, h('b', {}, `${fmt(pts)} points`), rewardChips(rw)), claimBtn(st.pts >= pts, st.claimed.includes(i), () => claimed(g.claimEventMilestone(i), m)))),
+      h('div.card', {}, h('div.row.sp', {}, h('b', {}, 'Your points'), h('b.gold.big', {}, fmt(st.pts))), h('div.muted', {}, 'Earn:', ' ', Object.entries(e.def.score).map(([k, v]) => L`${EVENTS[k]} (+${v})`).join(' · '))),
+      ...e.def.milestones.map(([pts, rw], i) => h('div.li', {}, h('span.ic', {}, st.claimed.includes(i) ? '✅' : st.pts >= pts ? '🎁' : '🔒'), h('div.grow', {}, h('b', {}, L`${fmt(pts)} points`), rewardChips(rw)), claimBtn(st.pts >= pts, st.claimed.includes(i), () => claimed(g.claimEventMilestone(i), m)))),
       h('p.muted', {}, 'A new event starts every Monday (UTC). Events rotate: Night of the Horde → Rebuild the World → Warpath.')];
   } });
 }
 function loginBody(m) {
   const g = A.g, st = g.loginState();
-  return [h('p.muted', {}, `Log in every day. Streak: ${st.streak} day(s). Missing a day restarts the cycle.`),
-    h('div.grid', {}, ...st.rewards.map((r, i) => h('div.card' + (i === st.day && !st.claimedToday ? '.hl.shine' : ''), { style: { textAlign: 'center', margin: 0, opacity: i < st.day || (i === st.day && st.claimedToday) ? 0.5 : 1 } }, h('b', {}, `Day ${i + 1}`), rewardChips(r), i < st.day || (i === st.day && st.claimedToday) ? h('div.good', {}, '✓') : null))),
+  return [h('p.muted', {}, L`Log in every day. Streak: ${st.streak} day(s). Missing a day restarts the cycle.`),
+    h('div.grid', {}, ...st.rewards.map((r, i) => h('div.card' + (i === st.day && !st.claimedToday ? '.hl.shine' : ''), { style: { textAlign: 'center', margin: 0, opacity: i < st.day || (i === st.day && st.claimedToday) ? 0.5 : 1 } }, h('b', {}, L`Day ${i + 1}`), rewardChips(r), i < st.day || (i === st.day && st.claimedToday) ? h('div.good', {}, '✓') : null))),
     h('button.btn.green' + (st.claimedToday ? '.off' : ''), { style: { width: '100%', marginTop: '10px' }, onclick: () => claimed(g.claimLogin(), m) }, st.claimedToday ? 'Come back tomorrow' : 'Claim today\'s reward')];
 }
 
@@ -56,16 +58,16 @@ export function openShop() {
   modal({ title: 'Shop', icon: '🛒', tabs: ['Gem Shop', 'VIP'], render: (m) => {
     if (m.tab === 1) return vipBody();
     return [h('div.card.hl', {}, h('div.row.sp', {}, h('div', {}, h('b', {}, '🎁 Daily Supply Drop'), rewardChips({ gems: 30, speed5m: 2, food: 2000, wood: 2000 })), h('button.btn.green.sm' + (g.freeSupplyReady() ? '' : '.off'), { onclick: () => claimed(g.claimFreeSupply(), m) }, g.freeSupplyReady() ? 'Free' : 'Claimed'))),
-      h('p.muted', {}, `💎 ${fmt(g.s.gems)} gems · Earn gems from missions, achievements, events, the campaign and login rewards. Every 10 gems spent here grants 1 VIP point. Real-money purchases are not implemented.`),
-      h('div.grid', {}, ...g.shopList().map((it) => h('div.card', { style: { textAlign: 'center', margin: 0 } }, h('div', { style: { fontSize: '28px' } }, it.def.icon), h('div', { style: { fontSize: '11px', fontWeight: 800, minHeight: '28px' } }, it.def.name, it.qty > 1 ? ` x${it.qty}` : ''), h('div.muted', { style: { fontSize: '10px' } }, `${it.left} left today`),
-        h('button.btn.sm.blue' + (it.left > 0 && g.s.gems >= it.gems ? '' : '.off'), { style: { marginTop: '4px', width: '100%' }, onclick: () => { if (result(g.buyShop(it.id), g, `Bought ${it.def.name}`)) { m.refresh(); A.refreshHud(); } } }, `💎${it.gems}`))))];
+      h('p.muted', {}, L`💎 ${fmt(g.s.gems)} gems · Earn gems from missions, achievements, events, the campaign and login rewards. Every 10 gems spent here grants 1 VIP point. Real-money purchases are not implemented.`),
+      h('div.grid', {}, ...g.shopList().map((it) => h('div.card', { style: { textAlign: 'center', margin: 0 } }, h('div', { style: { fontSize: '28px' } }, it.def.icon), h('div', { style: { fontSize: '11px', fontWeight: 800, minHeight: '28px' } }, it.def.name, it.qty > 1 ? L` x${it.qty}` : ''), h('div.muted', { style: { fontSize: '10px' } }, L`${it.left} left today`),
+        h('button.btn.sm.blue' + (it.left > 0 && g.s.gems >= it.gems ? '' : '.off'), { style: { marginTop: '4px', width: '100%' }, onclick: () => { if (result(g.buyShop(it.id), g, L`Bought ${it.def.name}`)) { m.refresh(); A.refreshHud(); } } }, L`💎${it.gems}`))))];
   } });
 }
 function vipBody() {
   const g = A.g, lvl = g.vipLevel(), cur = VIP_LEVELS[lvl], nx = VIP_LEVELS[lvl + 1];
-  return [h('div.card.hl', { style: { textAlign: 'center' } }, h('div.big.gold', {}, `👑 VIP ${lvl}`), nx ? [h('div.bar', { style: { margin: '8px 0' } }, h('div', { style: { width: ((g.s.player.vipPts - cur.pts) / (nx.pts - cur.pts) * 100) + '%' } })), h('div.muted', {}, `${fmt(g.s.player.vipPts)} / ${fmt(nx.pts)} VIP points`)] : h('div', {}, 'Max VIP!'),
+  return [h('div.card.hl', { style: { textAlign: 'center' } }, h('div.big.gold', {}, L`👑 VIP ${lvl}`), nx ? [h('div.bar', { style: { margin: '8px 0' } }, h('div', { style: { width: ((g.s.player.vipPts - cur.pts) / (nx.pts - cur.pts) * 100) + '%' } })), h('div.muted', {}, L`${fmt(g.s.player.vipPts)} / ${fmt(nx.pts)} VIP points`)] : h('div', {}, 'Max VIP!'),
     h('p.muted', {}, 'VIP points come from daily logins, missions, supply drops and gem spending.')),
-    ...VIP_LEVELS.map((v, i) => h('div.li' + (i === lvl ? '.me' : ''), {}, h('b.rank', {}, i), h('div.grow', {}, h('div.muted', {}, [v.build && `Build +${v.build * 100}%`, v.research && `Research +${v.research * 100}%`, v.queues && `+${v.queues} builder`, v.march && `March +${v.march * 100}%`, v.vigor && `Vigor +${v.vigor}`].filter(Boolean).join(' · ') || 'No perks')), h('span.muted', {}, fmt(v.pts))))];
+    ...VIP_LEVELS.map((v, i) => h('div.li' + (i === lvl ? '.me' : ''), {}, h('b.rank', {}, i), h('div.grow', {}, h('div.muted', {}, [v.build && L`Build +${v.build * 100}%`, v.research && L`Research +${v.research * 100}%`, v.queues && L`+${v.queues} builder`, v.march && L`March +${v.march * 100}%`, v.vigor && L`Vigor +${v.vigor}`].filter(Boolean).join(' · ') || 'No perks')), h('span.muted', {}, fmt(v.pts))))];
 }
 
 export function openBag() {
@@ -75,7 +77,7 @@ export function openBag() {
     if (!own.length) return h('p.muted', {}, 'Your backpack is empty.');
     return own.map(([k, n]) => {
       const it = ITEMS[k], usable = ['res', 'vigor', 'shield', 'relocate'].includes(it.kind);
-      return h('div.li', {}, h('span.ic', {}, it.icon), h('div.grow', {}, h('b', {}, `${it.name} ×${fmt(n)}`), h('div.muted', {}, it.desc)), usable ? h('button.btn.sm', { onclick: () => { if (it.kind === 'relocate') return confirmBox('Move your bastion to a random location?', () => { result(g.useItem(k)); m.refresh(); }); result(g.useItem(k), g); m.refresh(); A.refreshHud(); } }, 'Use') : null);
+      return h('div.li', {}, h('span.ic', {}, it.icon), h('div.grow', {}, h('b', {}, L`${it.name} ×${fmt(n)}`), h('div.muted', {}, it.desc)), usable ? h('button.btn.sm', { onclick: () => { if (it.kind === 'relocate') return confirmBox('Move your bastion to a random location?', () => { result(g.useItem(k)); m.refresh(); }); result(g.useItem(k), g); m.refresh(); A.refreshHud(); } }, 'Use') : null);
     });
   } });
 }
@@ -86,11 +88,11 @@ export function openReports() {
     if (!g.s.reports.length) return h('p.muted', {}, 'No battle reports yet.');
     return g.s.reports.map((r) => { r.read = true; return h('div.card', {}, h('div.row.sp', {}, h('b.' + (r.win ? 'good' : 'bad'), {}, r.title), h('span.muted', {}, ago(r.time, g.now()))),
       r.note ? h('div.muted', {}, r.note) : null,
-      r.intel ? h('div', {}, h('div.muted', {}, `Power ${fmt(r.intel.power)}`), ...r.intel.squads.map((s) => h('div.muted', {}, `${s.icon} ${s.name}: ${fmt(s.troops)} troops`)), r.intel.loot ? [h('div.muted', {}, 'Lootable:'), rewardChips(r.intel.loot)] : null) : null,
+      r.intel ? h('div', {}, h('div.muted', {}, L`Power ${fmt(r.intel.power)}`), ...r.intel.squads.map((s) => h('div.muted', {}, L`${s.icon} ${s.name}: ${fmt(s.troops)} troops`)), r.intel.loot ? [h('div.muted', {}, 'Lootable:'), rewardChips(r.intel.loot)] : null) : null,
       r.rewards && Object.keys(r.rewards).length ? rewardChips(r.rewards) : null,
-      r.plundered && Object.keys(r.plundered).length ? h('div.bad', {}, 'Plundered: ', Object.entries(r.plundered).map(([k, v]) => `${k} ${fmt(v)}`).join(', ')) : null,
-      r.dead && Object.keys(r.dead).length ? h('div.bad', { style: { fontSize: '12px' } }, `Killed: ${fmt(Object.values(r.dead).reduce((a, b) => a + b, 0))} troops (hospital full)`) : null,
-      r.wounded && Object.keys(r.wounded).length ? h('div.muted', {}, `Wounded → hospital: ${fmt(Object.values(r.wounded).reduce((a, b) => a + b, 0))}`) : null,
+      r.plundered && Object.keys(r.plundered).length ? h('div.bad', {}, 'Plundered: ', Object.entries(r.plundered).map(([k, v]) => L`${k} ${fmt(v)}`).join(', ')) : null,
+      r.dead && Object.keys(r.dead).length ? h('div.bad', { style: { fontSize: '12px' } }, L`Killed: ${fmt(Object.values(r.dead).reduce((a, b) => a + b, 0))} troops (hospital full)`) : null,
+      r.wounded && Object.keys(r.wounded).length ? h('div.muted', {}, L`Wounded → hospital: ${fmt(Object.values(r.wounded).reduce((a, b) => a + b, 0))}`) : null,
       r.a && r.b ? h('button.btn.sm.gray', { style: { marginTop: '6px' }, onclick: () => replayReport(r) }, '▶ Watch replay') : null); });
   } });
 }
@@ -103,7 +105,7 @@ export function openMail() {
 export function openProfile() {
   const g = A.g, p = g.s.player;
   modal({ title: 'Commander', icon: '🎖️', render: (m) => [
-    h('div.row', {}, h('img', { src: A.portrait(p.avatar, 128), style: { width: '90px', borderRadius: '12px', border: '2px solid #ffd27a' } }), h('div.grow', {}, h('div.big', {}, p.name), h('div.muted', {}, `Commander Lv ${p.level} · VIP ${g.vipLevel()}`), h('div.bar', { style: { margin: '6px 0' } }, h('div', { style: { width: (p.xp / commanderXpFor(p.level) * 100) + '%' } })), h('div.muted', {}, `${fmt(p.xp)} / ${fmt(commanderXpFor(p.level))} XP`), h('div.gold', { style: { fontWeight: 800 } }, `⚡ Power ${fmt(g.power())}`))),
+    h('div.row', {}, h('img', { src: A.portrait(p.avatar, 128), style: { width: '90px', borderRadius: '12px', border: '2px solid #ffd27a' } }), h('div.grow', {}, h('div.big', {}, p.name), h('div.muted', {}, L`Commander Lv ${p.level} · VIP ${g.vipLevel()}`), h('div.bar', { style: { margin: '6px 0' } }, h('div', { style: { width: (p.xp / commanderXpFor(p.level) * 100) + '%' } })), h('div.muted', {}, L`${fmt(p.xp)} / ${fmt(commanderXpFor(p.level))} XP`), h('div.gold', { style: { fontWeight: 800 } }, L`⚡ Power ${fmt(g.power())}`))),
     h('div.sec', {}, 'Avatar'),
     h('div.grid.sm', {}, ...Object.keys(g.s.heroes).map((id) => h('img', { src: A.portrait(id, 64), style: { width: '100%', borderRadius: '8px', outline: id === p.avatar ? '3px solid #ffd27a' : 'none' }, onclick: () => { p.avatar = id; m.refresh(); A.refreshHud(); } }))),
     h('div.sec', {}, 'Stats'),
@@ -116,7 +118,8 @@ export function openSettings() {
   modal({ title: 'Settings', icon: '⚙️', tabs: ['Game', 'Account'], render: (m) => {
     if (m.tab === 0) {
       const name = h('input.txt', { value: g.s.player.name, maxlength: 16 });
-      return [h('div.card', {}, h('div.row.sp', {}, h('b', {}, '🔊 Sound effects'), h('button.btn.sm' + (g.s.settings.sound ? '.green' : '.gray'), { onclick: () => { g.s.settings.sound = !g.s.settings.sound; setSfx(g.s.settings.sound); m.refresh(); } }, g.s.settings.sound ? 'On' : 'Off')),
+      return [h('div.card', {}, h('b', {}, '🌐 Language / اللغة'), h('div.row', { style: { marginTop: '8px' } }, ...Object.entries(LANGS).map(([k, v]) => h('button.btn.sm.grow' + (getLang() === k ? '' : '.gray'), { onclick: () => { if (getLang() === k) return; storage.set('ashfall.lang', k); A.save(); setTimeout(() => location.reload(), 150); } }, v)))),
+        h('div.card', {}, h('div.row.sp', {}, h('b', {}, '🔊 Sound effects'), h('button.btn.sm' + (g.s.settings.sound ? '.green' : '.gray'), { onclick: () => { g.s.settings.sound = !g.s.settings.sound; setSfx(g.s.settings.sound); m.refresh(); } }, g.s.settings.sound ? 'On' : 'Off')),
         h('div.row.sp', { style: { marginTop: '8px' } }, h('b', {}, '🎵 Ambient music'), h('button.btn.sm' + (g.s.settings.music ? '.green' : '.gray'), { onclick: () => { g.s.settings.music = !g.s.settings.music; setMusic(g.s.settings.music); m.refresh(); } }, g.s.settings.music ? 'On' : 'Off')),
         h('div.row.sp', { style: { marginTop: '8px' } }, h('b', {}, '📳 Vibration'), h('button.btn.sm' + (g.s.settings.haptics ? '.green' : '.gray'), { onclick: () => { g.s.settings.haptics = !g.s.settings.haptics; setHaptics(g.s.settings.haptics); m.refresh(); } }, g.s.settings.haptics ? 'On' : 'Off')),
         h('div.row.sp', { style: { marginTop: '8px' } }, h('div', {}, h('b', {}, '🔋 Graphics'), h('div.muted', {}, 'Battery saver: 30 FPS, lower resolution, fewer effects')), h('button.btn.sm' + (g.s.settings.quality === 'high' ? '.green' : '.gray'), { onclick: () => { g.s.settings.quality = g.s.settings.quality === 'high' ? 'low' : 'high'; setQuality(g.s.settings.quality); window.dispatchEvent(new Event('resize')); m.refresh(); } }, g.s.settings.quality === 'high' ? 'High' : 'Saver')),
@@ -125,14 +128,14 @@ export function openSettings() {
         h('div.card', {}, h('b', {}, 'Local save'), h('div.muted', {}, 'Progress autosaves to this device every few seconds.'), h('div.row', { style: { marginTop: '8px' } },
           h('button.btn.sm.gray.grow', { onclick: () => { const blob = new Blob([g.serialize()], { type: 'application/json' }); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'ashfall-save.json'; a.click(); } }, 'Export'),
           h('button.btn.sm.red.grow', { onclick: () => confirmBox('Erase ALL progress and start over?', () => { storage.remove('ashfall.save'); setTimeout(() => location.reload(), 150); }, { yesLabel: 'Erase', cls: 'red' }) }, 'Reset game'))),
-        h('p.muted', { style: { textAlign: 'center' } }, `${GAME_NAME} v${CONFIG.VERSION} · ${isNative ? platform + ' app' : 'web'} · ${HEROES.length} heroes`)];
+        h('p.muted', { style: { textAlign: 'center' } }, L`${GAME_NAME} v${CONFIG.VERSION} · ${isNative ? platform : T('web')} · ${HEROES.length} heroes`)];
     }
     const server = h('input.txt', { value: net.base, placeholder: 'Server URL (blank = same origin)' });
     const user = h('input.txt', { placeholder: 'Username', maxlength: 16, style: { marginTop: '8px' } }), pass = h('input.txt', { placeholder: 'Password', type: 'password', style: { marginTop: '8px' } });
     return [h('div.card', {}, h('div.row.sp', {}, h('b', {}, 'Server status'), h('b.' + (net.online ? 'good' : 'bad'), {}, net.online ? '🟢 Online' : '🔴 Offline')),
       h('div.muted', {}, net.online ? 'Connected to the game server.' : 'No server reachable. The game runs fully offline; multiplayer features show AI-simulated content, clearly labeled.'),
       h('div.row', { style: { marginTop: '8px' } }, server, h('button.btn.sm', { onclick: async () => { net.base = server.value.trim().replace(/\/$/, ''); localStorage.setItem('ashfall.server', net.base); await net.probe(); m.refresh(); } }, 'Connect'))),
-      net.user ? h('div.card', {}, h('div.row.sp', {}, h('b', {}, `👤 ${net.user.name}`), h('span.muted', {}, net.lastSync ? 'Synced ' + ago(net.lastSync) : '')),
+      net.user ? h('div.card', {}, h('div.row.sp', {}, h('b', {}, L`👤 ${net.user.name}`), h('span.muted', {}, net.lastSync ? 'Synced ' + ago(net.lastSync) : '')),
         h('div.row', { style: { marginTop: '8px' } }, h('button.btn.sm.blue.grow', { onclick: async () => { const r = await net.pushSave(); result(r, g, 'Saved to cloud'); m.refresh(); } }, '☁️ Upload save'), h('button.btn.sm.gray.grow', { onclick: async () => { const r = await net.pullSave(); if (!r.ok || !r.save) return toast(r.msg || 'No cloud save', 'bad'); confirmBox('Replace this device\'s progress with the cloud save?', () => { storage.set('ashfall.save', JSON.stringify(r.save)); setTimeout(() => location.reload(), 150); }); } }, '⬇️ Load cloud')),
         h('button.btn.sm.red', { style: { marginTop: '8px' }, onclick: () => { net.logout(); m.refresh(); } }, 'Log out'))
         : net.online ? h('div.card', {}, h('b', {}, 'Account'), user, pass, h('div.row', { style: { marginTop: '10px' } },

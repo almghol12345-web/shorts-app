@@ -1,3 +1,4 @@
+import { L, t as T, tr } from '../i18n.js';
 import { BUILDINGS, BASE_LAYOUT, buildingCost, buildingTime, buildingReqs, maxCountFor, productionPerHour, batch, tierFor, hospitalCap, RESOURCE_TYPES } from '../data/buildings.js';
 import { RESEARCH, RESEARCH_BY_ID, researchCost, researchTime } from '../data/research.js';
 import { TROOP_TYPES, troopKey, troopCost, troopTime, healCost, parseTroopKey } from '../data/troops.js';
@@ -22,15 +23,15 @@ export const economy = {
     if (toLvl > def.maxLevel) return { ...out, reason: 'Max level reached' };
     const hq = this.lvl('hq');
     if (!cur) {
-      if (hq < def.unlockHQ) return { ...out, reason: `Requires Command Center Lv ${def.unlockHQ}` };
+      if (hq < def.unlockHQ) return { ...out, reason: L`Requires Command Center Lv ${def.unlockHQ}` };
       if (lay.plot && !RESOURCE_TYPES.includes(type)) return { ...out, reason: 'Only resource buildings fit here' };
-      if (lay.plot && this.countOf(type) >= maxCountFor(type, hq)) return { ...out, reason: `Max ${def.name} count at this HQ level` };
+      if (lay.plot && this.countOf(type) >= maxCountFor(type, hq)) return { ...out, reason: L`Max ${def.name} count at this HQ level` };
     }
     out.cost = buildingCost(type, toLvl);
     out.time = Math.max(1, Math.round(buildingTime(type, toLvl) / (1 + this.bonus('build_speed'))));
     out.reqs = buildingReqs(type, toLvl).map((r) => ({ ...r, have: this.lvl(r.b), ok: this.lvl(r.b) >= r.lvl }));
     if (this.s.queues.build.some((q) => q.slot === slotId)) return { ...out, reason: 'Already upgrading' };
-    if (out.reqs.some((r) => !r.ok)) { const r = out.reqs.find((x) => !x.ok); return { ...out, reason: `Requires ${BUILDINGS[r.b].name} Lv ${r.lvl}` }; }
+    if (out.reqs.some((r) => !r.ok)) { const r = out.reqs.find((x) => !x.ok); return { ...out, reason: L`Requires ${BUILDINGS[r.b].name} Lv ${r.lvl}` }; }
     out.gemCost = gemsForSeconds(out.time) + gemsForResources(this.missing(out.cost));
     out.queueFull = this.s.queues.build.length >= this.buildQueueCap();
     out.ok = true;
@@ -63,7 +64,7 @@ export const economy = {
     this.addXp(Math.round(20 * Math.pow(q.toLvl, 1.6) * (q.type === 'hq' ? 3 : 1)));
     this.track('build', 1);
     this.emit('built', q);
-    this.toast(`${BUILDINGS[q.type].name} reached Lv ${q.toLvl}`, 'good');
+    this.toast(L`${BUILDINGS[q.type].name} reached Lv ${q.toLvl}`, 'good');
   },
   demolishEmpty(slotId) { const b = this.s.buildings[slotId]; if (b && b.lvl === 0) delete this.s.buildings[slotId]; },
 
@@ -98,8 +99,8 @@ export const economy = {
     const out = { node: n, cur, toLvl, ok: false, reason: '', cost: {}, time: 0 };
     if (cur >= n.max) return { ...out, reason: 'Fully researched' };
     if (!this.lvl('research')) return { ...out, reason: 'Build a Research Lab first' };
-    if (this.lvl('research') < n.lab) return { ...out, reason: `Requires Research Lab Lv ${n.lab}` };
-    for (const p of n.pre) { const [pid, pl] = p.split(':'); if ((this.s.research[pid] || 0) < +pl) return { ...out, reason: `Requires ${RESEARCH_BY_ID[pid].name} Lv ${pl}` }; }
+    if (this.lvl('research') < n.lab) return { ...out, reason: L`Requires Research Lab Lv ${n.lab}` };
+    for (const p of n.pre) { const [pid, pl] = p.split(':'); if ((this.s.research[pid] || 0) < +pl) return { ...out, reason: L`Requires ${RESEARCH_BY_ID[pid].name} Lv ${pl}` }; }
     out.cost = researchCost(n, toLvl);
     out.time = Math.max(1, Math.round(researchTime(n, toLvl) / (1 + this.bonus('research_speed'))));
     if (this.s.queues.research.length) return { ...out, reason: 'Lab is busy' , busy: true };
@@ -123,7 +124,7 @@ export const economy = {
   },
   completeResearch(q) {
     this.s.research[q.id] = q.toLvl; this.addXp(30 * q.toLvl * (1 + RESEARCH_BY_ID[q.id].lab));
-    this.track('research', 1); this.toast(`Research complete: ${RESEARCH_BY_ID[q.id].name} Lv ${q.toLvl}`, 'good'); this.emit('change');
+    this.track('research', 1); this.toast(L`Research complete: ${RESEARCH_BY_ID[q.id].name} Lv ${q.toLvl}`, 'good'); this.emit('change');
   },
   researchList() { return RESEARCH; },
 
@@ -131,8 +132,8 @@ export const economy = {
   trainInfo(type, tier, count) {
     const bType = TROOP_TYPES[type].building, bl = this.lvl(bType);
     const out = { ok: false, reason: '', max: batch(bl), cost: {}, time: 0 };
-    if (!bl) return { ...out, reason: `Build the ${BUILDINGS[bType].name} first` };
-    if (tier > tierFor(bl)) return { ...out, reason: `Requires ${BUILDINGS[bType].name} Lv ${[1, 5, 10, 15, 20][tier - 1]}` };
+    if (!bl) return { ...out, reason: L`Build the ${BUILDINGS[bType].name} first` };
+    if (tier > tierFor(bl)) return { ...out, reason: L`Requires ${BUILDINGS[bType].name} Lv ${[1, 5, 10, 15, 20][tier - 1]}` };
     count = Math.max(1, Math.min(count, out.max));
     const c = troopCost(type, tier);
     for (const [k, v] of Object.entries(c)) out.cost[k] = v * count;
@@ -161,7 +162,7 @@ export const economy = {
     this.s.troops[q.key] = (this.s.troops[q.key] || 0) + q.count;
     this.track('train', q.count); this.addXp(Math.round(q.count * 0.5));
     const { type, tier } = parseTroopKey(q.key);
-    this.toast(`${q.count} T${tier} ${TROOP_TYPES[type].name} ready`, 'good'); this.emit('change');
+    this.toast(L`${q.count} T${tier} ${TROOP_TYPES[type].name} ready`, 'good'); this.emit('change');
   },
 
   // ---------------- hospital ----------------
@@ -208,7 +209,7 @@ export const economy = {
   },
   completeHeal(q) {
     let n = 0; for (const [k, v] of Object.entries(q.troops)) { this.s.troops[k] = (this.s.troops[k] || 0) + v; n += v; }
-    this.track('heal', n); this.toast(`${n} troops healed`, 'good'); this.emit('change');
+    this.track('heal', n); this.toast(L`${n} troops healed`, 'good'); this.emit('change');
   },
 
   // ---------------- timers ----------------
@@ -222,9 +223,9 @@ export const economy = {
   },
   allTimers() {
     const out = [], Q = this.s.queues;
-    for (const q of Q.build) out.push({ kind: 'build', key: q.slot, q, label: `${BUILDINGS[q.type].name} → Lv ${q.toLvl}`, icon: BUILDINGS[q.type].icon });
-    for (const q of Q.research) out.push({ kind: 'research', key: q.id, q, label: `${RESEARCH_BY_ID[q.id].name} Lv ${q.toLvl}`, icon: '🔬' });
-    for (const [b, q] of Object.entries(Q.train)) if (q) { const { type, tier } = parseTroopKey(q.key); out.push({ kind: 'train', key: b, q, label: `${q.count} T${tier} ${TROOP_TYPES[type].name}`, icon: TROOP_TYPES[type].icon }); }
+    for (const q of Q.build) out.push({ kind: 'build', key: q.slot, q, label: L`${BUILDINGS[q.type].name} → Lv ${q.toLvl}`, icon: BUILDINGS[q.type].icon });
+    for (const q of Q.research) out.push({ kind: 'research', key: q.id, q, label: L`${RESEARCH_BY_ID[q.id].name} Lv ${q.toLvl}`, icon: '🔬' });
+    for (const [b, q] of Object.entries(Q.train)) if (q) { const { type, tier } = parseTroopKey(q.key); out.push({ kind: 'train', key: b, q, label: L`${q.count} T${tier} ${TROOP_TYPES[type].name}`, icon: TROOP_TYPES[type].icon }); }
     if (Q.heal) out.push({ kind: 'heal', key: 'heal', q: Q.heal, label: 'Healing wounded', icon: '🏥' });
     return out;
   },

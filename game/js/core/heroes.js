@@ -1,3 +1,4 @@
+import { L, t as T, tr } from '../i18n.js';
 import { HEROES, HERO_BY_ID, STAR_SHARDS, SKILL_UNLOCK, SKILL_MAX, skillUpgradeCost, heroXpFor, heroBaseStats, DUP_SHARDS } from '../data/heroes.js';
 import { heroCap } from '../data/buildings.js';
 import { GEAR_SLOTS, GEAR_RARITY, gearStats, gearUpgradeCost, forgeCost, gearName } from '../data/items.js';
@@ -39,7 +40,7 @@ export const heroes = {
   // Spend XP items until next level (or maxed)
   levelUpHero(id) {
     const h = this.s.heroes[id]; const cap = this.heroLevelCap();
-    if (h.lvl >= cap) return { ok: false, msg: `Level cap ${cap}. Upgrade the Survivor Hall.` };
+    if (h.lvl >= cap) return { ok: false, msg: L`Level cap ${cap}. Upgrade the Survivor Hall.` };
     const need = heroXpFor(h.lvl) - h.xp;
     let have = 0; const use = { xpSmall: 0, xpBig: 0 };
     while (have < need && (this.s.items.xpSmall || 0) > use.xpSmall) { use.xpSmall++; have += 500; }
@@ -55,17 +56,17 @@ export const heroes = {
     const need = STAR_SHARDS[h.stars];
     let own = this.s.shards[id] || 0, wild = 0;
     if (own < need && def.rarity !== 'SSR') wild = Math.min(this.s.items.wildShard || 0, need - own);
-    if (own + wild < need) return { ok: false, msg: `Need ${need} shards (have ${own}${def.rarity !== 'SSR' ? ` + ${this.s.items.wildShard || 0} universal` : ''})` };
+    if (own + wild < need) return { ok: false, msg: L`Need ${need} shards (have ${own}${def.rarity !== 'SSR' ? L` + ${this.s.items.wildShard || 0} universal` : ''})` };
     this.s.shards[id] = own - (need - wild); this.s.items.wildShard = (this.s.items.wildShard || 0) - wild;
-    h.stars++; this.toast(`${def.name} is now ${h.stars}★!`, 'good'); this.emit('change');
+    h.stars++; this.toast(L`${def.name} is now ${h.stars}★!`, 'good'); this.emit('change');
     return { ok: true };
   },
   upgradeSkill(id, idx) {
     const h = this.s.heroes[id];
-    if (!this.skillUnlocked(id, idx)) return { ok: false, msg: `Unlocks at ${SKILL_UNLOCK[['active', 'passive', 'command'][idx]]}★` };
+    if (!this.skillUnlocked(id, idx)) return { ok: false, msg: L`Unlocks at ${SKILL_UNLOCK[['active', 'passive', 'command'][idx]]}★` };
     if (h.skills[idx] >= this.skillCap(id)) return { ok: false, msg: h.skills[idx] >= SKILL_MAX ? 'Max skill level' : 'Raise stars to unlock higher skill levels' };
     const cost = skillUpgradeCost(h.skills[idx]);
-    if ((this.s.items.manual || 0) < cost) return { ok: false, msg: `Need ${cost} Skill Manuals` };
+    if ((this.s.items.manual || 0) < cost) return { ok: false, msg: L`Need ${cost} Skill Manuals` };
     this.s.items.manual -= cost; h.skills[idx]++; this.emit('change');
     return { ok: true };
   },
@@ -111,12 +112,12 @@ export const heroes = {
   forgeRarityAllowed(r) { const l = this.lvl('forge'); return r === 'R' ? l >= 1 : r === 'SR' ? l >= 6 : l >= 15; },
   forgeGear(slot, rarity) {
     if (!this.lvl('forge')) return { ok: false, msg: 'Build the Gear Forge first' };
-    if (!this.forgeRarityAllowed(rarity)) return { ok: false, msg: `Forge Lv ${rarity === 'SR' ? 6 : 15} required` };
+    if (!this.forgeRarityAllowed(rarity)) return { ok: false, msg: L`Forge Lv ${rarity === 'SR' ? 6 : 15} required` };
     if (!GEAR_SLOTS.includes(slot)) return { ok: false, msg: 'Bad slot' };
     const c = forgeCost(rarity);
     if (!this.spend(c)) return { ok: false, msg: 'Not enough materials' };
     const g = { id: this.s.gearSeq++, slot, rarity, lvl: 1, hero: null, name: gearName(slot, rarity) };
-    this.s.gear.push(g); this.track('forge', 1); this.toast(`Forged ${g.name}`, 'good');
+    this.s.gear.push(g); this.track('forge', 1); this.toast(L`Forged ${g.name}`, 'good');
     return { ok: true, gear: g };
   },
   grantGear(slot, rarity) { const g = { id: this.s.gearSeq++, slot, rarity, lvl: 1, hero: null, name: gearName(slot, rarity) }; this.s.gear.push(g); return g; },
@@ -135,7 +136,7 @@ export const heroes = {
     if (g.lvl >= GEAR_RARITY[g.rarity].maxLvl) return { ok: false, msg: 'Max level' };
     if (g.lvl >= this.lvl('forge') * 2 + 2) return { ok: false, msg: 'Upgrade the Gear Forge to raise the gear level cap' };
     const c = gearUpgradeCost(g);
-    if ((this.s.items.parts || 0) < c) return { ok: false, msg: `Need ${c} Gear Parts` };
+    if ((this.s.items.parts || 0) < c) return { ok: false, msg: L`Need ${c} Gear Parts` };
     this.s.items.parts -= c; g.lvl++; this.emit('change'); return { ok: true };
   },
   salvageGear(gearId) {

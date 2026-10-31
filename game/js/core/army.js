@@ -1,3 +1,4 @@
+import { L, t as T, tr } from '../i18n.js';
 import { HERO_BY_ID, SKILL_UNLOCK } from '../data/heroes.js';
 import { TROOP_TYPES, troopStats, parseTroopKey } from '../data/troops.js';
 import { squadCap, BUILDINGS } from '../data/buildings.js';
@@ -120,7 +121,7 @@ export const army = {
       if (first) { this.s.campaign.stage = index + 1; if (st.boss && Math.random() < 0.7) { const g = this.grantGear(['weapon', 'armor', 'helmet', 'boots'][index % 4], index >= 49 ? 'SSR' : index >= 19 ? 'SR' : 'R'); rewards.gear = g.name; } }
       this.track('pve', 1); if (st.boss) this.track('boss', 0);
     }
-    const rep = this.addReport({ type: 'pve', title: `Campaign ${st.name}${st.boss ? ' (Boss)' : ''}`, win, rewards, a: squads, b: enemy, seed, summary: { a: res.a, b: res.b, turns: res.turns } });
+    const rep = this.addReport({ type: 'pve', title: L`Campaign ${st.name}${st.boss ? ' (Boss)' : ''}`, win, rewards, a: squads, b: enemy, seed, summary: { a: res.a, b: res.b, turns: res.turns } });
     return { ok: true, win, result: res, report: rep, rewards, a: squads, b: enemy };
   },
 };

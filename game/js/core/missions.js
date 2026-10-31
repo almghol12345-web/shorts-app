@@ -1,3 +1,4 @@
+import { L, t as T, tr } from '../i18n.js';
 import { DAILY, DAILY_CHESTS, WEEKLY, ACHIEVEMENTS, STORY, LOGIN_REWARDS, TIMED_EVENTS } from '../data/missions.js';
 import { dayKey, weekIndex, weekEnd } from './state.js';
 

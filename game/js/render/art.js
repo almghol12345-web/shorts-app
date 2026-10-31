@@ -1,3 +1,4 @@
+import { tr as translate } from '../i18n.js';
 // Procedural artwork: isometric buildings that change with level tiers, hero portraits, unit sprites.
 // No external image assets — everything is drawn from code so the art style stays consistent.
 import { HERO_BY_ID } from '../data/heroes.js';
@@ -226,7 +227,7 @@ const PAINT = {
     const b = box(ctx, cx, cy, 1.6, 1.3, h, tr < 2 ? '#7a5a3c' : m.wall);
     roofGable(ctx, b, 1.6, 1.3, h, 14, tr < 2 ? '#5a3424' : m.roof);
     windows(ctx, b, 1.6, 1.3, h, 2, '#ffc46b', true);
-    const p = b.face(-1.2, 1.3, h - 6); ctx.fillStyle = '#3a2516'; ctx.fillRect(p.x - 12, p.y - 6, 24, 10); ctx.fillStyle = '#ffcf6b'; ctx.font = 'bold 7px sans-serif'; ctx.fillText('HALL', p.x - 9, p.y + 1);
+    const p = b.face(-1.2, 1.3, h - 6); ctx.fillStyle = '#3a2516'; ctx.fillRect(p.x - 12, p.y - 6, 24, 10); ctx.fillStyle = '#ffcf6b'; ctx.font = 'bold 7px sans-serif'; ctx.fillText(translate('HALL'), p.x - 9, p.y + 1);
     light(ctx, cx, cy - 10, 40, '#ffb35c', night ? 0.4 : 0.15);
     void t;
   },

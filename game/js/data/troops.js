@@ -10,7 +10,7 @@ export const TROOP_TYPES = {
     base: { atk: 12, def: 12, hp: 60, load: 18, power: 4 }, cost: { food: 40, wood: 30, metal: 40 }, time: 6 },
 };
 export const COUNTER_BONUS = 0.3;
-export const TIER_NAMES = ['Recruit', 'Veteran', 'Elite', 'Vanguard', 'Apex'];
+export const TIER_NAMES = ['Rookie', 'Veteran', 'Elite', 'Vanguard', 'Apex'];
 
 export function troopKey(type, tier) { return type + tier; }
 export function parseTroopKey(k) { return { type: k.slice(0, -1), tier: +k.slice(-1) }; }

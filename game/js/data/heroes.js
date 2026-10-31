@@ -140,7 +140,7 @@ export const HERO_BY_ID = Object.fromEntries(HEROES.map((h) => [h.id, h]));
 
 export const ROLE_INFO = {
   tank: { name: 'Tank', icon: '🛡️', mods: { atk: 0.8, def: 1.35, hp: 1.4 } },
-  damage: { name: 'Damage', icon: '⚔️', mods: { atk: 1.3, def: 0.9, hp: 0.9 } },
+  damage: { name: 'Striker', icon: '⚔️', mods: { atk: 1.3, def: 0.9, hp: 0.9 } },
   support: { name: 'Support', icon: '✚', mods: { atk: 1.0, def: 1.05, hp: 1.05 } },
 };
 

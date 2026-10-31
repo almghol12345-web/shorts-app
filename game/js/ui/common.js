@@ -1,3 +1,4 @@
+import { L, t as T, tr } from '../i18n.js';
 import { h, fmt, fmtTime, costRow, modal, result, progress, toast } from './dom.js';
 import { A } from './app.js';
 import { drawBuilding } from '../render/art.js';
@@ -26,10 +27,10 @@ export function openTimer(kind, key, label) {
       progress(q.start, q.end),
       h('div.row.sp', { style: { margin: '8px 0' } }, h('span.muted', {}, 'Remaining'), h('b.gold', { 'data-end': q.end }, fmtTime(rem))),
       items.length ? h('div.sec', {}, 'Use speedups') : h('p.muted', {}, 'No speedup items. Earn them from missions, events and the shop.'),
-      ...items.map((i) => h('div.li', {}, h('span.ic', {}, ITEMS[i].icon), h('div.grow', {}, h('b', {}, ITEMS[i].name), h('div.muted', {}, `Owned: ${g.s.items[i]}`)), h('button.btn.sm.blue', { onclick: () => { result(g.speedup(kind, key, i)); m.refresh(); A.refreshHud(); } }, 'Use'))),
+      ...items.map((i) => h('div.li', {}, h('span.ic', {}, ITEMS[i].icon), h('div.grow', {}, h('b', {}, ITEMS[i].name), h('div.muted', {}, L`Owned: ${g.s.items[i]}`)), h('button.btn.sm.blue', { onclick: () => { result(g.speedup(kind, key, i)); m.refresh(); A.refreshHud(); } }, 'Use'))),
       h('div.row', { style: { marginTop: '10px' } },
-        g.s.alliance ? h('button.btn.green.grow' + (q.help ? '.off' : ''), { onclick: () => { if (result(g.requestHelp(kind, key), g, 'Help requested')) m.refresh(); } }, q.help ? `Helps ${q.helps || 0}/${q.helpCap || 0}` : '🤝 Ask Help') : null,
-        h('button.btn.grow', { onclick: () => { if (result(g.finishNow(kind, key))) { m.close(); A.refreshHud(); } } }, gems ? `Finish 💎${gems}` : 'Finish FREE')),
+        g.s.alliance ? h('button.btn.green.grow' + (q.help ? '.off' : ''), { onclick: () => { if (result(g.requestHelp(kind, key), g, 'Help requested')) m.refresh(); } }, q.help ? L`Helps ${q.helps || 0}/${q.helpCap || 0}` : '🤝 Ask Help') : null,
+        h('button.btn.grow', { onclick: () => { if (result(g.finishNow(kind, key))) { m.close(); A.refreshHud(); } } }, gems ? L`Finish 💎${gems}` : 'Finish FREE')),
     ];
   } });
   return m;
@@ -45,11 +46,11 @@ export function actionBlock({ cost, time, ok, reason, gemCost, onStart, onInstan
     costRow(cost, g),
     h('div.row.sp', { style: { margin: '8px 0 4px' } }, h('span.muted', {}, '⏱️ Time'), h('b', {}, fmtTime(time))),
     extra || null,
-    !ok && reason ? h('p.bad', { style: { margin: '6px 0' } }, '⚠️ ' + reason) : null,
+    !ok && reason ? h('p.bad', { style: { margin: '6px 0' } }, '⚠️ ', reason) : null,
     h('div.row', { style: { marginTop: '8px' } },
-      h('button.btn.blue.grow' + (ok ? '' : '.off'), { onclick: onInstant }, '⚡ Instant', h('span.sub', {}, `💎 ${gemCost ?? '-'}`)),
+      h('button.btn.blue.grow' + (ok ? '' : '.off'), { onclick: onInstant }, '⚡ Instant', h('span.sub', {}, L`💎 ${gemCost ?? '-'}`)),
       h('button.btn.grow' + (ok && !short ? '' : '.off'), { onclick: onStart }, label, h('span.sub', {}, short ? 'Need resources' : fmtTime(time)))),
-    short && ok ? h('div.row', { style: { marginTop: '8px' } }, h('button.btn.gray.sm.grow', { onclick: () => buyMissing(missing) }, `Buy missing resources for 💎${gemsForResources(missing)}`)) : null,
+    short && ok ? h('div.row', { style: { marginTop: '8px' } }, h('button.btn.gray.sm.grow', { onclick: () => buyMissing(missing) }, L`Buy missing resources for 💎${gemsForResources(missing)}`)) : null,
   );
 }
 export function buyMissing(missing) {
@@ -60,7 +61,7 @@ export function buyMissing(missing) {
   toast('Resources purchased', 'good'); A.refreshAll();
 }
 export function statTable(now, next) {
-  return h('div', {}, ...Object.keys(now).map((k) => h('div.stat', {}, h('span', {}, k), h('span', {}, h('b', {}, typeof now[k] === 'number' ? fmt(now[k]) : now[k]), next && next[k] !== undefined && next[k] !== now[k] ? h('span.nx', {}, ' → ' + (typeof next[k] === 'number' ? fmt(next[k]) : next[k])) : null))));
+  return h('div', {}, ...Object.keys(now).map((k) => h('div.stat', {}, h('span', {}, k), h('span.ltr', {}, h('b', {}, typeof now[k] === 'number' ? fmt(now[k]) : now[k]), next && next[k] !== undefined && next[k] !== now[k] ? h('span.nx', {}, ' → ' + (typeof next[k] === 'number' ? fmt(next[k]) : next[k])) : null))));
 }
 export function resIcon(r) { return RES_INFO[r]?.icon || ''; }
 export function bName(t) { return BUILDINGS[t]?.name || t; }
