@@ -1,4 +1,4 @@
-import { h, fmt, fmtTime, tickTimers } from './dom.js';
+import { h, fmt, fmtTime, tickTimers, modal } from './dom.js';
 import { A } from './app.js';
 import { RES_INFO, VIGOR_MAX } from '../data/config.js';
 import { openProfile, openShop, openMissions, openEvents, openReports, openMail, openBag, openSettings } from './meta.js';
@@ -25,7 +25,7 @@ export function buildHud() {
   const side = document.getElementById('side');
   const sb = (icon, label, fn, key) => { const d = h('span.dot.hidden'); els['dot_' + key] = d; return h('button.sbtn', { onclick: fn }, icon, h('small', {}, label), d); };
   side.replaceChildren(sb('🔥', 'Events', () => openEvents(), 'events'), sb('📋', 'Quests', () => openMissions(1), 'missions'), sb('🛒', 'Shop', () => openShop(), 'shop'),
-    sb('📜', 'Reports', () => openReports(), 'reports'), sb('✉️', 'Mail', () => openMail(), 'mail'), sb('🏆', 'Rank', () => openRanking(), 'rank'), sb('🎒', 'Bag', () => openBag(), 'bag'), sb('⚙️', 'Settings', () => openSettings(), 'set'));
+    sb('✉️', 'Mail', () => openMail(), 'mail'), sb('📜', 'Reports', () => openReports(), 'reports'), sb('☰', 'More', () => openMore(), 'more'));
   const nav = document.getElementById('nav');
   const nb = (id, icon, label, fn) => h('button', { 'data-id': id, onclick: fn }, h('span.ni', {}, icon), label, h('span.dot.hidden', { 'data-dot': id }));
   nav.replaceChildren(nb('base', '🏰', 'Base', () => A.switchScreen('base')), nb('world', '🌍', 'World', () => A.switchScreen('world')), nb('heroes', '🦸', 'Heroes', () => openHeroes()),
@@ -34,7 +34,13 @@ export function buildHud() {
   els.timers = document.getElementById('sideL');
   updateHud(true);
 }
+function openMore() {
+  const item = (icon, label, fn) => h('button.li', { style: { width: '100%' }, onclick: () => { m.close(); fn(); } }, h('span.ic', {}, icon), h('b.grow', { style: { textAlign: 'left' } }, label), '›');
+  const m = modal({ title: 'More', icon: '☰', cls: 'small', render: () => [item('🎖️', 'Commander profile', openProfile), item('🏆', 'Rankings', openRanking), item('🎒', 'Backpack', openBag), item('🚩', 'Marches', openMarches), item('⚙️', 'Settings & account', openSettings)] });
+}
 let lastTimers = '';
+let hudH = 0;
+function syncHudHeight() { const hh = document.getElementById('hud').offsetHeight; if (hh !== hudH) { hudH = hh; document.getElementById('app').style.setProperty('--hud-h', hh + 'px'); } }
 export function updateHud(full) {
   const g = A.g; if (!els.name) return;
   const p = g.s.player;
@@ -44,10 +50,12 @@ export function updateHud(full) {
   els.pow.textContent = '⚡ ' + fmt(g.power());
   for (const r of ['food', 'wood', 'metal', 'fuel']) els.res[r].lastChild.textContent = fmt(g.s.res[r]);
   els.gems.lastChild.textContent = fmt(g.s.gems);
-  els.vigor.textContent = `⚡ ${g.vigor()}/${VIGOR_MAX + g.vip().vigor} Vigor`;
-  const sh = g.s.shieldUntil - g.now();
-  els.shield.textContent = sh > 0 ? `🛡️ ${fmtTime(sh / 1000)}` : '🛡️ No shield'; els.shield.style.color = sh > 0 ? '#5fd3ff' : '#a99a88';
-  els.net.textContent = A.net.user ? `🟢 ${A.net.user.name}` : A.net.online ? '🟡 Server: not logged in' : '⚪ Offline';
+  els.vigor.textContent = `⚡ ${g.vigor()}/${VIGOR_MAX + g.vip().vigor}`;
+  const sh = (g.s.shieldUntil - g.now()) / 1000;
+  els.shield.textContent = sh > 0 ? `🛡️ ${sh > 86400 ? Math.floor(sh / 86400) + 'd ' + Math.floor(sh % 86400 / 3600) + 'h' : sh > 3600 ? Math.floor(sh / 3600) + 'h ' + Math.floor(sh % 3600 / 60) + 'm' : fmtTime(sh)}` : '🛡️ —'; els.shield.style.color = sh > 0 ? '#5fd3ff' : '#a99a88';
+  els.net.textContent = A.net.user ? '🟢 Online' : A.net.online ? '🟡 Guest' : '⚪ Offline';
+  els.net.onclick = () => openSettings();
+  els.vigor.onclick = () => openBag();
   if (g.s.incoming) { els.alert.classList.remove('hidden'); els.alert.textContent = `⚠️ ${g.s.incoming.name} attacking in ${fmtTime((g.s.incoming.arrive - g.now()) / 1000)}!`; els.alert.onclick = () => import('./heroes.js').then((m) => m.openFormation('defense')); }
   else els.alert.classList.add('hidden');
   // badges
@@ -81,6 +89,7 @@ export function updateHud(full) {
       h('button.btn.sm' + (q.done ? '.green' : ''), { onclick: () => { if (q.done) { g.claimStory(); A.sfx('success'); A.toast('Story reward claimed!', 'good'); updateHud(true); } else goQuest(q); } }, q.done ? 'Claim' : 'Go'));
   } else els.quest.classList.add('hidden');
   tickTimers(g.now());
+  syncHudHeight();
 }
 function slotOf(type) { return Object.entries(A.g.s.buildings).find(([, b]) => b.type === type)?.[0] || BASE_LAYOUT.find((l) => l.type === type)?.id; }
 export function goEvent(ev) {

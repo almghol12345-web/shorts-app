@@ -1,3 +1,4 @@
+import { pixelRatio, getQuality } from '../platform.js';
 // Isometric base view: terrain, buildings by depth, construction, collect bubbles, ambient life & lighting.
 import { BASE_LAYOUT, BUILDINGS } from '../data/buildings.js';
 import { RES_INFO } from '../data/config.js';
@@ -51,7 +52,7 @@ export class BaseView {
     this.selected = h.slot; this.h.onSelect?.(h.slot);
   }
   resize() {
-    const dpr = Math.min(2, window.devicePixelRatio || 1);
+    const dpr = pixelRatio();
     this.c.width = this.c.clientWidth * dpr; this.c.height = this.c.clientHeight * dpr; this.dpr = dpr;
     if (!this.centered) this.center();
   }
@@ -154,7 +155,7 @@ export class BaseView {
     const warm = ctx.createLinearGradient(0, 0, W, H); warm.addColorStop(0, 'rgba(255,140,60,0.08)'); warm.addColorStop(1, 'rgba(0,0,0,0)'); ctx.fillStyle = warm; ctx.fillRect(0, 0, W, H);
     // ash
     ctx.fillStyle = 'rgba(220,210,200,0.5)';
-    for (const a of this.ash) { a.y += a.v / H * 2; a.x += Math.sin(t + a.y * 10) * 0.0004; if (a.y > 1) { a.y = 0; a.x = Math.random(); } ctx.fillRect(a.x * W, a.y * H, a.s * this.dpr, a.s * this.dpr); }
+    if (getQuality() !== 'low') for (const a of this.ash) { a.y += a.v / H * 2; a.x += Math.sin(t + a.y * 10) * 0.0004; if (a.y > 1) { a.y = 0; a.x = Math.random(); } ctx.fillRect(a.x * W, a.y * H, a.s * this.dpr, a.s * this.dpr); }
     const vg = ctx.createRadialGradient(W / 2, H / 2, Math.min(W, H) * 0.35, W / 2, H / 2, Math.max(W, H) * 0.75); vg.addColorStop(0, 'rgba(0,0,0,0)'); vg.addColorStop(1, 'rgba(0,0,0,0.6)'); ctx.fillStyle = vg; ctx.fillRect(0, 0, W, H);
     this.isNight = night;
   }

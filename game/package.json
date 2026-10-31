@@ -1,12 +1,33 @@
 {
   "name": "ashfall-last-bastion",
   "version": "0.1.0",
-  "description": "Ashfall: Last Bastion — a post-apocalyptic survival strategy game for mobile browsers",
+  "description": "Ashfall: Last Bastion \u2014 a post-apocalyptic survival strategy game for iOS and Android",
   "type": "module",
   "private": true,
   "scripts": {
     "start": "node server/server.js",
-    "test": "node --test tests/*.test.js"
+    "test": "node --test tests/*.test.js",
+    "build": "node scripts/build.mjs",
+    "icons": "node scripts/make-icons.cjs",
+    "cap:sync": "npm run build && npx cap sync",
+    "android": "npm run cap:sync && npx cap open android",
+    "ios": "npm run cap:sync && npx cap open ios",
+    "android:apk": "npm run cap:sync && cd android && ./gradlew assembleDebug"
   },
-  "engines": { "node": ">=18" }
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "@capacitor/android": "^7.6.10",
+    "@capacitor/app": "^7.1.2",
+    "@capacitor/core": "^7.6.10",
+    "@capacitor/haptics": "^7.0.5",
+    "@capacitor/ios": "^7.6.10",
+    "@capacitor/preferences": "^7.0.4",
+    "@capacitor/splash-screen": "^7.0.5",
+    "@capacitor/status-bar": "^7.0.6"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^7.6.10"
+  }
 }

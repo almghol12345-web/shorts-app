@@ -1,10 +1,12 @@
 // Client for the optional game server (server/server.js). When no server is reachable the game
 // runs fully offline and every multiplayer surface says so instead of faking it.
 import { A } from './ui/app.js';
+import { CONFIG } from './config.js';
+import { isNative } from './platform.js';
 
 export class Net {
   constructor() {
-    this.base = localStorage.getItem('ashfall.server') ?? '';
+    this.base = localStorage.getItem('ashfall.server') ?? CONFIG.SERVER ?? '';
     this.token = localStorage.getItem('ashfall.token') || null;
     this.user = null; this.online = false; this.alliance = null; this.chat = []; this.es = null; this.lastSync = 0;
   }
@@ -15,6 +17,7 @@ export class Net {
     return j;
   }
   async probe() {
+    if (isNative && !this.base) { this.online = false; return false; } // app build without a server URL
     try { const r = await fetch(this.base + '/api/health', { cache: 'no-store' }); this.online = r.ok && (await r.json()).ok; } catch { this.online = false; }
     if (this.online && this.token) { const me = await this.req('GET', '/api/me'); if (me.ok) this.user = me.user; }
     return this.online;

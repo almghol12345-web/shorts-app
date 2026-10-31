@@ -1,0 +1,63 @@
+name: Ashfall mobile builds
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'game/**'
+      - '.github/workflows/ashfall-mobile.yml'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    defaults: { run: { working-directory: game } }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: npm, cache-dependency-path: game/package-lock.json }
+      - run: npm ci
+      - run: npm test
+
+  android:
+    needs: test
+    runs-on: ubuntu-latest
+    defaults: { run: { working-directory: game } }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: npm, cache-dependency-path: game/package-lock.json }
+      - uses: actions/setup-java@v4
+        with: { distribution: temurin, java-version: 21 }
+      - uses: android-actions/setup-android@v3
+      - run: npm ci
+      - name: Build web bundle and sync native project
+        run: npm run cap:sync
+        env:
+          ASHFALL_SERVER: ${{ vars.ASHFALL_SERVER }}
+      - name: Build debug APK
+        working-directory: game/android
+        run: chmod +x gradlew && ./gradlew assembleDebug --no-daemon
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ashfall-android-debug-apk
+          path: game/android/app/build/outputs/apk/debug/app-debug.apk
+
+  ios:
+    needs: test
+    runs-on: macos-latest
+    defaults: { run: { working-directory: game } }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: npm, cache-dependency-path: game/package-lock.json }
+      - run: npm ci
+      - name: Build web bundle and sync native project
+        run: npm run cap:sync
+        env:
+          ASHFALL_SERVER: ${{ vars.ASHFALL_SERVER }}
+      - name: Compile for the iOS Simulator (no signing needed)
+        working-directory: game/ios/App
+        run: |
+          xcodebuild -workspace App.xcworkspace -scheme App -configuration Debug \
+            -sdk iphonesimulator -destination 'generic/platform=iOS Simulator' \
+            CODE_SIGNING_ALLOWED=NO build | tail -40

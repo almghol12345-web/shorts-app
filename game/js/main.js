@@ -14,9 +14,12 @@ import { Net } from './net.js';
 import { HERO_BY_ID } from './data/heroes.js';
 import { RES_INFO } from './data/config.js';
 import { BUILDINGS } from './data/buildings.js';
+import { initPlatform, storage, onBack, onPause, haptic, hideSplash, device, setHaptics, isNative, setQuality } from './platform.js';
+import { topModal, closeAll } from './ui/dom.js';
 
 const SAVE_KEY = 'ashfall.save';
 A.sfx = (n) => { if (A.g?.s.settings.sound) sfx(n); };
+void closeAll;
 A.toast = toast;
 A.portrait = heroPortrait;
 A.heroName = (id) => HERO_BY_ID[id]?.name || id;
@@ -24,8 +27,15 @@ A.refreshHud = () => updateHud(true);
 A.refreshAll = () => { refreshAll(); updateHud(true); };
 A.net = new Net();
 
-function loadSave() { try { const raw = localStorage.getItem(SAVE_KEY); return raw ? JSON.parse(raw) : null; } catch { return null; } }
-function save() { if (A.g) try { localStorage.setItem(SAVE_KEY, A.g.serialize()); } catch (e) { console.warn('save failed', e); } }
+async function loadSave() {
+  const parse = (raw) => { try { return raw ? JSON.parse(raw) : null; } catch { return null; } };
+  const local = parse(storage.get(SAVE_KEY)), durable = parse(await storage.getDurable(SAVE_KEY));
+  if (local && durable) return (local.lastTick || 0) >= (durable.lastTick || 0) ? local : durable;
+  return local || durable;
+}
+function save() { if (A.g) storage.set(SAVE_KEY, A.g.serialize()); }
+A.save = save;
+A.haptic = haptic;
 
 // ---------- splash ----------
 function embers() { const e = document.getElementById('embers'); for (let i = 0; i < 40; i++) { const s = h('i'); s.style.left = Math.random() * 100 + '%'; s.style.animationDuration = 4 + Math.random() * 6 + 's'; s.style.animationDelay = -Math.random() * 8 + 's'; e.append(s); } }
@@ -44,10 +54,15 @@ function start(state, name) {
   unlockAudio(state?.settings || { sound: true, music: true });
   const g = new Game(state, { name });
   A.g = g;
+  g.s.settings.quality ||= device.lowEnd ? 'low' : 'high';
+  if (g.s.settings.haptics === undefined) g.s.settings.haptics = true;
+  setHaptics(g.s.settings.haptics);
+  setQuality(g.s.settings.quality);
+  A.quality = () => g.s.settings.quality;
   const fresh = !state;
   document.getElementById('splash').remove();
   g.on('toast', ({ msg, kind }) => toast(msg, kind));
-  g.on('incoming', () => A.sfx('alarm'));
+  g.on('incoming', () => { A.sfx('alarm'); haptic('warning'); });
   g.on('built', (q) => { A.sfx('success'); A.views.base?.float(`Lv ${q.toLvl}!`, q.slot, '#ffd27a'); });
   g.on('helped', ({ by }) => { if (Math.random() < 0.3) toast(`🤝 ${by} helped you`); });
   g.on('report', (r) => { if (r.type === 'pve' && r.title.startsWith('Campaign')) return; if (r.type !== 'arena' && r.type !== 'boss') toast((r.win ? '✅ ' : '❌ ') + r.title, r.win ? 'good' : 'bad'); });
@@ -70,6 +85,7 @@ function start(state, name) {
   const coord = h('div.coord', {}, '');
   wui.replaceChildren(h('button.btn.sm', { onclick: () => world.goHome() }, '🏰 Home'), h('button.btn.sm.gray', { onclick: () => openMarches() }, '🚩 Marches'), coord);
   A.switchScreen = (s) => {
+    if (A.screen !== s) { const f = document.getElementById('fade'); f.classList.remove('go'); void f.offsetWidth; f.classList.add('go'); }
     A.screen = s;
     document.getElementById('baseCanvas').classList.toggle('hidden', s !== 'base');
     document.getElementById('worldCanvas').classList.toggle('hidden', s !== 'world');
@@ -83,13 +99,18 @@ function start(state, name) {
   window.addEventListener('resize', resize);
   A.switchScreen('base');
   // Main render loop
-  let last = performance.now();
+  // Frame limiter: 60 fps normally, 30 fps on "Battery saver", ~8 fps while a full-screen menu covers the map
+  let lastFrame = 0;
   const loop = (now) => {
-    const t = now / 1000; last = now;
+    requestAnimationFrame(loop);
+    const covered = document.querySelector('.modal.show:not(.small)');
+    const minGap = covered ? 120 : g.s.settings.quality === 'low' ? 32 : 0;
+    if (now - lastFrame < minGap) return;
+    lastFrame = now;
+    const t = now / 1000;
     if (!document.getElementById('battle').classList.contains('hidden')) { /* battle renders itself */ }
     else if (A.screen === 'base') base.render(t);
     else { world.render(t); const c = world.centerTile(); coord.textContent = `X:${c.x} Y:${c.y}`; }
-    requestAnimationFrame(loop);
   };
   requestAnimationFrame(loop);
   // Logic tick
@@ -99,8 +120,17 @@ function start(state, name) {
   document.addEventListener('click', () => setTimeout(() => updateHud(true), 0), true);
   document.addEventListener('pointerup', () => setTimeout(() => updateHud(), 30));
   setInterval(save, 5000);
-  document.addEventListener('visibilitychange', () => { if (document.hidden) { save(); A.net.pushSave().catch(() => {}); } });
-  window.addEventListener('pagehide', save);
+  onPause(() => { g.tick(); save(); A.net.pushSave().catch(() => {}); });
+  // Save soon after anything changes (debounced) so progress survives the app being killed
+  let saveTimer = 0; g.on('change', () => { clearTimeout(saveTimer); saveTimer = setTimeout(save, 800); });
+  onBack(() => {
+    const battle = document.getElementById('battle');
+    if (!battle.classList.contains('hidden')) { const btn = [...battle.querySelectorAll('button')].find((b) => /Continue|Skip/.test(b.textContent)); btn?.click(); return true; }
+    if (topModal()) { topModal().close(); return true; }
+    if (!document.getElementById('tileinfo').classList.contains('hidden')) { showTileInfo(null); return true; }
+    if (A.screen !== 'base') { A.switchScreen('base'); return true; }
+    return false;
+  });
   if (fresh || !g.loginState().claimedToday) setTimeout(() => { if (!modalOpen()) openEvents(); setTimeout(() => { const tabs = document.querySelectorAll('.tab'); tabs[1]?.click(); }, 50); }, 900);
   // Network
   A.net.probe().then(() => { updateHud(true); if (A.net.user) { syncLoop(); } });
@@ -149,6 +179,9 @@ function applyServerEffect(e) {
   } else if (e.type === 'mail') g.addMail(e.title, e.body, e.reward);
 }
 
-if ('serviceWorker' in navigator && location.protocol === 'https:') navigator.serviceWorker.register('sw.js').catch(() => {});
+if (!isNative && 'serviceWorker' in navigator && location.protocol === 'https:') navigator.serviceWorker.register('sw.js').catch(() => {});
 window.ashfall = A; // handy for debugging from the console
-splash(loadSave());
+window.addEventListener('ashfall-toast', (e) => toast(e.detail));
+document.addEventListener('contextmenu', (e) => e.preventDefault());
+document.addEventListener('gesturestart', (e) => e.preventDefault()); // iOS pinch-zooming the page
+(async () => { await initPlatform(); hideSplash(); splash(await loadSave()); })();

@@ -1,31 +1,47 @@
 :root{--bg:#14110e;--panel:#221c17;--panel2:#2c241d;--line:#4a3c2e;--gold:#ffd27a;--amber:#f2b33d;--text:#efe6da;--dim:#a99a88;--good:#6dd36d;--bad:#ff6a5a;--blue:#5fd3ff;--r:#4f9cff;--sr:#b06bff;--ssr:#ffb321;
 --safe-t:env(safe-area-inset-top,0px);--safe-b:env(safe-area-inset-bottom,0px)}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{margin:0;height:100%;background:var(--bg);color:var(--text);font:14px/1.35 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;overflow:hidden;user-select:none;-webkit-user-select:none;touch-action:none}
+html,body{margin:0;height:100%;background:#070605;overscroll-behavior:none;-webkit-touch-callout:none;-webkit-text-size-adjust:100%;text-size-adjust:100%;color:var(--text);font:14px/1.35 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;overflow:hidden;user-select:none;-webkit-user-select:none;touch-action:none}
 button{font:inherit;color:inherit;cursor:pointer;border:0;background:none}
 input{font:inherit}
-#app{position:fixed;inset:0}
+/* Phone-first frame: fills the screen on phones; on tablets/desktop it stays a centered 9:16 portrait column */
+#app{position:fixed;top:0;bottom:0;left:0;right:0;margin:0 auto;width:100%;max-width:calc(100vh * 9 / 16);max-width:calc(100dvh * 9 / 16);background:var(--bg);overflow:hidden;contain:strict}
+@media (min-aspect-ratio: 10/16){#app{box-shadow:0 0 0 1px #3a2e22,0 0 60px #000}}
+input,textarea{user-select:text;-webkit-user-select:text}
+#fade{position:absolute;inset:0;background:#000;opacity:0;pointer-events:none;z-index:15}
+#fade.go{animation:fadeswap .35s ease-out}
+@keyframes fadeswap{0%{opacity:.85}100%{opacity:0}}
+#rotate{display:none;position:fixed;inset:0;z-index:100;background:#0d0b09;color:var(--text);flex-direction:column;align-items:center;justify-content:center;gap:8px;text-align:center;padding:20px}
+#rotate .phone{font-size:56px;animation:rot 1.6s ease-in-out infinite}
+#rotate span{color:var(--dim);font-size:13px}
+@keyframes rot{0%,20%{transform:rotate(90deg)}60%,100%{transform:rotate(0)}}
+/* phone held sideways (short landscape screen) → ask to rotate */
+@media (orientation: landscape) and (max-height: 520px){#rotate{display:flex}}
 canvas.view{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:none}
 .hidden{display:none!important}
 /* ---------- top HUD ---------- */
 #hud{position:absolute;left:0;right:0;top:0;padding:calc(6px + var(--safe-t)) 8px 6px;background:linear-gradient(#0d0b09ee,#0d0b0900);pointer-events:none;z-index:5}
 #hud > *{pointer-events:auto}
-.toprow{display:flex;gap:8px;align-items:center}
+.toprow{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.toprow .pinfo{flex:1}
 .avatar{width:46px;height:46px;border-radius:10px;border:2px solid var(--gold);background:#333 center/cover;position:relative;flex:none;box-shadow:0 2px 8px #000a}
 .avatar .lv{position:absolute;bottom:-6px;left:50%;transform:translateX(-50%);background:#000c;border:1px solid var(--gold);border-radius:8px;font-size:10px;padding:0 5px;color:var(--gold);font-weight:700}
 .pinfo{flex:none;min-width:0}
 .pname{font-weight:800;font-size:13px;white-space:nowrap;max-width:110px;overflow:hidden;text-overflow:ellipsis}
 .ppow{font-size:12px;color:var(--gold);font-weight:700}
 .vip{display:inline-block;background:linear-gradient(#ffd27a,#c98a1a);color:#2a1a00;border-radius:5px;padding:0 5px;font-size:10px;font-weight:900;margin-left:4px}
-.resbar{display:flex;gap:4px;flex:1;justify-content:flex-end;flex-wrap:wrap}
-.res{display:flex;align-items:center;gap:3px;background:#000a;border:1px solid #ffffff1a;border-radius:12px;padding:2px 8px 2px 5px;font-size:12px;font-weight:700;min-width:62px}
+.resbar{display:flex;gap:4px;flex:1 1 100%;order:3;flex-wrap:nowrap}
+.res{display:flex;align-items:center;justify-content:center;gap:3px;background:#000a;border:1px solid #ffffff1a;border-radius:12px;padding:3px 4px;font-size:12px;font-weight:700;flex:1 1 0;min-width:0;white-space:nowrap;overflow:hidden}
 .res .ic{font-size:13px}
 .res.gems{color:var(--blue)}
-.subrow{display:flex;gap:6px;margin-top:6px;align-items:center}
-.vigor{font-size:11px;background:#000a;border-radius:10px;padding:2px 8px;border:1px solid #ffffff1a}
+.subrow{display:flex;gap:5px;margin-top:5px;align-items:center;flex-wrap:nowrap;overflow:hidden}
+.vigor{font-size:11px;background:#000a;border-radius:10px;padding:2px 8px;border:1px solid #ffffff1a;white-space:nowrap;flex:none}
+.subrow .alert{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:2px 8px;font-size:11px}
 /* ---------- side buttons ---------- */
-#side{position:absolute;right:6px;top:calc(96px + var(--safe-t));display:flex;flex-direction:column;gap:8px;z-index:4}
-#sideL{position:absolute;left:6px;top:calc(96px + var(--safe-t));display:flex;flex-direction:column;gap:8px;z-index:4;max-width:62%}
+#side{position:absolute;right:6px;top:calc(var(--hud-h, 110px) + 6px);display:flex;flex-direction:column;gap:8px;z-index:4}
+#sideL{position:absolute;left:6px;top:calc(var(--hud-h, 110px) + 6px);display:flex;flex-direction:column;gap:8px;z-index:4;max-width:62%}
+.sbtn:active,#nav button:active,.li:active,.hcard:active,.tnode:active{transform:scale(.95)}
+.sbtn,.li,.hcard,.tnode,#nav button{transition:transform .1s}
 .sbtn{width:48px;height:48px;border-radius:12px;background:radial-gradient(circle at 30% 25%,#4a3c2e,#1e1813);border:1.5px solid #7a6040;box-shadow:0 3px 8px #000b;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:20px;position:relative}
 .sbtn small{font-size:8px;font-weight:700;color:var(--gold);margin-top:-2px}
 .dot{position:absolute;top:-4px;right:-4px;min-width:17px;height:17px;border-radius:9px;background:#e53b2b;color:#fff;font-size:10px;font-weight:800;display:flex;align-items:center;justify-content:center;padding:0 4px;border:1.5px solid #fff3}
@@ -48,12 +64,13 @@ canvas.view{position:absolute;inset:0;width:100%;height:100%;display:block;touch
 #nav button.on .ni{filter:none;transform:translateY(-2px)}
 /* ---------- buttons ---------- */
 .btn{background:linear-gradient(#f6c453,#d38b1c);color:#2a1700;font-weight:800;border-radius:10px;padding:9px 14px;box-shadow:0 3px 0 #8a5510,0 4px 8px #0008;text-shadow:0 1px 0 #ffffff55;white-space:nowrap}
-.btn:active{transform:translateY(2px);box-shadow:0 1px 0 #8a5510}
+.btn:active{transform:translateY(2px) scale(.97);box-shadow:0 1px 0 #8a5510}
+.btn{transition:transform .08s,filter .15s;min-height:40px;touch-action:manipulation}
 .btn.blue{background:linear-gradient(#69d0ff,#2b8fd0);color:#00203a;box-shadow:0 3px 0 #135a8a,0 4px 8px #0008}
 .btn.green{background:linear-gradient(#7fe07a,#2fa52a);color:#062a04;box-shadow:0 3px 0 #1a6a16,0 4px 8px #0008}
 .btn.red{background:linear-gradient(#ff8a7a,#d0402b);color:#2a0400;box-shadow:0 3px 0 #8a2010,0 4px 8px #0008}
 .btn.gray{background:linear-gradient(#6a6058,#4a423b);color:#efe6da;box-shadow:0 3px 0 #2a241f,0 4px 8px #0008;text-shadow:none}
-.btn.sm{padding:5px 10px;font-size:12px;border-radius:8px}
+.btn.sm{padding:6px 11px;font-size:12px;border-radius:9px;min-height:34px}
 .btn:disabled,.btn.off{filter:grayscale(1) brightness(.7);pointer-events:none}
 .btn .sub{display:block;font-size:10px;font-weight:700;opacity:.85}
 .row{display:flex;gap:8px;align-items:center}
@@ -182,4 +199,28 @@ table.tbl th{color:var(--dim);font-size:10px;text-transform:uppercase}
 @keyframes pop{from{transform:scale(.3) rotate(-8deg);opacity:0}}
 .shine{animation:shine 1.2s infinite alternate}
 @keyframes shine{to{box-shadow:0 0 22px #ffb321}}
-@media (min-width:700px){.modal .panel{height:86%;border-radius:18px;border-bottom:2px solid #7a6040;margin-bottom:4%}}
+
+/* ---------- responsive phone sizes ---------- */
+@media (max-width: 360px){
+  body{font-size:13px}
+  .res{font-size:11px}
+  .avatar{width:40px;height:40px}
+  .pname{max-width:84px;font-size:12px}
+  .sbtn{width:42px;height:42px;font-size:17px}
+  #side{gap:6px}
+  #nav button .ni{font-size:19px}
+  #nav button{font-size:9px}
+  .mtitle{font-size:15px;padding:10px 12px}
+  .grid{grid-template-columns:repeat(auto-fill,minmax(84px,1fr))}
+  .bimg{width:90px;height:84px}
+  .tchip{max-width:170px}
+}
+@media (max-height: 640px){
+  #side{gap:5px}
+  .sbtn{width:40px;height:40px;font-size:16px}
+  .sbtn small{display:none}
+  #quest{padding:4px 8px}
+}
+@media (min-height: 860px){ .sbtn{width:52px;height:52px} }
+.modal .panel{max-width:100%}
+@media (prefers-reduced-motion: reduce){*{animation-duration:.01ms!important;transition-duration:.01ms!important}}

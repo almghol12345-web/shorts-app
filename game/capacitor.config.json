@@ -1,0 +1,12 @@
+{
+  "appId": "com.ashfall.lastbastion",
+  "appName": "Ashfall",
+  "webDir": "dist",
+  "backgroundColor": "#14110e",
+  "android": { "backgroundColor": "#14110e", "allowMixedContent": false },
+  "ios": { "backgroundColor": "#14110e", "contentInset": "never", "scrollEnabled": false },
+  "plugins": {
+    "SplashScreen": { "launchShowDuration": 3000, "launchAutoHide": false, "backgroundColor": "#14110e", "showSpinner": false, "androidScaleType": "CENTER_CROP" },
+    "StatusBar": { "style": "DARK", "backgroundColor": "#14110e", "overlaysWebView": true }
+  }
+}

@@ -1,3 +1,4 @@
+import { pixelRatio } from '../platform.js';
 // Plays back a combat log with animated squads, projectiles, skill banners and damage numbers.
 import { heroPortrait, drawSoldier, drawZombie, drawBuggy } from './art.js';
 import { roundRect } from './base.js';
@@ -14,7 +15,7 @@ export class BattleView {
     for (const u of this.units) if (u.heroId && !this.imgs[u.heroId]) { const im = new Image(); im.src = heroPortrait(u.heroId, 96); this.imgs[u.heroId] = im; }
     this.layout();
   }
-  resize() { const dpr = Math.min(2, window.devicePixelRatio || 1); this.c.width = this.c.clientWidth * dpr; this.c.height = this.c.clientHeight * dpr; this.dpr = dpr; this.layout(); }
+  resize() { const dpr = pixelRatio(); this.c.width = this.c.clientWidth * dpr; this.c.height = this.c.clientHeight * dpr; this.dpr = dpr; this.layout(); }
   layout() {
     if (!this.units) return;
     const W = this.c.clientWidth, H = this.c.clientHeight;

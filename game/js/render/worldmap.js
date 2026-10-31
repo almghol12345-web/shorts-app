@@ -1,3 +1,4 @@
+import { pixelRatio } from '../platform.js';
 // Top-down world map: procedural terrain, alliance territory, objects, marches.
 import { WORLD_SIZE } from '../data/config.js';
 import { terrainAt, NPC_ALLIANCES, TERRITORY_R, NODE_TYPES } from '../core/world.js';
@@ -16,7 +17,7 @@ export class WorldView {
     this.cam = new PanZoom(canvas, { onTap: (x, y) => this.tap(x, y), minZoom: 0.35, maxZoom: 1.8, zoom: 0.75 });
     this.sel = null; this.chunkCache = new Map(); this.objs = []; this.remote = [];
   }
-  resize() { const dpr = Math.min(2, window.devicePixelRatio || 1); this.c.width = this.c.clientWidth * dpr; this.c.height = this.c.clientHeight * dpr; this.dpr = dpr; }
+  resize() { const dpr = pixelRatio(); this.c.width = this.c.clientWidth * dpr; this.c.height = this.c.clientHeight * dpr; this.dpr = dpr; }
   goTo(x, y) { this.cam.x = this.c.clientWidth / 2 - (x + 0.5) * TS * this.cam.zoom; this.cam.y = this.c.clientHeight / 2 - (y + 0.5) * TS * this.cam.zoom; }
   goHome() { const p = this.g.basePos(); this.goTo(p.x, p.y); }
   centerTile() { const w = this.cam.toWorld(this.c.clientWidth / 2, this.c.clientHeight / 2); return { x: Math.floor(w.x / TS), y: Math.floor(w.y / TS) }; }

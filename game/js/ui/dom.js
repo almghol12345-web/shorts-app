@@ -2,6 +2,7 @@
 import { RES_INFO, RESOURCES } from '../data/config.js';
 import { ITEMS } from '../data/items.js';
 import { sfx } from '../audio.js';
+import { haptic } from '../platform.js';
 
 export function h(tag, attrs = {}, ...kids) {
   const [t, ...cls] = tag.split('.');
@@ -11,7 +12,7 @@ export function h(tag, attrs = {}, ...kids) {
   if (cls.length) el.className = cls.join(' ');
   for (const [k, v] of Object.entries(attrs || {})) {
     if (v == null || v === false) continue;
-    if (k.startsWith('on')) el.addEventListener(k.slice(2), (e) => { if (k === 'onclick') sfx('click'); v(e); });
+    if (k.startsWith('on')) el.addEventListener(k.slice(2), (e) => { if (k === 'onclick') { sfx('click'); haptic('light'); } v(e); });
     else if (k === 'style' && typeof v === 'object') Object.assign(el.style, v);
     else if (k === 'class') el.className += ' ' + v;
     else if (k === 'html') el.innerHTML = v;
@@ -92,8 +93,8 @@ export function confirmBox(text, yes, { yesLabel = 'Confirm', cls = '' } = {}) {
 }
 export function result(r, g, okMsg) {
   if (!r) return false;
-  if (r.ok) { if (okMsg) toast(okMsg, 'good'); sfx('success'); return true; }
-  if (r.msg) toast(r.msg, 'bad'); sfx('fail'); return false;
+  if (r.ok) { if (okMsg) toast(okMsg, 'good'); sfx('success'); haptic('success'); return true; }
+  if (r.msg) toast(r.msg, 'bad'); sfx('fail'); haptic('error'); return false;
 }
 export function progress(start, end, cls = '') {
   return h('div.prog ' + cls, { 'data-ps': start, 'data-pe': end }, h('div.fill'), h('span.ptxt', { 'data-end': end }, ''));

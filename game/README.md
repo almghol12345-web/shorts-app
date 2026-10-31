@@ -1,6 +1,6 @@
 # Ashfall: Last Bastion
 
-An original post-apocalyptic survival strategy game for mobile browsers: build a bastion, recruit
+An original post-apocalyptic survival strategy game for **iOS and Android phones**: build a bastion, recruit
 heroes, train an army, fight the horde, raid rivals and team up in alliances.
 All code, art, names and characters are original — the art is drawn procedurally in code, so the
 game ships with no image or audio files.
@@ -18,6 +18,39 @@ npm test           # 20 automated tests (game logic + server API)
 Open the URL on your phone (same Wi-Fi: `http://<your-computer-ip>:8080`) and "Add to Home
 Screen" for a full-screen app. It also runs from any static host (GitHub Pages, Netlify…) in
 **offline mode** — the server is only needed for multiplayer.
+
+## Mobile apps (iOS & Android)
+
+The game is built phone-first: portrait 9:16, touch controls (tap, drag, pinch), safe-area aware,
+tested on 320×568 up to 430×932 screens. On tablets/desktop it shows as a centered portrait column;
+a sideways phone gets a "rotate" prompt. The native apps are generated with
+[Capacitor](https://capacitorjs.com) and live in `android/` and `ios/`.
+
+```bash
+npm install
+npm run cap:sync        # copy the game into dist/ and both native projects
+npm run android         # open in Android Studio → Run / Build APK / Build Bundle (AAB)
+npm run ios             # open in Xcode (macOS) → Run / Archive for App Store
+ASHFALL_SERVER=https://your-server.example npm run cap:sync   # point the apps at a multiplayer server
+```
+
+What the native shell adds: portrait lock, Android back button (closes menus, double-press to exit),
+haptic feedback, status bar styling, splash screen, and saves mirrored to native storage
+(iOS can purge WebView storage; native Preferences survive). Progress is saved every few seconds,
+after every change, and whenever the app goes to the background.
+
+**Cloud builds:** `.github/workflows/ashfall-mobile.yml` runs the tests, builds a debug **APK** you
+can download from the workflow run (Actions → "Ashfall mobile builds" → Artifacts), and compiles the
+iOS app for the simulator. Set a repository variable `ASHFALL_SERVER` to bake in a server URL.
+
+**Before store release** you still need: a signing keystore + `./gradlew bundleRelease` for Google
+Play, an Apple Developer account + signing in Xcode for the App Store, a privacy policy URL, store
+listings/screenshots, and an HTTPS server (iOS blocks plain HTTP). `npm run icons` regenerates the
+app icon and splash screens (needs Playwright).
+
+**Performance:** render resolution is capped at 2× (1.25× on "Battery saver"), low-end devices
+start in Battery saver (30 FPS, fewer effects), the map renders at ~8 FPS while a full-screen menu
+covers it, and the base terrain is pre-rendered once.
 
 ## What's in the game
 
@@ -64,6 +97,9 @@ logic in `js/core` is already pure and runs unchanged in Node.
 ```
 game/
   index.html, css/, manifest.webmanifest, sw.js   # client shell (PWA, offline cache)
+  android/, ios/   # native app projects (Capacitor)
+  capacitor.config.json, scripts/build.mjs, scripts/make-icons.cjs, icons/
+  js/platform.js   # native bridge: storage, haptics, back button, status bar, quality
   js/data/     # all balance data: buildings, troops, heroes, research, items, missions, enemies
   js/core/     # pure game logic (no DOM) — shared by client, server and tests
   js/render/   # canvas renderers: base (isometric), world map, battle replay, procedural art
