@@ -23,7 +23,7 @@ import requests
 from .media import run
 
 UA = {"User-Agent": "DahshaShorts/1.0 (https://github.com/almghol12345-web/shorts-app)"}
-GRADE = "eq=brightness=-0.09:saturation=0.6:contrast=1.08,colorbalance=bs=0.10:bm=0.04"
+GRADE = "eq=brightness=-0.03:saturation=0.75:contrast=1.06,colorbalance=bs=0.08:bm=0.03"  # moody, not black
 ENCODE = ["-an", "-r", "30", "-c:v", "libx264", "-preset", "veryfast", "-pix_fmt", "yuv420p"]
 
 PALETTES = [  # dark, cold tones for a mysterious mood
@@ -191,13 +191,18 @@ def fetch_pixabay(query: str, out: Path, src: Sources) -> bool:
         "key": src.pixabay_key, "q": query, "per_page": 30, "safesearch": "true"})
     resp.raise_for_status()
     want = _words(query)
+    # in English the main noun is usually the last word ("ural mountains" -> mountains):
+    # a clip of the thing itself beats one that only shares a describing word (a "Ural owl")
+    words = [w for w in re.findall(r"[^\W_]+", query.lower()) if w in want]
+    head = words[-1] if words else ""
     best, best_score = None, -1
     for hit in resp.json().get("hits", []):  # already ordered by relevance
         if hit["id"] in src.used_ids or not 3 <= hit.get("duration", 0) <= 60:
             continue
         if _words(hit.get("tags", "")) & BANNED_TAGS and not _words(query) & BANNED_TAGS:
             continue
-        score = len(want & _words(hit.get("tags", "")))
+        tags = _words(hit.get("tags", ""))
+        score = len(want & tags) + (0.5 if head in tags else 0)
         if score > best_score:
             best, best_score = hit, score
     if not best or best_score < 1:  # nothing actually tagged like the query

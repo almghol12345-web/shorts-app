@@ -307,3 +307,21 @@ def test_history_journal_merges_without_duplicates(tmp_path):
     assert history.merge_journal(journal, other) == 1
     assert history.merge_journal(journal, other) == 0
     assert [i["video_id"] for i in history.load(other)] == ["id9", "id1"]
+
+
+def test_pixabay_prefers_the_main_noun(monkeypatch, tmp_path):
+    from shorts import background
+
+    class Resp:
+        def raise_for_status(self): pass
+        def json(self):
+            hd = {"large": {"url": "U", "width": 1920, "height": 1080}}
+            return {"hits": [
+                {"id": 1, "duration": 9, "tags": "ural owl, bird", "videos": {"large": {"url": "OWL", "width": 1920, "height": 1080}}},
+                {"id": 2, "duration": 9, "tags": "mountains, snow", "videos": {"large": {"url": "MOUNT", "width": 1920, "height": 1080}}}]}
+
+    got = []
+    monkeypatch.setattr(background.requests, "get", lambda *a, **k: Resp())
+    monkeypatch.setattr(background, "_download", lambda url, out: got.append(url))
+    assert background.fetch_pixabay("ural mountains", tmp_path / "x", background.Sources(pixabay_key="k"))
+    assert got == ["MOUNT"]
