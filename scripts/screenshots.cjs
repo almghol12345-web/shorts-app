@@ -11,7 +11,7 @@ const CAP = {
 };
 const SHOTS = ['base', 'battle', 'heroes', 'world', 'pass'];
 (async () => {
-  const b = await chromium.launch();
+  const b = await chromium.launch({ args: ['--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'] });
   const url = 'file://' + path.resolve('www/index.html');
   // 1) get a fresh save from the real game, then edit it into a mid-game state
   const c0 = await b.newContext({ viewport: { width: 430, height: 932 } }); const p0 = await c0.newPage();
@@ -39,7 +39,7 @@ const SHOTS = ['base', 'battle', 'heroes', 'world', 'pass'];
     const ctx = await b.newContext({ viewport: { width: 430, height: 932 }, deviceScaleFactor: 3 });
     const sv = seed(lang); await ctx.addInitScript(([k, v]) => { localStorage.setItem(k, v); }, [KEY, sv]);
     for (const k of SHOTS) {
-      const pg = await ctx.newPage(); await pg.goto(url); await pg.waitForTimeout(700);
+      const pg = await ctx.newPage(); await pg.goto(url); await pg.waitForTimeout(k === 'base' ? 2500 : 700);
       if (k === 'battle') { await pg.click('[data-x=campaign]'); await pg.click('[data-a=fight]'); await pg.waitForTimeout(12000); }
       if (k === 'heroes') await pg.click('[data-x=heroes]');
       if (k === 'world') { await pg.click('[data-x=world]'); await pg.waitForTimeout(300); await pg.click('[data-a=zoomIn]'); await pg.waitForTimeout(900); }

@@ -36,6 +36,7 @@ ${css}
 </head>
 <body>
 ${shell}
+<script src="three.min.js"></script>
 <script src="capacitor.js"></script>
 <script>
 ${game}
@@ -46,6 +47,7 @@ ${game}
 fs.mkdirSync('www', { recursive: true });
 fs.writeFileSync('www/index.html', app);
 fs.copyFileSync('node_modules/@capacitor/core/dist/capacitor.js', 'www/capacitor.js');
+fs.copyFileSync('node_modules/three/build/three.min.js', 'www/three.min.js');
 const art = `<title>فجر الناجين</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -55,6 +57,9 @@ const art = `<title>فجر الناجين</title>
 ${css}
 </style>
 ${shell}
+<script>
+${read('node_modules/three/build/three.min.js')}
+</script>
 <script>
 ${game}
 </script>

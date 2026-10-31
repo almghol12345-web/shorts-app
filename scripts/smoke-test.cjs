@@ -2,7 +2,7 @@
 const { chromium } = require('playwright');
 const path = require('path');
 (async () => {
-  const b = await chromium.launch();
+  const b = await chromium.launch({ args: ['--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'] });
   const ctx = await b.newContext({ viewport: { width: 393, height: 852 }, deviceScaleFactor: 2, hasTouch: true });
   const pg = await ctx.newPage();
   const errs = [], external = [];
@@ -15,8 +15,9 @@ const path = require('path');
   const step = async (name, fn) => { try { await fn(); } catch (e) { errs.push(name + ': ' + e.message.split('\n')[0]); } };
   await step('language', () => pg.click('[data-a=langPick][data-x=ar]'));
   await step('tutorial', () => pg.click('.sh-b [data-a=close]'));
-  await step('collect', () => pg.click('.bub:not([hidden])'));
-  await step('upgrade', async () => { await pg.click('[data-tile=farm1]'); await pg.click('[data-a=up]'); await pg.click('.sh-h [data-a=close]'); });
+  await step('3d village', async () => { await pg.waitForTimeout(150); const d = await pg.evaluate(() => window.V3_DEBUG && V3_DEBUG()); if (!d || !d.inited) throw new Error('village not started ' + JSON.stringify(d)); await pg.waitForFunction(() => V3_DEBUG().meshes === 19, null, { timeout: 5000 }); });
+  await step('collect', () => pg.evaluate(() => { const b = document.querySelector('.bub:not([hidden])'); if (!b) throw new Error('no bubble'); b.click(); }));
+  await step('upgrade', async () => { await pg.evaluate(() => document.querySelector('[data-tile=farm1]').click()); await pg.click('[data-a=up]'); await pg.click('.sh-h [data-a=close]'); });
   for (const a of ['events', 'quests', 'wheel', 'pass', 'shop', 'rank', 'achs', 'mail', 'bag', 'vip']) await step('open ' + a, async () => { await pg.click(`[data-a=${a}]`); await pg.waitForTimeout(120); await pg.click('.sh-h [data-a=close]'); await pg.waitForTimeout(120); });
   await step('recruit', async () => { await pg.click('[data-x=heroes]'); await pg.click('[data-a=openRecruit]'); await pg.click('[data-a=recruit][data-x="1"]'); await pg.click('.sh-h [data-a=close]'); });
   await step('battle', async () => { await pg.click('[data-x=campaign]'); await pg.click('[data-a=fight]'); await pg.waitForSelector('#b-res:not([hidden])', { timeout: 150000 }); await pg.click('#b-cont'); });

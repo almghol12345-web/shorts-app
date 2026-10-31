@@ -19,10 +19,12 @@ function render() {
   if (tab !== 'world') stopWorld();
   const v = $('#view'); const st = v.scrollTop;
   const ci = $('#chatin'), cv = ci ? ci.value : '', cf = ci && document.activeElement === ci;
-  v.classList.toggle('fixed', tab === 'world');
+  const v3 = tab === 'base' && v3Supported();
+  v.classList.toggle('fixed', tab === 'world' || v3);
   v.innerHTML = VIEWS[tab]();
   v.scrollTop = st;
   if (tab === 'world') mountWorld();
+  if (v3 && !mountVillage()) { V3.failed = true; v.classList.remove('fixed'); v.innerHTML = VIEWS.base(); }
   if (tab === 'alliance') { const c = v.querySelector('.chat'); if (c) c.scrollTop = c.scrollHeight; const ni = $('#chatin'); if (ni && cv) { ni.value = cv; if (cf) ni.focus(); } }
   renderTop(); renderTabs(); tickUI();
 }
@@ -59,7 +61,44 @@ const newsDot = () => NET.news.some(n => n.at > (S.newsSeen || 0));
 
 /* ================= views ================= */
 const VIEWS = {};
-VIEWS.base = () => {
+VIEWS.base = () => v3Supported() ? villageHTML() : flatBaseHTML();
+function baseBanners() {
+  const q = QUESTS[S.quest]; const qd = q && q[1]();
+  const siegeIn = S.siegeAt - now();
+  const evs = activeEvents().filter(e => e.type !== 'boss');
+  const offer = !S.starter.bought && S.starter.shown && IAPB.starter;
+  return `${hqLv() >= 2 && siegeIn < 120000 ? `<div class="banner siege">🧟 <span class="grow">${t('siege_in')} <b class="num" data-end="${S.siegeAt}"></b></span></div>` : ''}
+  ${evs.slice(0, 2).map(e => `<button class="banner ev" data-a="events"><span>⚡</span><span class="grow">${esc(L(e.title))}</span>${e.ends ? `<b class="num" data-end="${e.ends}"></b>` : ''}</button>`).join('')}
+  ${offer ? `<button class="banner offer" data-a="starter"><span>🎁</span><span class="grow">${t('starter_banner')}</span><b>${priceStr(IAPB.starter)}</b></button>` : ''}
+  ${q ? `<div class="quest"><span class="qk">${t('quest')}</span><span class="qt">${q[0]()}</span>${qd ? `<button class="btn gold sm" data-a="qclaim">${t('claim')}</button>` : `<button class="btn sm ${S.quest < 6 ? 'hint' : ''}" data-a="qgo">${t('go')}</button>`}</div>` : ''}`;
+}
+function baseShortcuts() {
+  return [
+    ['events', '🎁', t('sc_events'), hasEventDot()], ['quests', '📋', t('sc_quests'), false], ['wheel', '🎡', t('sc_wheel'), wheelFree() || S.inv.spin > 0],
+    ['pass', '🎖️', t('sc_pass'), passDot()], ['shop', '🛒', t('sc_shop'), cardActive() && S.card.last !== today()],
+    ['rank', '🏆', t('sc_rank'), false], ['achs', '🏅', t('sc_achs'), achDot()], ['mail', '✉️', t('sc_mail'), newsDot()],
+    ['bag', '🎒', t('sc_bag'), false], ['collectAll', '🧺', t('sc_collect'), false],
+  ].map(([a, i, n, d]) => `<button class="sc" data-a="${a}">${d ? '<span class="dot"></span>' : ''}<span class="si">${i}</span>${n}</button>`);
+}
+function hotspotHTML(p) {
+  const b = S.b[p.k], T = BT[p.t], q = S.builds.find(x => x.k === p.k);
+  if (hqLv() < p.u) return `<div class="hs locked" data-hs="${p.k}" data-tile="${p.k}" role="button" tabindex="0" data-a="locked" data-x="${p.u}" aria-label="${esc(L(T.n))}"><span class="hn">${L(T.n)} · ${t('hq_short', p.u)}</span></div>`;
+  if (!b.lv && !q) return `<div class="hs empty" data-hs="${p.k}" data-tile="${p.k}" role="button" tabindex="0" data-a="bld" data-x="${p.k}" aria-label="${esc(L(T.n))}"><span class="hn">+ ${L(T.n)}</span></div>`;
+  const bub = T.prod && b.lv ? `<button class="bub" data-acc="${p.k}" data-a="collect" data-x="${p.k}" hidden>${ico(T.prod)}<span></span></button>` : '';
+  return `<div class="hs${q ? ' busy' : ''}" data-hs="${p.k}" data-tile="${p.k}" role="button" tabindex="0" data-a="bld" data-x="${p.k}" aria-label="${esc(L(T.n))}">${bub}${!q && canUpgradeNow(p.k) ? '<span class="upok">↑</span>' : ''}${q ? `<span class="hbar"><span class="tt num" data-end="${q.end}"></span><span class="prog"><i data-bar data-st="${q.st}" data-en="${q.end}"></i></span></span>` : ''}<span class="hn">${L(T.n)} <b class="num">${b.lv || ''}</b></span></div>`;
+}
+function villageHTML() {
+  const sc = baseShortcuts();
+  const chips = S.builds.map(b => `<button class="chipq" data-a="bld" data-x="${b.k}">${bImg(PLOT[b.k].t, 'mini')}<span class="prog"><i data-bar data-st="${b.st}" data-en="${b.end}"></i></span><b class="num" data-end="${b.end}"></b></button>`).join('')
+    + (S.rq ? `<button class="chipq" data-a="bld" data-x="lab"><span class="ce">🔬</span><span class="prog"><i data-bar data-st="${S.rq.st}" data-en="${S.rq.end}"></i></span><b class="num" data-end="${S.rq.end}"></b></button>` : '')
+    + (S.tq ? `<button class="chipq" data-a="bld" data-x="barracks"><span class="ce">🎖️</span><span class="prog"><i data-bar data-st="${S.tq.st}" data-en="${S.tq.end}"></i></span><b class="num" data-end="${S.tq.end}"></b></button>` : '')
+    + (S.builds.length < maxBuilders() ? `<span class="chipq idle">🔨 ${S.builds.length}/${maxBuilders()}</span>` : '');
+  return `<div class="b3"><div id="b3c"></div><div id="b3h">${PLOTS.map(hotspotHTML).join('')}</div>
+  <div class="b3top b3ui">${baseBanners()}</div>
+  <div class="b3side b3ui">${sc.slice(0, 5).join('')}</div><div class="b3side end b3ui">${sc.slice(5).join('')}</div>
+  <div class="b3bot b3ui">${chips}</div></div>`;
+}
+function flatBaseHTML() {
   const q = QUESTS[S.quest]; const qd = q && q[1]();
   const siegeIn = S.siegeAt - now();
   const evs = activeEvents().filter(e => e.type !== 'boss');

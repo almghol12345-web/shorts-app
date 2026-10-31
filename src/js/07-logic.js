@@ -91,7 +91,7 @@ function goQuest() {
   if (g.startsWith('#')) { tab = g.slice(1); render(); return; }
   if (ACT[g] && !PLOT[g]) { ACT[g](); return; }
   const p = PLOT[g]; if (hqLv() < p.u) { toast(t('unlock_hq', p.u)); openModal(() => mBuilding('hq')); return; }
-  tab = 'base'; render(); hintNext = true; openModal(() => mBuilding(g));
+  tab = 'base'; render(); if (V3.inited) v3Focus(g); hintNext = true; openModal(() => mBuilding(g));
 }
 let hintNext = false;
 
