@@ -289,3 +289,11 @@ def test_elevenlabs_failure_falls_back_to_free_voice(monkeypatch, tmp_path):
     monkeypatch.setattr(voice, "_tts", fake_free)
     n = voice.synthesize(["أهلا"], "v", tmp_path)
     assert not n.silent and [w.text for w in n.words] == ["أهلا"]
+
+
+def test_outro_keeps_visual_plan_aligned():
+    from shorts.pipeline import OUTRO, add_outro
+    s = content.Script("t", "t #shorts", ["a", "b"], "d", visuals=["x", "y"], scenes=["s1", "s2"])
+    add_outro(s)
+    add_outro(s)                      # idempotent
+    assert s.lines == ["a", "b", OUTRO] and len(s.visual_plan()) == 3

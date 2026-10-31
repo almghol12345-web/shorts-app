@@ -13,6 +13,21 @@ def _slug(text: str) -> str:
     return re.sub(r"[^a-z0-9]+", "-", text.lower()).strip("-")[:40] or "short"
 
 
+# A clear ending (the stories close on an open question) that also invites comments.
+OUTRO = "وش رأيك أنت؟ اكتب لي توقعك في التعليقات"
+
+
+def add_outro(script: content.Script) -> None:
+    n = len(script.lines)
+    if script.lines and script.lines[-1] == OUTRO:
+        return
+    script.lines = script.lines + [OUTRO]
+    if len(script.scenes) == n:
+        script.scenes = script.scenes + [script.scenes[-1]]
+    if len(script.visuals) == n:
+        script.visuals = script.visuals + [script.visuals[-1]]
+
+
 def line_spans(narration: voice.Narration, n_lines: int) -> list[float]:
     """Seconds each script line is on screen: from its first spoken word to the next line's."""
     total = narration.length
@@ -26,6 +41,7 @@ def line_spans(narration: voice.Narration, n_lines: int) -> list[float]:
 def make_one(cfg: Config, do_upload: bool, keep_work: bool = False) -> dict:
     used = history.used_topics(cfg.history_file)
     script = content.generate(cfg, used)
+    add_outro(script)
     print(f"[script] {script.title}")
 
     stamp = datetime.now().strftime("%Y%m%d-%H%M%S")

@@ -28,7 +28,7 @@ class Narration:
 
     @property
     def length(self) -> float:
-        return self.words[-1].end + 0.4 if self.words else 0.0
+        return self.words[-1].end + 1.2 if self.words else 0.0   # a calm beat after the last word
 
 
 def join_lines(lines: list[str]) -> str:
