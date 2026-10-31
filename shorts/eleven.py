@@ -66,7 +66,8 @@ def _norm(text: str) -> str:
     return re.sub(r"[^a-z\u0600-\u06ff]", "", str(text).lower())
 
 
-SPELLINGS = {"abdulrahman": ["Abdulrahman", "Abdul Rahman", "Abdelrahman", "Abdurrahman", "Abdalrahman"]}
+SPELLINGS = {"abdulrahman": ["Abdulrahman", "Abdul Rahman", "Abdelrahman", "Abdurrahman", "Abdalrahman"],
+             "najdi": ["Najdi", "Najd", "Riyadh", "Saudi Najdi", "نجدي"]}
 
 
 def _find_shared_by_name(key: str, wanted: str) -> dict | None:
@@ -82,10 +83,9 @@ def _find_shared_by_name(key: str, wanted: str) -> dict | None:
         if not resp.ok:
             continue
         for v in resp.json().get("voices", []):
-            name = _norm(v.get("name", ""))
-            if any(t in name for t in targets) and _norm(wanted) in name + _norm(v.get("accent", "")) + name:
-                matches.append(v)
-            elif any(t in name for t in targets):
+            # match the name, or the accent / description (e.g. "najdi")
+            text = _norm(v.get("name", "")) + _norm(v.get("accent", "")) + _norm(v.get("description", ""))
+            if any(t in text for t in targets) and v not in matches:
                 matches.append(v)
     if not matches:
         return None
