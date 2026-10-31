@@ -28,15 +28,16 @@ jobs:
         with: { node-version: 22, cache: npm, cache-dependency-path: game/package-lock.json }
       - uses: actions/setup-java@v4
         with: { distribution: temurin, java-version: 21 }
-      - uses: android-actions/setup-android@v3
       - run: npm ci
       - name: Build web bundle and sync native project
         run: npm run cap:sync
         env:
           ASHFALL_SERVER: ${{ vars.ASHFALL_SERVER }}
-      - name: Build debug APK
+      - name: Build debug APK (Android SDK is preinstalled on GitHub's Ubuntu runners)
         working-directory: game/android
-        run: chmod +x gradlew && ./gradlew assembleDebug --no-daemon
+        run: |
+          echo "sdk.dir=$ANDROID_HOME" > local.properties
+          chmod +x gradlew && ./gradlew assembleDebug --no-daemon
       - uses: actions/upload-artifact@v4
         with:
           name: ashfall-android-debug-apk
