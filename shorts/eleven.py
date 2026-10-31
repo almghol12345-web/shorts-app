@@ -60,21 +60,35 @@ def _pick_shared_voice(key: str) -> dict | None:
     return found[0] if found else fallback
 
 
+def _find_shared_by_name(key: str, wanted: str) -> dict | None:
+    """A library voice whose name contains `wanted` (e.g. "Omar - Hijazi")."""
+    resp = requests.get(f"{API}/v1/shared-voices", headers=_headers(key), timeout=30,
+                        params={"page_size": 100, "language": "ar", "search": wanted.split(" - ")[0]})
+    if not resp.ok:
+        return None
+    for v in resp.json().get("voices", []):
+        if wanted.lower() in str(v.get("name", "")).lower():
+            return v
+    return None
+
+
 def voice_id(key: str) -> str:
     chosen = os.environ.get("ELEVENLABS_VOICE_ID", "").strip()
     if chosen:
         return chosen
+    pick = os.environ.get("ELEVENLABS_VOICE_PICK", "").strip()   # try a specific voice by name
+    name = f"Dahsha {pick}"[:50] if pick else VOICE_NAME
     resp = requests.get(f"{API}/v1/voices", headers=_headers(key), timeout=30)
     resp.raise_for_status()
     for v in resp.json().get("voices", []):
-        if v.get("name") == VOICE_NAME:
+        if v.get("name") == name:
             return v["voice_id"]
-    shared = _pick_shared_voice(key)
+    shared = _find_shared_by_name(key, pick) if pick else _pick_shared_voice(key)
     if not shared:
         raise RuntimeError("no Arabic voice found in the ElevenLabs library")
     print(f"[voice] choosing '{shared.get('name')}' ({shared.get('accent')}, {shared.get('locale')})")
     added = requests.post(f"{API}/v1/voices/add/{shared['public_owner_id']}/{shared['voice_id']}",
-                          headers=_headers(key), json={"new_name": VOICE_NAME}, timeout=30)
+                          headers=_headers(key), json={"new_name": name}, timeout=30)
     added.raise_for_status()
     return added.json()["voice_id"]
 

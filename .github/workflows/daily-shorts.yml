@@ -14,6 +14,12 @@ on:
         description: "Upload to YouTube"
         type: boolean
         default: true
+      voice:
+        description: "Try a specific ElevenLabs voice by name (empty = channel voice)"
+        default: ""
+      privacy:
+        description: "public / unlisted / private"
+        default: "public"
 
 permissions:
   contents: write
@@ -64,12 +70,13 @@ jobs:
           POLLINATIONS_TOKEN: ${{ secrets.POLLINATIONS_TOKEN }}
           ELEVENLABS_API_KEY: ${{ secrets.ELEVENLABS_API_KEY }}
           ELEVENLABS_VOICE_ID: ${{ vars.ELEVENLABS_VOICE_ID }}
+          ELEVENLABS_VOICE_PICK: ${{ inputs.voice }}
           YOUTUBE_CLIENT_ID: ${{ secrets.YOUTUBE_CLIENT_ID }}
           YOUTUBE_CLIENT_SECRET: ${{ secrets.YOUTUBE_CLIENT_SECRET }}
           YOUTUBE_REFRESH_TOKEN: ${{ secrets.YOUTUBE_REFRESH_TOKEN }}
           SHORTS_NICHE: ${{ vars.SHORTS_NICHE }}
           SHORTS_VOICE: ${{ vars.SHORTS_VOICE }}
-          SHORTS_PRIVACY: ${{ vars.SHORTS_PRIVACY }}
+          SHORTS_PRIVACY: ${{ inputs.privacy || vars.SHORTS_PRIVACY }}
           SHORTS_NARRATOR: ${{ vars.SHORTS_NARRATOR }}
         run: |
           UPLOAD_FLAG="--upload"
