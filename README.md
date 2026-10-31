@@ -29,6 +29,10 @@
 ### 2) مفتاح Claude (لأفكار لا تنتهي)
 من [console.anthropic.com](https://console.anthropic.com) ← API Keys ← أنشئ مفتاحاً. تكلفة الفيديو الواحد أقل من سنت تقريباً.
 
+**بديل: OmniRoute** — بعد ما تربط مزوّد في OmniRoute، انسخ المفتاح من **Dashboard ← Endpoints** وحطه في `OMNIROUTE_API_KEY`. إذا موجود، يُستخدم قبل Claude (ولو فشل يرجع لـ Claude ثم لبنك الأفكار).
+- `OMNIROUTE_BASE_URL` (افتراضي `http://localhost:20128/v1`) — في GitHub Actions لازم يكون رابط عام يوصله الإنترنت، مو localhost.
+- `OMNIROUTE_MODEL` (افتراضي `auto`).
+
 ### 3) مفتاح Pixabay (لفيديوهات الخلفية – مجاني)
 سجّل في [pixabay.com](https://pixabay.com/accounts/register/) ثم افتح [pixabay.com/api/docs](https://pixabay.com/api/docs/) وانسخ المفتاح الظاهر بجانب `key`.
 (Pexels أوقف إصدار مفاتيح جديدة، لكن النظام يدعمه لو عندك مفتاح قديم: `PEXELS_API_KEY`.)
@@ -53,6 +57,7 @@
 | الاسم | القيمة |
 |---|---|
 | `ANTHROPIC_API_KEY` | مفتاح Claude |
+| `OMNIROUTE_API_KEY` | (اختياري) مفتاح OmniRoute — وضيف `OMNIROUTE_BASE_URL` في تبويب Variables |
 | `PIXABAY_API_KEY` | مفتاح Pixabay |
 | `YOUTUBE_CLIENT_ID` | من الخطوة 4 |
 | `YOUTUBE_CLIENT_SECRET` | من الخطوة 4 |
