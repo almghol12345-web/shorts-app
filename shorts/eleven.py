@@ -24,6 +24,8 @@ def _headers(key: str) -> dict:
 def _pick_shared_voice(key: str) -> dict | None:
     """A male Saudi (else Gulf, else any Arabic) voice suited to narration, most used first."""
     tries = [
+        {"language": "ar", "gender": "male", "locale": "ar-SA", "use_cases": "narrative_story"},
+        {"language": "ar", "gender": "male", "locale": "ar-SA"},
         {"language": "ar", "gender": "male", "accent": "saudi"},
         {"language": "ar", "gender": "male", "search": "saudi"},
         {"language": "ar", "gender": "male", "search": "gulf"},
