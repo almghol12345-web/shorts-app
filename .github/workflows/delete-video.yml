@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       video_id:
-        description: "YouTube video id to delete"
+        description: "YouTube video id(s) to delete, comma-separated"
         required: true
 
 jobs:
