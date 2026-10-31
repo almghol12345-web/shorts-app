@@ -13,7 +13,7 @@ import requests
 
 API = "https://api.elevenlabs.io"
 MODEL = "eleven_multilingual_v2"
-VOICE_NAME = "Dahsha Saudi Narrator"   # colloquial Saudi/Gulf voice
+VOICE_NAME = "Dahsha Saudi Dialect"   # colloquial Saudi voice
 SETTINGS = {"stability": 0.36, "similarity_boost": 0.8, "style": 0.4, "use_speaker_boost": True}  # chatty, natural
 
 
@@ -49,6 +49,12 @@ def _pick_shared_voice(key: str) -> dict | None:
             found += [v for v in voices if _is_dialect(v)]
         if found:
             break
+    # prefer voices that describe themselves as everyday dialect over formal narrators
+    def colloquial(v):
+        name = str(v.get("name", "")).lower() + " " + str(v.get("description", "")).lower()
+        return (3 * ("dialect" in name) + 2 * ("authentic" in name) + 2 * ("natural" in name)
+                + ("conversational" in name) - ("narrator" in name))
+    found.sort(key=colloquial, reverse=True)   # stable: popularity order kept within a score
     for v in found[:8]:
         print(f"[voice] candidate: {v.get('name')} | {v.get('accent')} | {v.get('locale')}")
     return found[0] if found else fallback
