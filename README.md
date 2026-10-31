@@ -102,3 +102,10 @@ python -m pytest -q
 موسيقى خلفية (اختياري): ضع ملفات mp3 مرخّصة (مثل مكتبة YouTube Audio Library) في `assets/music/`.
 
 الخط: Noto Sans Arabic (رخصة OFL – `assets/fonts/OFL.txt`).
+
+---
+
+## 🎮 لعبة Ashfall: Last Bastion
+
+يحتوي مجلد [`game/`](game/README.md) على لعبة استراتيجية بقاء أصلية للجوال (بناء قاعدة، أبطال، جيوش، خريطة عالم، تحالفات، PvP).
+التشغيل: `cd game && npm start` ثم افتح `http://localhost:8080`.

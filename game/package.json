@@ -1,0 +1,12 @@
+{
+  "name": "ashfall-last-bastion",
+  "version": "0.1.0",
+  "description": "Ashfall: Last Bastion — a post-apocalyptic survival strategy game for mobile browsers",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "start": "node server/server.js",
+    "test": "node --test tests/*.test.js"
+  },
+  "engines": { "node": ">=18" }
+}
