@@ -13,34 +13,45 @@ import requests
 
 API = "https://api.elevenlabs.io"
 MODEL = "eleven_multilingual_v2"
-VOICE_NAME = "Dahsha Narrator"
-SETTINGS = {"stability": 0.42, "similarity_boost": 0.8, "style": 0.3, "use_speaker_boost": True}
+VOICE_NAME = "Dahsha Saudi Narrator"   # colloquial Saudi/Gulf voice
+SETTINGS = {"stability": 0.36, "similarity_boost": 0.8, "style": 0.4, "use_speaker_boost": True}  # chatty, natural
 
 
 def _headers(key: str) -> dict:
     return {"xi-api-key": key, "Content-Type": "application/json"}
 
 
+DIALECT_WORDS = ("saudi", "najdi", "hejazi", "hijazi", "gulf", "khaleeji", "khaliji", "emirati", "kuwaiti")
+
+
+def _is_dialect(v: dict) -> bool:
+    text = " ".join(str(v.get(k, "")) for k in ("accent", "name", "description", "descriptive")).lower()
+    return any(w in text for w in DIALECT_WORDS) and "standard" not in str(v.get("accent", "")).lower()
+
+
 def _pick_shared_voice(key: str) -> dict | None:
-    """A male Saudi (else Gulf, else any Arabic) voice suited to narration, most used first."""
-    tries = [
-        {"language": "ar", "gender": "male", "locale": "ar-SA", "use_cases": "narrative_story"},
-        {"language": "ar", "gender": "male", "locale": "ar-SA"},
-        {"language": "ar", "gender": "male", "accent": "saudi"},
-        {"language": "ar", "gender": "male", "search": "saudi"},
-        {"language": "ar", "gender": "male", "search": "gulf"},
-        {"language": "ar", "gender": "male", "use_cases": "narrative_story"},
-        {"language": "ar", "gender": "male"},
-    ]
-    for params in tries:
-        resp = requests.get(f"{API}/v1/shared-voices", headers=_headers(key), timeout=30,
-                            params={"page_size": 30, "sort": "cloned_by_count", **params})
-        if not resp.ok:
-            continue
-        voices = resp.json().get("voices", [])
-        if voices:
-            return voices[0]
-    return None
+    """A male voice that speaks colloquial Saudi/Gulf Arabic (not Modern Standard),
+    most used first; falls back to any Arabic male voice."""
+    found, fallback = [], None
+    for params in ({"language": "ar", "gender": "male", "search": "saudi"},
+                   {"language": "ar", "gender": "male", "search": "najdi"},
+                   {"language": "ar", "gender": "male", "search": "gulf"},
+                   {"language": "ar", "gender": "male"}):
+        for page in range(3):
+            resp = requests.get(f"{API}/v1/shared-voices", headers=_headers(key), timeout=30,
+                                params={"page_size": 100, "page": page, "sort": "cloned_by_count", **params})
+            if not resp.ok:
+                break
+            voices = resp.json().get("voices", [])
+            if not voices:
+                break
+            fallback = fallback or voices[0]
+            found += [v for v in voices if _is_dialect(v)]
+        if found:
+            break
+    for v in found[:8]:
+        print(f"[voice] candidate: {v.get('name')} | {v.get('accent')} | {v.get('locale')}")
+    return found[0] if found else fallback
 
 
 def voice_id(key: str) -> str:

@@ -43,7 +43,9 @@ def make_one(cfg: Config, do_upload: bool, keep_work: bool = False) -> dict:
         script.description += "\n\nالصور:\n" + "\n".join(credits)
     spans = line_spans(narration, len(script.lines))
     starts = [sum(spans[:i]) for i in range(len(spans))]
-    narrator, _ = animate.character_track(narration.audio, starts, narration.length, work / "narrator.mov")
+    narrator = None
+    if cfg.show_narrator:
+        narrator, _ = animate.character_track(narration.audio, starts, narration.length, work / "narrator.mov")
     video = render.render(cfg, narration, bg, work, cfg.output_dir / f"{name}.mp4", narrator=narrator)
     print(f"[video] {video}")
     mids = [starts[i] + spans[i] / 2 for i in range(len(spans))]

@@ -70,6 +70,7 @@ jobs:
           SHORTS_NICHE: ${{ vars.SHORTS_NICHE }}
           SHORTS_VOICE: ${{ vars.SHORTS_VOICE }}
           SHORTS_PRIVACY: ${{ vars.SHORTS_PRIVACY }}
+          SHORTS_NARRATOR: ${{ vars.SHORTS_NARRATOR }}
         run: |
           UPLOAD_FLAG="--upload"
           if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "${{ inputs.upload }}" != "true" ]; then UPLOAD_FLAG=""; fi

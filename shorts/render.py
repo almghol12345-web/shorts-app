@@ -28,8 +28,10 @@ def render(cfg: Config, narration: Narration, background: Path, workdir: Path, o
            narrator: Path | None = None) -> Path:
     total = narration.length
     ass = workdir / "captions.ass"
+    from .captions import CAPTION_Y, CAPTION_Y_NARRATOR
     ass.write_text(build_ass(narration.words, narration.line_sizes, total,
-                             cfg.width, cfg.height, cfg.font_name), encoding="utf-8")
+                             cfg.width, cfg.height, cfg.font_name,
+                             caption_y=CAPTION_Y_NARRATOR if narrator else CAPTION_Y), encoding="utf-8")
 
     music = sorted(cfg.music_dir.glob("*.mp3")) if cfg.music_dir.exists() else []
     cmd = ["ffmpeg", "-y", "-stream_loop", "-1", "-i", str(background.resolve()),

@@ -3,7 +3,8 @@ plus a progress bar. libass (inside ffmpeg) shapes Arabic right-to-left."""
 from .voice import Segment
 
 MAX_WORDS = 2
-CAPTION_Y = 0.30  # share of the height: above the narrator's head
+CAPTION_Y = 0.68          # share of the height: below centre, above YouTube's buttons
+CAPTION_Y_NARRATOR = 0.30  # above the narrator's head when he is on screen
 
 
 def _ts(seconds: float) -> str:
@@ -44,7 +45,7 @@ def pieces(words: list[Segment], line_sizes: list[int], total: float) -> list[tu
 
 
 def build_ass(words: list[Segment], line_sizes: list[int], total: float,
-              width: int, height: int, font: str) -> str:
+              width: int, height: int, font: str, caption_y: float = CAPTION_Y) -> str:
     header = f"""[Script Info]
 ScriptType: v4.00+
 PlayResX: {width}
@@ -62,7 +63,7 @@ Style: Bar,{font},20,&H00303BFF,&H00303BFF,&H00000000,&H00000000,0,0,0,0,100,100
 Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
 """
     events = []
-    cy = int(height * CAPTION_Y)
+    cy = int(height * caption_y)
     for line_index, seg in pieces(words, line_sizes, total):
         style = "Hook" if line_index == 0 else "Caption"
         anim = r"{\pos(%d,%d)\fscx85\fscy85\t(0,80,\fscx105\fscy105)\t(80,140,\fscx100\fscy100)}" % (width // 2, cy)
