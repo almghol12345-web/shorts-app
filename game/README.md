@@ -5,6 +5,8 @@ heroes, train an army, fight the horde, raid rivals and team up in alliances.
 All code, art, names and characters are original — the art is drawn procedurally in code, so the
 game ships with no image or audio files.
 
+![Ashfall screenshots](docs/preview.png)
+
 ## Run it
 
 ```bash
