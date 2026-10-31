@@ -61,16 +61,38 @@ def _pick_shared_voice(key: str) -> dict | None:
     return found[0] if found else fallback
 
 
+def _norm(text: str) -> str:
+    import re
+    return re.sub(r"[^a-z\u0600-\u06ff]", "", str(text).lower())
+
+
+SPELLINGS = {"abdulrahman": ["Abdulrahman", "Abdul Rahman", "Abdelrahman", "Abdurrahman", "Abdalrahman"]}
+
+
 def _find_shared_by_name(key: str, wanted: str) -> dict | None:
-    """A library voice whose name contains `wanted` (e.g. "Omar - Hijazi")."""
-    resp = requests.get(f"{API}/v1/shared-voices", headers=_headers(key), timeout=30,
-                        params={"page_size": 100, "language": "ar", "search": wanted.split(" - ")[0]})
-    if not resp.ok:
+    """A library voice whose name matches `wanted` (spacing and spelling variants allowed),
+    preferring Saudi / Gulf accents."""
+    base = wanted.split(" - ")[0]
+    queries = SPELLINGS.get(_norm(base), [base])
+    targets = {_norm(q) for q in queries} | {_norm(base)}
+    matches = []
+    for q in queries:
+        resp = requests.get(f"{API}/v1/shared-voices", headers=_headers(key), timeout=30,
+                            params={"page_size": 100, "language": "ar", "search": q})
+        if not resp.ok:
+            continue
+        for v in resp.json().get("voices", []):
+            name = _norm(v.get("name", ""))
+            if any(t in name for t in targets) and _norm(wanted) in name + _norm(v.get("accent", "")) + name:
+                matches.append(v)
+            elif any(t in name for t in targets):
+                matches.append(v)
+    if not matches:
         return None
-    for v in resp.json().get("voices", []):
-        if wanted.lower() in str(v.get("name", "")).lower():
-            return v
-    return None
+    matches.sort(key=lambda v: (not _is_dialect(v), -int(v.get("cloned_by_count") or 0)))
+    for v in matches[:5]:
+        print(f"[voice] match: {v.get('name')} | {v.get('accent')} | {v.get('locale')}")
+    return matches[0]
 
 
 def voice_id(key: str) -> str:
