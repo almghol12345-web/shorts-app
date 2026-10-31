@@ -104,12 +104,19 @@ jobs:
           git push -qf "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" previews
 
       - name: Save published-topics history
+        if: always()
         run: |
-          if [ -n "$(git status --porcelain data/history.json)" ]; then
-            git config user.name "shorts-bot"
-            git config user.email "shorts-bot@users.noreply.github.com"
+          [ -f output/published.jsonl ] || exit 0
+          git config user.name "shorts-bot"
+          git config user.email "shorts-bot@users.noreply.github.com"
+          # merge onto the latest branch tip (no rebase conflicts with other edits)
+          for i in 1 2 3; do
+            git fetch -q origin "${GITHUB_REF_NAME}"
+            git checkout -q -f -B history-update "origin/${GITHUB_REF_NAME}"
+            python scripts/merge_history.py output/published.jsonl data/history.json
             git add data/history.json
-            git commit -m "chore: record published Shorts"
-            git pull --rebase origin "${GITHUB_REF_NAME}"
-            git push
-          fi
+            git commit -qm "chore: record published Shorts" || exit 0
+            git push -q origin "HEAD:${GITHUB_REF_NAME}" && exit 0
+            sleep 5
+          done
+          exit 1

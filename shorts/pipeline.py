@@ -77,7 +77,8 @@ def make_one(cfg: Config, do_upload: bool, keep_work: bool = False) -> dict:
             from .upload import upload
             video_id = upload(cfg, script, video)
             print(f"[upload] https://youtube.com/shorts/{video_id}")
-            history.record(cfg.history_file, script.topic, script.title, video_id)
+            history.record(cfg.history_file, script.topic, script.title, video_id,
+                           journal=cfg.output_dir / "published.jsonl")
 
     if not keep_work:
         shutil.rmtree(work, ignore_errors=True)

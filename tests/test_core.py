@@ -297,3 +297,13 @@ def test_outro_keeps_visual_plan_aligned():
     add_outro(s)
     add_outro(s)                      # idempotent
     assert s.lines == ["a", "b", OUTRO] and len(s.visual_plan()) == 3
+
+
+def test_history_journal_merges_without_duplicates(tmp_path):
+    hist, journal = tmp_path / "h.json", tmp_path / "j.jsonl"
+    history.record(hist, "a", "A", "id1", journal=journal)
+    other = tmp_path / "remote.json"            # the branch tip someone else changed meanwhile
+    history.record(other, "z", "Z", "id9")
+    assert history.merge_journal(journal, other) == 1
+    assert history.merge_journal(journal, other) == 0
+    assert [i["video_id"] for i in history.load(other)] == ["id9", "id1"]
