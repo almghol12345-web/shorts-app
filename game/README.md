@@ -21,6 +21,8 @@ Screen" for a full-screen app. It also runs from any static host (GitHub Pages, 
 
 ## Mobile apps (iOS & Android)
 
+![Ashfall on five phone sizes](docs/phones.png)
+
 The game is built phone-first: portrait 9:16, touch controls (tap, drag, pinch), safe-area aware,
 tested on 320×568 up to 430×932 screens. On tablets/desktop it shows as a centered portrait column;
 a sideways phone gets a "rotate" prompt. The native apps are generated with
