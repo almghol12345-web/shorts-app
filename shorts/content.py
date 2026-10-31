@@ -1,7 +1,8 @@
 """Turns a niche into a ready-to-record Short script.
 
-Uses Claude when ANTHROPIC_API_KEY is set; otherwise falls back to a small
-bank of hand-checked facts so the pipeline always works.
+Uses OmniRoute when OMNIROUTE_API_KEY is set, Claude when ANTHROPIC_API_KEY is
+set; otherwise falls back to a small bank of hand-checked facts so the pipeline
+always works.
 """
 import json
 import random
@@ -110,6 +111,49 @@ def generate_with_claude(cfg: Config, used: list[str]) -> Script:
         raise RuntimeError("Claude declined to write this script")
     text = next(b.text for b in response.content if b.type == "text")
     return Script(**json.loads(text))
+
+
+def _extract_json(text: str) -> dict:
+    """Models behind a router don't all honour JSON mode: strip code fences / chatter."""
+    text = text.strip()
+    if text.startswith("```"):
+        text = text.split("\n", 1)[1] if "\n" in text else ""
+        text = text.rsplit("```", 1)[0]
+    start, end = text.find("{"), text.rfind("}")
+    if start == -1 or end == -1:
+        raise ValueError("no JSON object in the model reply")
+    return json.loads(text[start:end + 1])
+
+
+def generate_with_omniroute(cfg: Config, used: list[str]) -> Script:
+    """OmniRoute exposes an OpenAI-compatible /chat/completions endpoint."""
+    import requests
+
+    prompt = PROMPT.format(niche=cfg.niche, language=cfg.language, used=", ".join(used[-200:]) or "none")
+    prompt += ("\nReply with ONLY a JSON object (no markdown) with exactly these keys: "
+               + ", ".join(SCHEMA["required"]) + ". 'topic', 'title' and 'description' are strings, "
+               "the others are arrays of strings.")
+    url = cfg.omniroute_url.rstrip("/") + "/chat/completions"
+    headers = {"Authorization": f"Bearer {cfg.omniroute_key}", "Content-Type": "application/json"}
+    body = {
+        "model": cfg.omniroute_model,
+        "messages": [{"role": "user", "content": prompt}],
+        "max_tokens": 4000,
+        "response_format": {"type": "json_object"},
+    }
+    resp = requests.post(url, headers=headers, json=body, timeout=180)
+    if resp.status_code == 400:
+        # Some upstream providers reject response_format; retry with plain text.
+        body.pop("response_format")
+        resp = requests.post(url, headers=headers, json=body, timeout=180)
+    resp.raise_for_status()
+    text = resp.json()["choices"][0]["message"]["content"] or ""
+    data = _extract_json(text)
+    fields = {k: data[k] for k in SCHEMA["properties"] if k in data}
+    for key in ("topic", "title", "lines", "description"):
+        if not fields.get(key):
+            raise RuntimeError(f"OmniRoute reply is missing '{key}'")
+    return Script(**fields)
 
 
 FALLBACK_BANK = [
@@ -272,6 +316,11 @@ def generate_offline(used: list[str]) -> Script:
 
 
 def generate(cfg: Config, used: list[str]) -> Script:
+    if cfg.omniroute_key:
+        try:
+            return generate_with_omniroute(cfg, used)
+        except Exception as exc:
+            print(f"[warn] OmniRoute failed ({exc}); falling back")
     if cfg.anthropic_key:
         return generate_with_claude(cfg, used)
     return generate_offline(used)

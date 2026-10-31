@@ -289,3 +289,46 @@ def test_elevenlabs_failure_falls_back_to_free_voice(monkeypatch, tmp_path):
     monkeypatch.setattr(voice, "_tts", fake_free)
     n = voice.synthesize(["أهلا"], "v", tmp_path)
     assert not n.silent and [w.text for w in n.words] == ["أهلا"]
+
+
+def test_omniroute_response_is_parsed(monkeypatch):
+    import json
+
+    import requests
+
+    from shorts.config import Config
+
+    payload = {"topic": "t", "title": "x #shorts", "lines": ["a", "b"], "description": "d",
+               "tags": ["k"], "search_terms": ["sea"], "visuals": ["v1", "v2"], "scenes": ["s1", "s2"]}
+    seen = {}
+
+    class Resp:
+        status_code = 200
+        def raise_for_status(self): pass
+        def json(self):
+            return {"choices": [{"message": {"content": "```json\n" + json.dumps(payload) + "\n```"}}]}
+
+    def fake_post(url, headers, json, timeout):
+        seen.update(url=url, auth=headers["Authorization"], model=json["model"])
+        return Resp()
+
+    monkeypatch.setattr(requests, "post", fake_post)
+    cfg = Config()
+    cfg.omniroute_key, cfg.omniroute_url, cfg.omniroute_model = "ok", "http://x:20128/v1/", "auto"
+    script = content.generate(cfg, [])
+    assert seen == {"url": "http://x:20128/v1/chat/completions", "auth": "Bearer ok", "model": "auto"}
+    assert script.lines == ["a", "b"] and script.scenes == ["s1", "s2"]
+
+
+def test_omniroute_failure_falls_back_offline(monkeypatch):
+    import requests
+
+    from shorts.config import Config
+
+    def boom(*a, **k):
+        raise requests.ConnectionError("down")
+
+    monkeypatch.setattr(requests, "post", boom)
+    cfg = Config()
+    cfg.omniroute_key, cfg.anthropic_key = "ok", ""
+    assert content.generate(cfg, []).lines
