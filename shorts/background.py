@@ -51,6 +51,7 @@ class Sources:
     last_credit: str = ""
     seed: int = field(default_factory=lambda: random.randint(1, 10**6))
     ai_images: int = 0
+    ai_failures: int = 0      # consecutive shots the image generator could not draw
 
 
 def _download(link: str, out: Path) -> None:
@@ -248,11 +249,17 @@ def shot(spec: str, seconds: float, out: Path, src: Sources, width: int, height:
     raw = out.with_suffix(".src")
     if spec.startswith("ai:"):
         scene, _, fallback = spec[3:].partition(" >> ")
-        if fetch_ai_image(scene.strip(), raw, src, width, height):
+        # after two shots in a row fail, the generator is down: go straight to the
+        # real photo / footage of the event instead of waiting on retries
+        if src.ai_failures < 2 and fetch_ai_image(scene.strip(), raw, src, width, height,
+                                                  attempts=2):
+            src.ai_failures = 0
             art_clip(raw, seconds, out, width, height, index)
             print(f"[visual] {out.stem}: ai art for '{scene.strip()[:60]}'")
             return
-        print(f"[visual] {out.stem}: ai art failed, using fallback")
+        if src.ai_failures < 2:
+            src.ai_failures += 1
+        print(f"[visual] {out.stem}: using the event's photo/footage instead of ai art")
         spec = fallback.strip() or MOOD_FALLBACK
     stock = spec
     if spec.startswith("wiki:"):
