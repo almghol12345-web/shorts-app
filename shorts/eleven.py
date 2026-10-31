@@ -13,7 +13,8 @@ import requests
 
 API = "https://api.elevenlabs.io"
 MODEL = "eleven_multilingual_v2"
-VOICE_NAME = "Dahsha Saudi Dialect"   # colloquial Saudi voice
+VOICE_NAME = "Dahsha Saudi Dialect"   # colloquial Saudi voice (auto-pick fallback)
+CHANNEL_VOICE = "Omar - Hijazi"        # the channel's voice, chosen by the owner
 SETTINGS = {"stability": 0.36, "similarity_boost": 0.8, "style": 0.4, "use_speaker_boost": True}  # chatty, natural
 
 
@@ -76,7 +77,7 @@ def voice_id(key: str) -> str:
     chosen = os.environ.get("ELEVENLABS_VOICE_ID", "").strip()
     if chosen:
         return chosen
-    pick = os.environ.get("ELEVENLABS_VOICE_PICK", "").strip()   # try a specific voice by name
+    pick = os.environ.get("ELEVENLABS_VOICE_PICK", "").strip() or CHANNEL_VOICE
     name = f"Dahsha {pick}"[:50] if pick else VOICE_NAME
     resp = requests.get(f"{API}/v1/voices", headers=_headers(key), timeout=30)
     resp.raise_for_status()
