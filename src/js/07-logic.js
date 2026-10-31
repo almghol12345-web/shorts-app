@@ -10,12 +10,12 @@ function give(r) {
 }
 const GEMRATE = { food: 120, wood: 120, iron: 60, fuel: 30, exp: 40 };
 function missingGems(c) { let g = 0; for (const k in c) { const miss = c[k] - (S.res[k] || 0); if (miss > 0) g += Math.ceil(miss / (GEMRATE[k] || 1)); } return g; }
-function costHTML(c) { return Object.keys(c).map(k => `<span class="cc ${(S.res[k] || 0) >= c[k] ? '' : 'lack'}">${RES[k].i} ${fmt(c[k])}</span>`).join(' '); }
+function costHTML(c) { return Object.keys(c).map(k => `<span class="cc ${(S.res[k] || 0) >= c[k] ? '' : 'lack'}">${ico(k)} ${fmt(c[k])}</span>`).join(' '); }
 function rewHTML(r) {
   return Object.keys(r || {}).filter(k => r[k]).map(k => {
     if (k === 'hero') return `<span class="cc" style="color:var(--r3)">🦸 ${esc(L(HB[r[k]].n))}</span>`;
     if (k === 'vip') return `<span class="cc" style="color:var(--vip)">VIP +${fmt(r[k])}</span>`;
-    const d = RES[k] || ITEMS[k] || { i: '🪖' }; return `<span class="cc">${d.i} ${fmt(r[k])}</span>`;
+    const d = RES[k] || ITEMS[k] || { i: '🪖' }; return `<span class="cc">${ICO[k] ? ico(k) : d.i} ${fmt(r[k])}</span>`;
   }).join(' ');
 }
 const mulR = (r, m) => { if (m === 1) return r; const o = {}; for (const k in r) o[k] = typeof r[k] === 'number' && k !== 'ticket' && k !== 'hero' ? Math.round(r[k] * m) : r[k]; return o; };

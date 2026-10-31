@@ -96,7 +96,7 @@ function portraitSVG(p, rar) {
 }
 const PORTRAIT = {}, PORTRAIT_IMG = {};
 function portraitURI(id) {
-  if (!PORTRAIT[id] && typeof HERO_ART !== 'undefined' && HERO_ART[id]) PORTRAIT[id] = HERO_ART[id];
+  if (!PORTRAIT[id] && typeof HERO_ART !== 'undefined' && HERO_ART[id]) PORTRAIT[id] = toBlobURL(HERO_ART[id]);
   if (!PORTRAIT[id]) { const h = HB[id]; PORTRAIT[id] = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(portraitSVG(h.look || {}, h.r)); }
   return PORTRAIT[id];
 }
@@ -104,3 +104,17 @@ function portraitImg(id) {
   if (!PORTRAIT_IMG[id]) { const im = new Image(); im.src = portraitURI(id); PORTRAIT_IMG[id] = im; }
   return PORTRAIT_IMG[id];
 }
+
+/* ---------- game art (buildings, enemies, backgrounds, icons) ---------- */
+function toBlobURL(u) {
+  try { const i = u.indexOf(','), mime = u.slice(5, u.indexOf(';')), bin = atob(u.slice(i + 1)), arr = new Uint8Array(bin.length); for (let j = 0; j < bin.length; j++) arr[j] = bin.charCodeAt(j); return URL.createObjectURL(new Blob([arr], { type: mime })); } catch (e) { return u; }
+}
+const ARTU = {}, ARTC = {};
+function artURL(k) { if (!(k in ARTU)) ARTU[k] = (typeof ART !== 'undefined' && ART[k]) ? toBlobURL(ART[k]) : ''; return ARTU[k]; }
+function artImg(k) { if (!(k in ARTC)) { const u = artURL(k); if (u) { const im = new Image(); im.src = u; ARTC[k] = im; } else ARTC[k] = null; } return ARTC[k]; }
+const artReady = im => !!(im && im.complete && im.naturalWidth);
+const ICO = { food: 'i_food', wood: 'i_wood', iron: 'i_iron', fuel: 'i_fuel', gems: 'i_gems', ticket: 'i_ticket', sp5: 'i_speed', sp60: 'i_speed' };
+function ico(k, cls) { const u = ICO[k] && artURL(ICO[k]); if (u) return `<img class="ico ${cls || ''}" src="${u}" alt="" draggable="false">`; const d = RES[k] || ITEMS[k]; return d ? d.i : ''; }
+function bImg(tp, cls) { const u = artURL('b_' + tp); return u ? `<img class="bimg ${cls || ''}" src="${u}" alt="" draggable="false">` : `<span class="ti ${cls || ''}">${BT[tp].i}</span>`; }
+const ZIMG = { w: 'z_w', run: 'z_run', sp: 'z_sp', br: 'z_br', boss: 'z_boss', wb: 'z_wb' };
+function preloadArt() { if (typeof ART === 'undefined') return; Object.keys(ART).forEach(k => { if (!k.startsWith('b_') && !k.startsWith('i_')) artImg(k); }); const b = artURL('bg_base'); if (b) document.documentElement.style.setProperty('--bg-base', `url("${b}")`); }

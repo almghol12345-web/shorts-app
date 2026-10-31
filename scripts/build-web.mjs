@@ -9,7 +9,9 @@ const jsFiles = ['config.js', ...fs.readdirSync('src/js').filter(f => /^\d/.test
 // hero artwork from assets/heroes/<id>.jpg is embedded as data URIs so the game works offline and as one file
 const heroArt = fs.existsSync('assets/heroes') ? fs.readdirSync('assets/heroes').filter(f => f.endsWith('.jpg')).sort() : [];
 const artJs = 'const HERO_ART = {\n' + heroArt.map(f => `  ${JSON.stringify(f.replace('.jpg', ''))}: 'data:image/jpeg;base64,${fs.readFileSync('assets/heroes/' + f).toString('base64')}',`).join('\n') + '\n};\n';
-const js = jsFiles.map(f => `/* ---- ${f} ---- */\n` + (f === '02b-portraits.js' ? artJs : '') + read('src/js/' + f)).join('\n');
+const artFiles = fs.existsSync('assets/art') ? fs.readdirSync('assets/art').filter(f => f.endsWith('.webp')).sort() : [];
+const artJs2 = 'const ART = {\n' + artFiles.map(f => `  ${JSON.stringify(f.replace('.webp', ''))}: 'data:image/webp;base64,${fs.readFileSync('assets/art/' + f).toString('base64')}',`).join('\n') + '\n};\n';
+const js = jsFiles.map(f => `/* ---- ${f} ---- */\n` + (f === '02b-portraits.js' ? artJs + artJs2 : '') + read('src/js/' + f)).join('\n');
 const game = `(function(){'use strict';\n${js}\n})();`;
 new Function(game); // syntax check
 const AR = 'U+0600-06FF,U+0750-077F,U+0870-08FF,U+200C-200E,U+2010-2011,U+FB50-FDFF,U+FE70-FEFF';

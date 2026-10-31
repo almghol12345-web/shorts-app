@@ -149,6 +149,7 @@ function start(data) {
   if (data && data.S) { S = migrate(data.S); if (typeof data.tab === 'string') tab = data.tab; }
   else { const st = loadLocal(); if (st) info = catchUp(st); else S = newState(); }
   setLang(S.lang || guessLang());
+  preloadArt(); $$('[data-ico]').forEach(e => { const h = ico(e.dataset.ico); if (h.startsWith('<img')) e.innerHTML = h; });
   lastTick = now(); ensureDaily(); ensurePass();
   if (!S.world.nodes) genWorld();
   render();

@@ -78,17 +78,17 @@ VIEWS.base = () => {
   <div class="shortcuts">${shortcuts.map(([a, i, n, d]) => `<button class="sc" data-a="${a}">${d ? '<span class="dot"></span>' : ''}<span class="si">${i}</span>${n}</button>`).join('')}</div>
   <div class="compound">${PLOTS.map(tileHTML).join('')}</div>
   <div class="builders"><h3>${t('builders')} ${S.builds.length}/${maxBuilders()}</h3>
-  ${S.builds.length ? S.builds.map(b => `<button class="bq" data-a="bld" data-x="${b.k}"><span>${BT[PLOT[b.k].t].i}</span><span>${L(BT[PLOT[b.k].t].n)} → ${b.to}</span><span class="prog"><i data-bar data-st="${b.st}" data-en="${b.end}"></i></span><b class="num" data-end="${b.end}"></b></button>`).join('') : `<div class="bq muted">${t('builders_idle')}</div>`}
+  ${S.builds.length ? S.builds.map(b => `<button class="bq" data-a="bld" data-x="${b.k}">${bImg(PLOT[b.k].t, 'mini')}<span>${L(BT[PLOT[b.k].t].n)} → ${b.to}</span><span class="prog"><i data-bar data-st="${b.st}" data-en="${b.end}"></i></span><b class="num" data-end="${b.end}"></b></button>`).join('') : `<div class="bq muted">${t('builders_idle')}</div>`}
   ${S.rq ? `<button class="bq" data-a="bld" data-x="lab"><span>🔬</span><span>${L(TECH[S.rq.k].n)}</span><span class="prog"><i data-bar data-st="${S.rq.st}" data-en="${S.rq.end}"></i></span><b class="num" data-end="${S.rq.end}"></b></button>` : ''}
   ${S.tq ? `<button class="bq" data-a="bld" data-x="barracks"><span>🎖️</span><span>${t('training_n', S.tq.n)}</span><span class="prog"><i data-bar data-st="${S.tq.st}" data-en="${S.tq.end}"></i></span><b class="num" data-end="${S.tq.end}"></b></button>` : ''}
   </div></div>`;
 };
 function tileHTML(p) {
   const b = S.b[p.k], T = BT[p.t], q = S.builds.find(x => x.k === p.k), hq = p.t === 'hq' ? ' hq' : '';
-  if (hqLv() < p.u) return `<div class="tile locked${hq}" role="button" tabindex="0" data-a="locked" data-x="${p.u}"><span class="ti dim">🔒</span><span class="tn">${L(T.n)}</span><span class="ts">${t('hq_short', p.u)}</span></div>`;
-  if (!b.lv && !q) return `<div class="tile empty${hq}" role="button" tabindex="0" data-a="bld" data-x="${p.k}"><span class="ti dim">${T.i}</span><span class="tn">${L(T.n)}</span><span class="ts">+ ${t('build')}</span></div>`;
-  const bub = T.prod && b.lv ? `<button class="bub" data-acc="${p.k}" data-a="collect" data-x="${p.k}" hidden>${RES[T.prod].i}<span></span></button>` : '';
-  return `<div class="tile${hq}${q ? ' busy' : ''}" role="button" tabindex="0" data-tile="${p.k}" data-a="bld" data-x="${p.k}">${bub}${b.lv ? `<span class="lv num">${b.lv}</span>` : ''}${!q && canUpgradeNow(p.k) ? '<span class="upok">↑</span>' : ''}<span class="ti">${T.i}</span><span class="tn">${L(T.n)}</span>${q ? `<span class="tt num" data-end="${q.end}"></span><span class="prog tbar"><i data-bar data-st="${q.st}" data-en="${q.end}"></i></span>` : ''}</div>`;
+  if (hqLv() < p.u) return `<div class="tile locked${hq}" role="button" tabindex="0" data-a="locked" data-x="${p.u}">${bImg(p.t, 'dim')}<span class="lockb">🔒</span><span class="tn">${L(T.n)}</span><span class="ts">${t('hq_short', p.u)}</span></div>`;
+  if (!b.lv && !q) return `<div class="tile empty${hq}" role="button" tabindex="0" data-a="bld" data-x="${p.k}">${bImg(p.t, 'ghost')}<span class="tn">${L(T.n)}</span><span class="ts">+ ${t('build')}</span></div>`;
+  const bub = T.prod && b.lv ? `<button class="bub" data-acc="${p.k}" data-a="collect" data-x="${p.k}" hidden>${ico(T.prod)}<span></span></button>` : '';
+  return `<div class="tile${hq}${q ? ' busy' : ''}" role="button" tabindex="0" data-tile="${p.k}" data-a="bld" data-x="${p.k}">${bub}${b.lv ? `<span class="lv num">${b.lv}</span>` : ''}${!q && canUpgradeNow(p.k) ? '<span class="upok">↑</span>' : ''}${bImg(p.t)}<span class="tn">${L(T.n)}</span>${q ? `<span class="tt num" data-end="${q.end}"></span><span class="prog tbar"><i data-bar data-st="${q.st}" data-en="${q.end}"></i></span>` : ''}</div>`;
 }
 VIEWS.heroes = () => {
   const own = ownedHeroes().sort((a, b) => heroPower(b) - heroPower(a));
@@ -180,7 +180,7 @@ function mBuilding(k) {
   const p = PLOT[k], tp = p.t, T = BT[tp], b = S.b[k], q = S.builds.find(x => x.k === k), to = b.lv + 1;
   let body = `<p class="muted">${L(T.d)}</p>`;
   if (b.lv || to <= MAXLV) body += `<div class="eff"><span>${b.lv ? effText(tp, b.lv) : t('not_built')}</span><span class="arr">${isRTL() ? '←' : '→'}</span><span class="nx">${to <= MAXLV ? effText(tp, to) : t('max')}</span></div>`;
-  if (T.prod && b.lv) { const cap = storeCap(tp, b.lv); body += `<div class="li"><span class="lic">${RES[T.prod].i}</span><div class="lit"><b>${t('stock')} ${fmt(b.acc)} / ${fmt(cap)}</b><small>${t('stock_note', storeH(lvOf('warehouse')))}</small></div><button class="btn gold sm" data-a="collect1" data-x="${k}">${t('collect')}</button></div>`; }
+  if (T.prod && b.lv) { const cap = storeCap(tp, b.lv); body += `<div class="li"><span class="lic">${ico(T.prod, 'big')}</span><div class="lit"><b>${t('stock')} ${fmt(b.acc)} / ${fmt(cap)}</b><small>${t('stock_note', storeH(lvOf('warehouse')))}</small></div><button class="btn gold sm" data-a="collect1" data-x="${k}">${t('collect')}</button></div>`; }
   if (q) body += speedHTML('b:' + k, q);
   else if (to <= MAXLV) {
     const reqs = bReq(k), c = bCost(tp, to), ms = bTime(tp, to), ok = reqs.every(r => r.ok), aff = canPay(c), g = gemCost(ms), busy = S.builds.length >= maxBuilders();
@@ -198,7 +198,7 @@ function mBuilding(k) {
     if (tp === 'tavern') body += `<button class="btn wide" data-a="tab" data-x="heroes">🦸 ${t('open_heroes')}</button>`;
     if (tp === 'wall') body += `<div class="li"><span class="lic">🛡️</span><div class="lit"><b>${t('base_def')} ${fmt(wallDef(b.lv) + S.troops * 10 + squadPower() * .5)}</b><small>${t('base_def_note')} <span class="num" data-end="${S.siegeAt}"></span></small></div></div>`;
   }
-  return sheet(T.i, L(T.n), b.lv ? t('level_n', b.lv) : t('not_built'), body);
+  return sheet(bImg(tp, 'hdr'), L(T.n), b.lv ? t('level_n', b.lv) : t('not_built'), body);
 }
 function barracksHTML() {
   const Lb = lvOf('barracks'), max = trainCount(); trainN = clamp(trainN, 1, Math.max(1, max));
@@ -410,11 +410,11 @@ function mSettings() {
   return sheet(`<span class="av c-me">${esc((S.name || 'C')[0])}</span>`, esc(S.name || t('commander')), t('profile') + ' · Lv ' + S.cmd.lv, body);
 }
 function mLang() {
-  return sheet('🌐', 'اختر اللغة · Choose language', '', `<button class="btn pri wide" data-a="langPick" data-x="ar" style="font-size:20px;min-height:60px">العربية</button><button class="btn pri wide" data-a="langPick" data-x="en" style="font-size:20px;min-height:60px">English</button>`);
+  return sheet('🌐', 'اختر اللغة · Choose language', '', `${artURL('title') ? `<img class="titleimg" src="${artURL('title')}" alt="">` : ''}<button class="btn pri wide" data-a="langPick" data-x="ar" style="font-size:20px;min-height:60px">العربية</button><button class="btn pri wide" data-a="langPick" data-x="en" style="font-size:20px;min-height:60px">English</button>`);
 }
 function mTut() {
   const items = [['🏚️', 'tut_base'], ['🦸', 'tut_heroes'], ['⚔️', 'tut_battle'], ['🗺️', 'tut_world'], ['🧱', 'tut_def'], ['🎖️', 'tut_pass'], ['🤝', 'tut_ally']];
-  return sheet('🧟', t('game_name'), t('quick_guide'), `<p>${t('tut_intro')}</p>${items.map(([i, k]) => `<div class="li"><span class="lic">${i}</span><div class="lit"><b>${t(k + '_t')}</b><small>${t(k + '_b')}</small></div></div>`).join('')}<button class="btn pri wide" data-a="close">${t('lets_go')}</button>`);
+  return sheet('🧟', t('game_name'), t('quick_guide'), `${artURL('title') ? `<img class="titleimg" src="${artURL('title')}" alt="">` : ''}<p>${t('tut_intro')}</p>${items.map(([i, k]) => `<div class="li"><span class="lic">${i}</span><div class="lit"><b>${t(k + '_t')}</b><small>${t(k + '_b')}</small></div></div>`).join('')}<button class="btn pri wide" data-a="close">${t('lets_go')}</button>`);
 }
 function mSiege(r) {
   const body = r.win ? `<p>${t('siege_win_b')}</p><div class="vs"><div class="stat"><small>${t('your_def')}</small><b class="num good">${fmt(r.def)}</b></div><b>${t('vs')}</b><div class="stat"><small>${t('horde')}</small><b class="num">${fmt(r.horde)}</b></div></div><h3>${t('loot')}</h3><div class="row">${rewHTML(r.r)}</div>`

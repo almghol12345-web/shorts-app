@@ -2,7 +2,7 @@
 const TS = 64, N = 41, C = 20, ZMIN = .45, ZMAX = 2.4;
 let cam = null, wCan = null, wCtx = null, wRaf = 0, wW = 0, wH = 0, wDpr = 1;
 const ptrs = new Map();
-let gest = null, vel = { x: 0, y: 0 }, lastTapAt = 0, lastTapPos = null, anim = null, lastFrame = 0, wFog = null;
+let wPat = null, gest = null, vel = { x: 0, y: 0 }, lastTapAt = 0, lastTapPos = null, anim = null, lastFrame = 0, wFog = null;
 function freeSpot(R) { for (let i = 0; i < 900; i++) { const x = Math.floor(R() * N), y = Math.floor(R() * N); if (Math.abs(x - C) <= 1 && Math.abs(y - C) <= 1) continue; if (S.world.nodes.some(n => n.x === x && n.y === y)) continue; return { x, y }; } return null; }
 function makeNode(k, R) {
   const p = freeSpot(R); if (!p) return null; const d = Math.hypot(p.x - C, p.y - C);
@@ -92,7 +92,7 @@ function homeCam() { return { x: C * TS + TS / 2, y: C * TS + TS / 2, z: 1 }; }
 function mountWorld() {
   wCan = $('#wcan'); if (!wCan) return; wCtx = wCan.getContext('2d');
   if (!cam) cam = homeCam();
-  sizeWorld(); ptrs.clear(); gest = null;
+  sizeWorld(); ptrs.clear(); gest = null; wPat = null;
   const pos = e => { const r = wCan.getBoundingClientRect(); return { x: e.clientX - r.left, y: e.clientY - r.top }; };
   wCan.onpointerdown = e => {
     wCan.setPointerCapture(e.pointerId); const p = pos(e); ptrs.set(e.pointerId, p); anim = null; vel = { x: 0, y: 0 };
@@ -168,14 +168,18 @@ function drawWorld(ts) {
   c.setTransform(wDpr * z, 0, 0, wDpr * z, wDpr * (wW / 2 - cam.x * z), wDpr * (wH / 2 - cam.y * z));
   const tl = s2w(0, 0), br = s2w(wW, wH);
   const x0 = Math.max(0, Math.floor(tl.x / TS)), x1 = Math.min(N - 1, Math.floor(br.x / TS)), y0 = Math.max(0, Math.floor(tl.y / TS)), y1 = Math.min(N - 1, Math.floor(br.y / TS));
+  const gi = artImg('bg_map'); if (!wPat && artReady(gi)) wPat = c.createPattern(gi, 'repeat');
+  if (wPat) { c.fillStyle = wPat; c.fillRect(x0 * TS, y0 * TS, (x1 - x0 + 1) * TS, (y1 - y0 + 1) * TS); }
   for (let y = y0; y <= y1; y++) for (let x = x0; x <= x1; x++) {
     const h = hash(x, y), px = x * TS, py = y * TS, d = Math.hypot(x - C, y - C);
     const shade = clamp(1 - d / 34, .35, 1);
     const base = h < .33 ? [27, 33, 36] : h < .66 ? [30, 36, 39] : [25, 31, 34];
-    c.fillStyle = `rgb(${base[0] * shade + (d > 14 ? 6 : 0)},${base[1] * shade},${base[2] * shade})`; c.fillRect(px, py, TS + .5, TS + .5);
-    if (x === C || y === C || (x % 10 === 0 && Math.abs(y - C) < 16) || (y % 10 === 0 && Math.abs(x - C) < 16)) { c.fillStyle = '#272b2d'; if (x === C || x % 10 === 0) c.fillRect(px + TS * .32, py, TS * .36, TS + .5); if (y === C || y % 10 === 0) c.fillRect(px, py + TS * .32, TS + .5, TS * .36); }
+    if (wPat) { c.fillStyle = `rgba(6,8,10,${(.18 + (1 - shade) * .7).toFixed(2)})`; c.fillRect(px, py, TS + .5, TS + .5); }
+    else { c.fillStyle = `rgb(${base[0] * shade + (d > 14 ? 6 : 0)},${base[1] * shade},${base[2] * shade})`; c.fillRect(px, py, TS + .5, TS + .5); }
+    if (!wPat && (x === C || y === C || (x % 10 === 0 && Math.abs(y - C) < 16) || (y % 10 === 0 && Math.abs(x - C) < 16))) { c.fillStyle = '#272b2d'; if (x === C || x % 10 === 0) c.fillRect(px + TS * .32, py, TS * .36, TS + .5); if (y === C || y % 10 === 0) c.fillRect(px, py + TS * .32, TS + .5, TS * .36); }
     if (z > .7) {
-      if (h > .86) { c.fillStyle = '#2b2f2c'; c.fillRect(px + h * 30, py + 20, 14, 10); c.fillRect(px + 10, py + h * 40, 8, 8); }
+      if (wPat) { }
+      else if (h > .86) { c.fillStyle = '#2b2f2c'; c.fillRect(px + h * 30, py + 20, 14, 10); c.fillRect(px + 10, py + h * 40, 8, 8); }
       else if (h > .8) { c.strokeStyle = '#2e3a2a'; c.lineWidth = 2; c.beginPath(); c.moveTo(px + 32, py + 50); c.lineTo(px + 32, py + 30); c.lineTo(px + 24, py + 20); c.moveTo(px + 32, py + 34); c.lineTo(px + 42, py + 24); c.stroke(); }
       else if (h > .77) { c.fillStyle = '#3a1e1a'; c.beginPath(); c.ellipse(px + 30, py + 34, 12, 6, 0, 0, 7); c.fill(); }
       c.strokeStyle = '#ffffff07'; c.lineWidth = 1 / z; c.strokeRect(px, py, TS, TS);
@@ -191,25 +195,25 @@ function drawWorld(ts) {
   c.textAlign = 'center'; c.textBaseline = 'middle'; c.direction = isRTL() ? 'rtl' : 'ltr';
   { const px = C * TS + TS / 2, py = C * TS + TS / 2; const pulse = 1 + Math.sin((ts || 0) / 500) * .04;
     c.fillStyle = '#cf6a2c22'; c.beginPath(); c.arc(px, py, TS * 1.4 * pulse, 0, 7); c.fill(); c.strokeStyle = '#cf6a2c'; c.lineWidth = 2 / z; c.stroke();
-    c.font = '58px serif'; c.fillText('🏰', px, py - 4);
+    { const hi = artImg('b_hq'); if (artReady(hi)) { const hw = 120, hh = hw * hi.naturalHeight / hi.naturalWidth; c.drawImage(hi, px - hw / 2, py - hh * .6, hw, hh); } else { c.font = '58px serif'; c.fillText('🏰', px, py - 4); } }
     if (z > .6) { c.font = `700 ${Math.round(14 / Math.sqrt(z))}px Changa, sans-serif`; c.fillStyle = '#ece5d7'; c.fillText(S.name || t('commander'), px, py + TS * .95); } }
   const lbl = z > .75;
   for (const n of S.world.nodes) {
     const px = n.x * TS + TS / 2, py = n.y * TS + TS / 2; if (px < tl.x - TS || py < tl.y - TS || px > br.x + TS || py > br.y + TS) continue;
     if (n.k === 'z') {
       const ok = n.L <= S.world.maxZ + 1, top = ok && n.L === S.world.maxZ + 1;
-      c.fillStyle = ok ? '#5a1f1888' : '#2a1a1888'; c.beginPath(); c.arc(px, py, 24, 0, 7); c.fill();
+      { const gr = c.createRadialGradient(px, py + 8, 2, px, py + 8, 30); gr.addColorStop(0, ok ? '#e2513f66' : '#55555544'); gr.addColorStop(1, '#0000'); c.fillStyle = gr; c.beginPath(); c.arc(px, py + 8, 30, 0, 7); c.fill(); }
       if (top) { c.strokeStyle = '#f1b23c'; c.lineWidth = 2 / z; c.beginPath(); c.arc(px, py, 27 + Math.sin((ts || 0) / 300) * 2, 0, 7); c.stroke(); }
-      c.font = '30px serif'; c.globalAlpha = ok ? 1 : .5; c.fillText(n.L % 5 === 0 ? '👺' : '🧟', px, py - 2); c.globalAlpha = 1;
+      c.globalAlpha = ok ? 1 : .55; { const zi = artImg(n.L % 5 === 0 ? 'z_boss' : 'z_w'); if (artReady(zi)) { const zh = n.L % 5 === 0 ? 66 : 54, zw = zh * zi.naturalWidth / zi.naturalHeight; c.drawImage(zi, px - zw / 2, py - zh * .62, zw, zh); } else { c.font = '30px serif'; c.fillText(n.L % 5 === 0 ? '👺' : '🧟', px, py - 2); } } c.globalAlpha = 1;
       if (lbl || n.L % 5 === 0) badge(c, px, py + 22, n.L, ok ? '#e2513f' : '#555');
     } else if (n.k === 'r') {
       const col = { food: '#8a7a2a', wood: '#6a4a2a', iron: '#5a6a7a', fuel: '#3a3a4a' }[n.rt];
       c.fillStyle = col + 'aa'; c.beginPath(); c.arc(px, py, 22, 0, 7); c.fill();
-      c.font = '26px serif'; c.fillText({ food: '🌽', wood: '🪵', iron: '🔩', fuel: '🛢️' }[n.rt], px, py - 2);
+      { const ri = artImg(ICO[n.rt]); if (artReady(ri)) { const rw = 34, rh = rw * ri.naturalHeight / ri.naturalWidth; c.drawImage(ri, px - rw / 2, py - rh / 2 - 2, rw, rh); } else { c.font = '26px serif'; c.fillText({ food: '🌽', wood: '🪵', iron: '🔩', fuel: '🛢️' }[n.rt], px, py - 2); } }
       if (lbl) badge(c, px, py + 22, n.L, '#64b66e');
       if (S.world.marches.some(m => m.nid === n.id)) { c.strokeStyle = '#64b66e'; c.lineWidth = 2 / z; c.beginPath(); c.arc(px, py, 26, 0, 7); c.stroke(); }
     } else {
-      c.font = '34px serif'; c.fillText('🏚️', px, py - 4);
+      { const bi = artImg('b_warehouse'); if (artReady(bi)) { const bw = 54, bh = bw * bi.naturalHeight / bi.naturalWidth; c.drawImage(bi, px - bw / 2, py - bh * .65, bw, bh); } else { c.font = '34px serif'; c.fillText('🏚️', px, py - 4); } }
       if (lbl) { c.font = '700 11px Tajawal, sans-serif'; c.fillStyle = '#8e99a2'; c.fillText(`[${n.tag}] ${L(BOTS[n.bot])}`, px, py + 25); }
     }
   }

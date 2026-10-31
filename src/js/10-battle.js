@@ -21,7 +21,7 @@ function startBattle(cfg) {
     else el.style.visibility = 'hidden';
     cards.appendChild(el);
   }
-  B.heroes.forEach(h => portraitImg(h.id));
+  B.heroes.forEach(h => portraitImg(h.id)); Object.values(ZIMG).forEach(artImg);
   bResize(); bBg();
   B.last = 0; B.raf = requestAnimationFrame(bLoop);
 }
@@ -35,13 +35,18 @@ function bResize() {
 function bBg() {
   const W = B.W, Hh = B.H, cv = document.createElement('canvas'); cv.width = W * B.dpr; cv.height = Hh * B.dpr; const c = cv.getContext('2d'); c.scale(B.dpr, B.dpr);
   const g = c.createLinearGradient(0, 0, 0, Hh); g.addColorStop(0, B.cfg.boss ? '#1c1214' : '#141819'); g.addColorStop(1, '#1f2426'); c.fillStyle = g; c.fillRect(0, 0, W, Hh);
-  c.fillStyle = '#262b2d'; c.fillRect(W * .12, 0, W * .76, Hh);
-  c.strokeStyle = '#6b5f3a55'; c.lineWidth = 4; c.setLineDash([24, 22]); c.beginPath(); c.moveTo(W / 2, 0); c.lineTo(W / 2, B.lineY); c.stroke(); c.setLineDash([]);
-  const R = rng(7);
-  for (let i = 0; i < 40; i++) { c.strokeStyle = '#0d101166'; c.lineWidth = 1 + R() * 1.5; c.beginPath(); let x = R() * W, y = R() * B.lineY; c.moveTo(x, y); for (let j = 0; j < 4; j++) { x += (R() - .5) * 40; y += R() * 25; c.lineTo(x, y); } c.stroke(); }
-  for (let i = 0; i < 14; i++) { c.fillStyle = R() < .5 ? '#33302a' : '#2b3033'; const x = R() < .5 ? R() * W * .12 : W * .88 + R() * W * .12; c.fillRect(x, R() * B.lineY, 6 + R() * 14, 4 + R() * 10); }
-  c.font = '30px serif'; c.textAlign = 'center'; c.globalAlpha = .8; c.fillText('🚗', W * .06, B.lineY * .35); c.fillText('🛢️', W * .94, B.lineY * .6); c.fillText('🚧', W * .92, B.lineY * .15); c.globalAlpha = 1;
-  for (let x = 10; x < W; x += 26) { c.fillStyle = '#6b5c3e'; c.beginPath(); c.ellipse(x, B.lineY + 6, 15, 8, 0, 0, 7); c.fill(); c.fillStyle = '#584b33'; c.beginPath(); c.ellipse(x + 13, B.lineY - 3, 15, 8, 0, 0, 7); c.fill(); }
+  const bi = artImg('bg_battle');
+  if (artReady(bi)) {
+    // scale the street art so its sandbag row (about 90% down the image) lines up with the hero line
+    const ih = (B.lineY + 14) / .9, iw = Math.max(W, ih * bi.naturalWidth / bi.naturalHeight);
+    c.drawImage(bi, (W - iw) / 2, 0, iw, ih);
+    const fg = c.createLinearGradient(0, 0, 0, 120); fg.addColorStop(0, '#0b0e10cc'); fg.addColorStop(1, '#0b0e1000'); c.fillStyle = fg; c.fillRect(0, 0, W, 120);
+    const gg = c.createLinearGradient(0, B.lineY + 10, 0, Hh); gg.addColorStop(0, '#2a2620'); gg.addColorStop(1, '#141210'); c.fillStyle = gg; c.fillRect(0, B.lineY + 12, W, Hh);
+    if (B.cfg.boss) { c.fillStyle = '#5a141022'; c.fillRect(0, 0, W, Hh); }
+  } else {
+    c.fillStyle = '#262b2d'; c.fillRect(W * .12, 0, W * .76, Hh);
+    for (let x = 10; x < W; x += 26) { c.fillStyle = '#6b5c3e'; c.beginPath(); c.ellipse(x, B.lineY + 6, 15, 8, 0, 0, 7); c.fill(); }
+  }
   B.bg = cv;
 }
 function spawnZ(type) {
@@ -136,11 +141,16 @@ function bDraw() {
   c.textAlign = 'center'; c.textBaseline = 'middle'; c.direction = isRTL() ? 'rtl' : 'ltr';
   const zs = B.z.filter(z => z.alive).sort((a, b) => a.y - b.y);
   for (const z of zs) {
-    const s = z.T.r * 2; c.fillStyle = '#0006'; c.beginPath(); c.ellipse(z.x, z.y + z.T.r * .8, z.T.r * .8, z.T.r * .3, 0, 0, 7); c.fill();
-    c.font = `${s}px serif`; const wob = Math.sin(B.t * 6 + z.ph) * .08; c.save(); c.translate(z.x, z.y); c.rotate(z.stun > 0 ? 0 : wob); c.fillText(z.T.i, 0, 0); c.restore();
-    if (z.flash > 0) { c.fillStyle = '#fff6'; c.beginPath(); c.arc(z.x, z.y, z.T.r, 0, 7); c.fill(); }
-    if (z.stun > 0) { c.font = '14px serif'; c.fillText('💫', z.x, z.y - z.T.r - 10); }
-    if (z.hp < z.maxhp && z.type !== 'wb') { const w = z.T.r * 2; c.fillStyle = '#000a'; c.fillRect(z.x - w / 2, z.y - z.T.r - 6, w, 4); c.fillStyle = z.type === 'boss' ? '#e2513f' : '#c9453a'; c.fillRect(z.x - w / 2, z.y - z.T.r - 6, w * Math.max(0, z.hp / z.maxhp), 4); }
+    const zi = artImg(ZIMG[z.type]), zh = z.T.r * (z.type === 'wb' ? 3.4 : 3), wob = Math.sin(B.t * 6 + z.ph) * .06, top = z.y - zh * .62;
+    c.fillStyle = '#0007'; c.beginPath(); c.ellipse(z.x, z.y + zh * .36, z.T.r * .9, z.T.r * .28, 0, 0, 7); c.fill();
+    if (artReady(zi)) {
+      const zw = zh * zi.naturalWidth / zi.naturalHeight; c.save(); c.translate(z.x, z.y); c.rotate(z.stun > 0 ? 0 : wob);
+      c.drawImage(zi, -zw / 2, -zh * .62, zw, zh);
+      if (z.flash > 0) { c.globalCompositeOperation = 'lighter'; c.globalAlpha = .55; c.drawImage(zi, -zw / 2, -zh * .62, zw, zh); }
+      c.restore();
+    } else { c.font = `${z.T.r * 2}px serif`; c.save(); c.translate(z.x, z.y); c.rotate(wob); c.fillText(z.T.i, 0, 0); c.restore(); if (z.flash > 0) { c.fillStyle = '#fff6'; c.beginPath(); c.arc(z.x, z.y, z.T.r, 0, 7); c.fill(); } }
+    if (z.stun > 0) { c.font = '14px serif'; c.fillText('💫', z.x, top - 8); }
+    if (z.hp < z.maxhp && z.type !== 'wb') { const w = z.T.r * 2; c.fillStyle = '#000a'; c.fillRect(z.x - w / 2, top - 4, w, 4); c.fillStyle = z.type === 'boss' ? '#e2513f' : '#c9453a'; c.fillRect(z.x - w / 2, top - 4, w * Math.max(0, z.hp / z.maxhp), 4); }
   }
   for (const h of B.heroes) {
     const col = { tank: '#3f6f96', atk: '#9c3f2f', sup: '#3f8a5c' }[h.H.c], rc = ['', '#4f8fd6', '#a66be0', '#e8a62d'][h.H.r];
