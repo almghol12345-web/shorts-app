@@ -223,3 +223,69 @@ function m3Merge(root, keepFn) {
   for (const o of victims) o.parent.remove(o);
   for (const [mat, v] of byMat) { const merged = U.mergeBufferGeometries(v.geos, false); if (!merged) continue; const m = new THREE.Mesh(merged, mat); m.castShadow = v.shadow; m.receiveShadow = true; root.add(m); }
 }
+/* ---------- 3D characters: survivors, guards and zombies with walk animation ---------- */
+const CH = {};
+function chGeo() {
+  if (CH.g) return CH.g;
+  const rb = (w, h, d) => { const g = new THREE.BoxGeometry(w, h, d, 1, 1, 1); return g; };
+  CH.g = {
+    leg: (() => { const g = rb(.13, .44, .15); g.translate(0, -.22, 0); return g; })(),
+    boot: (() => { const g = rb(.15, .09, .21); g.translate(0, -.44, .03); return g; })(),
+    torso: new THREE.CylinderGeometry(.17, .15, .44, 8), vest: rb(.38, .32, .26),
+    belt: new THREE.CylinderGeometry(.165, .165, .06, 8),
+    arm: (() => { const g = new THREE.CylinderGeometry(.055, .05, .4, 6); g.translate(0, -.2, 0); return g; })(),
+    hand: (() => { const g = new THREE.SphereGeometry(.055, 6, 5); g.translate(0, -.42, 0); return g; })(),
+    head: new THREE.SphereGeometry(.12, 12, 10), helmet: new THREE.SphereGeometry(.14, 12, 8, 0, Math.PI * 2, 0, Math.PI / 2),
+    cap: new THREE.CylinderGeometry(.13, .13, .07, 12), brim: rb(.18, .02, .12), pack: rb(.24, .28, .12),
+    gun: rb(.05, .07, .55), mag: rb(.04, .12, .05), eye: new THREE.SphereGeometry(.018, 5, 4),
+  };
+  const S2 = o => new THREE.MeshStandardMaterial(Object.assign({ roughness: .85 }, o));
+  CH.m = {
+    skin: [S2({ color: '#d9a982' }), S2({ color: '#b98358' }), S2({ color: '#8a5a3a' }), S2({ color: '#e8c4a0' })],
+    cloth: [S2({ color: '#4a5a3a' }), S2({ color: '#5a3a2a' }), S2({ color: '#3a4a5a' }), S2({ color: '#6a5a40' }), S2({ color: '#3a3a3a' }), S2({ color: '#7a2a22' })],
+    pants: [S2({ color: '#2e3a28' }), S2({ color: '#3a3226' }), S2({ color: '#26282c' })],
+    vest: S2({ color: '#3a3f2e' }), dark: S2({ color: '#1e1c1a', roughness: .9 }), metal: S2({ color: '#2a2d30', roughness: .45, metalness: .6 }),
+    helmet: S2({ color: '#4a5038', roughness: .7 }), hair: S2({ color: '#2a1d14' }),
+    zskin: [S2({ color: '#8a9a78' }), S2({ color: '#9aa088' }), S2({ color: '#7a8a6a' })], zcloth: [S2({ color: '#4a4038' }), S2({ color: '#3a3a44' }), S2({ color: '#5a4a3a' })],
+    blood: S2({ color: '#5a1410' }), zeye: new THREE.MeshBasicMaterial({ color: '#ff3a2a' }),
+  };
+  return CH.g;
+}
+function chMesh(parent, geo, mat, x, y, z) { const m = new THREE.Mesh(geo, mat); m.position.set(x || 0, y || 0, z || 0); m.castShadow = true; parent.add(m); return m; }
+function m3Human(kind) {
+  const G = chGeo(), M = CH.m, R = Math.random, root = new THREE.Group(), body = new THREE.Group(); root.add(body);
+  const zombie = kind === 'zombie', guard = kind === 'guard';
+  const skin = zombie ? M.zskin[R() * 3 | 0] : M.skin[R() * 4 | 0], shirt = zombie ? M.zcloth[R() * 3 | 0] : guard ? M.cloth[0] : M.cloth[R() * 6 | 0], pants = zombie ? M.zcloth[R() * 3 | 0] : M.pants[R() * 3 | 0];
+  const hip = new THREE.Group(); hip.position.y = .5; body.add(hip);
+  const legL = new THREE.Group(), legR = new THREE.Group(); legL.position.set(-.08, 0, 0); legR.position.set(.08, 0, 0); hip.add(legL, legR);
+  for (const l of [legL, legR]) { chMesh(l, G.leg, pants); chMesh(l, G.boot, M.dark); }
+  const chest = new THREE.Group(); chest.position.y = .5; body.add(chest);
+  chMesh(chest, G.torso, shirt, 0, .22, 0); chMesh(chest, G.belt, M.dark, 0, .02, 0);
+  if (!zombie) { chMesh(chest, G.vest, guard ? M.vest : M.dark, 0, .28, 0).scale.set(1, 1, guard ? 1 : .85); if (R() < .6 || guard) chMesh(chest, G.pack, M.dark, 0, .28, -.18); }
+  else chMesh(chest, G.vest, M.blood, .05, .2, .06).scale.set(.4, .3, .55);
+  const armL = new THREE.Group(), armR = new THREE.Group(); armL.position.set(-.22, .42, 0); armR.position.set(.22, .42, 0); chest.add(armL, armR);
+  for (const a of [armL, armR]) { chMesh(a, G.arm, shirt); chMesh(a, G.hand, skin); }
+  const head = new THREE.Group(); head.position.y = .58; chest.add(head);
+  chMesh(head, G.head, skin, 0, .1, 0);
+  if (zombie) { chMesh(head, G.eye, M.zeye, -.045, .12, .105); chMesh(head, G.eye, M.zeye, .045, .12, .105); }
+  else {
+    const hat = R();
+    if (guard || hat < .35) chMesh(head, G.helmet, M.helmet, 0, .13, 0);
+    else if (hat < .65) { chMesh(head, G.cap, shirt, 0, .19, 0); chMesh(head, G.brim, shirt, 0, .17, .08); }
+    else chMesh(head, G.helmet, M.hair, 0, .12, -.01).scale.set(1, .9, 1);
+  }
+  let gun = null;
+  if (guard || (!zombie && R() < .5)) { gun = new THREE.Group(); chMesh(gun, G.gun, M.metal, 0, 0, .12); chMesh(gun, G.mag, M.metal, 0, -.08, .1); gun.position.set(.05, .3, .2); chest.add(gun); }
+  if (zombie) { chest.rotation.x = .35; armL.rotation.x = armR.rotation.x = -1.35; head.rotation.x = -.25; }
+  else if (gun) { armR.rotation.x = -.9; armL.rotation.set(-1.1, 0, .5); }
+  root.scale.setScalar(zombie ? 1.5 : 1.45);
+  root.userData = { legL, legR, armL, armR, chest, head, zombie, gun: !!gun, body };
+  return root;
+}
+function m3Walk(h, t, speed, moving) {
+  const u = h.userData, a = moving ? Math.sin(t * (u.zombie ? 5 : 9) * speed) : 0, amp = u.zombie ? .45 : .6;
+  u.legL.rotation.x = a * amp; u.legR.rotation.x = -a * amp;
+  if (u.zombie) { u.armL.rotation.x = -1.35 + Math.sin(t * 3) * .15; u.armR.rotation.x = -1.35 + Math.sin(t * 3 + 1) * .15; u.body.rotation.z = Math.sin(t * 2.5) * .08; }
+  else if (!u.gun) { u.armL.rotation.x = -a * .5; u.armR.rotation.x = a * .5; }
+  u.body.position.y = moving ? Math.abs(Math.sin(t * (u.zombie ? 5 : 9) * speed)) * .03 : 0;
+}

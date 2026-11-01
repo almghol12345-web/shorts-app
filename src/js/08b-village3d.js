@@ -160,20 +160,18 @@ function v3Units() {
   const looks = [['#4a5a3a', '#c99a72', '#3a4a2a'], ['#5a3a2a', '#b37a52', '#2a2a2a'], ['#3a4a5a', '#d8a578', '#5a1f1f'], ['#5a5040', '#8a5a3a', '#2a3a2a'], ['#3a3a3a', '#c99a72', '#7a1f22']];
   const way = () => { const pts = [[-10, -7], [10, -7], [-10, 2], [10, 2], [-3.5, 9], [3.5, 9], [0, 16], [-11, 13], [11, 13], [-4.5, -10], [4.5, -10]]; return pts[Math.floor(Math.random() * pts.length)]; };
   for (let i = 0; i < 9; i++) {
-    const L = looks[i % looks.length], tx = [texPerson(L[0], L[1], L[2])];
-    const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: tx[0], transparent: true, alphaTest: .4 })); s.scale.set(.9, 1.8, 1); s.center.set(.5, 0);
+    const s = m3Human('survivor');
     const w = way(); s.position.set(w[0], 0, w[1]); V3.scene.add(s); V3.units.push({ s, to: way(), spd: 1.3 + Math.random() * .8, ph: Math.random() * 6, wait: Math.random() * 3 });
   }
   // guards on the wall towers
-  for (const [x, z] of [[-WALL, WALL], [WALL, WALL], [-WALL, -WALL], [WALL, -WALL]]) { const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: texPerson('#3a4048', '#c99a72', '#2d3236'), transparent: true, alphaTest: .4 })); s.scale.set(.7, 1.4, 1); s.center.set(.5, 0); s.position.set(x, 4.7, z); V3.scene.add(s); }
+  V3.guards = [];
+  for (const [x, z] of [[-9, WALL], [9, WALL], [WALL, 2], [-WALL, 2], [WALL, -10], [-WALL, -10], [0, -WALL]]) { const s = m3Human('guard'); s.position.set(x, 2.4, z); s.rotation.y = Math.atan2(x, z); V3.scene.add(s); V3.guards.push(s); }
+  V3.towers = V3.guards.map(g => [g.position.x, g.position.z]);
 }
 function v3SpawnZombie() {
-  const img = artImg(Math.random() < .3 ? 'z_run' : 'z_w'); if (!artReady(img)) return;
-  const tx = new THREE.Texture(img); tx.encoding = THREE.sRGBEncoding; tx.needsUpdate = true;
-  const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: tx, transparent: true, alphaTest: .3, color: '#c8c8c8' }));
-  const a = Math.random() * Math.PI * 2, r = 34 + Math.random() * 10; const h = 1.9;
-  s.scale.set(h * img.naturalWidth / img.naturalHeight, h, 1); s.center.set(.5, 0); s.position.set(Math.cos(a) * r, 0, Math.sin(a) * r);
-  V3.scene.add(s); V3.zombies.push({ s, spd: .8 + Math.random() * .8, hp: 2 + Math.floor(Math.random() * 3), ph: Math.random() * 6, dead: 0 });
+  const s = m3Human('zombie'), a = Math.random() * Math.PI * 2, r = 34 + Math.random() * 10;
+  s.position.set(Math.cos(a) * r, 0, Math.sin(a) * r); s.rotation.y = Math.atan2(-s.position.x, -s.position.z);
+  V3.scene.add(s); V3.zombies.push({ s, spd: .6 + Math.random() * .7, hp: 2 + Math.floor(Math.random() * 3), ph: Math.random() * 6, dead: 0 });
 }
 /* ---------- buildings ---------- */
 function v3Billboard(key, size) {
@@ -242,7 +240,7 @@ function v3Bind(el) {
   el.addEventListener('pointermove', e => {
     if (!P.has(e.pointerId) || !g) return; const p = pos(e); P.set(e.pointerId, p);
     if (g.m === 'pinch' && P.size >= 2) { const [a, b] = [...P.values()]; V3.dist = clamp(g.z0 * g.d0 / (Math.hypot(a.x - b.x, a.y - b.y) || 1), 24, 92); V3.az = g.az0 - (Math.atan2(b.y - a.y, b.x - a.x) - g.a0); return; }
-    if (g.m === 'pan') { const dx = p.x - g.lx, dy = p.y - g.ly; moved += Math.abs(dx) + Math.abs(dy); if (moved > 6) { const ox = V3.tgt.x, oz = V3.tgt.z; v3Pan(dx, dy); const tn = performance.now(), dt = Math.max(1, tn - lt); V3.vel = { x: (V3.tgt.x - ox) / dt * 16, z: (V3.tgt.z - oz) / dt * 16 }; lt = tn; } g.lx = p.x; g.ly = p.y; }
+    if (g.m === 'pan') { moved += Math.abs(p.x - g.lx) + Math.abs(p.y - g.ly); if (moved > 6) { const a0 = v3Ground(g.lx, g.ly), a1 = v3Ground(p.x, p.y); if (a0 && a1) { const ddx = a0.x - a1.x, ddz = a0.z - a1.z; V3.tgt.x += ddx; V3.tgt.z += ddz; v3Clamp(); v3Cam(); V3.camera.updateMatrixWorld(); const tn = performance.now(), dt = Math.max(1, tn - lt); V3.vel = { x: ddx / dt * 16, z: ddz / dt * 16 }; lt = tn; } } g.lx = p.x; g.ly = p.y; }
   });
   const up = e => { P.delete(e.pointerId); if (P.size === 0) { if (performance.now() - lt > 90) V3.vel = { x: 0, z: 0 }; g = null; } else if (P.size === 1) { const q = [...P.values()][0]; g = { m: 'pan', lx: q.x, ly: q.y }; } };
   el.addEventListener('pointerup', up); el.addEventListener('pointercancel', up);
@@ -269,7 +267,7 @@ function v3Loop(ts) {
   if (tab !== 'base' || !V3.renderer || !$('#b3c') || B) { V3.raf = 0; return; }
   const dt = V3.last ? Math.min(.05, (ts - V3.last) / 1000) : .016; V3.last = ts; V3.t += dt; const t = V3.t;
   // inertia
-  if (Math.abs(V3.vel.x) + Math.abs(V3.vel.z) > .001) { V3.tgt.x += V3.vel.x * dt * 60; V3.tgt.z += V3.vel.z * dt * 60; const f = Math.pow(.9, dt * 60); V3.vel.x *= f; V3.vel.z *= f; v3Clamp(); }
+  if (Math.abs(V3.vel.x) + Math.abs(V3.vel.z) > .001) { V3.tgt.x += V3.vel.x * dt * 60; V3.tgt.z += V3.vel.z * dt * 60; const f = Math.pow(.86, dt * 60); V3.vel.x *= f; V3.vel.z *= f; v3Clamp(); }
   if (V3.azT !== undefined) { V3.az += (V3.azT - V3.az) * Math.min(1, dt * 6); if (Math.abs(V3.azT - V3.az) < .002) { V3.az = V3.azT; V3.azT = undefined; } }
   v3Cam();
   if ((V3.retry = (V3.retry || 0) + dt) > .4) { V3.retry = 0; for (const k in V3.objs) if (!V3.objs[k].mesh) { v3SyncBuildings(); break; } }
@@ -286,24 +284,25 @@ function v3Loop(ts) {
   V3.fx = V3.fx.filter(f => { if (f.life <= 0) { V3.scene.remove(f.s); f.s.material.dispose(); return false; } return true; });
   // survivors walk between spots
   for (const u of V3.units) {
-    if (u.wait > 0) { u.wait -= dt; continue; }
+    if (u.wait > 0) { u.wait -= dt; m3Walk(u.s, t + u.ph, 1, false); continue; }
     const p = u.s.position, dx = u.to[0] - p.x, dz = u.to[1] - p.z, d = Math.hypot(dx, dz);
     if (d < .2) { u.wait = 1 + Math.random() * 3; const pts = [[-10, -7], [10, -7], [-10, 2], [10, 2], [-3.5, 9], [3.5, 9], [0, 16], [-11, 13], [11, 13], [-4.5, -10], [4.5, -10], [0, 5]]; u.to = pts[Math.floor(Math.random() * pts.length)]; continue; }
-    p.x += dx / d * u.spd * dt; p.z += dz / d * u.spd * dt; p.y = Math.abs(Math.sin(t * 8 + u.ph)) * .07;
+    p.x += dx / d * u.spd * dt; p.z += dz / d * u.spd * dt; const ry = Math.atan2(dx, dz); let dr = ry - u.s.rotation.y; dr = Math.atan2(Math.sin(dr), Math.cos(dr)); u.s.rotation.y += dr * Math.min(1, dt * 8); m3Walk(u.s, t + u.ph, u.spd / 1.6, true);
   }
   // zombies shamble towards the walls; towers shoot them
   if (V3.zombies.length < 9 && Math.random() < dt * .8) v3SpawnZombie();
   for (const zb of V3.zombies) {
     const p = zb.s.position;
-    if (zb.dead) { zb.dead += dt; zb.s.material.opacity = Math.max(0, 1 - zb.dead); zb.s.material.transparent = true; zb.s.scale.y *= .97; continue; }
+    if (zb.dead) { zb.dead += dt; zb.s.rotation.x = -Math.min(Math.PI / 2, zb.dead * 4); zb.s.position.y = -Math.max(0, zb.dead - .6) * .8; continue; }
     const d = Math.hypot(p.x, p.z), stop = WALL + 3.5;
-    if (d > stop) { p.x -= p.x / d * zb.spd * dt; p.z -= p.z / d * zb.spd * dt; } p.y = Math.abs(Math.sin(t * 4 + zb.ph)) * .05;
+    const walking = d > stop; if (walking) { p.x -= p.x / d * zb.spd * dt; p.z -= p.z / d * zb.spd * dt; } m3Walk(zb.s, t + zb.ph, zb.spd, walking);
     if (d < WALL + 12 && Math.random() < dt * .9) {
       const tw = V3.towers.reduce((a, b) => Math.hypot(b[0] - p.x, b[1] - p.z) < Math.hypot(a[0] - p.x, a[1] - p.z) ? b : a);
-      v3Shot(tw[0], 5, tw[1], p.x, 1.1, p.z); if (--zb.hp <= 0) zb.dead = .01;
+      v3Shot(tw[0], 3.5, tw[1], p.x, 1.4, p.z); if (--zb.hp <= 0) zb.dead = .01;
+      for (const gd of V3.guards || []) if (Math.abs(gd.position.x - tw[0]) < 1 && Math.abs(gd.position.z - tw[1]) < 1) gd.rotation.y = Math.atan2(p.x - gd.position.x, p.z - gd.position.z);
     }
   }
-  V3.zombies = V3.zombies.filter(zb => { if (zb.dead > 1) { V3.scene.remove(zb.s); zb.s.material.map.dispose(); zb.s.material.dispose(); return false; } return true; });
+  V3.zombies = V3.zombies.filter(zb => { if (zb.dead > 2) { V3.scene.remove(zb.s); return false; } return true; });
   for (const s of V3.shots) { s.life -= dt; s.line.material.opacity = Math.max(0, s.life / .12); }
   V3.shots = V3.shots.filter(s => { if (s.life <= 0) { V3.scene.remove(s.line); s.line.geometry.dispose(); s.line.material.dispose(); return false; } return true; });
   // slow dusk light breathing
@@ -337,9 +336,13 @@ function v3PlaceHotspots() {
 function v3Focus(k) { const o = V3.objs[k] || { x: V3POS[k][0], z: V3POS[k][1] }; V3.tgt.set(o.x, 0, o.z + 2); V3.dist = Math.min(V3.dist, 40); }
 window.addEventListener('resize', () => { if (V3.inited && $('#b3c')) v3Resize(); });
 window.V3_DEBUG = () => ({ glb: typeof GLB !== 'undefined' ? Object.fromEntries(Object.entries(GLB).map(([k, v]) => [k, v === null ? 'none' : v === 'loading' ? 'loading' : 'ok'])) : {}, models: typeof MODELS !== 'undefined' ? Object.keys(MODELS) : [], inited: V3.inited, failed: V3.failed, sup: V3.sup, objs: Object.keys(V3.objs || {}).length, meshes: Object.values(V3.objs || {}).filter(o => o.mesh).length });
-window.V3DBG = { dist(d) { V3.dist = d; }, pads(on) { for (const k in V3.objs) { const g = V3.objs[k].group; g.children[0].visible = on; g.children[1].visible = on; } }, shadows(on) { V3.sun.castShadow = on; }, bill(on) { for (const k in V3.objs) if (V3.objs[k].mesh) V3.objs[k].mesh.visible = on; } };
+window.V3DBG = { dist(d) { V3.dist = d; }, look(x, z, d) { V3.tgt.set(x, 0, z); V3.dist = d; V3.vel = { x: 0, z: 0 }; }, unit(i) { const u = V3.units[i || 0]; u.wait = 99; return [u.s.position.x, u.s.position.z]; }, guard(i) { const g = V3.guards[i || 0]; return [g.position.x, g.position.z]; }, pads(on) { for (const k in V3.objs) { const g = V3.objs[k].group; g.children[0].visible = on; g.children[1].visible = on; } }, shadows(on) { V3.sun.castShadow = on; }, bill(on) { for (const k in V3.objs) if (V3.objs[k].mesh) V3.objs[k].mesh.visible = on; } };
 
 function v3Rotate(dir) { if (!V3.inited) return; V3.azT = (V3.azT !== undefined ? V3.azT : V3.az) + dir * Math.PI / 4; }
 function v3ResetView() { if (!V3.inited) return; V3.azT = Math.PI / 4; V3.tgt.set(0, 0, 2); V3.dist = 78; }
 
 window.V3INFO = () => V3.renderer ? { calls: V3.renderer.info.render.calls, tris: V3.renderer.info.render.triangles, geos: V3.renderer.info.memory.geometries } : null;
+
+/* the ground point under a screen position: dragging keeps that point under the finger */
+const _ray = typeof THREE !== 'undefined' ? new THREE.Raycaster() : null, _gp = typeof THREE !== 'undefined' ? new THREE.Plane(new THREE.Vector3(0, 1, 0), 0) : null;
+function v3Ground(x, y) { if (!V3.W) return null; _ray.setFromCamera({ x: x / V3.W * 2 - 1, y: -(y / V3.H) * 2 + 1 }, V3.camera); const out = new THREE.Vector3(); return _ray.ray.intersectPlane(_gp, out) ? out : null; }
