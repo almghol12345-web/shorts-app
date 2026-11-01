@@ -14,7 +14,7 @@ from collections import Counter
 
 NICHE_WORDS = ("لغز", "ألغاز", "الغاز", "غموض", "غامض", "غامضة", "قصص", "قصة", "قصه", "حقيقية",
                "حقيقي", "اختفاء", "اختفت", "اختفى", "جريمة", "جرائم", "رعب", "مرعب", "غريب", "غرائب",
-               "تاريخ", "فضاء", "حقائق", "هل_تعلم", "معلومات", "وثائقي", "اسرار", "أسرار", "سر",
+               "تاريخ", "فضاء", "حقائق", "هل_تعلم", "معلومات", "وثائقي", "اسرار", "أسرار",
                "mystery", "mysteries", "unsolved", "truestory", "documentary", "facts")
 EVERGREEN = ["ألغاز", "قصص_حقيقية", "غموض", "ألغاز_لم_تحل", "قصص_غامضة", "معلومات"]
 SEARCH_TAGS = ["ألغاز لم تحل", "قصص غامضة حقيقية", "قصص حقيقية", "أغرب القصص",
@@ -23,8 +23,14 @@ HASHTAG = re.compile(r"#([\w؀-ۿ]+)")
 
 
 def _relevant(tag: str) -> bool:
-    t = tag.lower()
-    return any(w in t for w in NICHE_WORDS)
+    """Whole words only: 'قصص_رعب' matches, but 'سراب' or 'تسريب' must not match 'سر'."""
+    words = [w for w in re.split(r"[_\s]+", tag.lower().lstrip("#")) if w]
+    for w in words:
+        for n in NICHE_WORDS:
+            base = w[2:] if w.startswith("ال") and len(w) > 4 else w      # drop the Arabic article
+            if base == n or w == n:
+                return True
+    return False
 
 
 def trending_hashtags(yt, region: str = "SA", limit: int = 3) -> list[str]:

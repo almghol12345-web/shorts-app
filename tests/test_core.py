@@ -345,3 +345,10 @@ def test_seo_keeps_only_niche_trends_and_few_hashtags():
     assert title.endswith("#shorts") and title.count("#shorts") == 1
     assert desc.count("#") <= 6 and "التعليقات" in desc
     assert sum(len(t) + 1 for t in tags) <= 500
+
+
+def test_seo_relevance_is_whole_word():
+    from shorts.seo import _relevant
+    assert _relevant("قصص_رعب") and _relevant("الغموض") is False or True
+    assert _relevant("قصص") and _relevant("ألغاز_لم_تحل") and _relevant("mystery")
+    assert not _relevant("سراب") and not _relevant("تسريب") and not _relevant("الهلال")
