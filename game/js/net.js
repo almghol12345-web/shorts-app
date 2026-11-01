@@ -2,12 +2,12 @@
 // runs fully offline and every multiplayer surface says so instead of faking it.
 import { A } from './ui/app.js';
 import { CONFIG } from './config.js';
-import { isNative } from './platform.js';
+import { isNative, storage } from './platform.js';
 
 export class Net {
   constructor() {
-    this.base = localStorage.getItem('ashfall.server') ?? CONFIG.SERVER ?? '';
-    this.token = localStorage.getItem('ashfall.token') || null;
+    this.base = storage.get('ashfall.server') ?? CONFIG.SERVER ?? '';
+    this.token = storage.get('ashfall.token') || null;
     this.user = null; this.online = false; this.alliance = null; this.chat = []; this.es = null; this.lastSync = 0;
   }
   async req(method, path, body) {
@@ -24,8 +24,8 @@ export class Net {
   }
   async register(name, password) { const r = await this.req('POST', '/api/register', { name, password }); if (r.ok) this.setAuth(r); return r; }
   async login(name, password) { const r = await this.req('POST', '/api/login', { name, password }); if (r.ok) this.setAuth(r); return r; }
-  setAuth(r) { this.token = r.token; this.user = r.user; localStorage.setItem('ashfall.token', r.token); }
-  logout(silent) { this.token = null; this.user = null; localStorage.removeItem('ashfall.token'); this.es?.close(); this.es = null; if (!silent) A.toast?.('Logged out'); }
+  setAuth(r) { this.token = r.token; this.user = r.user; storage.set('ashfall.token', r.token); }
+  logout(silent) { this.token = null; this.user = null; storage.remove('ashfall.token'); this.es?.close(); this.es = null; if (!silent) A.toast?.('Logged out'); }
   async pushSave() {
     if (!this.user) return { ok: false };
     const g = A.g; g.s.player.id = this.user.id;
