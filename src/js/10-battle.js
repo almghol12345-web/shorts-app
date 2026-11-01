@@ -22,7 +22,7 @@ function startBattle(cfg) {
     cards.appendChild(el);
   }
   B.heroes.forEach(h => portraitImg(h.id)); Object.values(ZIMG).forEach(artImg);
-  bResize(); bBg();
+  bResize(); bBg(); B.m3 = b3Start();
   B.last = 0; B.raf = requestAnimationFrame(bLoop);
 }
 function bResize() {
@@ -31,6 +31,7 @@ function bResize() {
   B.lineY = B.H - Math.min(170, B.H * .36);
   const pos = [[.36, 0], [.64, 0], [.18, 1], [.5, 1], [.82, 1]];
   for (const h of B.heroes) { const p = pos[h.slot]; h.x = B.W * p[0]; h.y = B.lineY + 40 + p[1] * 58; }
+  if (B.m3) b3Resize();
 }
 function bBg() {
   const W = B.W, Hh = B.H, cv = document.createElement('canvas'); cv.width = W * B.dpr; cv.height = Hh * B.dpr; const c = cv.getContext('2d'); c.scale(B.dpr, B.dpr);
@@ -76,10 +77,10 @@ function hitHero(h, d) {
 }
 function cast(h) {
   if (!h.alive || h.en < 100 || B.done) return;
-  h.en = 0; const m = RM[h.H.r], vz = visibleZ(); SND.skill(); buzz('medium'); if (['aoe', 'air', 'stun', 'snipe'].includes(h.H.sk)) setTimeout(SND.boom, 120);
+  h.en = 0; h.castT = .7; const m = RM[h.H.r], vz = visibleZ(); SND.skill(); buzz('medium'); if (['aoe', 'air', 'stun', 'snipe'].includes(h.H.sk)) setTimeout(SND.boom, 120);
   B.fx.push({ k: 'txt', x: h.x, y: h.y - 44, s: L(h.H.skn), col: '#5aa6d6', big: true, t: 0, life: 1.1 });
   switch (h.H.sk) {
-    case 'snipe': { const tg = vz.reduce((a, z) => !a || z.hp > a.hp ? z : a, null); if (tg) { B.fx.push({ k: 'tr', x: h.x, y: h.y, tx: tg.x, ty: tg.y, t: 0, life: .25, w: 5, col: '#f1b23c' }); dmgZ(tg, h.atk * 7 * m, true); } break; }
+    case 'snipe': { const tg = vz.reduce((a, z) => !a || z.hp > a.hp ? z : a, null); if (tg) { B.fx.push({ k: 'tr', x: h.x, y: h.y, tx: tg.x, ty: tg.y, t: 0, life: .25, w: 5, col: '#f1b23c', hid: h.id, tz: tg }); h.shotT = .3; dmgZ(tg, h.atk * 7 * m, true); } break; }
     case 'shield': for (const x of B.heroes) if (x.alive) { x.shield += h.maxhp * .3 * m; x.shT = 6; } break;
     case 'heal': for (const x of B.heroes) if (x.alive) { const v = h.atk * 5 * m + x.maxhp * .1; x.hp = Math.min(x.maxhp, x.hp + v); B.fx.push({ k: 'txt', x: x.x, y: x.y - 26, s: '+' + fmt(v), col: '#64b66e', t: 0, life: .8 }); B.fx.push({ k: 'heal', x: x.x, y: x.y, t: 0, life: .6 }); } break;
     case 'aoe': { const tg = nearestZ(); if (tg) { B.fx.push({ k: 'boom', x: tg.x, y: tg.y, r: 85, t: 0, life: .5 }); for (const z of vz) if (Math.hypot(z.x - tg.x, z.y - tg.y) < 85 + z.T.r) dmgZ(z, h.atk * 3 * m); } break; }
@@ -121,7 +122,7 @@ function bStep(dt) {
     h.cd -= dt;
     if (h.cd <= 0) {
       const tg = nearestZ();
-      if (tg) { const rate = { tank: 1, atk: .6, sup: .9 }[h.H.c]; h.cd = rate / (h.rapid > 0 ? 3 : 1); let d = h.atk * (B.buff > 0 ? 1.4 : 1); const cr = Math.random() < .12; if (cr) d *= 2; B.fx.push({ k: 'tr', x: h.x, y: h.y - 12, tx: tg.x, ty: tg.y, t: 0, life: .07, w: 2, col: '#ffe9a8' }); dmgZ(tg, d, cr); SND.shot(); h.en = Math.min(100, h.en + (h.H.c === 'sup' ? 11 : 8)); }
+      if (tg) { const rate = { tank: 1, atk: .6, sup: .9 }[h.H.c]; h.cd = rate / (h.rapid > 0 ? 3 : 1); let d = h.atk * (B.buff > 0 ? 1.4 : 1); const cr = Math.random() < .12; if (cr) d *= 2; B.fx.push({ k: 'tr', x: h.x, y: h.y - 12, tx: tg.x, ty: tg.y, t: 0, life: .07, w: 2, col: '#ffe9a8', hid: h.id, tz: tg }); h.shotT = .22; dmgZ(tg, d, cr); SND.shot(); h.en = Math.min(100, h.en + (h.H.c === 'sup' ? 11 : 8)); }
       else h.cd = .15;
     }
     if (h.en >= 100 && S.auto) cast(h);
@@ -134,6 +135,7 @@ function bStep(dt) {
 }
 function bBanner(txt) { const e = $('#b-banner'); e.textContent = txt; e.classList.remove('go'); void e.offsetWidth; e.classList.add('go'); }
 function bDraw() {
+  if (B.m3) return b3Draw();
   const c = B.ctx, W = B.W, Hh = B.H; c.setTransform(B.dpr, 0, 0, B.dpr, 0, 0);
   if (B.shake > 0) c.translate((Math.random() - .5) * 8, (Math.random() - .5) * 8);
   c.drawImage(B.bg, 0, 0, W, Hh);
@@ -208,7 +210,7 @@ function bEnd(win, why) {
   $('#b-cont').onclick = closeBattle;
   const nx = $('#b-next'); if (nx) nx.onclick = () => { closeBattle(); startCampaign(); };
 }
-function closeBattle() { if (!B) return; cancelAnimationFrame(B.raf); B = null; $('#battle').hidden = true; refresh(); setTimeout(nextPopup, 300); }
+function closeBattle() { if (!B) return; cancelAnimationFrame(B.raf); if (B.m3) b3Stop(); B = null; $('#battle').hidden = true; refresh(); setTimeout(nextPopup, 300); }
 function startCampaign() {
   const s = S.stage;
   startBattle({ title: t('campaign_stage', s), waves: stageWaves(s), sc: s, next: true, onEnd: win => { if (!win) return null; const r = stageReward(s); give(r); S.stage = s + 1; addXP(15 + s * 2); return { r }; } });

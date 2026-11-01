@@ -287,52 +287,11 @@ function m3Walk(h, t, speed, moving) {
   const u = h.userData, a = moving ? Math.sin(t * (u.zombie ? 5 : 9) * speed) : 0, amp = u.zombie ? .45 : .6;
   u.legL.rotation.x = a * amp; u.legR.rotation.x = -a * amp;
   if (u.zombie) { u.armL.rotation.x = -1.35 + Math.sin(t * 3) * .15; u.armR.rotation.x = -1.35 + Math.sin(t * 3 + 1) * .15; u.body.rotation.z = Math.sin(t * 2.5) * .08; }
-  else if (!u.gun) { u.armL.rotation.x = -a * .5; u.armR.rotation.x = a * .5; }
+  else if (!u.gun) { u.armL.rotation.x = (u.poseL || 0) - a * .5; u.armR.rotation.x = (u.poseR || 0) + a * .5; }
   u.body.position.y = moving ? Math.abs(Math.sin(t * (u.zombie ? 5 : 9) * speed)) * .03 : 0;
   if (u.cape) u.cape.rotation.x = .12 + (moving ? .25 : .05) + Math.sin(t * 4) * .06;
-  if (u.orb) u.orb.position.y = -.5 + Math.sin(t * 3) * .03;
-}
-/* ---------- heroes walking in the village: each hero gets its own outfit and gear ---------- */
-const HERO_LOOK = {
-  redking: { shirt: '#7a1a14', pants: '#2a1a14', skin: '#c99068', head: 'crown', cape: '#8a1a14', beard: '#2a1a10', weapon: 'fsword', fur: '#5a4030', scale: 1.62 },
-  destroyer: { shirt: '#3a1a5a', pants: '#2a1440', skin: '#b08a7a', head: 'hood', hood: '#241038', robe: '#2e1648', weapon: 'orb', orb: '#b26bff', scale: 1.55 },
-  fire: { shirt: '#2a1410', pants: '#1a0c08', skin: '#3a1a10', head: 'horns', glow: '#ff5a1a', weapon: 'fsword', scale: 1.66 },
-  knight: { shirt: '#6e747a', pants: '#3a3e44', skin: '#d9a982', head: 'plume', metal: 1, cape: '#5a1414', weapon: 'swordShield', scale: 1.58 },
-  lightning: { shirt: '#6a5a40', pants: '#4a4030', skin: '#c99068', head: 'nvg', weapon: 'rifle', scale: 1.5 },
-  shadow: { shirt: '#1a1a1e', pants: '#141418', skin: '#d9a982', head: 'hood', hood: '#121216', mask: 1, weapon: 'daggers', scale: 1.45 },
-  medic: { shirt: '#d8d2c4', pants: '#3a4a3a', skin: '#e0b48e', head: 'pony', hair: '#1a1210', cross: 1, weapon: 'orb', orb: '#7dff7a', scale: 1.45 },
-  mountain: { shirt: '#5a4030', pants: '#2a2018', skin: '#a87a5a', head: 'wild', hair: '#1e1610', beard: '#1e1610', fur: '#6a5040', weapon: 'axe', scale: 1.78 },
-  hawk: { shirt: '#2a2420', pants: '#1e1a16', skin: '#c99068', head: 'hood', hood: '#1e1a16', mask: 1, weapon: 'bow', scale: 1.5 },
-  wind: { shirt: '#3a4a6a', pants: '#24304a', skin: '#e8c4a0', head: 'white', hair: '#e8e8f0', cape: '#2a4a7a', weapon: 'sword', scale: 1.5 },
-};
-function m3Hero(id) {
-  const L = HERO_LOOK[id] || HERO_LOOK.wind, G = chGeo(), S2 = o => new THREE.MeshStandardMaterial(Object.assign({ roughness: .8 }, o));
-  const h = m3Human('plain'), u = h.userData;
-  const shirt = L.metal ? S2({ color: L.shirt, metalness: .6, roughness: .4 }) : S2({ color: L.shirt }), pants = S2({ color: L.pants }), skin = S2({ color: L.skin, emissive: L.glow || '#000', emissiveIntensity: L.glow ? .35 : 0 });
-  h.traverse(o => { if (!o.isMesh) return; const mn = o.material; if (mn === u.mShirt) o.material = shirt; else if (mn === u.mPants) o.material = pants; else if (mn === u.mSkin) o.material = skin; });
-  const head = u.head, chest = u.chest, gold = S2({ color: '#e0a83a', metalness: .9, roughness: .3, emissive: '#402200', emissiveIntensity: .4 });
-  const add = (parent, geo, mat, x, y, z) => chMesh(parent, geo, mat, x, y, z);
-  if (L.head === 'crown') { add(head, new THREE.CylinderGeometry(.11, .12, .06, 10, 1, true), gold, 0, .22, 0); for (let i = 0; i < 6; i++) add(head, new THREE.ConeGeometry(.02, .07, 4), gold, Math.cos(i) * .11, .28, Math.sin(i) * .11); }
-  if (L.head === 'hood') { add(head, new THREE.ConeGeometry(.17, .34, 10), S2({ color: L.hood }), 0, .19, -.02); }
-  if (L.head === 'horns') { for (const sx of [-1, 1]) { const c = add(head, new THREE.ConeGeometry(.035, .2, 6), S2({ color: '#1a0a06' }), sx * .09, .25, 0); c.rotation.z = -sx * .5; } }
-  if (L.head === 'plume') { add(head, G.helmet, S2({ color: '#8a9096', metalness: .7, roughness: .35 }), 0, .13, 0); add(head, new THREE.BoxGeometry(.03, .14, .2), S2({ color: '#a01a14' }), 0, .3, -.02); }
-  if (L.head === 'nvg') { add(head, G.helmet, S2({ color: '#5a5038' }), 0, .13, 0); add(head, new THREE.BoxGeometry(.1, .05, .06), S2({ color: '#1a1a1a' }), 0, .2, .12); add(head, new THREE.BoxGeometry(.18, .05, .04), S2({ color: '#1a1a1a' }), 0, .07, .11); }
-  if (L.head === 'pony' || L.head === 'wild' || L.head === 'white') { add(head, G.helmet, S2({ color: L.hair }), 0, .11, -.01).scale.set(1.05, L.head === 'wild' ? 1.3 : .95, 1.05); if (L.head === 'pony') add(head, new THREE.CylinderGeometry(.03, .02, .18, 6), S2({ color: L.hair }), 0, .05, -.13); }
-  if (L.mask) add(head, new THREE.BoxGeometry(.2, .08, .05), S2({ color: '#0e0e10' }), 0, .06, .1);
-  if (L.beard) add(head, new THREE.BoxGeometry(.16, .1, .06), S2({ color: L.beard }), 0, .02, .09);
-  if (L.fur) add(chest, new THREE.TorusGeometry(.16, .06, 6, 12), S2({ color: L.fur, roughness: 1 }), 0, .44, 0).rotation.x = Math.PI / 2;
-  if (L.cross) { add(chest, new THREE.BoxGeometry(.1, .03, .01), S2({ color: '#c9302c' }), 0, .3, .135); add(chest, new THREE.BoxGeometry(.03, .1, .01), S2({ color: '#c9302c' }), 0, .3, .135); }
-  if (L.cape) { const c = add(chest, new THREE.PlaneGeometry(.38, .62), S2({ color: L.cape, side: THREE.DoubleSide }), 0, .14, -.15); c.rotation.x = .12; u.cape = c; }
-  if (L.robe) add(h.userData.body, new THREE.ConeGeometry(.26, .55, 10, 1, true), S2({ color: L.robe, side: THREE.DoubleSide }), 0, .28, 0);
-  const handR = u.armR, metal = S2({ color: '#9aa2a8', metalness: .8, roughness: .3 });
-  const blade = (glow) => { const g = new THREE.Group(); add(g, new THREE.BoxGeometry(.04, .5, .015), glow ? S2({ color: '#ff8a3a', emissive: '#ff4a10', emissiveIntensity: .9 }) : metal, 0, -.62, .12); add(g, new THREE.BoxGeometry(.14, .03, .04), gold, 0, -.38, .12); return g; };
-  if (L.weapon === 'sword' || L.weapon === 'fsword' || L.weapon === 'swordShield') handR.add(blade(L.weapon === 'fsword'));
-  if (L.weapon === 'swordShield') { const sh = add(u.armL, new THREE.CylinderGeometry(.16, .16, .03, 12), S2({ color: '#5a1414', metalness: .3 }), 0, -.3, .08); sh.rotation.x = Math.PI / 2; }
-  if (L.weapon === 'axe') { const g = new THREE.Group(); add(g, new THREE.CylinderGeometry(.02, .02, .6, 6), S2({ color: '#4a3020' }), 0, -.55, .1); add(g, new THREE.BoxGeometry(.04, .16, .18), metal, 0, -.82, .18); handR.add(g); }
-  if (L.weapon === 'daggers') { for (const a of [u.armL, u.armR]) { const d = add(a, new THREE.BoxGeometry(.025, .22, .01), metal, 0, -.5, .06); } }
-  if (L.weapon === 'bow') { const b = add(u.armL, new THREE.TorusGeometry(.26, .015, 5, 16, Math.PI), S2({ color: '#5a3a20' }), 0, -.42, .05); b.rotation.set(0, Math.PI / 2, Math.PI / 2); add(chest, new THREE.CylinderGeometry(.05, .05, .32, 6), S2({ color: '#3a2a1a' }), .08, .3, -.18).rotation.z = .3; }
-  if (L.weapon === 'rifle') { const g = new THREE.Group(); add(g, G.gun, S2({ color: '#2a2d30', metalness: .6 }), 0, 0, .12); g.position.set(.05, .3, .2); chest.add(g); u.armR.rotation.x = -.9; u.armL.rotation.set(-1.1, 0, .5); u.gun = true; }
-  if (L.weapon === 'orb') { const o = add(u.armL, new THREE.SphereGeometry(.07, 10, 8), new THREE.MeshBasicMaterial({ color: L.orb }), 0, -.5, .1); u.orb = o; }
-  if (L.glow || L.orb) { const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: V3.glowTex, color: L.glow || L.orb, blending: THREE.AdditiveBlending, depthWrite: false, transparent: true, opacity: .55 })); s.scale.set(1.6, 1.6, 1); s.position.y = .7; h.add(s); }
-  h.scale.setScalar(L.scale); u.heroId = id; return h;
+  if (u.orb) u.orb.position.y = -.47 + Math.sin(t * 3) * .03;
+  if (u.scarf) u.scarf.rotation.x = .5 + (moving ? .3 : .1) + Math.sin(t * 5) * .1;
+  if (u.flick) u.flick.forEach((s, i) => { const f = .8 + Math.sin(t * 13 + i * 2.1) * .15 + Math.sin(t * 29 + i) * .08; s.scale.set(s.userData.b * f, s.userData.b * f * 1.25, 1); });
+  if (u.orbParts) u.orbParts.forEach((s, i) => { const a = t * 2.4 + i * 1.05; s.position.set(Math.cos(a) * .1, Math.sin(a * 1.3) * .05, Math.sin(a) * .1); });
 }
