@@ -70,7 +70,7 @@ function baseBanners() {
   return `${hqLv() >= 2 && siegeIn < 120000 ? `<div class="banner siege">🧟 <span class="grow">${t('siege_in')} <b class="num" data-end="${S.siegeAt}"></b></span></div>` : ''}
   ${evs.slice(0, 2).map(e => `<button class="banner ev" data-a="events"><span>⚡</span><span class="grow">${esc(L(e.title))}</span>${e.ends ? `<b class="num" data-end="${e.ends}"></b>` : ''}</button>`).join('')}
   ${offer ? `<button class="banner offer" data-a="starter"><span>🎁</span><span class="grow">${t('starter_banner')}</span><b>${priceStr(IAPB.starter)}</b></button>` : ''}
-  ${q ? `<div class="quest"><span class="qk">${t('quest')}</span><span class="qt">${q[0]()}</span>${qd ? `<button class="btn gold sm" data-a="qclaim">${t('claim')}</button>` : `<button class="btn sm ${S.quest < 6 ? 'hint' : ''}" data-a="qgo">${t('go')}</button>`}</div>` : ''}`;
+  ${q ? `<div class="quest"><span class="qk">${t('chapter_short', chapterOf(S.quest) + 1)} · ${chapterProgress().done + 1}/${CH_LEN}</span><span class="qt">${q[0]()}</span>${qd ? `<button class="btn gold sm" data-a="qclaim">${t('claim')}</button>` : `<button class="btn sm ${S.quest < 6 ? 'hint' : ''}" data-a="qgo">${t('go')}</button>`}</div>` : ''}`;
 }
 function baseShortcuts() {
   return [
@@ -93,7 +93,7 @@ function villageHTML() {
     + (S.rq ? `<button class="chipq" data-a="bld" data-x="lab"><span class="ce">🔬</span><span class="prog"><i data-bar data-st="${S.rq.st}" data-en="${S.rq.end}"></i></span><b class="num" data-end="${S.rq.end}"></b></button>` : '')
     + (S.tq ? `<button class="chipq" data-a="bld" data-x="barracks"><span class="ce">🎖️</span><span class="prog"><i data-bar data-st="${S.tq.st}" data-en="${S.tq.end}"></i></span><b class="num" data-end="${S.tq.end}"></b></button>` : '')
     + (S.builds.length < maxBuilders() ? `<span class="chipq idle">🔨 ${S.builds.length}/${maxBuilders()}</span>` : '');
-  return `<div class="b3"><div id="b3c"></div><div id="b3h">${PLOTS.map(hotspotHTML).join('')}</div>
+  return `<div class="b3"><div id="b3c"></div><div id="v3tag" class="v3tag b3ui" hidden></div><div id="b3h">${PLOTS.map(hotspotHTML).join('')}</div>
   <div class="b3top b3ui">${baseBanners()}</div>
   <div class="b3side b3ui">${sc.slice(0, 5).join('')}</div><div class="b3side end b3ui">${sc.slice(5).join('')}</div>
   <div class="b3rot b3ui"><button data-a="v3rot" data-x="-1" aria-label="rotate">⟲</button><button data-a="v3home" aria-label="reset">⌂</button><button data-a="v3rot" data-x="1" aria-label="rotate">⟳</button></div>
@@ -114,7 +114,7 @@ function flatBaseHTML() {
   ${hqLv() >= 2 && siegeIn < 120000 ? `<div class="banner siege">🧟 <span class="grow">${t('siege_in')} <b class="num" data-end="${S.siegeAt}"></b></span></div>` : ''}
   ${evs.map(e => `<button class="banner ev" data-a="events"><span>⚡</span><span class="grow">${esc(L(e.title))}</span>${e.ends ? `<b class="num" data-end="${e.ends}"></b>` : ''}</button>`).join('')}
   ${offer ? `<button class="banner offer" data-a="starter"><span>🎁</span><span class="grow">${t('starter_banner')}</span><b>${priceStr(IAPB.starter)}</b></button>` : ''}
-  ${q ? `<div class="quest"><span class="qk">${t('quest')}</span><span class="qt">${q[0]()}</span>${qd ? `<button class="btn gold sm" data-a="qclaim">${t('claim')}</button>` : `<button class="btn sm ${S.quest < 6 ? 'hint' : ''}" data-a="qgo">${t('go')}</button>`}</div>` : `<div class="quest"><span class="qk">${t('quest')}</span><span class="qt">${t('quests_done')}</span></div>`}
+  ${q ? `<div class="quest"><span class="qk">${t('chapter_short', chapterOf(S.quest) + 1)} · ${chapterProgress().done + 1}/${CH_LEN}</span><span class="qt">${q[0]()}</span>${qd ? `<button class="btn gold sm" data-a="qclaim">${t('claim')}</button>` : `<button class="btn sm ${S.quest < 6 ? 'hint' : ''}" data-a="qgo">${t('go')}</button>`}</div>` : `<div class="quest"><span class="qk">${t('quest')}</span><span class="qt">${t('quests_done')}</span></div>`}
   <div class="shortcuts">${shortcuts.map(([a, i, n, d]) => `<button class="sc" data-a="${a}">${d ? '<span class="dot"></span>' : ''}<span class="si">${i}</span>${n}</button>`).join('')}</div>
   <div class="compound">${PLOTS.map(tileHTML).join('')}</div>
   <div class="builders"><h3>${t('builders')} ${S.builds.length}/${maxBuilders()}</h3>
@@ -314,10 +314,10 @@ function mEvents() {
     let act = '';
     if (e.type === 'boss') act = `<button class="btn pri sm" data-a="worldBoss" ${S.wb.tries >= 3 ? 'disabled' : ''}>⚔️ ${t('fight')} (${3 - S.wb.tries}/3)</button>`;
     else if (e.type === 'gift') { const done = S.evp[e.id] && S.evp[e.id].done; act = `<button class="btn gold sm" data-a="evClaim" data-x="${esc(e.id)}" ${done ? 'disabled' : ''}>${done ? '✔' : t('claim')}</button>`; }
-    else if (e.type === 'kills') { const p = evProgress(e), g = Number(e.params.goal) || 1, done = S.evp[e.id] && S.evp[e.id].done; act = `<div style="display:grid;gap:4px;justify-items:end"><span class="cc num">${fmt(Math.min(p, g))}/${fmt(g)}</span><button class="btn gold sm" data-a="evClaim" data-x="${esc(e.id)}" ${p >= g && !done ? '' : 'disabled'}>${done ? '✔' : t('claim')}</button></div>`; }
-    const extra = e.type === 'double' ? `×${Number(e.params.m) || 2}` : e.type === 'production' ? `×${Number(e.params.m) || 1.5}` : e.type === 'discount' ? `-${Number(e.params.p) || 0}%` : '';
-    const rw = (e.type === 'gift' || e.type === 'kills') ? `<div class="row">${rewHTML(sanitizeRewards(e.params.r || {}))}</div>` : '';
-    return `<div class="li hot"><span class="lic">${{ boss: '🦍', double: '✖️', production: '🏭', discount: '🏷️', gift: '🎁', kills: '🧟' }[e.type] || '⚡'}</span><div class="lit"><b>${esc(L(e.title))} ${extra ? `<span class="tag live">${extra}</span>` : ''}</b><small>${esc(L(e.body))}</small>${rw}${e.ends ? `<small>${t('ends_in')} <span class="num" data-end="${e.ends}"></span></small>` : ''}</div>${act}</div>`;
+    else if (e.type === 'kills' || e.type === 'race') { const p = evProgress(e), g = Number(e.params.goal) || 1, done = S.evp[e.id] && S.evp[e.id].done; act = `<div style="display:grid;gap:4px;justify-items:end"><span class="cc num">${fmt(Math.min(p, g))}/${fmt(g)}</span><button class="btn gold sm" data-a="evClaim" data-x="${esc(e.id)}" ${p >= g && !done ? '' : 'disabled'}>${done ? '✔' : t('claim')}</button></div>`; }
+    const extra = e.type === 'race' ? t('m_' + e.params.metric) : e.type === 'double' ? `×${Number(e.params.m) || 2}` : e.type === 'production' ? `×${Number(e.params.m) || 1.5}` : e.type === 'discount' ? `-${Number(e.params.p) || 0}%` : '';
+    const rw = (e.type === 'gift' || e.type === 'kills' || e.type === 'race') ? `<div class="row">${rewHTML(sanitizeRewards(e.params.r || {}))}</div>` : '';
+    return `<div class="li hot"><span class="lic">${{ boss: '🦍', double: '✖️', production: '🏭', discount: '🏷️', gift: '🎁', kills: '🧟', race: '🏁' }[e.type] || '⚡'}</span><div class="lit"><b>${esc(L(e.title))} ${extra ? `<span class="tag live">${extra}</span>` : ''}</b><small>${esc(L(e.body))}</small>${rw}${e.ends ? `<small>${t('ends_in')} <span class="num" data-end="${e.ends}"></span></small>` : ''}</div>${act}</div>`;
   }).join('');
   const body = `<h3>${t('live_events')}</h3>${evHTML}
   <h3>${t('login_rewards')}</h3>
@@ -330,8 +330,8 @@ function mEvents() {
   return sheet('🎁', t('events'), t('events_sub'), body);
 }
 function mQuests() {
-  const list = QUESTS.slice(S.quest, S.quest + 5);
-  return sheet('📋', t('main_quests'), t('done_of', S.quest, QUESTS.length), list.length ? list.map((q, i) => `<div class="li"><div class="lit"><b>${q[0]()}</b><div class="row">${rewHTML(q[2])}</div></div>${i === 0 ? (q[1]() ? `<button class="btn gold sm" data-a="qclaim">${t('claim')}</button>` : `<button class="btn sm" data-a="qgo">${t('go')}</button>`) : `<span class="tag">${t('upcoming')}</span>`}</div>`).join('') : `<p>${t('quests_done')}</p>`);
+  const list = QUESTS.slice(S.quest, S.quest + 5), ci = chapterOf(S.quest);
+  return sheet('📋', t('chapter_n', ci + 1) + ' · ' + esc(L(CHAPTERS[ci].t)), t('done_of', S.quest, QUESTS.length) + ` · <button class="btn sm" data-a="story" style="min-height:26px;padding:2px 8px">📖 ${t('read_story')}</button>`, list.length ? list.map((q, i) => `<div class="li"><div class="lit"><b>${q[0]()}</b><div class="row">${rewHTML(q[2])}</div></div>${i === 0 ? (q[1]() ? `<button class="btn gold sm" data-a="qclaim">${t('claim')}</button>` : `<button class="btn sm" data-a="qgo">${t('go')}</button>`) : `<span class="tag">${t('upcoming')}</span>`}</div>`).join('') : `<p>${t('quests_done')}</p>`);
 }
 const GSHOP = [
   { k: 'free', i: '🎁', p: 0, r: { gems: 30, food: 2000, wood: 2000 } },

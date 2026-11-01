@@ -85,7 +85,7 @@ const QUESTS = [
   [() => t('q_stage', 50), () => S.stage > 50, { gems: 1500, ticket: 8 }, '#campaign'],
   qUp('hq', 20, { gems: 2000, ticket: 10 }, 'hq'),
 ];
-function claimQuest() { const q = QUESTS[S.quest]; if (!q || !q[1]()) return; give(q[2]); S.quest++; addXP(40 + S.quest * 5); SND.coin(); toast(t('reward_claimed')); save(); refresh(); }
+function claimQuest() { const q = QUESTS[S.quest]; if (!q || !q[1]()) return; give(q[2]); const pq = S.quest; S.quest++; storyOnQuestClaim(pq); addXP(40 + S.quest * 5); SND.coin(); toast(t('reward_claimed')); save(); refresh(); }
 function goQuest() {
   const q = QUESTS[S.quest]; if (!q) return; const g = q[3]; closeModal();
   if (g.startsWith('#')) { tab = g.slice(1); render(); return; }
@@ -113,10 +113,10 @@ function upgrade(k, instant) {
   const ms = bTime(p.t, to);
   if (instant) {
     const g = gemCost(ms); if (S.res.gems < g) { toast(t('no_gems'), 1); return; }
-    pay(c); S.res.gems -= g; finishBuild(k, to); track('build'); closeModal();
+    pay(c); S.res.gems -= g; finishBuild(k, to); track('build'); S.stats.builds = (S.stats.builds || 0) + 1; closeModal();
   } else {
     if (S.builds.length >= maxBuilders()) { toast(t('builders_busy'), 1); return; }
-    pay(c); S.builds.push({ k, to, st: now(), end: now() + ms, h: 0, hr: false }); track('build'); toast(t('build_started', L(BT[p.t].n)));
+    pay(c); S.builds.push({ k, to, st: now(), end: now() + ms, h: 0, hr: false }); track('build'); S.stats.builds = (S.stats.builds || 0) + 1; toast(t('build_started', L(BT[p.t].n)));
     askNotif();
   }
   save(); refresh();
@@ -265,11 +265,16 @@ function vipChest() { if (S.vip.chest === today() || vipLv() < 1) return; S.vip.
 function cardClaim() { if (!cardActive() || S.card.last === today()) return; S.card.last = today(); give({ gems: IAPB.monthly.daily }); SND.coin(); toast(t('reward_claimed')); save(); refresh(); }
 
 /* ================= events actions ================= */
-function evProgress(e) { if (e.type === 'kills') { const p = S.evp[e.id] || (S.evp[e.id] = { start: S.stats.kills }); return S.stats.kills - p.start; } return 0; }
+const RACE_METRICS = ['kills', 'wins', 'recruits', 'spins', 'builds', 'gathered', 'sieges', 'trained'];
+const metricVal = m => Number(S.stats[m] || 0);
+function evProgress(e) {
+  const m = e.type === 'kills' ? 'kills' : e.type === 'race' && RACE_METRICS.includes(e.params.metric) ? e.params.metric : null; if (!m) return 0;
+  const p = S.evp[e.id] || (S.evp[e.id] = { start: metricVal(m) }); return metricVal(m) - p.start;
+}
 function evClaim(id) {
   const e = activeEvents().find(x => x.id === id); if (!e) return;
   const p = S.evp[id] || (S.evp[id] = {}); if (p.done) return;
-  if (e.type === 'kills' && evProgress(e) < (Number(e.params.goal) || 0)) return;
+  if ((e.type === 'kills' || e.type === 'race') && evProgress(e) < (Number(e.params.goal) || 0)) return;
   p.done = 1; const r = sanitizeRewards(e.params.r || e.params.rewards || {}); give(r); SND.rare(); queuePopup(() => mGift(r, L(e.title))); save(); refresh();
 }
 function wbReset() { if (S.wb.date !== today()) S.wb = { date: today(), tries: 0 }; }

@@ -126,7 +126,7 @@ end $$;
 -- ---------- events ----------
 create table if not exists public.events (
   id bigint generated always as identity primary key,
-  type text not null check (type in ('double','production','discount','gift','kills')),
+  type text not null,
   title jsonb not null default '{}'::jsonb,
   body jsonb not null default '{}'::jsonb,
   params jsonb not null default '{}'::jsonb,
@@ -135,6 +135,8 @@ create table if not exists public.events (
   active boolean not null default true,
   created_at timestamptz not null default now()
 );
+alter table public.events drop constraint if exists events_type_check;
+alter table public.events add constraint events_type_check check (type in ('double','production','discount','gift','kills','race'));
 alter table public.events enable row level security;
 drop policy if exists "events read" on public.events;
 create policy "events read" on public.events for select using (active or public.is_admin());
@@ -148,6 +150,7 @@ create table if not exists public.news (
   body jsonb not null default '{}'::jsonb,
   created_at timestamptz not null default now()
 );
+alter table public.news add column if not exists popup boolean not null default false;
 alter table public.news enable row level security;
 drop policy if exists "news read" on public.news;
 create policy "news read" on public.news for select using (true);

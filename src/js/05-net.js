@@ -68,7 +68,9 @@ async function fetchEvents() {
 }
 async function fetchNews() {
   const rows = await http('/rest/v1/news?select=*&order=created_at.desc&limit=20');
-  NET.news = (rows || []).map(r => ({ id: r.id, title: r.title || {}, body: r.body || {}, at: Date.parse(r.created_at) }));
+  NET.news = (rows || []).map(r => ({ id: r.id, title: r.title || {}, body: r.body || {}, at: Date.parse(r.created_at), popup: !!r.popup }));
+  const pop = NET.news.filter(n => n.popup && n.id > (S.newsPop || 0)).sort((a, b) => a.id - b.id).pop();
+  if (pop) { S.newsPop = pop.id; save(); queuePopup(() => sheet('📢', esc(L(pop.title)), new Date(pop.at).toLocaleDateString(LANG === 'ar' ? 'ar' : 'en'), `<p style="white-space:pre-wrap;line-height:1.8">${esc(L(pop.body))}</p><button class="btn gold wide" data-a="close">${t('ok')}</button>`)); }
 }
 async function claimGrants() {
   if (!NET.on) return;

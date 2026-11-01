@@ -15,7 +15,7 @@ const SHOTS = ['base', 'battle', 'heroes', 'world', 'pass'];
   const url = 'file://' + path.resolve('www/index.html');
   // 1) get a fresh save from the real game, then edit it into a mid-game state
   const c0 = await b.newContext({ viewport: { width: 430, height: 932 } }); const p0 = await c0.newPage();
-  await p0.goto(url); await p0.waitForTimeout(400); await p0.click('[data-a=langPick][data-x=ar]'); await p0.click('.sh-b [data-a=close]'); await p0.waitForTimeout(5600);
+  await p0.goto(url); await p0.waitForTimeout(400); await p0.click('[data-a=langPick][data-x=ar]'); await p0.click('.sh-b [data-a=close]'); await p0.waitForTimeout(400); await p0.click('#modal .sh-h [data-a=close]').catch(() => { }); await p0.waitForTimeout(5600);
   const base = await p0.evaluate(k => localStorage.getItem(k), KEY); await c0.close();
   const seed = lang => {
     const s = JSON.parse(base);

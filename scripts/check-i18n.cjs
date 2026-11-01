@@ -7,7 +7,7 @@ const used = new Set([...src.matchAll(/\bt\('([a-zA-Z0-9_]+)'/g)].map(m => m[1])
 const dyn = {
   tab_: ['base', 'heroes', 'campaign', 'world', 'alliance'], d_: ['collect', 'win', 'build', 'train', 'recruit', 'gather', 'research', 'spin'],
   g_: ['free', 'ticket', 'ticket10', 'sp5', 'sp60', 'stam', 'spin', 'food', 'wood', 'iron', 'fuel', 'exp'], shop_: ['gems', 'offers', 'items'], tag_: ['popular', 'best'],
-  ach_: ['kills', 'stage', 'heroes', 'power', 'sieges', 'recruits', 'gathered', 'hq', 'boss'], evt_: ['double', 'production', 'discount', 'gift', 'kills'], evh_: ['double', 'production', 'discount', 'gift', 'kills'],
+  ach_: ['kills', 'stage', 'heroes', 'power', 'sieges', 'recruits', 'gathered', 'hq', 'boss'], evt_: ['double', 'production', 'discount', 'gift', 'kills', 'race'], evh_: ['double', 'production', 'discount', 'gift', 'kills', 'race'], m_: ['kills', 'wins', 'recruits', 'spins', 'builds', 'gathered', 'sieges', 'trained'],
   adm_: ['dash', 'players', 'gifts', 'events', 'news', 'config', 'buys'], k_: ['players_total', 'active_24h', 'new_today', 'banned_n', 'buys_total', 'buys_today', 'revenue_total', 'revenue_today'],
   tier: ['0', '1', '2', '3', '4'], sk_: ['snipe', 'shield', 'heal', 'air', 'aoe', 'stun', 'rapid', 'buff'],
 };

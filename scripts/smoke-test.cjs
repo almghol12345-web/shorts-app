@@ -15,6 +15,7 @@ const path = require('path');
   const step = async (name, fn) => { try { await fn(); } catch (e) { errs.push(name + ': ' + e.message.split('\n')[0]); } };
   await step('language', () => pg.click('[data-a=langPick][data-x=ar]'));
   await step('tutorial', () => pg.click('.sh-b [data-a=close]'));
+  await step('story', async () => { await pg.waitForTimeout(400); const t = await pg.textContent('#modal'); if (!/Chapter 1|الفصل 1/.test(t || '')) throw new Error('chapter 1 story did not open'); await pg.click('#modal .sh-h [data-a=close]'); await pg.waitForTimeout(300); });
   await step('3d village', async () => { await pg.waitForTimeout(150); const d = await pg.evaluate(() => window.V3_DEBUG && V3_DEBUG()); if (!d || !d.inited) throw new Error('village not started ' + JSON.stringify(d)); await pg.waitForFunction(() => V3_DEBUG().meshes === 19, null, { timeout: 5000 }); });
   await step('collect', () => pg.evaluate(() => { const b = document.querySelector('.bub:not([hidden])'); if (!b) throw new Error('no bubble'); b.click(); }));
   await step('upgrade', async () => { await pg.evaluate(() => document.querySelector('[data-tile=farm1]').click()); await pg.click('[data-a=up]'); await pg.click('.sh-h [data-a=close]'); });

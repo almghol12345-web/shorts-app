@@ -159,14 +159,46 @@ function v3Embers() {
 function v3Units() {
   const looks = [['#4a5a3a', '#c99a72', '#3a4a2a'], ['#5a3a2a', '#b37a52', '#2a2a2a'], ['#3a4a5a', '#d8a578', '#5a1f1f'], ['#5a5040', '#8a5a3a', '#2a3a2a'], ['#3a3a3a', '#c99a72', '#7a1f22']];
   const way = () => { const pts = [[-10, -7], [10, -7], [-10, 2], [10, 2], [-3.5, 9], [3.5, 9], [0, 16], [-11, 13], [11, 13], [-4.5, -10], [4.5, -10]]; return pts[Math.floor(Math.random() * pts.length)]; };
-  for (let i = 0; i < 9; i++) {
-    const s = m3Human('survivor');
+  for (let i = 0; i < 7; i++) {
+    const s = m3Human('survivor'); s.userData.citizen = CITIZENS[(i * 7 + 3) % CITIZENS.length];
     const w = way(); s.position.set(w[0], 0, w[1]); V3.scene.add(s); V3.units.push({ s, to: way(), spd: 1.3 + Math.random() * .8, ph: Math.random() * 6, wait: Math.random() * 3 });
   }
   // guards on the wall towers
   V3.guards = [];
   for (const [x, z] of [[-9, WALL], [9, WALL], [WALL, 2], [-WALL, 2], [WALL, -10], [-WALL, -10], [0, -WALL]]) { const s = m3Human('guard'); s.position.set(x, 2.4, z); s.rotation.y = Math.atan2(x, z); V3.scene.add(s); V3.guards.push(s); }
   V3.towers = V3.guards.map(g => [g.position.x, g.position.z]);
+}
+const CITIZENS = [['أبو خالد', 'Abu Khalid', 'نجار', 'Carpenter'], ['أم سعد', 'Umm Saad', 'طباخة', 'Cook'], ['فيصل', 'Faisal', 'حارس', 'Watchman'], ['ريم', 'Reem', 'مزارعة', 'Farmer'], ['سلمان', 'Salman', 'حدّاد', 'Blacksmith'], ['هيا', 'Haya', 'ممرضة', 'Nurse'], ['مساعد', 'Musaed', 'عامل منجم', 'Miner'], ['جواهر', 'Jawaher', 'تاجرة', 'Trader'], ['ناصر', 'Nasser', 'مهندس', 'Engineer'], ['عبير', 'Abeer', 'معلّمة', 'Teacher'], ['راشد', 'Rashed', 'صياد', 'Hunter'], ['دلال', 'Dalal', 'خيّاطة', 'Tailor']].map(([ar, en, jar, jen]) => ({ n: { ar, en }, job: { ar: jar, en: jen } }));
+function v3SyncHeroes() {
+  if (!V3.inited) return; V3.heroUnits = V3.heroUnits || {};
+  const want = ownedHeroes().slice(0, 10);
+  for (const id of want) if (!V3.heroUnits[id]) {
+    const h = m3Hero(id), pts = [[-6, 3], [6, 3], [0, 6], [-8, -5], [8, -5], [-3, 12], [3, 12]]; const w = pts[Math.floor(Math.random() * pts.length)];
+    h.position.set(w[0] + Math.random(), 0, w[1] + Math.random()); V3.scene.add(h); V3.heroUnits[id] = h;
+    V3.units.push({ s: h, to: pts[Math.floor(Math.random() * pts.length)], spd: 1.2 + Math.random() * .6, ph: Math.random() * 6, wait: Math.random() * 2 });
+  }
+  for (const id in V3.heroUnits) if (!want.includes(id)) { const h = V3.heroUnits[id]; V3.scene.remove(h); V3.units = V3.units.filter(u => u.s !== h); delete V3.heroUnits[id]; }
+}
+/* tap a character: show its name (heroes also open their page) */
+function v3PickUnit(x, y) {
+  if (!V3.W) return null; _ray.setFromCamera({ x: x / V3.W * 2 - 1, y: -(y / V3.H) * 2 + 1 }, V3.camera);
+  let best = null, bd = 1e9;
+  for (const u of V3.units) { const p = u.s.position, sc = u.s.scale.x; const sph = new THREE.Sphere(new THREE.Vector3(p.x, p.y + .9 * sc, p.z), .55 * sc); const hit = _ray.ray.intersectSphere(sph, new THREE.Vector3()); if (hit) { const d = hit.distanceTo(_ray.ray.origin); if (d < bd) { bd = d; best = u; } } }
+  return best;
+}
+function v3ShowTag(u) {
+  const el = $('#v3tag'); if (!el || !u) return;
+  const ud = u.s.userData; V3.tagUnit = u; V3.tagUntil = now() + 3500;
+  if (ud.heroId) { const Hh = HB[ud.heroId]; el.innerHTML = `<img src="${portraitURI(ud.heroId)}" alt=""><span><b>${esc(L(Hh.n))}</b><small style="color:${RAR[Hh.r].c}">${L(RAR[Hh.r].n)} · ${esc(L(Hh.role))}</small></span><button class="btn gold sm" data-a="hero" data-x="${ud.heroId}">${t('details')}</button>`; }
+  else el.innerHTML = `<span class="cz">🧑</span><span><b>${esc(L(ud.citizen.n))}</b><small>${t('citizen')} · ${esc(L(ud.citizen.job))}</small></span>`;
+  el.hidden = false; u.wait = Math.max(u.wait, 3.5);
+  u.s.rotation.y = Math.atan2(V3.camera.position.x - u.s.position.x, V3.camera.position.z - u.s.position.z);
+}
+function v3PlaceTag() {
+  const el = $('#v3tag'); if (!el || el.hidden) return;
+  if (!V3.tagUnit || now() > V3.tagUntil) { el.hidden = true; V3.tagUnit = null; return; }
+  const p = V3.tagUnit.s.position, sc = V3.tagUnit.s.scale.x, pr = v3Project(p.x, p.y + 1.35 * sc, p.z);
+  el.style.transform = `translate(calc(${pr.x.toFixed(0)}px - 50%), calc(${pr.y.toFixed(0)}px - 100%))`;
 }
 function v3SpawnZombie() {
   const s = m3Human('zombie'), a = Math.random() * Math.PI * 2, r = 34 + Math.random() * 10;
@@ -242,9 +274,10 @@ function v3Bind(el) {
     if (g.m === 'pinch' && P.size >= 2) { const [a, b] = [...P.values()]; V3.dist = clamp(g.z0 * g.d0 / (Math.hypot(a.x - b.x, a.y - b.y) || 1), 24, 92); V3.az = g.az0 - (Math.atan2(b.y - a.y, b.x - a.x) - g.a0); return; }
     if (g.m === 'pan') { moved += Math.abs(p.x - g.lx) + Math.abs(p.y - g.ly); if (moved > 6) { const a0 = v3Ground(g.lx, g.ly), a1 = v3Ground(p.x, p.y); if (a0 && a1) { const ddx = a0.x - a1.x, ddz = a0.z - a1.z; V3.tgt.x += ddx; V3.tgt.z += ddz; v3Clamp(); v3Cam(); V3.camera.updateMatrixWorld(); const tn = performance.now(), dt = Math.max(1, tn - lt); V3.vel = { x: ddx / dt * 16, z: ddz / dt * 16 }; lt = tn; } } g.lx = p.x; g.ly = p.y; }
   });
-  const up = e => { P.delete(e.pointerId); if (P.size === 0) { if (performance.now() - lt > 90) V3.vel = { x: 0, z: 0 }; g = null; } else if (P.size === 1) { const q = [...P.values()][0]; g = { m: 'pan', lx: q.x, ly: q.y }; } };
+  const up = e => { if (tab === 'base' && V3.inited && P.size === 1 && moved <= 6 && !e.target.closest('.b3ui') && !e.target.closest('#v3tag')) { const r = el.getBoundingClientRect(), u = v3PickUnit(e.clientX - r.left, e.clientY - r.top); if (u) { v3ShowTag(u); V3.swallow = true; } }
+    P.delete(e.pointerId); if (P.size === 0) { if (performance.now() - lt > 90) V3.vel = { x: 0, z: 0 }; g = null; } else if (P.size === 1) { const q = [...P.values()][0]; g = { m: 'pan', lx: q.x, ly: q.y }; } };
   el.addEventListener('pointerup', up); el.addEventListener('pointercancel', up);
-  el.addEventListener('click', e => { if (moved > 8) { e.stopPropagation(); e.preventDefault(); } moved = 0; }, true);
+  el.addEventListener('click', e => { if (moved > 8 || (V3.swallow && !e.target.closest('#v3tag'))) { e.stopPropagation(); e.preventDefault(); } V3.swallow = false; moved = 0; }, true);
   el.addEventListener('wheel', e => { e.preventDefault(); V3.dist = clamp(V3.dist * Math.exp(e.deltaY * .0012), 24, 92); }, { passive: false });
 }
 /* ---------- mount / loop ---------- */
@@ -252,7 +285,7 @@ function mountVillage() {
   const host = $('#b3c'); if (!host || !v3Init()) return false;
   const cv = V3.renderer.domElement; cv.className = 'b3canvas'; host.appendChild(cv);
   if (!V3.bound) { v3Bind($('#view')); V3.bound = true; }
-  v3Resize(); v3SyncBuildings(); v3Hotspots();
+  v3Resize(); v3SyncBuildings(); v3SyncHeroes(); v3Hotspots();
   cancelAnimationFrame(V3.raf); V3.last = 0; V3.raf = requestAnimationFrame(v3Loop);
   return true;
 }
@@ -308,7 +341,7 @@ function v3Loop(ts) {
   // slow dusk light breathing
   V3.sun.intensity = .95 + Math.sin(t * .15) * .1;
   V3.renderer.render(V3.scene, V3.camera);
-  v3PlaceHotspots();
+  v3PlaceHotspots(); v3PlaceTag();
   V3.raf = requestAnimationFrame(v3Loop);
 }
 function v3Puff(o, spark) {
@@ -336,7 +369,7 @@ function v3PlaceHotspots() {
 function v3Focus(k) { const o = V3.objs[k] || { x: V3POS[k][0], z: V3POS[k][1] }; V3.tgt.set(o.x, 0, o.z + 2); V3.dist = Math.min(V3.dist, 40); }
 window.addEventListener('resize', () => { if (V3.inited && $('#b3c')) v3Resize(); });
 window.V3_DEBUG = () => ({ glb: typeof GLB !== 'undefined' ? Object.fromEntries(Object.entries(GLB).map(([k, v]) => [k, v === null ? 'none' : v === 'loading' ? 'loading' : 'ok'])) : {}, models: typeof MODELS !== 'undefined' ? Object.keys(MODELS) : [], inited: V3.inited, failed: V3.failed, sup: V3.sup, objs: Object.keys(V3.objs || {}).length, meshes: Object.values(V3.objs || {}).filter(o => o.mesh).length });
-window.V3DBG = { dist(d) { V3.dist = d; }, look(x, z, d) { V3.tgt.set(x, 0, z); V3.dist = d; V3.vel = { x: 0, z: 0 }; }, unit(i) { const u = V3.units[i || 0]; u.wait = 99; return [u.s.position.x, u.s.position.z]; }, guard(i) { const g = V3.guards[i || 0]; return [g.position.x, g.position.z]; }, pads(on) { for (const k in V3.objs) { const g = V3.objs[k].group; g.children[0].visible = on; g.children[1].visible = on; } }, shadows(on) { V3.sun.castShadow = on; }, bill(on) { for (const k in V3.objs) if (V3.objs[k].mesh) V3.objs[k].mesh.visible = on; } };
+window.V3DBG = { dist(d) { V3.dist = d; }, look(x, z, d) { V3.tgt.set(x, 0, z); V3.dist = d; V3.vel = { x: 0, z: 0 }; }, tagAt(i) { const u = V3.units[i]; v3ShowTag(u); return !!u; }, heroCount() { return Object.keys(V3.heroUnits || {}).length; }, unit(i) { const u = V3.units[i || 0]; u.wait = 99; return [u.s.position.x, u.s.position.z]; }, guard(i) { const g = V3.guards[i || 0]; return [g.position.x, g.position.z]; }, pads(on) { for (const k in V3.objs) { const g = V3.objs[k].group; g.children[0].visible = on; g.children[1].visible = on; } }, shadows(on) { V3.sun.castShadow = on; }, bill(on) { for (const k in V3.objs) if (V3.objs[k].mesh) V3.objs[k].mesh.visible = on; } };
 
 function v3Rotate(dir) { if (!V3.inited) return; V3.azT = (V3.azT !== undefined ? V3.azT : V3.az) + dir * Math.PI / 4; }
 function v3ResetView() { if (!V3.inited) return; V3.azT = Math.PI / 4; V3.tgt.set(0, 0, 2); V3.dist = 78; }

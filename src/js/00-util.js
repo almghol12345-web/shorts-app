@@ -19,8 +19,22 @@ function weighted(list) { const tot = list.reduce((a, x) => a + x.w, 0); let r =
 const dayNum = () => Math.floor((Date.now() - new Date().getTimezoneOffset() * 60000) / 864e5);
 const lerp = (a, b, t) => a + (b - a) * t;
 function storeGet(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
-function storeSet(k, v) { try { localStorage.setItem(k, v); } catch (e) { } }
-function storeDel(k) { try { localStorage.removeItem(k); } catch (e) { } }
+/* On iOS the save and login are also kept in native storage, because the system can clear web storage. */
+const MIRROR = ['fajr-naajin-save-v1', 'fajr-auth-v1'];
+function storeSet(k, v) { try { localStorage.setItem(k, v); } catch (e) { } mirrorSet(k, v); }
+function storeDel(k) { try { localStorage.removeItem(k); } catch (e) { } mirrorSet(k, null); }
+function mirrorSet(k, v) {
+  if (!MIRROR.includes(k)) return; const P = plugin('Preferences'); if (!P) return;
+  (v == null ? P.remove({ key: k }) : P.set({ key: k, value: v })).catch(() => { });
+}
+/* Copies native storage back into web storage when web storage came back empty. */
+async function restoreMirror() {
+  const P = plugin('Preferences'); if (!P) return;
+  await Promise.race([Promise.all(MIRROR.map(async k => {
+    if (storeGet(k)) return;
+    try { const r = await P.get({ key: k }); if (r && r.value) localStorage.setItem(k, r.value); } catch (e) { }
+  })), new Promise(r => setTimeout(r, 1500))]);
+}
 /* Capacitor native plugins (only inside the iOS app) */
 const NATIVE = !!(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform());
 const _plug = {};

@@ -45,7 +45,7 @@ const ACT = {
   attackNode: x => attackNode(x), gather: x => startGather(x),
   recenter: () => { const h = homeCam(); flyTo(h.x, h.y, 1); },
   zoomIn: () => zoomAt(wW / 2, wH / 2, cam.z * 1.4, true), zoomOut: () => zoomAt(wW / 2, wH / 2, cam.z / 1.4, true), findZ: () => findTarget(),
-  qclaim: () => claimQuest(), qgo: () => goQuest(), quests: () => openModal(mQuests),
+  qclaim: () => claimQuest(), qgo: () => goQuest(), quests: () => openModal(mQuests), story: () => openModal(() => mStory(chapterOf(S.quest))),
   events: () => openModal(mEvents), worldBoss: () => startWorldBoss(), evClaim: x => evClaim(x),
   login: () => { if (S.login.last === today()) return; const r = LOGIN[S.login.day % 7]; give(r); S.login.day++; S.login.last = today(); passXP(20); SND.rare(); toast(t('login_claimed')); save(); refresh(); },
   dclaim: x => { ensureDaily(); const d = DAILY.find(d => d.k === x); if (!d || S.daily.c[x] || (S.daily.p[x] || 0) < d.g) return; S.daily.c[x] = 1; S.res.gems += 10; passXP(20); addXP(10); SND.coin(); toast(t('task_claimed')); save(); refresh(); },
@@ -64,7 +64,7 @@ const ACT = {
   mail: () => openModal(mMail),
   settings: () => openModal(mSettings), tut: () => openModal(mTut),
   lang: x => { S.lang = x; setLang(x); save(); refresh(); syncPlayer().catch(() => { }); },
-  langPick: x => { S.lang = x; setLang(x); save(); closeModal(); render(); if (!S.tut) { S.tut = true; openModal(mTut); } },
+  langPick: x => { S.lang = x; setLang(x); save(); closeModal(); render(); if (!S.tut) { S.tut = true; openModal(mTut); if (!S.storySeen) { S.storySeen = 0.5; queuePopup(() => mStory(0)); } } },
   tsnd: () => { S.snd = !S.snd; save(); renderModal(); if (S.snd) SND.coin(); },
   tvib: () => { S.vib = !S.vib; save(); renderModal(); buzz('medium'); },
   copyId: () => { const v = '#' + (NET.me && NET.me.short_id); try { navigator.clipboard.writeText(v).then(() => toast(t('copied')), () => toast(v)); } catch (e) { toast(v); } },
@@ -163,4 +163,4 @@ function start(data) {
   connectClaudeCloud(); netInit(); iapInit();
 }
 try { window.claude && window.claude.hot && window.claude.hot.snapshot && window.claude.hot.snapshot(() => ({ S, tab })); } catch (e) { }
-if (window.claude && window.claude.hot && window.claude.hot.ready) window.claude.hot.ready(start); else start((window.claude && window.claude.hot && window.claude.hot.data) || {});
+if (window.claude && window.claude.hot && window.claude.hot.ready) window.claude.hot.ready(start); else restoreMirror().catch(() => { }).finally(() => start((window.claude && window.claude.hot && window.claude.hot.data) || {}));

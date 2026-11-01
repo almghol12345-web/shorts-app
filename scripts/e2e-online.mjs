@@ -3,6 +3,7 @@
 import { chromium } from 'playwright';
 import fs from 'node:fs';
 import path from 'node:path';
+import http from 'node:http';
 import { startMock } from './mock-supabase.mjs';
 
 const mock = await startMock(54329);
@@ -12,7 +13,12 @@ const html = fs.readFileSync('www/index.html', 'utf8')
   .replace("supabaseAnonKey: '',", "supabaseAnonKey: 'test-anon',")
   .replace('devPurchases: false,', 'devPurchases: true,');
 if (!html.includes(mock.url)) throw new Error('config injection failed');
-const page = path.resolve('www/__e2e.html'); fs.writeFileSync(page, html);
+// Served over http, because file:// pages can lose their storage on reload in headless Chromium.
+const web = http.createServer((req, res) => {
+  if (req.url.endsWith('.js')) { const f = path.resolve('www', req.url.slice(1).split('?')[0]); res.writeHead(200, { 'Content-Type': 'text/javascript' }); return res.end(fs.existsSync(f) ? fs.readFileSync(f) : ''); }
+  res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' }); res.end(html);
+}).listen(54330);
+const page = 'http://127.0.0.1:54330/';
 
 const b = await chromium.launch();
 const ctx = await b.newContext({ viewport: { width: 393, height: 852 }, deviceScaleFactor: 1 });
@@ -24,12 +30,12 @@ let fail = 0; const ok = (c, m) => { console.log((c ? 'PASS ' : 'FAIL ') + m); i
 const q = async (sql, p) => (await mock.db.query(sql, p)).rows;
 const closeAll = async () => { for (let i = 0; i < 5; i++) { const x = await pg.$('#modal:not([hidden]) .sh-h [data-a=close]'); if (!x) break; await x.click(); await pg.waitForTimeout(300); } };
 try {
-  await pg.goto('file://' + page); await pg.waitForTimeout(500);
-  await pg.click('[data-a=langPick][data-x=en]'); await pg.click('.sh-b [data-a=close]');
+  await pg.goto(page); await pg.waitForTimeout(500);
+  await pg.click('[data-a=langPick][data-x=en]'); await pg.click('.sh-b [data-a=close]'); await pg.waitForTimeout(400); await closeAll();
   await pg.waitForTimeout(1500);
   let rows = await q('select short_id, name from public.players');
   ok(rows.length === 1, 'player row created on first open #' + (rows[0] && rows[0].short_id));
-  const pid = (await q('select id from public.players'))[0].id; console.log('players after open:', (await q('select count(*)::int n from public.players'))[0].n);
+  const pid = (await q('select id from public.players'))[0].id;
   await pg.click('[data-a=settings]'); await pg.waitForTimeout(300);
   ok((await pg.textContent('.sh-b')).includes('#' + rows[0].short_id), 'settings shows player ID');
   await pg.fill('#namein', 'Tester'); await pg.click('#namef button'); await pg.waitForTimeout(800);
@@ -51,9 +57,11 @@ try {
   await pg.click('[data-a=admBack]'); await pg.click('[data-a=admTab][data-x=gifts]'); await pg.waitForTimeout(500);
   await pg.fill('#ga_gems', '50'); await pg.fill('#ga_note', 'Eid gift'); await pg.click('[data-a=admGrantAll]'); await pg.waitForTimeout(800);
   await pg.click('[data-a=admTab][data-x=events]'); await pg.waitForTimeout(500);
-  await pg.fill('#ev_tar', 'جوائز مضاعفة'); await pg.fill('#ev_ten', 'Triple rewards'); await pg.fill('#ev_m', '3'); await pg.click('[data-a=admEvAdd]'); await pg.waitForTimeout(900);
+  await pg.selectOption('#ev_type', 'double'); await pg.fill('#ev_tar', 'جوائز مضاعفة'); await pg.fill('#ev_ten', 'Triple rewards'); await pg.fill('#ev_m', '3'); await pg.click('[data-a=admEvAdd]'); await pg.waitForTimeout(900);
   await pg.selectOption('#ev_type', 'kills'); await pg.fill('#ev_ten', 'Kill race'); await pg.fill('#ev_goal', '5'); await pg.fill('#er_gems', '99'); await pg.click('[data-a=admEvAdd]'); await pg.waitForTimeout(900);
-  ok((await q('select count(*)::int n from public.events where active')).at(0).n === 2, 'admin published 2 events');
+  await pg.selectOption('#ev_type', 'race'); await pg.selectOption('#ev_metric', 'wins'); await pg.fill('#ev_ten', 'Win race'); await pg.fill('#ev_goal', '1'); await pg.fill('#er_gems', '5'); await pg.click('[data-a=admEvAdd]'); await pg.waitForTimeout(900);
+  ok((await q('select count(*)::int n from public.events where active')).at(0).n === 3, 'admin published 3 events');
+  ok((await q("select params from public.events where type = 'race'"))[0]?.params?.metric === 'wins', 'race event stores its goal (wins)');
   await pg.click('[data-a=admTab][data-x=news]'); await pg.waitForTimeout(400);
   await pg.fill('#nw_ten', 'Season 2 is here'); await pg.fill('#nw_ben', 'New heroes!'); await pg.click('[data-a=admNewsAdd]'); await pg.waitForTimeout(800);
   await pg.click('[data-a=admTab][data-x=config]'); await pg.waitForTimeout(500);
@@ -73,6 +81,8 @@ try {
   await pg.click('[data-x=campaign]'); { const v = await pg.textContent('#view'); ok(v.includes('×3') || v.includes('×6'), 'campaign shows ×3 rewards (×6 on weekends)'); }
   await pg.click('[data-x=base]'); await pg.click('[data-a=mail]'); await pg.waitForTimeout(300);
   ok((await pg.textContent('.sh-b')).includes('Season 2 is here'), 'news shows in mail'); await closeAll();
+  ok((await q('select popup from public.news'))[0]?.popup === true, 'news saved as popup');
+  ok(await pg.evaluate(() => JSON.parse(localStorage.getItem('fajr-naajin-save-v1')).newsPop > 0), 'popup news was shown to the player');
   // purchase (dev mode) → logged, VIP up, first-buy double with admin amount
   await pg.click('[data-a=shop]'); await pg.waitForTimeout(300); await pg.click('[data-a=buy][data-x=gems1]'); await pg.waitForTimeout(1200);
   const buys = await q('select product_id, gems from public.purchases');
@@ -82,7 +92,6 @@ try {
   // leaderboard
   await pg.click('[data-a=rank]'); await pg.waitForTimeout(800); ok((await pg.textContent('.sh-b')).includes('Tester'), 'leaderboard lists the player'); await closeAll();
   // ban → blocked screen
-  await pg.evaluate(() => { });
   await mock.db.query("update public.players set banned = true, ban_reason = 'Test ban'");
   await pg.reload(); await pg.waitForSelector('#block', { timeout: 15000 }).catch(() => { });
   ok(await pg.$('#block') && (await pg.textContent('#block')).includes('Test ban'), 'banned player sees blocked screen');
@@ -92,6 +101,6 @@ try {
   ok(await pg.$('#block') && (await pg.textContent('#block')).includes('Update'), 'old version asked to update');
   await mock.db.query("delete from public.config where key='min_version'");
   const real = errs.filter(e => !/status of 400/.test(e) && !/navigator\.vibrate/.test(e)); ok(real.length === 0 && errs.length <= 1, 'no page errors besides the wrong-password test ' + JSON.stringify(errs));
-} catch (e) { ok(false, 'exception: ' + e.message.split('\n')[0]); }
-await b.close(); mock.close(); fs.unlinkSync(page);
+} catch (e) { ok(false, 'exception: ' + e.message.split('\n').slice(0, 6).join(' | ')); await pg.screenshot({ path: '/tmp/claude-0/prev/e2efail.png' }).catch(() => { }); }
+await b.close(); mock.close(); web.close();
 if (fail) { console.log(fail + ' FAILED'); process.exit(1); } else console.log('ONLINE E2E PASSED');
