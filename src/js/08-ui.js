@@ -96,6 +96,7 @@ function villageHTML() {
   return `<div class="b3"><div id="b3c"></div><div id="b3h">${PLOTS.map(hotspotHTML).join('')}</div>
   <div class="b3top b3ui">${baseBanners()}</div>
   <div class="b3side b3ui">${sc.slice(0, 5).join('')}</div><div class="b3side end b3ui">${sc.slice(5).join('')}</div>
+  <div class="b3rot b3ui"><button data-a="v3rot" data-x="-1" aria-label="rotate">⟲</button><button data-a="v3home" aria-label="reset">⌂</button><button data-a="v3rot" data-x="1" aria-label="rotate">⟳</button></div>
   <div class="b3bot b3ui">${chips}</div></div>`;
 }
 function flatBaseHTML() {

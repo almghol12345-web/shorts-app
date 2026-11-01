@@ -81,6 +81,7 @@ const ACT = {
   join: x => { const i = +x, a = ALLIES[i]; const m = BOTS.slice().sort(() => Math.random() - .5).slice(0, 8 + a.lv % 4).map((n, j) => ({ n, p: Math.round((60000 - j * 5000) * (.6 + Math.random() * .6)) })).sort((p, q) => q.p - p.p); S.alliance = { i, m, gift: '' }; S.chat = [{ u: m[0].n, m: { ar: `حيّاك الله في ${a.n.ar}! 👋`, en: `Welcome to ${a.n.en}! 👋` }, t: now() }]; S.chatAt = now(); toast(t('joined_ally', L(a.n))); SND.up(); save(); refresh(); },
   leave: (x, el) => { if (el.dataset.arm) { S.alliance = null; S.chat = []; toast(t('left_ally')); save(); refresh(); } else { el.dataset.arm = '1'; el.textContent = t('tap_confirm'); el.classList.add('danger'); } },
   gift: () => { if (!S.alliance || S.alliance.gift === today()) return; S.alliance.gift = today(); give({ gems: 60, food: 3000, wood: 3000, sp5: 2 }); SND.rare(); toast(t('ally_gift_got')); save(); refresh(); },
+  v3rot: x => v3Rotate(+x), v3home: () => v3ResetView(),
   ...ADMIN_ACT,
 };
 document.addEventListener('click', e => {

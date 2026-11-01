@@ -6,6 +6,7 @@
  */
 const V3 = { inited: false, failed: false };
 const WALL = 19.5;
+const V3POSROT = { farm1: .5, farm2: .5, farm3: .5, saw1: -.5, saw2: -.5, saw3: -.5, mine3: .6, oil2: -.6, oil1: .6, wall: -.6, lab: 0, hospital: 0, radar: 0 };
 const V3POS = {
   hq: [0.0, -2.3, 11.09], radar: [0.0, -14.49, 6.07], lab: [-7.59, -13.34, 6.07], hospital: [7.59, -13.34, 6.07],
   farm1: [-14.26, -11.96, 6.07], saw1: [14.26, -11.96, 6.07], farm2: [-14.49, -4.14, 6.07], saw2: [14.49, -4.14, 6.07],
@@ -70,13 +71,13 @@ function v3Init() {
   try {
     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false, powerPreference: 'high-performance' });
     renderer.setPixelRatio(Math.min(2, window.devicePixelRatio || 1));
-    renderer.outputEncoding = THREE.sRGBEncoding; renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.3;
+    renderer.outputEncoding = THREE.sRGBEncoding; renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.12;
     renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     const scene = new THREE.Scene(); scene.background = new THREE.Color('#141a22'); scene.fog = new THREE.FogExp2('#18202a', .0095);
     const camera = new THREE.PerspectiveCamera(30, 1, 1, 400);
     Object.assign(V3, { renderer, scene, camera, inited: true, tgt: new THREE.Vector3(0, 0, 2), dist: 78, az: Math.PI / 4, el: .92, vel: { x: 0, z: 0 }, anim: null, t: 0, objs: {}, fx: [], units: [], zombies: [], torches: [], shots: [] });
     // lights
-    scene.add(new THREE.HemisphereLight('#8a9cc0', '#3a2a1a', .95));
+    scene.add(new THREE.HemisphereLight('#7a8cb0', '#3a2a1a', .75));
     const sun = new THREE.DirectionalLight('#ffb27a', 1.05); sun.position.set(-30, 40, -18); sun.castShadow = true;
     sun.shadow.mapSize.set(1024, 1024); const sc = sun.shadow.camera; sc.left = -30; sc.right = 30; sc.top = 30; sc.bottom = -30; sc.near = 1; sc.far = 120; sun.shadow.bias = -.0008;
     scene.add(sun); V3.sun = sun;
@@ -196,10 +197,9 @@ function v3SyncBuildings() {
     if (o.state !== state || !o.mesh) {
       if (o.mesh) { o.group.remove(o.mesh); o.mesh = null; }
       if (o.lock) { o.group.remove(o.lock); o.lock = null; }
-      const m = v3Billboard('b_' + p.t, size);
+      const m = state === 'built' ? m3Build(p.t, size) : m3Pad(size, state, p.t);
       if (m) {
-        if (state === 'locked') { m.material.color.set('#3a3a3a'); m.material.opacity = .55; m.material.alphaTest = .5; }
-        if (state === 'empty') { m.material.color.set('#8a8a8a'); m.material.opacity = .5; }
+        m.rotation.y = V3POSROT[p.k] || 0;
         o.group.add(m); o.mesh = m; o.state = state;
       }
       if (state === 'locked') { const l = new THREE.Sprite(new THREE.SpriteMaterial({ map: V3.lockTex, transparent: true, depthTest: false })); l.scale.set(1.6, 1.6, 1); l.position.y = size * .45; o.group.add(l); o.lock = l; }
@@ -235,11 +235,11 @@ function v3Bind(el) {
     if (tab !== 'base' || !V3.inited || e.target.closest('.b3ui')) return;
     P.set(e.pointerId, pos(e)); V3.vel = { x: 0, z: 0 }; V3.anim = null;
     if (P.size === 1) { const p = pos(e); g = { m: 'pan', lx: p.x, ly: p.y }; moved = 0; lt = performance.now(); }
-    if (P.size === 2) { const [a, b] = [...P.values()]; g = { m: 'pinch', d0: Math.hypot(a.x - b.x, a.y - b.y) || 1, z0: V3.dist }; moved = 99; }
+    if (P.size === 2) { const [a, b] = [...P.values()]; g = { m: 'pinch', d0: Math.hypot(a.x - b.x, a.y - b.y) || 1, z0: V3.dist, a0: Math.atan2(b.y - a.y, b.x - a.x), az0: V3.az }; moved = 99; }
   });
   el.addEventListener('pointermove', e => {
     if (!P.has(e.pointerId) || !g) return; const p = pos(e); P.set(e.pointerId, p);
-    if (g.m === 'pinch' && P.size >= 2) { const [a, b] = [...P.values()]; V3.dist = clamp(g.z0 * g.d0 / (Math.hypot(a.x - b.x, a.y - b.y) || 1), 24, 92); return; }
+    if (g.m === 'pinch' && P.size >= 2) { const [a, b] = [...P.values()]; V3.dist = clamp(g.z0 * g.d0 / (Math.hypot(a.x - b.x, a.y - b.y) || 1), 24, 92); V3.az = g.az0 - (Math.atan2(b.y - a.y, b.x - a.x) - g.a0); return; }
     if (g.m === 'pan') { const dx = p.x - g.lx, dy = p.y - g.ly; moved += Math.abs(dx) + Math.abs(dy); if (moved > 6) { const ox = V3.tgt.x, oz = V3.tgt.z; v3Pan(dx, dy); const tn = performance.now(), dt = Math.max(1, tn - lt); V3.vel = { x: (V3.tgt.x - ox) / dt * 16, z: (V3.tgt.z - oz) / dt * 16 }; lt = tn; } g.lx = p.x; g.ly = p.y; }
   });
   const up = e => { P.delete(e.pointerId); if (P.size === 0) { if (performance.now() - lt > 90) V3.vel = { x: 0, z: 0 }; g = null; } else if (P.size === 1) { const q = [...P.values()][0]; g = { m: 'pan', lx: q.x, ly: q.y }; } };
@@ -268,11 +268,12 @@ function v3Loop(ts) {
   const dt = V3.last ? Math.min(.05, (ts - V3.last) / 1000) : .016; V3.last = ts; V3.t += dt; const t = V3.t;
   // inertia
   if (Math.abs(V3.vel.x) + Math.abs(V3.vel.z) > .001) { V3.tgt.x += V3.vel.x * dt * 60; V3.tgt.z += V3.vel.z * dt * 60; const f = Math.pow(.9, dt * 60); V3.vel.x *= f; V3.vel.z *= f; v3Clamp(); }
+  if (V3.azT !== undefined) { V3.az += (V3.azT - V3.az) * Math.min(1, dt * 6); if (Math.abs(V3.azT - V3.az) < .002) { V3.az = V3.azT; V3.azT = undefined; } }
   v3Cam();
   if ((V3.retry = (V3.retry || 0) + dt) > .4) { V3.retry = 0; for (const k in V3.objs) if (!V3.objs[k].mesh) { v3SyncBuildings(); break; } }
   const q = V3.camera.quaternion;
   // buildings face the camera; busy ones bob a little
-  for (const k in V3.objs) { const o = V3.objs[k]; if (o.mesh) { o.mesh.quaternion.copy(q); o.mesh.position.y = o.busy ? Math.sin(t * 6) * .04 : 0; } if (o.lock) o.lock.position.y = o.size * .45 + Math.sin(t * 2) * .1; }
+  for (const k in V3.objs) { const o = V3.objs[k]; if (o.mesh) { if (o.mesh.userData.bill) o.mesh.quaternion.copy(q); o.mesh.position.y = 0; if (o.state === 'built') m3Animate(o.mesh, t, o.x); } if (o.lock) o.lock.position.y = o.size * .45 + Math.sin(t * 2) * .1; }
   // torches flicker
   for (const tc of V3.torches) { const f = .75 + Math.sin(t * 11 + tc.ph) * .12 + Math.sin(t * 23 + tc.ph * 2) * .08 + Math.random() * .06; tc.spr.scale.set(.8 * f, 1.3 * f, 1); tc.glow.material.opacity = .25 + f * .15; if (tc.pl) tc.pl.intensity = 1.1 * f + .2; }
   // embers drift up
@@ -333,5 +334,8 @@ function v3PlaceHotspots() {
 }
 function v3Focus(k) { const o = V3.objs[k] || { x: V3POS[k][0], z: V3POS[k][1] }; V3.tgt.set(o.x, 0, o.z + 2); V3.dist = Math.min(V3.dist, 40); }
 window.addEventListener('resize', () => { if (V3.inited && $('#b3c')) v3Resize(); });
-window.V3_DEBUG = () => ({ inited: V3.inited, failed: V3.failed, sup: V3.sup, objs: Object.keys(V3.objs || {}).length, meshes: Object.values(V3.objs || {}).filter(o => o.mesh).length });
+window.V3_DEBUG = () => ({ glb: typeof GLB !== 'undefined' ? Object.fromEntries(Object.entries(GLB).map(([k, v]) => [k, v === null ? 'none' : v === 'loading' ? 'loading' : 'ok'])) : {}, models: typeof MODELS !== 'undefined' ? Object.keys(MODELS) : [], inited: V3.inited, failed: V3.failed, sup: V3.sup, objs: Object.keys(V3.objs || {}).length, meshes: Object.values(V3.objs || {}).filter(o => o.mesh).length });
 window.V3DBG = { dist(d) { V3.dist = d; }, pads(on) { for (const k in V3.objs) { const g = V3.objs[k].group; g.children[0].visible = on; g.children[1].visible = on; } }, shadows(on) { V3.sun.castShadow = on; }, bill(on) { for (const k in V3.objs) if (V3.objs[k].mesh) V3.objs[k].mesh.visible = on; } };
+
+function v3Rotate(dir) { if (!V3.inited) return; V3.azT = (V3.azT !== undefined ? V3.azT : V3.az) + dir * Math.PI / 4; }
+function v3ResetView() { if (!V3.inited) return; V3.azT = Math.PI / 4; V3.tgt.set(0, 0, 2); V3.dist = 78; }

@@ -401,3 +401,5 @@ input[type=range]{width:100%;accent-color:var(--rust)}
 .chipq .ce{font-size:18px}
 .chipq.idle{color:var(--muted)}
 .hs.locked.mid .hn,.hs.empty.far .hn{display:none}
+.b3rot{position:absolute;bottom:52px;left:50%;transform:translateX(-50%);display:flex;gap:8px}
+.b3rot button{width:40px;height:40px;border-radius:50%;background:#0e1215d0;border:2px solid #b8873a;color:#f1d9a8;font-size:20px;font-weight:800;display:grid;place-items:center;box-shadow:0 3px 8px #000a}

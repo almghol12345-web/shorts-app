@@ -11,7 +11,9 @@ const heroArt = fs.existsSync('assets/heroes') ? fs.readdirSync('assets/heroes')
 const artJs = 'const HERO_ART = {\n' + heroArt.map(f => `  ${JSON.stringify(f.replace('.jpg', ''))}: 'data:image/jpeg;base64,${fs.readFileSync('assets/heroes/' + f).toString('base64')}',`).join('\n') + '\n};\n';
 const artFiles = fs.existsSync('assets/art') ? fs.readdirSync('assets/art').filter(f => f.endsWith('.webp')).sort() : [];
 const artJs2 = 'const ART = {\n' + artFiles.map(f => `  ${JSON.stringify(f.replace('.webp', ''))}: 'data:image/webp;base64,${fs.readFileSync('assets/art/' + f).toString('base64')}',`).join('\n') + '\n};\n';
-const js = jsFiles.map(f => `/* ---- ${f} ---- */\n` + (f === '02b-portraits.js' ? artJs + artJs2 : '') + read('src/js/' + f)).join('\n');
+const modelFiles = fs.existsSync('assets/models') ? fs.readdirSync('assets/models').filter(f => f.endsWith('.glb')).sort() : [];
+const modelsJs = 'const MODELS = {\n' + modelFiles.map(f => `  ${JSON.stringify(f.replace('.glb', ''))}: 'data:model/gltf-binary;base64,${fs.readFileSync('assets/models/' + f).toString('base64')}',`).join('\n') + '\n};\n';
+const js = jsFiles.map(f => `/* ---- ${f} ---- */\n` + (f === '02b-portraits.js' ? artJs + artJs2 + modelsJs : '') + read('src/js/' + f)).join('\n');
 const game = `(function(){'use strict';\n${js}\n})();`;
 new Function(game); // syntax check
 const AR = 'U+0600-06FF,U+0750-077F,U+0870-08FF,U+200C-200E,U+2010-2011,U+FB50-FDFF,U+FE70-FEFF';
@@ -37,6 +39,7 @@ ${css}
 <body>
 ${shell}
 <script src="three.min.js"></script>
+<script src="GLTFLoader.js"></script>
 <script src="capacitor.js"></script>
 <script>
 ${game}
@@ -48,6 +51,7 @@ fs.mkdirSync('www', { recursive: true });
 fs.writeFileSync('www/index.html', app);
 fs.copyFileSync('node_modules/@capacitor/core/dist/capacitor.js', 'www/capacitor.js');
 fs.copyFileSync('node_modules/three/build/three.min.js', 'www/three.min.js');
+fs.copyFileSync('node_modules/three/examples/js/loaders/GLTFLoader.js', 'www/GLTFLoader.js');
 const art = `<title>فجر الناجين</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -59,6 +63,9 @@ ${css}
 ${shell}
 <script>
 ${read('node_modules/three/build/three.min.js')}
+</script>
+<script>
+${read('node_modules/three/examples/js/loaders/GLTFLoader.js')}
 </script>
 <script>
 ${game}
