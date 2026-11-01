@@ -40,6 +40,7 @@ ${css}
 ${shell}
 <script src="three.min.js"></script>
 <script src="GLTFLoader.js"></script>
+<script src="BufferGeometryUtils.js"></script>
 <script src="capacitor.js"></script>
 <script>
 ${game}
@@ -52,6 +53,7 @@ fs.writeFileSync('www/index.html', app);
 fs.copyFileSync('node_modules/@capacitor/core/dist/capacitor.js', 'www/capacitor.js');
 fs.copyFileSync('node_modules/three/build/three.min.js', 'www/three.min.js');
 fs.copyFileSync('node_modules/three/examples/js/loaders/GLTFLoader.js', 'www/GLTFLoader.js');
+fs.copyFileSync('node_modules/three/examples/js/utils/BufferGeometryUtils.js', 'www/BufferGeometryUtils.js');
 const art = `<title>فجر الناجين</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -66,6 +68,9 @@ ${read('node_modules/three/build/three.min.js')}
 </script>
 <script>
 ${read('node_modules/three/examples/js/loaders/GLTFLoader.js')}
+</script>
+<script>
+${read('node_modules/three/examples/js/utils/BufferGeometryUtils.js')}
 </script>
 <script>
 ${game}

@@ -171,7 +171,9 @@ function m3Build(tp, size) {
     c.scale.setScalar(s); const b2 = new THREE.Box3().setFromObject(c), ctr = b2.getCenter(new THREE.Vector3()); c.position.set(-ctr.x, -b2.min.y, -ctr.z); g.add(c);
     g.userData.h = b2.max.y - b2.min.y; g.userData.glb = 1; return g;
   }
-  const inner = new THREE.Group(); (MODEL[tp] || MODEL.warehouse)(inner, M); inner.scale.setScalar(size); g.add(inner);
+  const inner = new THREE.Group(); (MODEL[tp] || MODEL.warehouse)(inner, M);
+  m3Merge(inner, o => { const u = o.userData || {}; return u.spin || u.flag || u.pulse || u.dish || u.blink || u.spinY; });
+  inner.scale.setScalar(size); g.add(inner);
   g.userData.h = (MODEL_H[tp] || .6) * size;
   const anim = []; inner.traverse(o => { if (o.userData && (o.userData.spin || o.userData.spinY || o.userData.flag || o.userData.pulse || o.userData.dish || o.userData.blink)) anim.push(o); });
   g.userData.anim = anim; return g;
@@ -202,4 +204,22 @@ function m3Pad(size, state, tp) {
     const ghost = m3Build(tp, 1); ghost.children[0].scale.setScalar(.85); m3Ghost(ghost, M.ghost); ghost.children[0].position.y = .03; inner.add(ghost);
   } else for (let i = 0; i < 5; i++) mk(inner, new THREE.DodecahedronGeometry(.04 + i % 2 * .02), M.rock, -.25 + i * .12, .03, (i % 2 - .5) * .2);
   g.userData.h = size * (state === 'empty' ? .5 : .25); return g;
+}
+
+/* merge static meshes that share a material into one draw call (animated parts stay separate) */
+function m3Merge(root, keepFn) {
+  const U = THREE.BufferGeometryUtils; if (!U || !U.mergeBufferGeometries) return;
+  root.updateMatrixWorld(true);
+  const inv = new THREE.Matrix4().copy(root.matrixWorld).invert(), byMat = new Map(), victims = [];
+  root.traverse(o => {
+    if (!o.isMesh || (keepFn && keepFn(o))) return;
+    let p = o.parent, anim = false; while (p && p !== root) { if (p.userData && (p.userData.spinY || p.userData.keep)) anim = true; p = p.parent; } if (anim) return;
+    let g = o.geometry.index ? o.geometry.toNonIndexed() : o.geometry.clone();
+    g.applyMatrix4(new THREE.Matrix4().multiplyMatrices(inv, o.matrixWorld));
+    for (const k of Object.keys(g.attributes)) if (!['position', 'normal', 'uv'].includes(k)) g.deleteAttribute(k);
+    if (!g.attributes.uv) g.setAttribute('uv', new THREE.BufferAttribute(new Float32Array(g.attributes.position.count * 2), 2));
+    if (!byMat.has(o.material)) byMat.set(o.material, { geos: [], shadow: o.castShadow }); byMat.get(o.material).geos.push(g); victims.push(o);
+  });
+  for (const o of victims) o.parent.remove(o);
+  for (const [mat, v] of byMat) { const merged = U.mergeBufferGeometries(v.geos, false); if (!merged) continue; const m = new THREE.Mesh(merged, mat); m.castShadow = v.shadow; m.receiveShadow = true; root.add(m); }
 }

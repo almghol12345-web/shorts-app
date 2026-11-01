@@ -45,7 +45,7 @@ const SHOTS = ['base', 'battle', 'heroes', 'world', 'pass'];
       if (k === 'world') { await pg.click('[data-x=world]'); await pg.waitForTimeout(300); await pg.click('[data-a=zoomIn]'); await pg.waitForTimeout(900); }
       if (k === 'pass') { await pg.click('[data-a=pass]'); }
       await pg.waitForTimeout(500);
-      const f = path.resolve(`design/raw/${lang}-${k}.png`); fs.mkdirSync(path.dirname(f), { recursive: true }); await pg.screenshot({ path: f }); raw[lang + k] = f;
+      const f = path.resolve(`design/raw/${lang}-${k}.png`); fs.mkdirSync(path.dirname(f), { recursive: true }); await pg.screenshot({ path: f, timeout: 180000 }); raw[lang + k] = f;
       await pg.close();
     }
     await ctx.close();

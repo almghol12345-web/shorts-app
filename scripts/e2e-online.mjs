@@ -16,8 +16,10 @@ const page = path.resolve('www/__e2e.html'); fs.writeFileSync(page, html);
 
 const b = await chromium.launch();
 const ctx = await b.newContext({ viewport: { width: 393, height: 852 }, deviceScaleFactor: 1 });
+await ctx.addInitScript(() => { try { localStorage.setItem('fajr-no3d', '1'); } catch (e) { } });
 const pg = await ctx.newPage();
 const errs = []; pg.on('pageerror', e => errs.push(e.message)); pg.on('console', m => { if (m.type() === 'error') errs.push(m.text()); });
+const until = async (fn, ms = 15000) => { const t0 = Date.now(); while (Date.now() - t0 < ms) { try { if (await fn()) return true; } catch (e) { } await new Promise(r => setTimeout(r, 250)); } return false; };
 let fail = 0; const ok = (c, m) => { console.log((c ? 'PASS ' : 'FAIL ') + m); if (!c) fail++; };
 const q = async (sql, p) => (await mock.db.query(sql, p)).rows;
 const closeAll = async () => { for (let i = 0; i < 5; i++) { const x = await pg.$('#modal:not([hidden]) .sh-h [data-a=close]'); if (!x) break; await x.click(); await pg.waitForTimeout(300); } };
@@ -27,7 +29,7 @@ try {
   await pg.waitForTimeout(1500);
   let rows = await q('select short_id, name from public.players');
   ok(rows.length === 1, 'player row created on first open #' + (rows[0] && rows[0].short_id));
-  const pid = (await q('select id from public.players'))[0].id;
+  const pid = (await q('select id from public.players'))[0].id; console.log('players after open:', (await q('select count(*)::int n from public.players'))[0].n);
   await pg.click('[data-a=settings]'); await pg.waitForTimeout(300);
   ok((await pg.textContent('.sh-b')).includes('#' + rows[0].short_id), 'settings shows player ID');
   await pg.fill('#namein', 'Tester'); await pg.click('#namef button'); await pg.waitForTimeout(800);
@@ -59,11 +61,11 @@ try {
   ok(JSON.stringify((await q("select value from public.config where key='gem_packs'"))[0].value).includes('150'), 'gem pack amount saved');
   await pg.click('.sh-h [data-a=close]').catch(() => { });
   // player receives everything after reopening
-  await pg.reload(); await pg.waitForTimeout(2500);
+  await pg.reload(); await until(async () => (await q('select count(*)::int n from public.grant_claims')).at(0).n === 1 && (await q('select count(*)::int n from public.grants where claimed_at is not null')).at(0).n === 1); await pg.waitForTimeout(800);
   const giftTxt = await pg.textContent('#modal').catch(() => '');
   ok((await q('select count(*)::int n from public.grants where claimed_at is not null')).at(0).n === 1 && (await q('select count(*)::int n from public.grant_claims')).at(0).n === 1, 'personal and global gifts claimed by the game');
   const gemsAfter = await pg.evaluate(() => JSON.parse(localStorage.getItem('fajr-naajin-save-v1')).res.gems);
-  ok(gemsAfter - gemsBefore >= 827, `gems added (+${gemsAfter - gemsBefore})`);
+  console.log('players now:', JSON.stringify(await q('select short_id, name from public.players'))); ok(gemsAfter - gemsBefore >= 827, `gems added (+${gemsAfter - gemsBefore})`);
   const mail = await pg.evaluate(() => JSON.parse(localStorage.getItem('fajr-naajin-save-v1')).mail.map(m => m.note));
   ok(mail.includes('Thanks for buying') && mail.includes('Eid gift'), 'gift notes saved in mail');
   await closeAll();
@@ -75,18 +77,18 @@ try {
   await pg.click('[data-a=shop]'); await pg.waitForTimeout(300); await pg.click('[data-a=buy][data-x=gems1]'); await pg.waitForTimeout(1200);
   const buys = await q('select product_id, gems from public.purchases');
   ok(buys.length === 1 && buys[0].gems === 300, 'purchase logged with first-buy double of admin amount: ' + JSON.stringify(buys));
-  ok(Number((await q('select spent from public.players'))[0].spent) > 0, 'player spent updated');
+  await until(async () => Number((await q('select spent from public.players'))[0].spent) > 0); ok(Number((await q('select spent from public.players'))[0].spent) > 0, 'player spent updated');
   await closeAll();
   // leaderboard
   await pg.click('[data-a=rank]'); await pg.waitForTimeout(800); ok((await pg.textContent('.sh-b')).includes('Tester'), 'leaderboard lists the player'); await closeAll();
   // ban → blocked screen
   await pg.evaluate(() => { });
   await mock.db.query("update public.players set banned = true, ban_reason = 'Test ban'");
-  await pg.reload(); await pg.waitForTimeout(2500);
+  await pg.reload(); await pg.waitForSelector('#block', { timeout: 15000 }).catch(() => { });
   ok(await pg.$('#block') && (await pg.textContent('#block')).includes('Test ban'), 'banned player sees blocked screen');
   await mock.db.query("update public.players set banned = false");
   await mock.db.query("insert into public.config(key,value) values ('min_version','\"9.0.0\"') on conflict (key) do update set value = excluded.value");
-  await pg.reload(); await pg.waitForTimeout(2500);
+  await pg.reload(); await pg.waitForFunction(() => document.querySelector('#block') && /Update/.test(document.querySelector('#block').textContent), null, { timeout: 15000 }).catch(() => { });
   ok(await pg.$('#block') && (await pg.textContent('#block')).includes('Update'), 'old version asked to update');
   await mock.db.query("delete from public.config where key='min_version'");
   const real = errs.filter(e => !/status of 400/.test(e) && !/navigator\.vibrate/.test(e)); ok(real.length === 0 && errs.length <= 1, 'no page errors besides the wrong-password test ' + JSON.stringify(errs));

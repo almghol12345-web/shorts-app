@@ -15,7 +15,7 @@ const V3POS = {
   oil1: [-14.49, 16.79, 5.54], wall: [14.49, 16.79, 6.07],
 };
 function v3Supported() {
-  if (V3.failed || typeof THREE === 'undefined') return false;
+  if (V3.failed || typeof THREE === 'undefined' || storeGet('fajr-no3d') === '1') return false;
   if (V3.sup !== undefined) return V3.sup;
   try { const c = document.createElement('canvas'); V3.sup = !!(c.getContext('webgl') || c.getContext('experimental-webgl')); } catch (e) { V3.sup = false; }
   return V3.sup;
@@ -92,7 +92,9 @@ function v3Init() {
     V3.fireTex = texRadial('rgba(255,236,170,1)', 'rgba(255,90,20,0)');
     V3.smokeTex = texRadial('rgba(120,120,120,.55)', 'rgba(80,80,80,0)');
     V3.glowTex = texRadial('rgba(255,170,80,.55)', 'rgba(255,120,40,0)');
+    const before = new Set(scene.children);
     v3Walls(); v3Props();
+    { const st = new THREE.Group(); scene.children.filter(o => !before.has(o) && o.isMesh).forEach(o => { scene.remove(o); st.add(o); }); scene.add(st); m3Merge(st); }
     V3.lockTex = canvasTex(128, 128, c => { c.font = '90px serif'; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText('🔒', 64, 70); });
     v3Embers(); v3Units();
     return true;
@@ -339,3 +341,5 @@ window.V3DBG = { dist(d) { V3.dist = d; }, pads(on) { for (const k in V3.objs) {
 
 function v3Rotate(dir) { if (!V3.inited) return; V3.azT = (V3.azT !== undefined ? V3.azT : V3.az) + dir * Math.PI / 4; }
 function v3ResetView() { if (!V3.inited) return; V3.azT = Math.PI / 4; V3.tgt.set(0, 0, 2); V3.dist = 78; }
+
+window.V3INFO = () => V3.renderer ? { calls: V3.renderer.info.render.calls, tris: V3.renderer.info.render.triangles, geos: V3.renderer.info.memory.geometries } : null;

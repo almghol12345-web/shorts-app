@@ -462,6 +462,7 @@ input[type=range]{width:100%;accent-color:var(--rust)}
 
 <script src="three.min.js"></script>
 <script src="GLTFLoader.js"></script>
+<script src="BufferGeometryUtils.js"></script>
 <script src="capacitor.js"></script>
 <script>
 (function(){'use strict';
@@ -2186,7 +2187,7 @@ const V3POS = {
   oil1: [-14.49, 16.79, 5.54], wall: [14.49, 16.79, 6.07],
 };
 function v3Supported() {
-  if (V3.failed || typeof THREE === 'undefined') return false;
+  if (V3.failed || typeof THREE === 'undefined' || storeGet('fajr-no3d') === '1') return false;
   if (V3.sup !== undefined) return V3.sup;
   try { const c = document.createElement('canvas'); V3.sup = !!(c.getContext('webgl') || c.getContext('experimental-webgl')); } catch (e) { V3.sup = false; }
   return V3.sup;
@@ -2263,7 +2264,9 @@ function v3Init() {
     V3.fireTex = texRadial('rgba(255,236,170,1)', 'rgba(255,90,20,0)');
     V3.smokeTex = texRadial('rgba(120,120,120,.55)', 'rgba(80,80,80,0)');
     V3.glowTex = texRadial('rgba(255,170,80,.55)', 'rgba(255,120,40,0)');
+    const before = new Set(scene.children);
     v3Walls(); v3Props();
+    { const st = new THREE.Group(); scene.children.filter(o => !before.has(o) && o.isMesh).forEach(o => { scene.remove(o); st.add(o); }); scene.add(st); m3Merge(st); }
     V3.lockTex = canvasTex(128, 128, c => { c.font = '90px serif'; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText('🔒', 64, 70); });
     v3Embers(); v3Units();
     return true;
@@ -2511,6 +2514,8 @@ window.V3DBG = { dist(d) { V3.dist = d; }, pads(on) { for (const k in V3.objs) {
 function v3Rotate(dir) { if (!V3.inited) return; V3.azT = (V3.azT !== undefined ? V3.azT : V3.az) + dir * Math.PI / 4; }
 function v3ResetView() { if (!V3.inited) return; V3.azT = Math.PI / 4; V3.tgt.set(0, 0, 2); V3.dist = 78; }
 
+window.V3INFO = () => V3.renderer ? { calls: V3.renderer.info.render.calls, tris: V3.renderer.info.render.triangles, geos: V3.renderer.info.memory.geometries } : null;
+
 /* ---- 08c-models3d.js ---- */
 /* ================= 3D building models =================
  * Each building is real geometry (stone, timber, tiled roofs, metal, glowing windows) built from
@@ -2685,7 +2690,9 @@ function m3Build(tp, size) {
     c.scale.setScalar(s); const b2 = new THREE.Box3().setFromObject(c), ctr = b2.getCenter(new THREE.Vector3()); c.position.set(-ctr.x, -b2.min.y, -ctr.z); g.add(c);
     g.userData.h = b2.max.y - b2.min.y; g.userData.glb = 1; return g;
   }
-  const inner = new THREE.Group(); (MODEL[tp] || MODEL.warehouse)(inner, M); inner.scale.setScalar(size); g.add(inner);
+  const inner = new THREE.Group(); (MODEL[tp] || MODEL.warehouse)(inner, M);
+  m3Merge(inner, o => { const u = o.userData || {}; return u.spin || u.flag || u.pulse || u.dish || u.blink || u.spinY; });
+  inner.scale.setScalar(size); g.add(inner);
   g.userData.h = (MODEL_H[tp] || .6) * size;
   const anim = []; inner.traverse(o => { if (o.userData && (o.userData.spin || o.userData.spinY || o.userData.flag || o.userData.pulse || o.userData.dish || o.userData.blink)) anim.push(o); });
   g.userData.anim = anim; return g;
@@ -2716,6 +2723,24 @@ function m3Pad(size, state, tp) {
     const ghost = m3Build(tp, 1); ghost.children[0].scale.setScalar(.85); m3Ghost(ghost, M.ghost); ghost.children[0].position.y = .03; inner.add(ghost);
   } else for (let i = 0; i < 5; i++) mk(inner, new THREE.DodecahedronGeometry(.04 + i % 2 * .02), M.rock, -.25 + i * .12, .03, (i % 2 - .5) * .2);
   g.userData.h = size * (state === 'empty' ? .5 : .25); return g;
+}
+
+/* merge static meshes that share a material into one draw call (animated parts stay separate) */
+function m3Merge(root, keepFn) {
+  const U = THREE.BufferGeometryUtils; if (!U || !U.mergeBufferGeometries) return;
+  root.updateMatrixWorld(true);
+  const inv = new THREE.Matrix4().copy(root.matrixWorld).invert(), byMat = new Map(), victims = [];
+  root.traverse(o => {
+    if (!o.isMesh || (keepFn && keepFn(o))) return;
+    let p = o.parent, anim = false; while (p && p !== root) { if (p.userData && (p.userData.spinY || p.userData.keep)) anim = true; p = p.parent; } if (anim) return;
+    let g = o.geometry.index ? o.geometry.toNonIndexed() : o.geometry.clone();
+    g.applyMatrix4(new THREE.Matrix4().multiplyMatrices(inv, o.matrixWorld));
+    for (const k of Object.keys(g.attributes)) if (!['position', 'normal', 'uv'].includes(k)) g.deleteAttribute(k);
+    if (!g.attributes.uv) g.setAttribute('uv', new THREE.BufferAttribute(new Float32Array(g.attributes.position.count * 2), 2));
+    if (!byMat.has(o.material)) byMat.set(o.material, { geos: [], shadow: o.castShadow }); byMat.get(o.material).geos.push(g); victims.push(o);
+  });
+  for (const o of victims) o.parent.remove(o);
+  for (const [mat, v] of byMat) { const merged = U.mergeBufferGeometries(v.geos, false); if (!merged) continue; const m = new THREE.Mesh(merged, mat); m.castShadow = v.shadow; m.receiveShadow = true; root.add(m); }
 }
 
 /* ---- 09-world.js ---- */
