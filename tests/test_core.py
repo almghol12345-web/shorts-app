@@ -325,3 +325,23 @@ def test_pixabay_prefers_the_main_noun(monkeypatch, tmp_path):
     monkeypatch.setattr(background, "_download", lambda url, out: got.append(url))
     assert background.fetch_pixabay("ural mountains", tmp_path / "x", background.Sources(pixabay_key="k"))
     assert got == ["MOUNT"]
+
+
+def test_seo_keeps_only_niche_trends_and_few_hashtags():
+    from shorts import seo
+
+    class YT:
+        def videos(self): return self
+        def list(self, **k): return self
+        def execute(self):
+            return {"items": [
+                {"snippet": {"title": "مباراة الهلال #الهلال #دوري_روشن", "description": "", "tags": []}},
+                {"snippet": {"title": "قصة غريبة #قصص_رعب #ألغاز", "description": "#اكسبلور", "tags": ["قصص غامضة"]}},
+                {"snippet": {"title": "#قصص_رعب جديدة", "description": "", "tags": []}}]}
+
+    trending = seo.trending_hashtags(YT())
+    assert trending[0] == "قصص_رعب" and "الهلال" not in trending and "اكسبلور" not in trending
+    title, desc, tags = seo.build("صخرة غامضة.. #shorts", "تخيل..", ["ألغاز", "غموض", "a", "b", "c", "السعودية"], trending)
+    assert title.endswith("#shorts") and title.count("#shorts") == 1
+    assert desc.count("#") <= 6 and "التعليقات" in desc
+    assert sum(len(t) + 1 for t in tags) <= 500

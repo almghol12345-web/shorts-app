@@ -29,12 +29,19 @@ def _client(cfg: Config):
 def upload(cfg: Config, script: Script, video: Path) -> str:
     from googleapiclient.http import MediaFileUpload
 
-    title = script.title if "#shorts" in script.title.lower() else f"{script.title} #shorts"
+    from . import seo
+
+    yt = _client(cfg)
+    credits = script.description.split("\n\nالصور:\n", 1)
+    title, description, tags = seo.build(script.title, script.lines[0], script.tags,
+                                         seo.trending_hashtags(yt))
+    if len(credits) == 2:
+        description += "\n\nالصور:\n" + credits[1]
     body = {
         "snippet": {
-            "title": title[:100],
-            "description": script.description[:4900],
-            "tags": script.tags[:15],
+            "title": title,
+            "description": description[:4900],
+            "tags": tags,
             "categoryId": EDUCATION,
             "defaultLanguage": cfg.language,
             "defaultAudioLanguage": cfg.language,
@@ -48,7 +55,7 @@ def upload(cfg: Config, script: Script, video: Path) -> str:
         },
     }
     media = MediaFileUpload(str(video), mimetype="video/mp4", chunksize=8 * 1024 * 1024, resumable=True)
-    request = _client(cfg).videos().insert(part="snippet,status", body=body, media_body=media)
+    request = yt.videos().insert(part="snippet,status", body=body, media_body=media)
     response = None
     while response is None:
         status, response = request.next_chunk()

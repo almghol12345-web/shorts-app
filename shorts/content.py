@@ -59,7 +59,7 @@ unexplained events, disappearances, undeciphered writings, strange places and ee
 Your only goal is retention: viewers must watch to the last second and replay.
 
 Niche: {niche}
-Language of the video: {language} (simple, spoken, suspenseful storytelling)
+Language of the video: colloquial Saudi / Gulf Arabic (spoken dialect, like a friend telling a story: تخيل، والسالفة إن، طيب ليش...), not Modern Standard Arabic
 
 Write ONE new Short. Rules:
 - Only real, documented cases. State facts accurately (dates, places, numbers). If a case has
