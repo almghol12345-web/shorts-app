@@ -72,7 +72,9 @@ def _estimate(lines: list[str]) -> list[Segment]:
 
 
 def synthesize(lines: list[str], voice: str, workdir: Path) -> Narration:
+    from .spoken import speakable
     workdir.mkdir(parents=True, exist_ok=True)
+    lines = [speakable(line) for line in lines]   # numbers as words, natural pauses
     line_sizes = [len(_spoken_words(line)) for line in lines]
     raw = workdir / "voice.mp3"
     silent = False

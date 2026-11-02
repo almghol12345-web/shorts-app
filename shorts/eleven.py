@@ -15,7 +15,7 @@ API = "https://api.elevenlabs.io"
 MODEL = "eleven_multilingual_v2"
 VOICE_NAME = "Dahsha Saudi Dialect"   # colloquial Saudi voice (auto-pick fallback)
 CHANNEL_VOICE = "Omar - Hijazi"        # the channel's voice, chosen by the owner
-SETTINGS = {"stability": 0.36, "similarity_boost": 0.8, "style": 0.4, "use_speaker_boost": True}  # chatty, natural
+SETTINGS = {"stability": 0.5, "similarity_boost": 0.85, "style": 0.2, "use_speaker_boost": True}  # clear and natural, fewer slips
 
 
 def _headers(key: str) -> dict:
@@ -143,7 +143,9 @@ def synthesize(text: str, out: Path, key: str):
     vid = voice_id(key)
     resp = requests.post(f"{API}/v1/text-to-speech/{vid}/with-timestamps",
                          params={"output_format": "mp3_44100_128"}, headers=_headers(key),
-                         json={"text": text, "model_id": MODEL, "voice_settings": SETTINGS},
+                         json={"text": text, "model_id": MODEL, "voice_settings": SETTINGS,
+                               "seed": 4242,                          # same delivery style every time
+                               "apply_text_normalization": "off"},    # numbers are already words
                          timeout=180)
     resp.raise_for_status()
     data = resp.json()
