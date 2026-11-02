@@ -363,3 +363,31 @@ def test_numbers_are_spoken_in_gulf_arabic():
     assert speakable("72 ثانية.. واختفت...") == "اثنين وسبعين ثانية، واختفت."
     assert speakable("طيب مين قص هالصخرة...") == "طيب مين قص هالصخرة؟"
     assert speakable("3.8 سم و 2%") == "ثلاثة فاصلة ثمانية سم و اثنين بالمية"
+
+
+def test_darijat_line_timing_and_json_audio(monkeypatch, tmp_path):
+    import base64
+    import shutil
+
+    import pytest
+
+    from shorts import darijat
+    from shorts.media import run
+
+    if not shutil.which("ffmpeg"):
+        pytest.skip("ffmpeg not installed")
+    clip = tmp_path / "c.mp3"
+    run(["ffmpeg", "-y", "-f", "lavfi", "-i", "sine=f=200:d=1", "-c:a", "libmp3lame", str(clip)])
+    b64 = base64.b64encode(clip.read_bytes()).decode()
+
+    class Resp:
+        ok, status_code = True, 200
+        headers = {"content-type": "application/json"}
+        def json(self): return {"data": {"audio": b64}}
+
+    monkeypatch.setenv("DARIJAT_API_KEY", "k")
+    monkeypatch.setattr(darijat.requests, "post", lambda *a, **k: Resp())
+    timed = darijat.synthesize(["أهلا وسهلا", "كيف الحال"], tmp_path / "out.mp3", tmp_path / "w")
+    assert [w for w, _, _ in timed] == ["أهلا", "وسهلا", "كيف", "الحال"]
+    assert timed[2][1] > 1.0                      # second line starts after the first clip
+    assert (tmp_path / "out.mp3").stat().st_size > 0

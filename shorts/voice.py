@@ -79,8 +79,18 @@ def synthesize(lines: list[str], voice: str, workdir: Path) -> Narration:
     raw = workdir / "voice.mp3"
     silent = False
     words = None
+    if os.environ.get("DARIJAT_API_KEY", "").strip():
+        # Saudi-dialect voice from Darijat first; ElevenLabs and the free voice are fallbacks
+        try:
+            from . import darijat
+            timed = darijat.synthesize(lines, raw, workdir / "darijat")
+            if timed and raw.stat().st_size > 0:
+                words = [Segment(t, a, b) for t, a, b in timed]
+                print("[voice] Darijat Saudi voice")
+        except Exception as exc:
+            print(f"[voice] Darijat failed ({type(exc).__name__}: {str(exc)[:300]}); trying ElevenLabs")
     key = os.environ.get("ELEVENLABS_API_KEY", "").strip()
-    if key:
+    if key and words is None:
         # natural human voice first; the free voice below is the fallback
         try:
             from . import eleven
