@@ -3383,7 +3383,7 @@ window.C3DBG = { kk: () => KK.ready, cit: i => kkCitizen(i), mk: (base, rec) => 
  * animations (idle, walk, run, attacks, spells, death) drives them all. Until the models are ready, or if they
  * fail to load, the older code-built characters are used.
  */
-const KK = { ready: false, loading: false, gltf: {}, clips: {}, img: {}, tex: {}, mat: {}, h: {} };
+const KK = { custom: {}, ready: false, loading: false, gltf: {}, clips: {}, img: {}, tex: {}, mat: {}, h: {} };
 function kkLoad(done) {
   if (KK.ready || KK.loading || typeof CHARS === 'undefined' || typeof THREE === 'undefined' || !THREE.GLTFLoader || !THREE.SkeletonUtils) return;
   KK.loading = true; const L = new THREE.GLTFLoader(), names = Object.keys(CHARS); let left = names.length;
@@ -3392,6 +3392,7 @@ function kkLoad(done) {
     let buf; try { const s = atob(CHARS[n]); buf = new Uint8Array(s.length); for (let i = 0; i < s.length; i++) buf[i] = s.charCodeAt(i); } catch (e) { fin(); continue; }
     L.parse(buf.buffer, '', g => {
       if (n.startsWith('anims')) g.animations.forEach(c => { KK.clips[c.name] = c; });
+      else if (n.startsWith('h_') || n.startsWith('z_')) { KK.gltf[n] = g; KK.custom[n] = g; }
       else { KK.gltf[n] = g; g.scene.traverse(o => { if (o.isMesh && o.material && o.material.map && !KK.img[n]) KK.img[n] = o.material.map.image; }); kkMergeSkins(g.scene); }
       fin();
     }, e => { console.warn('character ' + n, e); fin(); });
@@ -3444,6 +3445,7 @@ function kkHeight(base) {
   // measure the posed, skinned vertices (positions are stored compressed, so the raw box is meaningless)
   const sc = KK.gltf[base].scene; sc.updateMatrixWorld(true); const b = new THREE.Box3(), v = new THREE.Vector3();
   sc.traverse(o => { if (!o.isSkinnedMesh) return; o.skeleton.update(); const pa = o.geometry.attributes.position, n = pa.count, ar = pa.array, dn = !pa.normalized ? 1 : ar instanceof Int16Array ? 32767 : ar instanceof Uint16Array ? 65535 : ar instanceof Int8Array ? 127 : ar instanceof Uint8Array ? 255 : 1; for (let i = 0; i < n; i += 3) { v.fromBufferAttribute(pa, i).divideScalar(dn); o.boneTransform(i, v); v.applyMatrix4(o.matrixWorld); b.expandByPoint(v); } });
+  if (b.isEmpty()) b.setFromObject(sc); // a model without a skeleton
   return (KK.h[base] = Math.max(.5, b.max.y - b.min.y));
 }
 function kkMake(look) {
@@ -3464,7 +3466,7 @@ function kkMake(look) {
   return root;
 }
 function kkPlay(h, name, speed, once, hold) {
-  const u = h.userData, clip = KK.clips[name]; if (!clip) return false;
+  const u = h.userData, clip = (u.clips && u.clips[name]) || KK.clips[name]; if (!clip) return false;
   if (u.cur === name && !once) { if (speed) u.curA.timeScale = speed; return true; }
   const a = u.acts[name] || (u.acts[name] = u.mixer.clipAction(clip));
   a.reset(); a.enabled = true; a.setLoop(once ? THREE.LoopOnce : THREE.LoopRepeat, Infinity); a.clampWhenFinished = !!once; a.timeScale = speed || 1;
@@ -3477,6 +3479,20 @@ function kkWalk(h, t, speed, moving) {
   const u = h.userData, dt = u.lt === undefined ? 0 : clamp(t - u.lt, 0, .1); u.lt = t;
   if (!u.once) kkPlay(h, moving ? (speed > 1.6 ? u.run : u.walk) : u.idle, moving ? clamp(speed * u.walkK, .5, 2.2) : 1);
   kkTick(h, dt);
+}
+/* a model made for one hero or zombie (assets/heroes3d/<id>.glb, assets/zombies3d/<type>.glb) with its own animations.
+   Clips are matched by name: idle, walk, run, attack, cast (spell/skill), hit, death (die). */
+function kkCustom(key, hgt, shadow) {
+  const g = KK.custom[key]; if (!g) return null;
+  const root = new THREE.Group(), body = THREE.SkeletonUtils.clone(g.scene), bones = {}; root.add(body);
+  body.traverse(o => { if (o.isBone || o.type === 'Bone') bones[o.name] = o; if (o.isMesh) { o.castShadow = !!shadow; o.frustumCulled = false; } });
+  root.scale.setScalar(hgt / kkHeight(key));
+  const find = re => g.animations.find(c => re.test(c.name)), clips = {};
+  for (const [role, re] of [['idle', /idle|stand/i], ['walk', /walk/i], ['run', /run|sprint/i], ['attack', /attack|slash|shoot|punch|hit_?a?$/i], ['cast', /cast|spell|skill|magic/i], ['hit', /hurt|damage|^hit/i], ['death', /death|die|dead/i]]) { const c = find(re); if (c) clips[role] = c; }
+  if (!clips.idle && g.animations[0]) clips.idle = g.animations[0];
+  const u = root.userData = { kk: true, custom: true, base: key, hgt, bones, clips, mixer: new THREE.AnimationMixer(body), acts: {}, flick: [], idle: 'idle', walk: clips.walk ? 'walk' : 'idle', run: clips.run ? 'run' : clips.walk ? 'walk' : 'idle', atk: clips.attack ? 'attack' : 'idle', cast: clips.cast ? 'cast' : clips.attack ? 'attack' : 'idle', death: clips.death ? 'death' : 'idle', walkK: 1, body: root };
+  u.mixer.addEventListener('finished', e => { if (e.action === u.curA && !u.hold) { u.once = false; u.cur = null; } });
+  kkPlay(root, u.idle); u.mixer.update(0); return root;
 }
 /* extra pieces fixed to bones */
 function kkAt(bones, name, obj, x, y, z, rx, ry, rz, s) { const b = bones[name.replace(/[\[\]\.:\/]/g, '')]; if (!b) return obj; obj.position.set(x || 0, y || 0, z || 0); obj.rotation.set(rx || 0, ry || 0, rz || 0); if (s) obj.scale.setScalar(s); b.add(obj); return obj; }
@@ -3512,7 +3528,7 @@ const KKH = {
   wind: { base: 'knight', height: 2.15, show: ['1H_Sword', 'Knight_Cape'], rec: { 1: '#eef0f6', 3: '#4a525c', 4: '#3a4048', 7: '#5aa6ff', 6: '#2a4a8a', 8: '#2a4a8a', 9: '#5aa6ff', 10: '#2a3038', 15: '#2a4a8a', 11: '#d8ecff', 13: '#5aa6ff' }, glow: { 11: '#5aa6ff' }, glowI: .6, metal: .4,
     extra: (r, b, u) => kkGlowAt(b, 'handslotr', u, '#7ac8ff', .8, 0, .5, 0, .45) },
 };
-function kkHero(id) { const L = KKH[id]; if (!L || !KK.ready) return null; const h = kkMake(Object.assign({ shadow: true }, L)); if (h) h.userData.heroId = id; return h; }
+function kkHero(id) { const L = KKH[id]; if (KK.custom['h_' + id]) { const c = kkCustom('h_' + id, (L && L.height) || 2.2, true); if (c) { c.userData.heroId = id; return c; } } if (!L || !KK.ready) return null; const h = kkMake(Object.assign({ shadow: true }, L)); if (h) h.userData.heroId = id; return h; }
 /* ---------- citizens, guards and zombies ---------- */
 const KK_SHIRTS = ['#6a5a40', '#5a3a2a', '#3a4a5a', '#7a2a22', '#4a5a3a', '#8a7a5a', '#3a3a44', '#6a4a6a'], KK_PANTS = ['#3a3226', '#26282c', '#3a4048', '#4a3a2a'], KK_SKIN = ['#e8c4a0', '#c99068', '#a87a58', '#8a5a3a'], KK_HAIR = ['#2a1a10', '#1a1410', '#5a3a20', '#3a2a1a', '#7a7a7a', '#141010'];
 function kkCitizen(i) {
@@ -3530,7 +3546,7 @@ const KKZ = {
   wb: { base: 'barbarian', height: 5.2, rec: { 6: '#4a4440', 23: '#4a4440', 0: '#4a4440', 1: '#3a3430', 9: '#2a2420', 10: '#2a2420', 7: '#1a1410', 8: '#2a2420', 19: '#2a2420', 3: '#ff6a1a', 15: '#ff6a1a', 2: '#ff6a1a' }, glow: { 3: '#ff5a10', 15: '#ff5a10', 2: '#ffb03a' }, glowI: 1.6, walk: 'Walking_D_Skeletons', walkK: .8, atk: 'Unarmed_Melee_Attack_Punch_A', eyes: '#ff5a1a', lava: 1, wide: 1.2 },
 };
 function kkZombie(type) {
-  const Z = KKZ[type]; if (!Z || !KK.ready) return null;
+  const Z = KKZ[type]; if (KK.custom['z_' + type]) { const c = kkCustom('z_' + type, (Z && Z.height) || 2, false); if (c) { c.userData.zombie = true; c.userData.ztype = type; c.userData.walkK = 1; return c; } } if (!Z || !KK.ready) return null;
   const z = kkMake(Object.assign({}, Z, { rec: Object.assign({ 2: Z.eyes }, Z.rec), glow: Object.assign({ 2: Z.eyes }, Z.glow || {}), glowI: Z.glowI || 1.3, extra: (r, b, u) => {
     if (Z.slime) { kkAt(b, 'head', A(new THREE.Group(), c3Cone(.08, .4, 6), c3M({ color: Z.slime, emissive: Z.slime, emissiveIntensity: .5, transparent: true, opacity: .9 }), 0, 0, 0, Math.PI).parent, 0, .05, .42); kkGlowAt(b, 'head', u, Z.slime, .6, 0, .1, .45, .5); }
     if (Z.horns) kkAt(b, 'head', kkHorns('#d8c8a8', 1.1), 0, .85, 0);

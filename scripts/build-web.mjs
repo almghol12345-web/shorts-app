@@ -14,8 +14,10 @@ const artJs2 = 'const ART = {\n' + artFiles.map(f => `  ${JSON.stringify(f.repla
 const modelFiles = fs.existsSync('assets/models') ? fs.readdirSync('assets/models').filter(f => f.endsWith('.glb')).sort() : [];
 const modelsJs = 'const MODELS = {\n' + modelFiles.map(f => `  ${JSON.stringify(f.replace('.glb', ''))}: 'data:model/gltf-binary;base64,${fs.readFileSync('assets/models/' + f).toString('base64')}',`).join('\n') + '\n};\n';
 // rigged characters (KayKit, CC0) prepared by scripts/prep-chars.mjs
-const charFiles = fs.existsSync('assets/chars') ? fs.readdirSync('assets/chars').filter(f => f.endsWith('.glb')).sort() : [];
-const charsJs = 'const CHARS = {\n' + charFiles.map(f => `  ${JSON.stringify(f.replace('.glb', ''))}: '${fs.readFileSync('assets/chars/' + f).toString('base64')}',`).join('\n') + '\n};\n';
+// plus models made for one hero or zombie: assets/heroes3d/<heroId>.glb and assets/zombies3d/<type>.glb
+const glbIn = (dir, pre) => fs.existsSync(dir) ? fs.readdirSync(dir).filter(f => f.endsWith('.glb')).sort().map(f => [pre + f.replace('.glb', ''), dir + '/' + f]) : [];
+const charFiles = [...glbIn('assets/chars', ''), ...glbIn('assets/heroes3d', 'h_'), ...glbIn('assets/zombies3d', 'z_')];
+const charsJs = 'const CHARS = {\n' + charFiles.map(([k, f]) => `  ${JSON.stringify(k)}: '${fs.readFileSync(f).toString('base64')}',`).join('\n') + '\n};\n';
 const js = jsFiles.map(f => `/* ---- ${f} ---- */\n` + (f === '02b-portraits.js' ? artJs + artJs2 + modelsJs + charsJs : '') + read('src/js/' + f)).join('\n');
 const game = `(function(){'use strict';\n${js}\n})();`;
 new Function(game); // syntax check
