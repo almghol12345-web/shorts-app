@@ -396,3 +396,15 @@ def test_darijat_line_timing_and_json_audio(monkeypatch, tmp_path):
 def test_seo_skips_gaming_hashtags():
     from shorts.seo import _relevant
     assert not _relevant("روبلوكس_قصص") and not _relevant("روبلوكس_رعب") and _relevant("قصص_رعب")
+
+
+def test_music_mood_and_bed(tmp_path):
+    from shorts.music import compose, mood_for, write_bed
+    assert mood_for("سفينة لقوها في البحر") == "sea"
+    assert mood_for("إشارة من الفضاء") == "space"
+    assert mood_for("صخرة في السعودية") == "desert"
+    assert mood_for("قصة عادية") == "mystery"
+    for mood in ("sea", "space", "desert", "ancient", "crime", "mystery"):
+        x = compose(mood, 3.0)
+        assert len(x) == 3 * 44100 and abs(x).max() < 0.95
+    assert write_bed("desert", 2.0, tmp_path / "m.wav").stat().st_size > 100_000

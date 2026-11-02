@@ -62,7 +62,11 @@ def make_one(cfg: Config, do_upload: bool, keep_work: bool = False) -> dict:
     narrator = None
     if cfg.show_narrator:
         narrator, _ = animate.character_track(narration.audio, starts, narration.length, work / "narrator.mov")
-    video = render.render(cfg, narration, bg, work, cfg.output_dir / f"{name}.mp4", narrator=narrator)
+    from .music import mood_for
+    mood = mood_for(script.title, " ".join(script.tags), " ".join(script.visual_plan()), " ".join(script.lines))
+    print(f"[music] mood: {mood}")
+    video = render.render(cfg, narration, bg, work, cfg.output_dir / f"{name}.mp4",
+                          narrator=narrator, mood=mood)
     print(f"[video] {video}")
     mids = [starts[i] + spans[i] / 2 for i in range(len(spans))]
     render.contact_sheet(video, mids, cfg.output_dir / "preview.jpg")
