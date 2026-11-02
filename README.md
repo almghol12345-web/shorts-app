@@ -130,3 +130,6 @@ npx cap sync ios     # ينسخ اللعبة لمشروع iOS
 2. ارفع `appVersion` في `src/js/config.js`، و`MARKETING_VERSION` في `ios/App/App.xcodeproj/project.pbxproj` لنفس الرقم (مثلاً 1.1).
 3. شغّل **Upload to TestFlight**. رقم البناء يزيد تلقائياً.
 4. لو تبي تجبر الكل يحدّث: لوحة الإدارة ← الإعدادات ← أقل إصدار مسموح.
+
+## الشخصيات ثلاثية الأبعاد
+الأبطال والمواطنين والزومبي مبنيين على حزم **KayKit Adventurers + Skeletons** من Kay Lousberg (www.kaylousberg.com) — رخصة CC0 (مجانية حتى للاستخدام التجاري). الملفات المجهزة في `assets/chars` وتنبني من جديد بـ `node scripts/prep-chars.mjs <مجلد الحزم>`.

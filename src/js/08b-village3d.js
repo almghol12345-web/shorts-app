@@ -183,7 +183,7 @@ function v3SyncHeroes() {
 function v3PickUnit(x, y) {
   if (!V3.W) return null; _ray.setFromCamera({ x: x / V3.W * 2 - 1, y: -(y / V3.H) * 2 + 1 }, V3.camera);
   let best = null, bd = 1e9;
-  for (const u of V3.units) { const p = u.s.position, sc = u.s.scale.x; const sph = new THREE.Sphere(new THREE.Vector3(p.x, p.y + .9 * sc, p.z), .55 * sc); const hit = _ray.ray.intersectSphere(sph, new THREE.Vector3()); if (hit) { const d = hit.distanceTo(_ray.ray.origin); if (d < bd) { bd = d; best = u; } } }
+  for (const u of V3.units) { const p = u.s.position, hh = u.s.userData.hgt || 1.3 * u.s.scale.x; const sph = new THREE.Sphere(new THREE.Vector3(p.x, p.y + hh * .55, p.z), hh * .42); const hit = _ray.ray.intersectSphere(sph, new THREE.Vector3()); if (hit) { const d = hit.distanceTo(_ray.ray.origin); if (d < bd) { bd = d; best = u; } } }
   return best;
 }
 function v3ShowTag(u) {
@@ -197,7 +197,7 @@ function v3ShowTag(u) {
 function v3PlaceTag() {
   const el = $('#v3tag'); if (!el || el.hidden) return;
   if (!V3.tagUnit || now() > V3.tagUntil) { el.hidden = true; V3.tagUnit = null; return; }
-  const p = V3.tagUnit.s.position, sc = V3.tagUnit.s.scale.x, pr = v3Project(p.x, p.y + 1.35 * sc, p.z);
+  const p = V3.tagUnit.s.position, pr = v3Project(p.x, p.y + (V3.tagUnit.s.userData.hgt || 1.35 * V3.tagUnit.s.scale.x) + .1, p.z);
   el.style.transform = `translate(calc(${pr.x.toFixed(0)}px - 50%), calc(${pr.y.toFixed(0)}px - 100%))`;
 }
 function v3SpawnZombie() {
@@ -337,7 +337,7 @@ function v3Loop(ts) {
   if (V3.zombies.length < 9 && Math.random() < dt * .8) v3SpawnZombie();
   for (const zb of V3.zombies) {
     const p = zb.s.position;
-    if (zb.dead) { zb.dead += dt; zb.s.rotation.x = -Math.min(Math.PI / 2, zb.dead * 4); zb.s.position.y = -Math.max(0, zb.dead - .6) * .8; continue; }
+    if (zb.dead) { zb.dead += dt; if (zb.s.userData.kk) { if (!zb.dd) { zb.dd = 1; kkOnce(zb.s, zb.s.userData.death, 1, true); } kkTick(zb.s, dt); zb.s.position.y = -Math.max(0, zb.dead - 1.3) * .8; } else { zb.s.rotation.x = -Math.min(Math.PI / 2, zb.dead * 4); zb.s.position.y = -Math.max(0, zb.dead - .6) * .8; } continue; }
     const d = Math.hypot(p.x, p.z), stop = WALL + 3.5;
     const walking = d > stop; if (walking) { p.x -= p.x / d * zb.spd * dt; p.z -= p.z / d * zb.spd * dt; } m3Walk(zb.s, t + zb.ph, zb.spd, walking);
     if (d < WALL + 12 && Math.random() < dt * .9) {
@@ -346,7 +346,8 @@ function v3Loop(ts) {
       for (const gd of V3.guards || []) if (Math.abs(gd.position.x - tw[0]) < 1 && Math.abs(gd.position.z - tw[1]) < 1) gd.rotation.y = Math.atan2(p.x - gd.position.x, p.z - gd.position.z);
     }
   }
-  V3.zombies = V3.zombies.filter(zb => { if (zb.dead > 2) { V3.scene.remove(zb.s); return false; } return true; });
+  for (const gd of V3.guards || []) if (gd.userData.kk) kkWalk(gd, t, 1, false);
+  V3.zombies = V3.zombies.filter(zb => { if (zb.dead > 2.2) { V3.scene.remove(zb.s); return false; } return true; });
   for (const s of V3.shots) { s.life -= dt; s.line.material.opacity = Math.max(0, s.life / .12); }
   V3.shots = V3.shots.filter(s => { if (s.life <= 0) { V3.scene.remove(s.line); s.line.geometry.dispose(); s.line.material.dispose(); return false; } return true; });
   // slow dusk light breathing

@@ -13,7 +13,10 @@ const artFiles = fs.existsSync('assets/art') ? fs.readdirSync('assets/art').filt
 const artJs2 = 'const ART = {\n' + artFiles.map(f => `  ${JSON.stringify(f.replace('.webp', ''))}: 'data:image/webp;base64,${fs.readFileSync('assets/art/' + f).toString('base64')}',`).join('\n') + '\n};\n';
 const modelFiles = fs.existsSync('assets/models') ? fs.readdirSync('assets/models').filter(f => f.endsWith('.glb')).sort() : [];
 const modelsJs = 'const MODELS = {\n' + modelFiles.map(f => `  ${JSON.stringify(f.replace('.glb', ''))}: 'data:model/gltf-binary;base64,${fs.readFileSync('assets/models/' + f).toString('base64')}',`).join('\n') + '\n};\n';
-const js = jsFiles.map(f => `/* ---- ${f} ---- */\n` + (f === '02b-portraits.js' ? artJs + artJs2 + modelsJs : '') + read('src/js/' + f)).join('\n');
+// rigged characters (KayKit, CC0) prepared by scripts/prep-chars.mjs
+const charFiles = fs.existsSync('assets/chars') ? fs.readdirSync('assets/chars').filter(f => f.endsWith('.glb')).sort() : [];
+const charsJs = 'const CHARS = {\n' + charFiles.map(f => `  ${JSON.stringify(f.replace('.glb', ''))}: '${fs.readFileSync('assets/chars/' + f).toString('base64')}',`).join('\n') + '\n};\n';
+const js = jsFiles.map(f => `/* ---- ${f} ---- */\n` + (f === '02b-portraits.js' ? artJs + artJs2 + modelsJs + charsJs : '') + read('src/js/' + f)).join('\n');
 const game = `(function(){'use strict';\n${js}\n})();`;
 new Function(game); // syntax check
 const AR = 'U+0600-06FF,U+0750-077F,U+0870-08FF,U+200C-200E,U+2010-2011,U+FB50-FDFF,U+FE70-FEFF';
@@ -41,6 +44,7 @@ ${shell}
 <script src="three.min.js"></script>
 <script src="GLTFLoader.js"></script>
 <script src="BufferGeometryUtils.js"></script>
+<script src="SkeletonUtils.js"></script>
 <script src="capacitor.js"></script>
 <script>
 ${game}
@@ -54,6 +58,7 @@ fs.copyFileSync('node_modules/@capacitor/core/dist/capacitor.js', 'www/capacitor
 fs.copyFileSync('node_modules/three/build/three.min.js', 'www/three.min.js');
 fs.copyFileSync('node_modules/three/examples/js/loaders/GLTFLoader.js', 'www/GLTFLoader.js');
 fs.copyFileSync('node_modules/three/examples/js/utils/BufferGeometryUtils.js', 'www/BufferGeometryUtils.js');
+fs.copyFileSync('node_modules/three/examples/js/utils/SkeletonUtils.js', 'www/SkeletonUtils.js');
 const art = `<title>فجر الناجين</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -71,6 +76,9 @@ ${read('node_modules/three/examples/js/loaders/GLTFLoader.js')}
 </script>
 <script>
 ${read('node_modules/three/examples/js/utils/BufferGeometryUtils.js')}
+</script>
+<script>
+${read('node_modules/three/examples/js/utils/SkeletonUtils.js')}
 </script>
 <script>
 ${game}

@@ -107,13 +107,14 @@ function b3Fire(x, z, light) {
   let pl = null; if (light) { pl = new THREE.PointLight('#ff7a2a', 2.2, 11, 2); pl.position.set(x, 1.6, z); B3.scene.add(pl); }
   B3.fires.push({ spr, pl, ph: Math.random() * 6 });
 }
-function b3Blob(m, r) { const s = new THREE.Mesh(c3G('blob', () => { const g = new THREE.PlaneGeometry(1, 1); g.rotateX(-Math.PI / 2); return g; }), B3.blob); s.scale.set(r, 1, r); s.position.y = .02; s.renderOrder = -1; m.add(s); m.userData.blobM = s; }
+function b3Blob(m, r) { const s = new THREE.Mesh(c3G('blob', () => { const g = new THREE.PlaneGeometry(1, 1); g.rotateX(-Math.PI / 2); return g; }), B3.blob); const k = r * 1.55 / m.scale.x; s.scale.set(k, 1, k); s.position.y = .02; s.renderOrder = -1; m.add(s); m.userData.blobM = s; }
 /* ---------- characters ---------- */
 function b3TakeZ(type) {
   const pool = B3.pool[type] || (B3.pool[type] = []);
   let m = pool.pop();
   if (!m) { m = m3Zombie(type); m.userData.baseSc = m.scale.x; b3Blob(m, type === 'wb' ? .9 : .55); }
-  m.rotation.set(0, 0, 0); m.position.y = 0; m.scale.setScalar(m.userData.baseSc); m.userData.blobM.visible = true; m.visible = true;
+  m.rotation.set(0, 0, 0); m.position.y = 0; m.scale.setScalar(m.userData.baseSc);
+  if (m.userData.kk) { const u = m.userData; u.mixer.stopAllAction(); u.cur = null; u.curA = null; u.once = false; u.hold = false; u.lt = undefined; kkPlay(m, u.idle); } m.userData.blobM.visible = true; m.visible = true;
   B3.scene.add(m); return m;
 }
 function b3PutZ(m) { B3.scene.remove(m); const p = B3.pool[m.userData.ztype] || (B3.pool[m.userData.ztype] = []); if (p.length < 24) p.push(m); else b3Dispose(m); }
@@ -125,7 +126,7 @@ function b3Start() {
     B3.dying.forEach(d => b3PutZ(d.m)); B3.dying = []; B3.parts.forEach(p => B3.scene.remove(p.s)); B3.parts = [];
     const boss = !!B.cfg.boss; B3.scene.background.set(boss ? '#2a161a' : '#1c2636'); B3.scene.fog.color.set(boss ? '#2a161a' : '#1c2636'); B3.hemi.color.set(boss ? '#d09a90' : '#9ab0d8');
     b3Attach(); b3Resize();
-    for (const h of B.heroes) { h.m = m3Hero(h.id); h.m.rotation.y = Math.PI; b3Blob(h.m, .55); B3.scene.add(h.m); h.m3h = (HERO3[h.id] || {}).sc * 1.32; }
+    for (const h of B.heroes) { h.m = m3Hero(h.id); h.m.rotation.y = Math.PI; b3Blob(h.m, .55); B3.scene.add(h.m); h.m3h = h.m.userData.hgt || (HERO3[h.id] || {}).sc * 1.32; }
     B3.lt = 0; return true;
   } catch (e) { console.warn('3D battle off', e); return false; }
 }
@@ -158,30 +159,36 @@ function b3Frame() {
   for (const h of B.heroes) {
     const m = h.m; if (!m) continue; const u = m.userData;
     m.position.set(b3X(h.x), 0, b3Z(h.y));
-    if (!h.alive) { h.deadT = (h.deadT || 0) + dt; m.rotation.x = Math.min(Math.PI / 2, h.deadT * 4); m.position.y = .08; u.blobM.visible = false; continue; }
+    if (!h.alive) { if (u.kk) { if (!h.deadT) kkOnce(m, u.death, 1, true); kkTick(m, dt); } else { m.rotation.x = Math.min(Math.PI / 2, (h.deadT || 0) * 4); m.position.y = .08; } h.deadT = (h.deadT || 0) + dt; u.blobM.visible = false; continue; }
     const tg = nearestZ(); let ry = Math.PI;
     if (tg && tg.m) ry = Math.atan2(tg.m.position.x - m.position.x, tg.m.position.z - m.position.z);
     let d = ry - m.rotation.y; d = Math.atan2(Math.sin(d), Math.cos(d)); m.rotation.y += d * Math.min(1, rdt * 10);
+    if (u.kk) {
+      if (h.shotT > 0 && !h.atkOn) { h.atkOn = 1; kkOnce(m, u.atk, 1.5); } if (h.shotT <= 0) h.atkOn = 0; if (h.shotT > 0) h.shotT -= dt;
+      if (h.castT > 0 && !h.castFx) kkOnce(m, u.cast, 1.2);
+      m3Walk(m, t, 1, false);
+    } else {
     m3Walk(m, t, 1, false); u.body.position.y = Math.sin(t * 2.2 + h.slot) * .012; u.body.position.z = 0; if (u.orb) u.orb.scale.setScalar(1);
     if (h.shotT > 0) { h.shotT -= dt; b3Attack(h, u, clamp(1 - h.shotT / .22, 0, 1)); }
+    }
     if (h.castT > 0) {
       if (!h.castFx) { h.castFx = 1; b3Burst(m.position.x, 1.2, m.position.z, (HERO3[h.id] || {}).fx || '#fff', 1.2, .6, 3.5); }
-      h.castT -= dt; const p = clamp(1 - h.castT / .7, 0, 1), s = Math.sin(p * Math.PI); u.body.position.y = s * .25; u.armL.rotation.x = u.armR.rotation.x = -2.8 * s;
+      h.castT -= dt; const p = clamp(1 - h.castT / .7, 0, 1), s = Math.sin(p * Math.PI); if (!u.kk) { u.body.position.y = s * .25; u.armL.rotation.x = u.armR.rotation.x = -2.8 * s; }
     } else h.castFx = 0;
   }
   for (const z of B.z) {
-    if (!z.m) { if (!z.alive) continue; z.m = b3TakeZ(z.type); z.m3h = ZOMB3[z.type].sc * 1.22; }
-    if (!z.alive) { z.m.userData.blobM.visible = false; B3.dying.push({ m: z.m, t: 0 }); z.m = null; continue; }
+    if (!z.m) { if (!z.alive) continue; z.m = b3TakeZ(z.type); z.m3h = z.m.userData.hgt || ZOMB3[z.type].sc * 1.22; }
+    if (!z.alive) { z.m.userData.blobM.visible = false; if (z.m.userData.kk) kkOnce(z.m, z.m.userData.death, 1.2, true); B3.dying.push({ m: z.m, t: 0 }); z.m = null; continue; }
     const m = z.m, u = m.userData, Z = ZOMB3[z.type];
     m.position.set(b3X(z.x), 0, b3Z(z.y) - B3_ZOFF[z.type]);
     const stopY = z.T.range ? B.lineY - 170 : B.lineY - z.T.r + 4, moving = z.y < stopY - .5 && z.stun <= 0;
-    m3Walk(m, t + z.ph, z.T.spd / 28, moving); u.chest.rotation.x = Z.hunch;
+    m3Walk(m, t + z.ph, z.T.spd / 28, moving); if (!u.kk) u.chest.rotation.x = Z.hunch;
     m.rotation.y = z.stun > 0 ? Math.sin(t * 9 + z.ph) * .3 : Math.sin(t * 2 + z.ph) * .12;
     if (z.acd > (z.pacd || 0) + .15) z.atkT = .35; z.pacd = z.acd;
-    if (z.atkT > 0) { z.atkT -= dt; const s = Math.sin(clamp(1 - z.atkT / .35, 0, 1) * Math.PI); u.armL.rotation.x = u.armR.rotation.x = -1.35 + s * 1.2; u.chest.rotation.x = Z.hunch + s * .35; }
-    m.scale.setScalar(u.baseSc * (z.flash > 0 ? 1.06 : 1));
+    if (z.atkT > 0 && u.kk) { if (!z.atkOn) { z.atkOn = 1; kkOnce(m, u.atk, 1.3); } z.atkT -= dt; } else if (z.atkT > 0) { z.atkT -= dt; const s = Math.sin(clamp(1 - z.atkT / .35, 0, 1) * Math.PI); u.armL.rotation.x = u.armR.rotation.x = -1.35 + s * 1.2; u.chest.rotation.x = Z.hunch + s * .35; }
+    if (z.atkT <= 0) z.atkOn = 0; m.scale.setScalar(u.baseSc * (z.flash > 0 ? 1.06 : 1));
   }
-  for (const d of B3.dying) { d.t += dt; d.m.rotation.x = -Math.min(Math.PI / 2, d.t * 4); if (d.t > .9) d.m.position.y = -(d.t - .9) * .5 * d.m.userData.baseSc; }
+  for (const d of B3.dying) { d.t += dt; if (d.m.userData.kk) { kkTick(d.m, dt); if (d.t > 1.3) d.m.position.y = -(d.t - 1.3) * .5 * d.m.userData.hgt; } else { d.m.rotation.x = -Math.min(Math.PI / 2, d.t * 4); if (d.t > .9) d.m.position.y = -(d.t - .9) * .5 * d.m.userData.baseSc; } }
   B3.dying = B3.dying.filter(d => { if (d.t > 2.2) { b3PutZ(d.m); return false; } return true; });
   for (const f of B.fx) {
     if (f.lit || f.t < 0) continue;

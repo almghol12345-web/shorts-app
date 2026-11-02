@@ -164,6 +164,7 @@ const HERO3 = {
   wind: { sc: 1.52, skin: '#e8c4a0', body: ['armor', '#3e444c', '#5aa6ff'], legs: ['armor', '#2e343c', '#5aa6ff'], cape: '#2a4a8a', scarf: '#2a4a8a', head: 'spiky', hair: '#e8ecf4', paul: 'gold', wpn: 'sword', bladeGlow: '#7ac8ff', fx: '#7ac8ff' },
 };
 function m3Hero(id) {
+  const kh = kkHero(id); if (kh) return kh;
   const L = HERO3[id] || HERO3.wind, mats = {}, mm = sp => { if (!sp) return null; const k = sp.join('|'); return mats[k] || (mats[k] = c3Mat(sp, L.skin)); };
   const skinM = c3M({ color: L.skin, roughness: .7 }), bodyM = mm(L.body), armsM = L.arms && L.arms[0] === 'skin' ? skinM : mm(L.arms || L.body), legsM = mm(L.legs || L.body);
   const isArmor = (L.body[0] === 'armor' || L.body[0] === 'lava'), trimC = L.body[2] || '#d4a24a';
@@ -354,6 +355,7 @@ function c3ZMats(type) {
   return (C3.mat['z' + type] = m);
 }
 function m3Zombie(type) {
+  const kz = kkZombie(type); if (kz) return kz;
   const Z = ZOMB3[type] || ZOMB3.w, M = c3ZMats(type) , R = Math.random;
   const b = c3Body({ build: Z.build, fat: Z.fat, thickArms: Z.thick, skinM: M.skin, bodyM: M.torso, bellyM: Z.fat ? M.skin : null, armsM: M.arms, legsM: M.pants, handM: M.skin, bootM: Z.armor ? M.pants : M.skin, eyeM: M.eye, noFace: true, browM: M.dark });
   const { chest, head, armL, armR, hip, bw } = b, u = { zombie: true, flick: [], ztype: type };
@@ -386,4 +388,4 @@ function m3Zombie(type) {
   chest.rotation.x = Z.hunch; head.rotation.x = -Z.hunch * .7; armL.rotation.x = armR.rotation.x = -1.35;
   const z = c3Finish(b, u); z.scale.setScalar(Z.sc); return z;
 }
-window.C3DBG = { hero: m3Hero, zombie: m3Zombie, heroes: () => HEROES.map(h => h.id) };
+window.C3DBG = { kk: () => KK.ready, cit: i => kkCitizen(i), mk: (base, rec) => kkMake({ base, rec, height: 2 }), hero: m3Hero, zombie: m3Zombie, heroes: () => HEROES.map(h => h.id) };

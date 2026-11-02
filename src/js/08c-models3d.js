@@ -253,6 +253,7 @@ function chGeo() {
 }
 function chMesh(parent, geo, mat, x, y, z) { const m = new THREE.Mesh(geo, mat); m.position.set(x || 0, y || 0, z || 0); m.castShadow = true; parent.add(m); return m; }
 function m3Human(kind) {
+  if (KK.ready) { const k = kind === 'survivor' ? kkCitizen(kkCit++) : kind === 'guard' ? kkGuard() : kind === 'zombie' ? kkZombie(Math.random() < .3 ? 'run' : 'w') : null; if (k) return k; }
   const G = chGeo(), M = CH.m, R = Math.random, root = new THREE.Group(), body = new THREE.Group(); root.add(body);
   const zombie = kind === 'zombie', guard = kind === 'guard', plain = kind === 'plain';
   const skin = zombie ? M.zskin[R() * 3 | 0] : M.skin[R() * 4 | 0], shirt = zombie ? M.zcloth[R() * 3 | 0] : guard ? M.cloth[0] : M.cloth[R() * 6 | 0], pants = zombie ? M.zcloth[R() * 3 | 0] : M.pants[R() * 3 | 0];
@@ -284,6 +285,7 @@ function m3Human(kind) {
   return root;
 }
 function m3Walk(h, t, speed, moving) {
+  if (h.userData.kk) return kkWalk(h, t, speed, moving);
   const u = h.userData, a = moving ? Math.sin(t * (u.zombie ? 5 : 9) * speed) : 0, amp = u.zombie ? .45 : .6;
   u.legL.rotation.x = a * amp; u.legR.rotation.x = -a * amp;
   if (u.zombie) { u.armL.rotation.x = -1.35 + Math.sin(t * 3) * .15; u.armR.rotation.x = -1.35 + Math.sin(t * 3 + 1) * .15; u.body.rotation.z = Math.sin(t * 2.5) * .08; }

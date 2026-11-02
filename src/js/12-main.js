@@ -146,6 +146,7 @@ try { const P = plugin('App'); if (P) P.addListener('pause', () => { save(); syn
 
 /* ================= boot ================= */
 function start(data) {
+  try { kkLoad(kkSwapIn); } catch (e) { }
   let info = null;
   if (data && data.S) { S = migrate(data.S); if (typeof data.tab === 'string') tab = data.tab; }
   else { const st = loadLocal(); if (st) info = catchUp(st); else S = newState(); }
