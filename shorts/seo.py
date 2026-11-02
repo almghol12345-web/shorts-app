@@ -22,9 +22,17 @@ SEARCH_TAGS = ["ألغاز لم تحل", "قصص غامضة حقيقية", "قص
 HASHTAG = re.compile(r"#([\w؀-ۿ]+)")
 
 
+# gaming / off-topic words: a 'stories' hashtag about a game is not our audience
+OFF_TOPIC = ("روبلوكس", "roblox", "ماينكرافت", "minecraft", "فورتنايت", "fortnite", "ببجي", "pubg",
+             "قيمز", "gaming", "game", "لعبة", "العاب", "ألعاب", "ماب", "سكن", "فري_فاير", "freefire",
+             "انمي", "anime", "مسلسل", "مسلسلات", "فلم", "فيلم")
+
+
 def _relevant(tag: str) -> bool:
     """Whole words only: 'قصص_رعب' matches, but 'سراب' or 'تسريب' must not match 'سر'."""
     words = [w for w in re.split(r"[_\s]+", tag.lower().lstrip("#")) if w]
+    if any(off in tag.lower() for off in OFF_TOPIC):
+        return False
     for w in words:
         for n in NICHE_WORDS:
             base = w[2:] if w.startswith("ال") and len(w) > 4 else w      # drop the Arabic article

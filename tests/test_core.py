@@ -391,3 +391,8 @@ def test_darijat_line_timing_and_json_audio(monkeypatch, tmp_path):
     assert [w for w, _, _ in timed] == ["أهلا", "وسهلا", "كيف", "الحال"]
     assert timed[2][1] > 1.0                      # second line starts after the first clip
     assert (tmp_path / "out.mp3").stat().st_size > 0
+
+
+def test_seo_skips_gaming_hashtags():
+    from shorts.seo import _relevant
+    assert not _relevant("روبلوكس_قصص") and not _relevant("روبلوكس_رعب") and _relevant("قصص_رعب")
