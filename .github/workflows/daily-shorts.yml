@@ -2,9 +2,12 @@ name: Daily Shorts
 
 on:
   schedule:
-    # Twice a day, timed for Gulf evening viewers (UTC): ~5pm and ~9pm Riyadh.
+    # Four a day for Gulf viewers (UTC+3): ~1pm, ~5pm, ~8:45pm and ~11:30pm Riyadh.
+    # (YouTube API quota allows about 6 uploads a day.)
+    - cron: "07 10 * * *"
     - cron: "13 14 * * *"
     - cron: "47 17 * * *"
+    - cron: "29 20 * * *"
   workflow_dispatch:
     inputs:
       count:
