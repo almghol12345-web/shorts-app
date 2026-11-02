@@ -71,7 +71,8 @@ Write ONE new Short. Rules:
 - Middle lines: when and where, then escalating details, one per line.
 - End on the open question, phrased so it flows back into line 1 when the video loops.
   NO "follow", "like" or "subscribe" lines.
-- 7 to 9 lines, each 3 to 12 words, spoken in about 30-40 seconds.
+- 12 to 15 lines, each 3 to 14 words, spoken in about 45-60 seconds: a full story
+  with a twist near the end, never a list of facts.
 - title: under 55 characters, mysterious, does not reveal the answer, ends with " #shorts".
 - description: the hook sentence, then "تابع القناة.. لغز حقيقي جديد كل يوم 🔍", then 3 hashtags.
 - tags: 8 short tags in the video language.
@@ -268,7 +269,9 @@ def generate_offline(used: list[str]) -> Script:
         return random.choice(bank)
     # Keep the bank's order of preference: the first unused mystery comes before any fact.
     preferred = [s for s in fresh if s in _load_json("mysteries.json")]
-    return random.choice(preferred or fresh)
+    # full stories (45-60 s) hold viewers longer than short ones, so they go first
+    full = [s for s in preferred if len(s.lines) >= 12]
+    return random.choice(full or preferred or fresh)
 
 
 def generate(cfg: Config, used: list[str]) -> Script:

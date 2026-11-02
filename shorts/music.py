@@ -23,7 +23,8 @@ MOOD_WORDS = {
     "ancient": ("آثار", "حضارات", "حضارة", "تاريخ", "أهرامات", "الأهرامات", "معبد", "مخطوطة", "روما",
                 "إنكا", "pyramid", "ancient", "ruins", "temple", "manuscript", "roman"),
     "crime": ("جرائم", "جريمة", "قاتل", "اختفاءات", "اختفى", "اختفت", "طائرة", "طيارة", "الشرطة",
-              "شفرة", "crime", "killer", "police", "airplane", "vanished", "cipher"),
+              "شفرة", "crime", "killer", "police", "airplane", "vanished", "cipher",
+              "رعب", "اختفوا", "اختفاء", "مقتولين", "انقتلت", "خطف", "انخطفوا", "احترق", "missing"),
 }
 
 

@@ -44,7 +44,8 @@ def test_offline_bank_avoids_used_topics():
 def test_offline_bank_is_well_formed():
     for s in content.FALLBACK_BANK:
         assert s.title.endswith("#shorts") and len(s.title) <= 100
-        assert 5 <= len(s.lines) <= 10 and s.search_terms and s.tags
+        assert 5 <= len(s.lines) <= 16 and s.search_terms
+        assert not s.scenes or len(s.scenes) == len(s.lines) and s.tags
 
 
 def test_history_roundtrip(tmp_path):
@@ -142,7 +143,8 @@ def test_fact_bank_is_well_formed_and_unique():
     assert len(bank) >= 50 and len(topics) == len(set(topics))
     for s in bank:
         assert s.title.endswith("#shorts") and len(s.title) <= 100
-        assert 5 <= len(s.lines) <= 10 and s.search_terms
+        assert 5 <= len(s.lines) <= 16 and s.search_terms
+        assert not s.scenes or len(s.scenes) == len(s.lines)
 
 
 def test_real_ffmpeg_shots_join(monkeypatch, tmp_path):
