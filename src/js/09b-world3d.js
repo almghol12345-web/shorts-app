@@ -162,7 +162,7 @@ function w3Draw(ts) {
   if ((W3.liveT -= dt) <= 0) { W3.liveT = .5; w3Live(tx, tz); }
   for (const l of W3.live) { l.a += dt * .5; const x = l.cx + Math.cos(l.a) * l.r, z = l.cz + Math.sin(l.a) * l.r; l.m.position.set(x, 0, z); l.m.rotation.y = l.a + Math.PI; m3Walk(l.m, tt + l.ph, .7, true); }
   W3.ring.material.opacity = .2 + Math.sin(tt * 2) * .06;
-  V3.renderer.render(W3.scene, W3.cam);
+  fxRender(W3.scene, W3.cam, wW, wH, 'world');
   // overlay: march lines, level badges, names, vignette
   const c = wCtx; if (!c) return; c.setTransform(wDpr, 0, 0, wDpr, 0, 0); c.clearRect(0, 0, wW, wH);
   c.textAlign = 'center'; c.textBaseline = 'middle'; c.direction = isRTL() ? 'rtl' : 'ltr';

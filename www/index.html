@@ -476,6 +476,12 @@ input[type=range]{width:100%;accent-color:var(--rust)}
 <script src="GLTFLoader.js"></script>
 <script src="BufferGeometryUtils.js"></script>
 <script src="SkeletonUtils.js"></script>
+<script src="fx/CopyShader.js"></script>
+<script src="fx/LuminosityHighPassShader.js"></script>
+<script src="fx/EffectComposer.js"></script>
+<script src="fx/RenderPass.js"></script>
+<script src="fx/ShaderPass.js"></script>
+<script src="fx/UnrealBloomPass.js"></script>
 <script src="capacitor.js"></script>
 <script>
 (function(){'use strict';
@@ -589,7 +595,7 @@ ar: {
   upgrade_to: 'تطوير إلى المستوى {0}', buy_missing: 'شراء الناقص', builders_busy: 'البناؤون مشغولين', upgrade: 'تطوير', instant: 'فوري', open_heroes: 'فتح الأبطال', base_def: 'دفاع القاعدة الكلي', base_def_note: 'السور + الجنود + نصف قوة الفريق. الهجوم القادم', level_n: 'المستوى {0}',
   tier0: 'مشاة', tier1: 'رماة', tier2: 'قناصة', tier3: 'مدرعات', tier4: 'نخبة', troops: 'الجنود', troops_note: 'كل جندي يرفع هجوم الأبطال. الدعم الحالي +{0}%', troops_full: 'وصلت للحد الأقصى. طوّر الثكنة لرفعه.', count: 'العدد', train: 'تدريب',
   wounded: 'الجرحى', heal_all: 'علاج الكل', no_wounded: 'لا يوجد جرحى. الجنود يتصابون في المعارك والهجمات.', research: 'الأبحاث', lab_n: 'مختبر {0}', do_research: 'بحث',
-  trait: 'ضربته الخاصة', privacy: 'سياسة الخصوصية',
+  trait: 'ضربته الخاصة', privacy: 'سياسة الخصوصية', gfx_high: 'الرسوميات: عالية (توهج وظلال)', gfx_low: 'الرسوميات: خفيفة (أسرع)',
   tr_redking: 'ضربة واسعة: كل ضربة تصيب زومبي ثاني جنبه بنصف القوة.', tr_destroyer: 'برق سحري: الطلقة تنتقل لزومبيين ثانيين بثلث القوة.', tr_fire: 'كرة نار: تنفجر وتحرق اللي حولها بـ40% من القوة.',
   tr_knight: 'درع الفارس: كل ضربة تعطيه درع صغير يحميه.', tr_lightning: 'قناص: فرصة الضربة القاضية 30% بدل 12%.', tr_shadow: 'خنجرين: تضرب مرتين، الثانية بـ60% من القوة.',
   tr_medic: 'شفاء: كل ضربة تعالج أضعف بطل بربع قوتها.', tr_mountain: 'ضربة الأرض: يرجّع الزومبي لورا وأحياناً يدوّخه.', tr_hawk: 'سهم خارق: يخترق ويصيب الزومبي اللي وراه.', tr_wind: 'سرعة الريح: يضرب أسرع بـ40% ويشحن طاقة الفريق.',
@@ -677,7 +683,7 @@ en: {
   upgrade_to: 'Upgrade to level {0}', buy_missing: 'Buy missing', builders_busy: 'Builders busy', upgrade: 'Upgrade', instant: 'Instant', open_heroes: 'Open heroes', base_def: 'Total base defense', base_def_note: 'Wall + troops + half your squad power. Next raid in', level_n: 'Level {0}',
   tier0: 'Infantry', tier1: 'Riflemen', tier2: 'Snipers', tier3: 'Armor', tier4: 'Elite', troops: 'Troops', troops_note: 'Every soldier boosts hero attack. Current bonus +{0}%', troops_full: 'At max troops. Upgrade the Barracks to raise it.', count: 'Count', train: 'Train',
   wounded: 'Wounded', heal_all: 'Heal all', no_wounded: 'No wounded. Troops get hurt in battles and raids.', research: 'Research', lab_n: 'Lab {0}', do_research: 'Research',
-  trait: 'Special attack', privacy: 'Privacy policy',
+  trait: 'Special attack', privacy: 'Privacy policy', gfx_high: 'Graphics: High (glow and shadows)', gfx_low: 'Graphics: Light (faster)',
   tr_redking: 'Cleave: every hit also strikes a nearby zombie for half damage.', tr_destroyer: 'Arc bolt: the shot jumps to two more zombies for a third of the damage.', tr_fire: 'Fireball: explodes and burns everything around for 40%.',
   tr_knight: 'Knight’s guard: every hit gives him a small shield.', tr_lightning: 'Marksman: 30% critical chance instead of 12%.', tr_shadow: 'Twin blades: strikes twice, the second for 60%.',
   tr_medic: 'Mending: every hit heals the weakest hero for a quarter of its damage.', tr_mountain: 'Earth slam: knocks zombies back and sometimes stuns them.', tr_hawk: 'Piercing arrow: goes through and hits the zombie behind.', tr_wind: 'Gale speed: attacks 40% faster and charges the squad’s energy.',
@@ -2251,6 +2257,7 @@ function mSettings() {
   <div class="grid4"><div class="stat"><small>${t('power')}</small><b class="num">${fmt(totalPower())}</b></div><div class="stat"><small>${t('kills')}</small><b class="num">${fmt(S.stats.kills)}</b></div><div class="stat"><small>${t('wins')}</small><b class="num">${fmt(S.stats.wins)}</b></div><div class="stat"><small>${t('sieges_def')}</small><b class="num">${fmt(S.stats.sieges)}</b></div></div>
   <div class="grid2"><button class="btn ${S.snd ? 'ok' : ''}" data-a="tsnd">${S.snd ? '🔊 ' + t('sound_on') : '🔇 ' + t('sound_off')}</button><button class="btn ${S.vib ? 'ok' : ''}" data-a="tvib">${S.vib ? '📳 ' + t('vib_on') : '📴 ' + t('vib_off')}</button></div>
   <div class="li"><span class="lic">${NET.on ? '☁️' : '📱'}</span><div class="lit"><b>${NET.on ? t('online_on') : t('online_off')}</b><small>${NET.on ? t('player_id') + ' <b class="num ltr">#' + (NET.me ? NET.me.short_id : '…') + '</b> · ' + t('id_note') : t('offline_note')}</small></div>${NET.on && NET.me ? `<button class="btn sm" data-a="copyId">${t('copy')}</button>` : ''}</div>
+  <button class="btn wide ${S.gfx === 'low' ? '' : 'ok'}" data-a="gfx">✨ ${t(S.gfx === 'low' ? 'gfx_low' : 'gfx_high')}</button>
   <button class="btn wide" data-a="vip">👑 VIP ${vipLv()}</button>
   <button class="btn wide" data-a="tut">📖 ${t('how_to_play')}</button>
   <button class="btn wide" data-a="restore">${t('restore')}</button>
@@ -2641,7 +2648,7 @@ function v3Loop(ts) {
   V3.shots = V3.shots.filter(s => { if (s.life <= 0) { V3.scene.remove(s.line); s.line.geometry.dispose(); s.line.material.dispose(); return false; } return true; });
   // slow dusk light breathing
   V3.sun.intensity = .95 + Math.sin(t * .15) * .1;
-  V3.renderer.render(V3.scene, V3.camera);
+  fxRender(V3.scene, V3.camera, V3.W, V3.H, 'village');
   v3PlaceHotspots(); v3PlaceTag();
   V3.raf = requestAnimationFrame(v3Loop);
 }
@@ -3436,7 +3443,7 @@ function kkMat(base, look) {
   if (KK.mat[key]) return KK.mat[key];
   const m = new THREE.MeshStandardMaterial({ map: t.map, roughness: look.rough || .75, metalness: look.metal || 0 });
   if (t.em) { m.emissive = new THREE.Color('#ffffff'); m.emissiveMap = t.em; m.emissiveIntensity = look.glowI || 1; }
-  const sk = m.clone(); sk.skinning = true; // three r128 needs a separate skinned copy
+  fxRim(m); const sk = m.clone(); sk.skinning = true; fxRim(sk); // three r128 needs a separate skinned copy
   return (KK.mat[key] = { rigid: m, skin: sk });
 }
 /* ---------- build one character ---------- */
@@ -3565,6 +3572,68 @@ function kkSwapIn() {
   V3.zpool = [];
   for (const u of V3.units) V3.scene.remove(u.s); for (const g of V3.guards || []) V3.scene.remove(g); for (const z of V3.zombies) V3.scene.remove(z.s);
   V3.units = []; V3.heroUnits = {}; V3.zombies = []; kkCit = 0; v3Units(); v3SyncHeroes();
+}
+
+/* ---- 08f-fx.js ---- */
+/* ================= picture quality: glow, color grading, vignette =================
+ * One effect chain shared by the village, the battle and the world: the scene is rendered, bright parts
+ * (fire, windows, magic, eyes) get a soft glow, then colors are graded and the edges darkened.
+ * Phones that cannot keep up switch to the plain renderer by themselves, and Settings has a switch.
+ */
+const FX = { comp: null, ok: true, slow: 0, frames: 0, acc: 0 };
+const FX_FINAL = {
+  uniforms: { tDiffuse: { value: null }, vig: { value: .26 }, sat: { value: 1.12 }, con: { value: 1.04 }, tint: { value: null } },
+  vertexShader: 'varying vec2 vUv; void main() { vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }',
+  fragmentShader: [
+    'uniform sampler2D tDiffuse; uniform float vig; uniform float sat; uniform float con; uniform vec3 tint; varying vec2 vUv;',
+    'void main() {',
+    '  vec4 c = texture2D(tDiffuse, vUv);',
+    '  float l = dot(c.rgb, vec3(.299, .587, .114));',
+    '  c.rgb = mix(vec3(l), c.rgb, sat);',
+    '  c.rgb *= 1.08;',
+    '  c.rgb = (c.rgb - .5) * con + .5;',
+    '  c.rgb *= tint;',
+    '  vec2 d = vUv - .5; c.rgb *= 1.0 - vig * smoothstep(.25, .75, length(d * vec2(1.0, 1.25)));',
+    '  gl_FragColor = vec4(clamp(c.rgb, 0.0, 1.0), 1.0);',
+    '}'].join('\n'),
+};
+function fxWanted() { return FX.ok && S.gfx !== 'low' && !!(THREE.EffectComposer && THREE.UnrealBloomPass); }
+function fxInit() {
+  if (FX.comp) return true;
+  try {
+    // the in-between images keep sRGB colors, so dark areas stay dark (8-bit linear washes them out)
+    const rt = new THREE.WebGLRenderTarget(256, 256, { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBAFormat, encoding: THREE.sRGBEncoding });
+    const r = V3.renderer, comp = new THREE.EffectComposer(r, rt), rp = new THREE.RenderPass(new THREE.Scene(), new THREE.Camera());
+    const bloom = new THREE.UnrealBloomPass(new THREE.Vector2(256, 256), .4, .2, .93);
+    FX_FINAL.uniforms.tint.value = new THREE.Vector3(1, 1, 1);
+    const fin = new THREE.ShaderPass(FX_FINAL);
+    comp.addPass(rp); comp.addPass(bloom); comp.addPass(fin);
+    Object.assign(FX, { comp, rp, bloom, fin }); return true;
+  } catch (e) { console.warn('effects off', e); FX.ok = false; return false; }
+}
+/* look of each place: glow strength, saturation, warm/cold tint */
+const FX_LOOK = { village: [.42, 1.15, [1.04, 1, .95]], battle: [.4, 1.18, [.98, 1, 1.04]], boss: [.5, 1.2, [1.08, .95, .95]], world: [.35, 1.12, [1.02, 1, .97]] };
+function fxRender(scene, cam, w, h, look) {
+  const r = V3.renderer;
+  if (!fxWanted() || !fxInit()) { r.render(scene, cam); return; }
+  const k = w + 'x' + h + '@' + r.getPixelRatio();
+  if (FX.size !== k) { FX.size = k; FX.comp.setPixelRatio(Math.min(1.5, r.getPixelRatio())); FX.comp.setSize(w, h); }
+  const L = FX_LOOK[look] || FX_LOOK.village; FX.bloom.strength = FX.force !== undefined ? FX.force : L[0]; FX.fin.uniforms.sat.value = L[1]; FX.fin.uniforms.tint.value.set(...L[2]);
+  FX.rp.scene = scene; FX.rp.camera = cam;
+  const t0 = performance.now(); FX.comp.render(); fxWatch(performance.now() - t0);
+}
+/* if the effect chain is too slow on this phone, fall back to plain rendering */
+function fxWatch(ms) {
+  const tn = performance.now();
+  if (FX.last) { FX.acc += tn - FX.last; FX.frames++; }
+  FX.last = tn;
+  if (FX.frames >= 90) { const avg = FX.acc / FX.frames; FX.frames = 0; FX.acc = 0; if (avg > 45 && !FX.checked && !navigator.webdriver) { FX.ok = false; } FX.checked = true; }
+}
+/* soft rim light so characters stand out from the background */
+function fxRim(mat, col) {
+  if (mat.userData.rim) return mat; mat.userData.rim = 1; const c = new THREE.Color(col || '#9ab0d8');
+  mat.onBeforeCompile = sh => { sh.fragmentShader = sh.fragmentShader.replace('#include <emissivemap_fragment>', `#include <emissivemap_fragment>\n  totalEmissiveRadiance += vec3(${c.r.toFixed(3)}, ${c.g.toFixed(3)}, ${c.b.toFixed(3)}) * .55 * pow(1.0 - saturate(dot(normal, normalize(vViewPosition))), 3.0);`); };
+  mat.customProgramCacheKey = () => 'rim' + c.getHexString(); mat.needsUpdate = true; return mat;
 }
 
 /* ---- 09-world.js ---- */
@@ -3960,7 +4029,7 @@ function w3Draw(ts) {
   if ((W3.liveT -= dt) <= 0) { W3.liveT = .5; w3Live(tx, tz); }
   for (const l of W3.live) { l.a += dt * .5; const x = l.cx + Math.cos(l.a) * l.r, z = l.cz + Math.sin(l.a) * l.r; l.m.position.set(x, 0, z); l.m.rotation.y = l.a + Math.PI; m3Walk(l.m, tt + l.ph, .7, true); }
   W3.ring.material.opacity = .2 + Math.sin(tt * 2) * .06;
-  V3.renderer.render(W3.scene, W3.cam);
+  fxRender(W3.scene, W3.cam, wW, wH, 'world');
   // overlay: march lines, level badges, names, vignette
   const c = wCtx; if (!c) return; c.setTransform(wDpr, 0, 0, wDpr, 0, 0); c.clearRect(0, 0, wW, wH);
   c.textAlign = 'center'; c.textBaseline = 'middle'; c.direction = isRTL() ? 'rtl' : 'ltr';
@@ -4268,7 +4337,8 @@ function b3Scene() {
   B3.cam = new THREE.PerspectiveCamera(50, 1, .5, 140);
   B3.hemi = new THREE.HemisphereLight('#9ab0d8', '#3a3028', .95); scene.add(B3.hemi);
   const moon = new THREE.DirectionalLight('#b0c4ff', .55); moon.position.set(-6, 14, -4); scene.add(moon);
-  const warm = new THREE.DirectionalLight('#ffc890', .75); warm.position.set(4, 9, 14); scene.add(warm);
+  const warm = new THREE.DirectionalLight('#ffc890', .8); warm.position.set(4, 12, 12); warm.target.position.set(0, 0, -6); scene.add(warm, warm.target);
+  if (S.gfx !== 'low') { warm.castShadow = true; warm.shadow.mapSize.set(1024, 1024); const sc = warm.shadow.camera; sc.left = -9; sc.right = 9; sc.top = 16; sc.bottom = -10; sc.near = 2; sc.far = 50; warm.shadow.bias = -.0015; }
   B3.flash = new THREE.PointLight('#ffb050', 0, 16, 2); scene.add(B3.flash);
   const st = new THREE.Group(); scene.add(st);
   // road and sidewalks
@@ -4321,6 +4391,7 @@ function b3Scene() {
   const n = 260, pos = new Float32Array(n * 3); for (let i = 0; i < n; i++) { pos[i * 3] = (Math.random() - .5) * 16; pos[i * 3 + 1] = Math.random() * 10; pos[i * 3 + 2] = 8 - Math.random() * 50; }
   const ag = new THREE.BufferGeometry(); ag.setAttribute('position', new THREE.BufferAttribute(pos, 3));
   B3.ash = new THREE.Points(ag, new THREE.PointsMaterial({ color: '#cfc6bc', size: .07, transparent: true, opacity: .55, depthWrite: false })); scene.add(B3.ash);
+  B3.decals = []; B3.bloodM = new THREE.MeshBasicMaterial({ map: texBlood(), transparent: true, depthWrite: false, color: '#ffffff' });
   B3.blob = new THREE.MeshBasicMaterial({ map: texRadial('rgba(0,0,0,.75)', 'rgba(0,0,0,0)'), transparent: true, depthWrite: false });
 }
 function b3Fire(x, z, light) {
@@ -4336,6 +4407,7 @@ function b3TakeZ(type) {
   let m = pool.pop();
   if (!m) { m = m3Zombie(type); m.userData.baseSc = m.scale.x; b3Blob(m, type === 'wb' ? .9 : .55); }
   m.rotation.set(0, 0, 0); m.position.y = 0; m.scale.setScalar(m.userData.baseSc);
+  m.traverse(o => { if (o.isMesh) o.castShadow = S.gfx !== 'low'; });
   if (m.userData.kk) { const u = m.userData; u.mixer.stopAllAction(); u.cur = null; u.curA = null; u.once = false; u.hold = false; u.lt = undefined; kkPlay(m, u.idle); } m.userData.blobM.visible = true; m.visible = true;
   B3.scene.add(m); return m;
 }
@@ -4363,7 +4435,7 @@ function b3Stop() {
   for (const h of B.heroes) if (h.m) { B3.scene.remove(h.m); b3Dispose(h.m); h.m = null; }
   for (const z of B.z) if (z.m) { b3PutZ(z.m); z.m = null; }
   B3.dying.forEach(d => b3PutZ(d.m)); B3.dying = []; B3.parts.forEach(p => B3.scene.remove(p.s)); B3.parts = [];
-  B3.proj.forEach(p => B3.scene.remove(p.o)); B3.proj = []; B3.rings.forEach(r => B3.scene.remove(r.m)); B3.rings = [];
+  B3.proj.forEach(p => B3.scene.remove(p.o)); B3.proj = []; (B3.decals || []).forEach(d => { B3.scene.remove(d.m); d.m.material.dispose(); }); B3.decals = []; B3.rings.forEach(r => B3.scene.remove(r.m)); B3.rings = [];
 }
 function b3Burst(x, y, z, col, size, life, grow) { const s = c3Glow(col, size, .9); s.position.set(x, y, z); B3.scene.add(s); B3.parts.push({ s, life, l0: life, s0: size, grow }); }
 function b3Attack(h, u, p) {
@@ -4378,7 +4450,8 @@ function b3Attack(h, u, p) {
 const B3_PROJ = { redking: ['slash', '#ff6a3a', 20], destroyer: ['orb', '#c07aff', 15], fire: ['orb', '#ff7a1a', 13, 1], knight: ['slash', '#ffd77a', 20], lightning: ['bullet'], shadow: ['dagger', '#c8d0ff', 24], medic: ['orb', '#7dff7a', 15], mountain: ['quake', '#ffb070'], hawk: ['arrow', '#e8d8a0', 24], wind: ['slash', '#7ac8ff', 26] };
 const texCrescent = () => c3Tex('crescent', (c, w, h) => { c.strokeStyle = '#fff'; c.lineCap = 'round'; for (const [lw, a] of [[18, .25], [10, .55], [4, 1]]) { c.globalAlpha = a; c.lineWidth = lw; c.beginPath(); c.arc(w / 2, h * .75, w * .36, Math.PI * 1.1, Math.PI * 1.9); c.stroke(); } });
 function b3Shot(f) {
-  const P = B3_PROJ[f.hid], hh = B.heroes.find(x => x.id === f.hid); if (!P || !hh || !hh.m || P[0] === 'bullet') return;
+  const P = B3_PROJ[f.hid], hh = B.heroes.find(x => x.id === f.hid); if (!P || !hh || !hh.m) return;
+  if (P[0] === 'bullet') { if (f.tz && f.tz.m) { const q = f.tz.m.position; b3Burst(q.x, (f.tz.m3h || 1.6) * .6, q.z, '#ffd27a', .5, .12, .6); } if (hh.m.userData.muzzle || true) { const p = hh.m.position; b3Burst(p.x, hh.m3h * .6, p.z - .5, '#ffe9a8', .55, .06, 0); } return; }
   const tz = f.tz, to = tz && tz.m ? tz.m.position.clone().setY((tz.m3h || 1.6) * .55) : new THREE.Vector3(b3X(f.tx), 1, b3Z(f.ty));
   const from = f.sub && tz ? to.clone() : hh.m.position.clone().setY(hh.m3h * .6);
   if (f.sub) { const z0 = B.z.find(z => z.m && Math.hypot(z.x - f.x, z.y - f.y) < 1); if (z0) from.copy(z0.m.position).setY(1); }
@@ -4391,6 +4464,12 @@ function b3Shot(f) {
   else { o = new THREE.Group(); A(o, c3Cyl(.012, .012, .8, 4), c3M({ color: '#6a4a2a' }), 0, 0, 0, Math.PI / 2); A(o, c3Cone(.035, .1, 4), c3M({ color: '#c8c8c8', metalness: .7 }), 0, 0, .45, Math.PI / 2); A(o, c3Box(.005, .06, .14), c3M({ color: '#e8e0d0' }), 0, 0, -.36); }
   o.position.copy(from); B3.scene.add(o);
   B3.proj.push({ o, from, to, tz, t: 0, dur: Math.max(.08, from.distanceTo(to) / P[2]), kind: P[0], col: P[1], big: P[3] });
+}
+function texBlood() { return c3Tex('blood', (c, w, h) => { const R = rng(97); for (let i = 0; i < 26; i++) { const r = i ? 4 + R() * 14 : 38, a = R() * 6.3, d = i ? 18 + R() * 36 : 0; c.fillStyle = i % 3 ? 'rgba(90,8,6,.85)' : 'rgba(60,4,4,.9)'; c.beginPath(); c.ellipse(64 + Math.cos(a) * d, 64 + Math.sin(a) * d, r, r * (.6 + R() * .4), a, 0, 7); c.fill(); } }); }
+function b3Blood(x, z, s) {
+  const g = c3G('decal', () => { const p = new THREE.PlaneGeometry(1, 1); p.rotateX(-Math.PI / 2); return p; }), m = new THREE.Mesh(g, B3.bloodM.clone());
+  m.position.set(x + (Math.random() - .5) * .3, .025, z - .3); m.rotation.y = Math.random() * 6.3; m.scale.set(s * 1.6, 1, s * 1.6); m.renderOrder = -1; B3.scene.add(m);
+  B3.decals.push({ m, t: 0 }); if (B3.decals.length > 28) { const o = B3.decals.shift(); B3.scene.remove(o.m); o.m.material.dispose(); }
 }
 function b3Ring(x, z, col) { const m = new THREE.Mesh(c3G('ring3', () => { const g = new THREE.RingGeometry(.5, .75, 28); g.rotateX(-Math.PI / 2); return g; }), new THREE.MeshBasicMaterial({ color: col, transparent: true, opacity: .8, depthWrite: false, blending: THREE.AdditiveBlending })); m.position.set(x, .06, z); B3.scene.add(m); B3.rings.push({ m, t: 0 }); }
 function b3Proj(dt) {
@@ -4406,6 +4485,8 @@ function b3Proj(dt) {
     if (k >= 1) { p.done = 1; B3.scene.remove(p.o); b3Burst(p.to.x, p.to.y, p.to.z, p.col || '#fff', p.big ? 1.4 : .8, .3, p.big ? 2.5 : 1.2); }
   }
   B3.proj = B3.proj.filter(p => !p.done);
+  for (const d of B3.decals) { d.t += dt; if (d.t > 8) d.m.material.opacity = Math.max(0, 1 - (d.t - 8) / 3); }
+  B3.decals = B3.decals.filter(d => { if (d.t > 11) { B3.scene.remove(d.m); d.m.material.dispose(); return false; } return true; });
   for (const r of B3.rings) { r.t += dt; const s = 1 + r.t * 5; r.m.scale.set(s, 1, s); r.m.material.opacity = Math.max(0, .8 - r.t * 1.6); }
   B3.rings = B3.rings.filter(r => { if (r.t > .5) { B3.scene.remove(r.m); r.m.material.dispose(); return false; } return true; });
 }
@@ -4436,7 +4517,7 @@ function b3Frame() {
   }
   for (const z of B.z) {
     if (!z.m) { if (!z.alive) continue; z.m = b3TakeZ(z.type); z.m3h = z.m.userData.hgt || ZOMB3[z.type].sc * 1.22; }
-    if (!z.alive) { z.m.userData.blobM.visible = false; if (z.m.userData.kk) kkOnce(z.m, z.m.userData.death, 1.2, true); B3.dying.push({ m: z.m, t: 0 }); z.m = null; continue; }
+    if (!z.alive) { b3Blood(z.m.position.x, z.m.position.z, (z.m3h || 2) * .45); z.m.userData.blobM.visible = false; if (z.m.userData.kk) kkOnce(z.m, z.m.userData.death, 1.2, true); B3.dying.push({ m: z.m, t: 0 }); z.m = null; continue; }
     const m = z.m, u = m.userData, Z = ZOMB3[z.type];
     m.position.set(b3X(z.x), 0, b3Z(z.y) - B3_ZOFF[z.type]);
     const stopY = z.T.range ? B.lineY - 170 : B.lineY - z.T.r + 4, moving = z.y < stopY - .5 && z.stun <= 0;
@@ -4445,6 +4526,7 @@ function b3Frame() {
     if (z.acd > (z.pacd || 0) + .15) z.atkT = .35; z.pacd = z.acd;
     if (z.atkT > 0 && u.kk) { if (!z.atkOn) { z.atkOn = 1; kkOnce(m, u.atk, 1.3); } z.atkT -= dt; } else if (z.atkT > 0) { z.atkT -= dt; const s = Math.sin(clamp(1 - z.atkT / .35, 0, 1) * Math.PI); u.armL.rotation.x = u.armR.rotation.x = -1.35 + s * 1.2; u.chest.rotation.x = Z.hunch + s * .35; }
     if (z.atkT <= 0) z.atkOn = 0; m.scale.setScalar(u.baseSc * (z.flash > 0 ? 1.06 : 1));
+    if (u.kk && z.flash > 0 && !z.atkT && (z.hitCd || 0) < B3.t && z.type !== 'wb') { z.hitCd = B3.t + .7; kkOnce(m, 'Hit_A', 1.7); }
   }
   for (const d of B3.dying) { d.t += dt; if (d.m.userData.kk) { kkTick(d.m, dt); if (d.t > 1.3) d.m.position.y = -(d.t - 1.3) * .5 * d.m.userData.hgt; } else { d.m.rotation.x = -Math.min(Math.PI / 2, d.t * 4); if (d.t > .9) d.m.position.y = -(d.t - .9) * .5 * d.m.userData.baseSc; } }
   B3.dying = B3.dying.filter(d => { if (d.t > 2.2) { b3PutZ(d.m); return false; } return true; });
@@ -4460,7 +4542,7 @@ function b3Frame() {
   for (const f of B3.fires) { const k = .8 + Math.sin(t * 11 + f.ph) * .12 + Math.random() * .1; f.spr.forEach((s, i) => s.scale.set(s.userData.b * k, s.userData.b * k * 1.3, 1)); if (f.pl) f.pl.intensity = 1.8 + k; }
   const ap = B3.ash.geometry.attributes.position; for (let i = 0; i < ap.count; i++) { let y = ap.getY(i) - rdt * .5; if (y < 0) y = 10; ap.setY(i, y); ap.setX(i, ap.getX(i) + Math.sin(t + i) * rdt * .2); } ap.needsUpdate = true;
   B3.cam.position.copy(B3.camPos); if (B.shake > 0) { B3.cam.position.x += (Math.random() - .5) * .3; B3.cam.position.y += (Math.random() - .5) * .3; }
-  V3.renderer.render(B3.scene, B3.cam);
+  fxRender(B3.scene, B3.cam, B.W, B.H, B.cfg.boss ? 'boss' : 'battle');
 }
 /* ---------- 2D overlay: bars, numbers, shots ---------- */
 function b3Draw() {
@@ -4504,7 +4586,7 @@ function b3Draw() {
   c.textAlign = 'right'; c.fillText(B.cfg.boss ? `💥 ${fmt(B.dealt)}` : `🧟 ${B.kills}`, W - 10, 14);
   if (B.cfg.boss) { const z = B.z.find(z => z.type === 'wb'); if (z) { const w = W * .7, x = (W - w) / 2; c.fillStyle = '#000a'; c.fillRect(x, 26, w, 8); c.fillStyle = '#e2513f'; c.fillRect(x, 26, w * Math.max(0, z.hp / z.maxhp), 8); } }
 }
-window.B3DBG = { fight: (sc, waves, boss, squad) => { if (squad) { squad.forEach(id => { if (!S.heroes[id]) S.heroes[id] = { lv: 30, st: 3, sh: 0 }; }); S.squad = squad; } startBattle({ title: 'test', waves, sc, boss, onEnd: () => null }); }, on: () => !!(B && B.m3), zombies: () => B ? B.z.filter(z => z.m).length : 0, heroes: () => B ? B.heroes.filter(h => h.m).length : 0, calls: () => V3.renderer.info.render.calls, texs: () => { const set = new Map(); B3.scene.traverse(o => { const ms = o.material ? [].concat(o.material) : []; for (const m of ms) for (const k of ['map', 'emissiveMap']) if (m[k]) set.set(m[k].uuid, (o.name || o.type) + ':' + (m[k].image && m[k].image.width)); }); return [set.size, [...set.values()].slice(0, 60).join(',')]; }, mem: () => { const i = V3.renderer.info; return `geo ${i.memory.geometries} tex ${i.memory.textures} prog ${i.programs.length} heap ${(performance.memory ? performance.memory.usedJSHeapSize / 1e6 : 0).toFixed(0)}MB`; } };
+window.B3DBG = { fx: on => { FX.ok = !!on; }, bloom: v => { FX.force = v; }, fight: (sc, waves, boss, squad) => { if (squad) { squad.forEach(id => { if (!S.heroes[id]) S.heroes[id] = { lv: 30, st: 3, sh: 0 }; }); S.squad = squad; } startBattle({ title: 'test', waves, sc, boss, onEnd: () => null }); }, on: () => !!(B && B.m3), zombies: () => B ? B.z.filter(z => z.m).length : 0, heroes: () => B ? B.heroes.filter(h => h.m).length : 0, calls: () => V3.renderer.info.render.calls, texs: () => { const set = new Map(); B3.scene.traverse(o => { const ms = o.material ? [].concat(o.material) : []; for (const m of ms) for (const k of ['map', 'emissiveMap']) if (m[k]) set.set(m[k].uuid, (o.name || o.type) + ':' + (m[k].image && m[k].image.width)); }); return [set.size, [...set.values()].slice(0, 60).join(',')]; }, mem: () => { const i = V3.renderer.info; return `geo ${i.memory.geometries} tex ${i.memory.textures} prog ${i.programs.length} heap ${(performance.memory ? performance.memory.usedJSHeapSize / 1e6 : 0).toFixed(0)}MB`; } };
 
 /* ---- 11-admin.js ---- */
 /* ================= admin panel (hidden: tap the version label 7 times in Settings) ================= */
@@ -4697,6 +4779,7 @@ const ACT = {
   settings: () => openModal(mSettings), tut: () => openModal(mTut),
   lang: x => { S.lang = x; setLang(x); save(); refresh(); syncPlayer().catch(() => { }); },
   langPick: x => { S.lang = x; setLang(x); save(); closeModal(); render(); if (!S.tut) { S.tut = true; openModal(mTut); if (!S.storySeen) { S.storySeen = 0.5; queuePopup(() => mStory(0)); } } },
+  gfx: () => { S.gfx = S.gfx === 'low' ? 'high' : 'low'; FX.ok = true; FX.checked = false; save(); renderModal(); toast(t(S.gfx === 'low' ? 'gfx_low' : 'gfx_high')); },
   tsnd: () => { S.snd = !S.snd; save(); renderModal(); if (S.snd) SND.coin(); },
   tvib: () => { S.vib = !S.vib; save(); renderModal(); buzz('medium'); },
   copyId: () => { const v = '#' + (NET.me && NET.me.short_id); try { navigator.clipboard.writeText(v).then(() => toast(t('copied')), () => toast(v)); } catch (e) { toast(v); } },

@@ -47,6 +47,12 @@ ${shell}
 <script src="GLTFLoader.js"></script>
 <script src="BufferGeometryUtils.js"></script>
 <script src="SkeletonUtils.js"></script>
+<script src="fx/CopyShader.js"></script>
+<script src="fx/LuminosityHighPassShader.js"></script>
+<script src="fx/EffectComposer.js"></script>
+<script src="fx/RenderPass.js"></script>
+<script src="fx/ShaderPass.js"></script>
+<script src="fx/UnrealBloomPass.js"></script>
 <script src="capacitor.js"></script>
 <script>
 ${game}
@@ -61,6 +67,8 @@ fs.copyFileSync('node_modules/three/build/three.min.js', 'www/three.min.js');
 fs.copyFileSync('node_modules/three/examples/js/loaders/GLTFLoader.js', 'www/GLTFLoader.js');
 fs.copyFileSync('node_modules/three/examples/js/utils/BufferGeometryUtils.js', 'www/BufferGeometryUtils.js');
 fs.copyFileSync('node_modules/three/examples/js/utils/SkeletonUtils.js', 'www/SkeletonUtils.js');
+fs.mkdirSync('www/fx', { recursive: true });
+for (const f of ["shaders/CopyShader.js", "shaders/LuminosityHighPassShader.js", "postprocessing/EffectComposer.js", "postprocessing/RenderPass.js", "postprocessing/ShaderPass.js", "postprocessing/UnrealBloomPass.js"]) fs.copyFileSync('node_modules/three/examples/js/' + f, 'www/fx/' + f.split('/')[1]);
 const art = `<title>فجر الناجين</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -81,6 +89,24 @@ ${read('node_modules/three/examples/js/utils/BufferGeometryUtils.js')}
 </script>
 <script>
 ${read('node_modules/three/examples/js/utils/SkeletonUtils.js')}
+</script>
+<script>
+${read('node_modules/three/examples/js/shaders/CopyShader.js')}
+</script>
+<script>
+${read('node_modules/three/examples/js/shaders/LuminosityHighPassShader.js')}
+</script>
+<script>
+${read('node_modules/three/examples/js/postprocessing/EffectComposer.js')}
+</script>
+<script>
+${read('node_modules/three/examples/js/postprocessing/RenderPass.js')}
+</script>
+<script>
+${read('node_modules/three/examples/js/postprocessing/ShaderPass.js')}
+</script>
+<script>
+${read('node_modules/three/examples/js/postprocessing/UnrealBloomPass.js')}
 </script>
 <script>
 ${game}

@@ -58,7 +58,7 @@ function kkMat(base, look) {
   if (KK.mat[key]) return KK.mat[key];
   const m = new THREE.MeshStandardMaterial({ map: t.map, roughness: look.rough || .75, metalness: look.metal || 0 });
   if (t.em) { m.emissive = new THREE.Color('#ffffff'); m.emissiveMap = t.em; m.emissiveIntensity = look.glowI || 1; }
-  const sk = m.clone(); sk.skinning = true; // three r128 needs a separate skinned copy
+  fxRim(m); const sk = m.clone(); sk.skinning = true; fxRim(sk); // three r128 needs a separate skinned copy
   return (KK.mat[key] = { rigid: m, skin: sk });
 }
 /* ---------- build one character ---------- */

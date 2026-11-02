@@ -65,6 +65,7 @@ const ACT = {
   settings: () => openModal(mSettings), tut: () => openModal(mTut),
   lang: x => { S.lang = x; setLang(x); save(); refresh(); syncPlayer().catch(() => { }); },
   langPick: x => { S.lang = x; setLang(x); save(); closeModal(); render(); if (!S.tut) { S.tut = true; openModal(mTut); if (!S.storySeen) { S.storySeen = 0.5; queuePopup(() => mStory(0)); } } },
+  gfx: () => { S.gfx = S.gfx === 'low' ? 'high' : 'low'; FX.ok = true; FX.checked = false; save(); renderModal(); toast(t(S.gfx === 'low' ? 'gfx_low' : 'gfx_high')); },
   tsnd: () => { S.snd = !S.snd; save(); renderModal(); if (S.snd) SND.coin(); },
   tvib: () => { S.vib = !S.vib; save(); renderModal(); buzz('medium'); },
   copyId: () => { const v = '#' + (NET.me && NET.me.short_id); try { navigator.clipboard.writeText(v).then(() => toast(t('copied')), () => toast(v)); } catch (e) { toast(v); } },

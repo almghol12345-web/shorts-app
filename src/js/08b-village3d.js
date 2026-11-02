@@ -354,7 +354,7 @@ function v3Loop(ts) {
   V3.shots = V3.shots.filter(s => { if (s.life <= 0) { V3.scene.remove(s.line); s.line.geometry.dispose(); s.line.material.dispose(); return false; } return true; });
   // slow dusk light breathing
   V3.sun.intensity = .95 + Math.sin(t * .15) * .1;
-  V3.renderer.render(V3.scene, V3.camera);
+  fxRender(V3.scene, V3.camera, V3.W, V3.H, 'village');
   v3PlaceHotspots(); v3PlaceTag();
   V3.raf = requestAnimationFrame(v3Loop);
 }

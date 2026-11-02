@@ -442,6 +442,7 @@ function mSettings() {
   <div class="grid4"><div class="stat"><small>${t('power')}</small><b class="num">${fmt(totalPower())}</b></div><div class="stat"><small>${t('kills')}</small><b class="num">${fmt(S.stats.kills)}</b></div><div class="stat"><small>${t('wins')}</small><b class="num">${fmt(S.stats.wins)}</b></div><div class="stat"><small>${t('sieges_def')}</small><b class="num">${fmt(S.stats.sieges)}</b></div></div>
   <div class="grid2"><button class="btn ${S.snd ? 'ok' : ''}" data-a="tsnd">${S.snd ? '🔊 ' + t('sound_on') : '🔇 ' + t('sound_off')}</button><button class="btn ${S.vib ? 'ok' : ''}" data-a="tvib">${S.vib ? '📳 ' + t('vib_on') : '📴 ' + t('vib_off')}</button></div>
   <div class="li"><span class="lic">${NET.on ? '☁️' : '📱'}</span><div class="lit"><b>${NET.on ? t('online_on') : t('online_off')}</b><small>${NET.on ? t('player_id') + ' <b class="num ltr">#' + (NET.me ? NET.me.short_id : '…') + '</b> · ' + t('id_note') : t('offline_note')}</small></div>${NET.on && NET.me ? `<button class="btn sm" data-a="copyId">${t('copy')}</button>` : ''}</div>
+  <button class="btn wide ${S.gfx === 'low' ? '' : 'ok'}" data-a="gfx">✨ ${t(S.gfx === 'low' ? 'gfx_low' : 'gfx_high')}</button>
   <button class="btn wide" data-a="vip">👑 VIP ${vipLv()}</button>
   <button class="btn wide" data-a="tut">📖 ${t('how_to_play')}</button>
   <button class="btn wide" data-a="restore">${t('restore')}</button>
