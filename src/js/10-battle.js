@@ -90,6 +90,21 @@ function cast(h) {
     case 'air': B.shake = .5; for (let i = 0; i < 6; i++) B.fx.push({ k: 'boom', x: B.W * (.15 + Math.random() * .7), y: B.lineY * (.2 + Math.random() * .7), r: 60, t: -i * .06, life: .5 }); for (const z of vz) dmgZ(z, h.atk * 3.5 * m); break;
   }
 }
+/* each hero's own touch on a normal attack */
+function heroTrait(h, tg, d) {
+  const vz = visibleZ(), others = vz.filter(z => z !== tg && z.alive), byDist = (o, p) => o.slice().sort((a, b) => Math.hypot(a.x - p.x, a.y - p.y) - Math.hypot(b.x - p.x, b.y - p.y));
+  switch (h.id) {
+    case 'redking': { const z = byDist(others, tg)[0]; if (z && Math.hypot(z.x - tg.x, z.y - tg.y) < 80) { dmgZ(z, d * .5); B.fx.push({ k: 'tr', x: tg.x, y: tg.y, tx: z.x, ty: z.y, t: 0, life: .12, w: 2, col: '#ff6a3a', hid: 'redking', tz: z, sub: 1 }); } break; }
+    case 'destroyer': { let from = tg; for (const z of byDist(others, tg).slice(0, 2)) { dmgZ(z, d * .35); B.fx.push({ k: 'arc', x: from.x, y: from.y, tx: z.x, ty: z.y, t: 0, life: .25, fz: from, tz: z }); from = z; } break; }
+    case 'fire': { for (const z of others) if (Math.hypot(z.x - tg.x, z.y - tg.y) < 48 + z.T.r) dmgZ(z, d * .4); B.fx.push({ k: 'boom', x: tg.x, y: tg.y, r: 48, t: .05, life: .4, small: 1 }); break; }
+    case 'knight': h.shield = Math.min(h.maxhp * .3, h.shield + h.maxhp * .03); h.shT = Math.max(h.shT, 3); break;
+    case 'shadow': setTimeout(() => { if (!B || B.done) return; const z = tg.alive ? tg : nearestZ(); if (z) { dmgZ(z, d * .6); B.fx.push({ k: 'tr', x: h.x, y: h.y - 12, tx: z.x, ty: z.y, t: 0, life: .07, w: 2, col: '#c8d0ff', hid: 'shadow', tz: z }); } }, 140); break;
+    case 'medic': { const al = B.heroes.filter(x => x.alive).sort((a, b) => a.hp / a.maxhp - b.hp / b.maxhp)[0]; if (al && al.hp < al.maxhp) { const v = d * .25; al.hp = Math.min(al.maxhp, al.hp + v); B.fx.push({ k: 'txt', x: al.x, y: al.y - 26, s: '+' + fmt(v), col: '#64b66e', t: 0, life: .7 }); } break; }
+    case 'mountain': if (tg.alive && tg.type !== 'wb' && tg.type !== 'boss') { tg.y = Math.max(-20, tg.y - 22); if (Math.random() < .12) tg.stun = Math.max(tg.stun, .6); } break;
+    case 'hawk': { const z = others.filter(o => o.y < tg.y && Math.abs(o.x - tg.x) < 45).sort((a, b) => b.y - a.y)[0]; if (z) dmgZ(z, d * .6); break; }
+    case 'wind': if (Math.random() < .1) for (const x of B.heroes) if (x.alive) x.en = Math.min(100, x.en + 5); break;
+  }
+}
 function bStep(dt) {
   B.t += dt; if (B.buff > 0) B.buff -= dt; if (B.shake > 0) B.shake -= dt;
   const nW = B.cfg.waves.length;
@@ -122,7 +137,7 @@ function bStep(dt) {
     h.cd -= dt;
     if (h.cd <= 0) {
       const tg = nearestZ();
-      if (tg) { const rate = { tank: 1, atk: .6, sup: .9 }[h.H.c]; h.cd = rate / (h.rapid > 0 ? 3 : 1); let d = h.atk * (B.buff > 0 ? 1.4 : 1); const cr = Math.random() < .12; if (cr) d *= 2; B.fx.push({ k: 'tr', x: h.x, y: h.y - 12, tx: tg.x, ty: tg.y, t: 0, life: .07, w: 2, col: '#ffe9a8', hid: h.id, tz: tg }); h.shotT = .22; dmgZ(tg, d, cr); SND.shot(); h.en = Math.min(100, h.en + (h.H.c === 'sup' ? 11 : 8)); }
+      if (tg) { const rate = { tank: 1, atk: .6, sup: .9 }[h.H.c] * (h.id === 'wind' ? .6 : 1); h.cd = rate / (h.rapid > 0 ? 3 : 1); let d = h.atk * (B.buff > 0 ? 1.4 : 1); const cr = Math.random() < (h.id === 'lightning' ? .3 : .12); if (cr) d *= 2; B.fx.push({ k: 'tr', x: h.x, y: h.y - 12, tx: tg.x, ty: tg.y, t: 0, life: .07, w: 2, col: '#ffe9a8', hid: h.id, tz: tg }); h.shotT = .22; dmgZ(tg, d, cr); heroTrait(h, tg, d); SND.shot(); h.en = Math.min(100, h.en + (h.H.c === 'sup' ? 11 : 8)); }
       else h.cd = .15;
     }
     if (h.en >= 100 && S.auto) cast(h);
@@ -177,6 +192,7 @@ function bDraw() {
     else if (f.k === 'boom') { c.globalAlpha = 1 - p; const g = c.createRadialGradient(f.x, f.y, 0, f.x, f.y, f.r * (.4 + p * .6)); g.addColorStop(0, '#fff3c0'); g.addColorStop(.4, '#f1b23c'); g.addColorStop(1, '#cf6a2c00'); c.fillStyle = g; c.beginPath(); c.arc(f.x, f.y, f.r * (.4 + p * .6), 0, 7); c.fill(); c.globalAlpha = 1; }
     else if (f.k === 'spit') { const x = f.x + (f.tx - f.x) * p, y = f.y + (f.ty - f.y) * p - Math.sin(p * Math.PI) * 40; c.fillStyle = '#8fcf3a'; c.beginPath(); c.arc(x, y, 5, 0, 7); c.fill(); }
     else if (f.k === 'heal') { c.globalAlpha = 1 - p; c.strokeStyle = '#64b66e'; c.lineWidth = 3; c.beginPath(); c.arc(f.x, f.y, 18 + p * 20, 0, 7); c.stroke(); c.globalAlpha = 1; }
+    else if (f.k === 'arc') { c.strokeStyle = '#c07aff'; c.globalAlpha = 1 - p; c.lineWidth = 2; c.beginPath(); c.moveTo(f.x, f.y); c.lineTo(f.tx, f.ty); c.stroke(); c.globalAlpha = 1; }
     else if (f.k === 'claw') { c.globalAlpha = 1 - p; c.strokeStyle = '#e2513f'; c.lineWidth = 2; for (let i = -1; i <= 1; i++) { c.beginPath(); c.moveTo(f.x + i * 6 - 6, f.y - 6); c.lineTo(f.x + i * 6 + 6, f.y + 6); c.stroke(); } c.globalAlpha = 1; }
   }
   const fog = c.createLinearGradient(0, 0, 0, 90); fog.addColorStop(0, '#0b0e10'); fog.addColorStop(1, '#0b0e1000'); c.fillStyle = fog; c.fillRect(0, 0, W, 90);

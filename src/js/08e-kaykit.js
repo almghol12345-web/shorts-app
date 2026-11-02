@@ -14,10 +14,26 @@ function kkLoad(done) {
     let buf; try { const s = atob(CHARS[n]); buf = new Uint8Array(s.length); for (let i = 0; i < s.length; i++) buf[i] = s.charCodeAt(i); } catch (e) { fin(); continue; }
     L.parse(buf.buffer, '', g => {
       if (n.startsWith('anims')) g.animations.forEach(c => { KK.clips[c.name] = c; });
-      else { KK.gltf[n] = g; g.scene.traverse(o => { if (o.isMesh && o.material && o.material.map && !KK.img[n]) KK.img[n] = o.material.map.image; }); }
+      else { KK.gltf[n] = g; g.scene.traverse(o => { if (o.isMesh && o.material && o.material.map && !KK.img[n]) KK.img[n] = o.material.map.image; }); kkMergeSkins(g.scene); }
       fin();
     }, e => { console.warn('character ' + n, e); fin(); });
   }
+}
+/* the body parts all share one skeleton, so join them into one mesh: one draw instead of seven */
+function kkMergeSkins(scene) {
+  try {
+    const parts = []; scene.traverse(o => { if (o.isSkinnedMesh) parts.push(o); }); if (parts.length < 2) return;
+    const f = parts[0], same = parts.every(p => p.skeleton.bones.length === f.skeleton.bones.length && p.skeleton.bones.every((b, i) => b === f.skeleton.bones[i]) && p.bindMatrix.equals(f.bindMatrix) && p.parent === f.parent && p.matrix.equals(f.matrix));
+    if (!same) return;
+    const keys = Object.keys(f.geometry.attributes).sort().join();
+    if (!parts.every(p => Object.keys(p.geometry.attributes).sort().join() === keys && !!p.geometry.index === !!f.geometry.index)) return;
+    const flat = g => { const o = new THREE.BufferGeometry(), get = ['getX', 'getY', 'getZ', 'getW']; if (g.index) o.setIndex(g.index.clone());
+      for (const k in g.attributes) { const a = g.attributes[k]; if (!a.isInterleavedBufferAttribute) { o.setAttribute(k, a.clone()); continue; } const arr = new a.array.constructor(a.count * a.itemSize); for (let i = 0; i < a.count; i++) for (let c = 0; c < a.itemSize; c++) arr[i * a.itemSize + c] = a[get[c]](i); o.setAttribute(k, new THREE.BufferAttribute(arr, a.itemSize, a.normalized)); }
+      return o; };
+    const geo = THREE.BufferGeometryUtils.mergeBufferGeometries(parts.map(p => flat(p.geometry))); if (!geo) return;
+    const m = new THREE.SkinnedMesh(geo, f.material); m.name = 'Body'; m.position.copy(f.position); m.quaternion.copy(f.quaternion); m.scale.copy(f.scale);
+    f.parent.add(m); m.bind(f.skeleton, f.bindMatrix); for (const p of parts) p.parent.remove(p);
+  } catch (e) { console.warn('merge skins', e); }
 }
 /* ---------- recolor the palette texture: each of the 8x4 swatches can get a new color (shading kept) ---------- */
 function kkTex(base, look) {
@@ -58,7 +74,7 @@ function kkMake(look) {
   const mat = kkMat(base, look), show = look.show || [], bones = {};
   body.traverse(o => {
     if (o.isBone || o.type === 'Bone') bones[o.name] = o;
-    if (!o.isMesh) return; o.material = o.isSkinnedMesh ? mat.skin : mat.rigid; o.castShadow = true; o.frustumCulled = false;
+    if (!o.isMesh) return; o.material = o.isSkinnedMesh ? mat.skin : mat.rigid; o.castShadow = !!look.shadow; o.frustumCulled = false;
     if (!o.isSkinnedMesh) o.visible = show.includes(o.name);
     else if ((look.hide || []).includes(o.name)) o.visible = false;
   });
@@ -118,7 +134,7 @@ const KKH = {
   wind: { base: 'knight', height: 2.15, show: ['1H_Sword', 'Knight_Cape'], rec: { 1: '#eef0f6', 3: '#4a525c', 4: '#3a4048', 7: '#5aa6ff', 6: '#2a4a8a', 8: '#2a4a8a', 9: '#5aa6ff', 10: '#2a3038', 15: '#2a4a8a', 11: '#d8ecff', 13: '#5aa6ff' }, glow: { 11: '#5aa6ff' }, glowI: .6, metal: .4,
     extra: (r, b, u) => kkGlowAt(b, 'handslotr', u, '#7ac8ff', .8, 0, .5, 0, .45) },
 };
-function kkHero(id) { const L = KKH[id]; if (!L || !KK.ready) return null; const h = kkMake(L); if (h) h.userData.heroId = id; return h; }
+function kkHero(id) { const L = KKH[id]; if (!L || !KK.ready) return null; const h = kkMake(Object.assign({ shadow: true }, L)); if (h) h.userData.heroId = id; return h; }
 /* ---------- citizens, guards and zombies ---------- */
 const KK_SHIRTS = ['#6a5a40', '#5a3a2a', '#3a4a5a', '#7a2a22', '#4a5a3a', '#8a7a5a', '#3a3a44', '#6a4a6a'], KK_PANTS = ['#3a3226', '#26282c', '#3a4048', '#4a3a2a'], KK_SKIN = ['#e8c4a0', '#c99068', '#a87a58', '#8a5a3a'], KK_HAIR = ['#2a1a10', '#1a1410', '#5a3a20', '#3a2a1a', '#7a7a7a', '#141010'];
 function kkCitizen(i) {
@@ -152,6 +168,7 @@ let kkCit = 0;
 function kkSwapIn() {
   if (typeof B3 !== 'undefined') B3.pool = {};
   if (!V3.inited) return;
+  V3.zpool = [];
   for (const u of V3.units) V3.scene.remove(u.s); for (const g of V3.guards || []) V3.scene.remove(g); for (const z of V3.zombies) V3.scene.remove(z.s);
   V3.units = []; V3.heroUnits = {}; V3.zombies = []; kkCit = 0; v3Units(); v3SyncHeroes();
 }

@@ -7,5 +7,6 @@ const CFG = {
   supabaseUrl: '',        // example: 'https://abcdefgh.supabase.co'
   supabaseAnonKey: '',    // Project Settings > API Keys > anon / publishable key
   productPrefix: 'com.almghol.fajrsurvivors.', // App Store in-app purchase product IDs start with this
+  privacyUrl: '',         // link to the privacy policy page (docs/privacy.html once hosted); shown in Settings
   devPurchases: false,    // true = fake purchases for testing in a browser. Keep false for release.
 };

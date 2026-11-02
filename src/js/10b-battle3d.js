@@ -4,7 +4,7 @@
  * shots are drawn on the 2D canvas on top, at the projected 3D positions. It borrows the village renderer,
  * so the phone only ever holds one WebGL context.
  */
-const B3 = { pool: {}, dying: [], parts: [], fires: [], t: 0 };
+const B3 = { pool: {}, dying: [], parts: [], fires: [], proj: [], rings: [], t: 0 };
 const B3_ZOFF = { w: .3, run: .3, sp: .4, br: .55, boss: .75, wb: 1.3 };
 const b3X = x => (x - B.W / 2) / B3.U, b3Z = y => (y - B.lineY) / B3.U;
 const _b3v = typeof THREE !== 'undefined' ? new THREE.Vector3() : null;
@@ -118,7 +118,7 @@ function b3TakeZ(type) {
   B3.scene.add(m); return m;
 }
 function b3PutZ(m) { B3.scene.remove(m); const p = B3.pool[m.userData.ztype] || (B3.pool[m.userData.ztype] = []); if (p.length < 24) p.push(m); else b3Dispose(m); }
-function b3Dispose(o) { o.traverse(x => { if (x.isMesh && x.geometry && !C3.cached.has(x.geometry)) x.geometry.dispose(); }); }
+function b3Dispose(o) { o.traverse(x => { if (x.isSkinnedMesh && x.skeleton) x.skeleton.dispose(); if (x.isMesh && x.geometry && !C3.cached.has(x.geometry) && !x.isSkinnedMesh) x.geometry.dispose(); }); }
 function b3Start() {
   try {
     if (!v3Supported() || !v3Init()) return false;
@@ -141,6 +141,7 @@ function b3Stop() {
   for (const h of B.heroes) if (h.m) { B3.scene.remove(h.m); b3Dispose(h.m); h.m = null; }
   for (const z of B.z) if (z.m) { b3PutZ(z.m); z.m = null; }
   B3.dying.forEach(d => b3PutZ(d.m)); B3.dying = []; B3.parts.forEach(p => B3.scene.remove(p.s)); B3.parts = [];
+  B3.proj.forEach(p => B3.scene.remove(p.o)); B3.proj = []; B3.rings.forEach(r => B3.scene.remove(r.m)); B3.rings = [];
 }
 function b3Burst(x, y, z, col, size, life, grow) { const s = c3Glow(col, size, .9); s.position.set(x, y, z); B3.scene.add(s); B3.parts.push({ s, life, l0: life, s0: size, grow }); }
 function b3Attack(h, u, p) {
@@ -150,6 +151,41 @@ function b3Attack(h, u, p) {
   else if (w === 'orb') { u.armL.rotation.x = u.poseL - Math.sin(p * Math.PI) * 1; if (u.orb) u.orb.scale.setScalar(1 + Math.sin(p * Math.PI) * .6); }
   else if (w === 'daggers') { u.armR.rotation.x = u.poseR - Math.sin(p * Math.PI) * 1.3; u.armL.rotation.x = u.poseL - Math.sin(Math.min(1, p * 1.4) * Math.PI) * 1.1; }
   else { const a = p < .35 ? lerp(u.poseR, -2.6, p / .35) : lerp(-2.6, .35, (p - .35) / .65); u.armR.rotation.x = a; }
+}
+/* ---------- each hero's own shot ---------- */
+const B3_PROJ = { redking: ['slash', '#ff6a3a', 20], destroyer: ['orb', '#c07aff', 15], fire: ['orb', '#ff7a1a', 13, 1], knight: ['slash', '#ffd77a', 20], lightning: ['bullet'], shadow: ['dagger', '#c8d0ff', 24], medic: ['orb', '#7dff7a', 15], mountain: ['quake', '#ffb070'], hawk: ['arrow', '#e8d8a0', 24], wind: ['slash', '#7ac8ff', 26] };
+const texCrescent = () => c3Tex('crescent', (c, w, h) => { c.strokeStyle = '#fff'; c.lineCap = 'round'; for (const [lw, a] of [[18, .25], [10, .55], [4, 1]]) { c.globalAlpha = a; c.lineWidth = lw; c.beginPath(); c.arc(w / 2, h * .75, w * .36, Math.PI * 1.1, Math.PI * 1.9); c.stroke(); } });
+function b3Shot(f) {
+  const P = B3_PROJ[f.hid], hh = B.heroes.find(x => x.id === f.hid); if (!P || !hh || !hh.m || P[0] === 'bullet') return;
+  const tz = f.tz, to = tz && tz.m ? tz.m.position.clone().setY((tz.m3h || 1.6) * .55) : new THREE.Vector3(b3X(f.tx), 1, b3Z(f.ty));
+  const from = f.sub && tz ? to.clone() : hh.m.position.clone().setY(hh.m3h * .6);
+  if (f.sub) { const z0 = B.z.find(z => z.m && Math.hypot(z.x - f.x, z.y - f.y) < 1); if (z0) from.copy(z0.m.position).setY(1); }
+  f.p3 = 1;
+  if (P[0] === 'quake') { b3Ring(to.x, to.z, P[1]); for (let i = 0; i < 4; i++) b3Burst(to.x + (Math.random() - .5), .3, to.z + (Math.random() - .5), '#8a6a4a', .3, .4, .2); return; }
+  let o;
+  if (P[0] === 'orb') o = c3Glow(P[1], P[3] ? 1 : .6, 1);
+  else if (P[0] === 'slash') { o = new THREE.Sprite(new THREE.SpriteMaterial({ map: texCrescent(), color: P[1], blending: THREE.AdditiveBlending, transparent: true, depthWrite: false })); o.scale.set(1.3, 1.3, 1); }
+  else if (P[0] === 'dagger') { o = new THREE.Group(); A(o, c3Box(.05, .32, .015), c3M({ color: '#d8e0ea', metalness: .9, roughness: .2 }), 0, 0, 0); A(o, c3Box(.09, .03, .03), c3M({ color: '#3a2a20' }), 0, -.14, 0); o.scale.setScalar(1.4); }
+  else { o = new THREE.Group(); A(o, c3Cyl(.012, .012, .8, 4), c3M({ color: '#6a4a2a' }), 0, 0, 0, Math.PI / 2); A(o, c3Cone(.035, .1, 4), c3M({ color: '#c8c8c8', metalness: .7 }), 0, 0, .45, Math.PI / 2); A(o, c3Box(.005, .06, .14), c3M({ color: '#e8e0d0' }), 0, 0, -.36); }
+  o.position.copy(from); B3.scene.add(o);
+  B3.proj.push({ o, from, to, tz, t: 0, dur: Math.max(.08, from.distanceTo(to) / P[2]), kind: P[0], col: P[1], big: P[3] });
+}
+function b3Ring(x, z, col) { const m = new THREE.Mesh(c3G('ring3', () => { const g = new THREE.RingGeometry(.5, .75, 28); g.rotateX(-Math.PI / 2); return g; }), new THREE.MeshBasicMaterial({ color: col, transparent: true, opacity: .8, depthWrite: false, blending: THREE.AdditiveBlending })); m.position.set(x, .06, z); B3.scene.add(m); B3.rings.push({ m, t: 0 }); }
+function b3Proj(dt) {
+  for (const p of B3.proj) {
+    p.t += dt / p.dur; const k = Math.min(1, p.t);
+    if (p.tz && p.tz.m && p.tz.alive) p.to.set(p.tz.m.position.x, (p.tz.m3h || 1.6) * .55, p.tz.m.position.z);
+    const arc = p.kind === 'arrow' ? 1.2 : p.kind === 'orb' ? .25 : p.kind === 'dagger' ? .3 : 0;
+    p.o.position.lerpVectors(p.from, p.to, k); p.o.position.y += Math.sin(k * Math.PI) * arc;
+    if (p.kind === 'arrow') { const nx = _b3v.copy(p.to).sub(p.from); p.o.rotation.set(0, Math.atan2(nx.x, nx.z), 0); p.o.rotateX(-Math.cos(k * Math.PI) * .7); }
+    if (p.kind === 'dagger') { p.o.rotation.x += dt * 30; p.o.rotation.y = Math.atan2(p.to.x - p.from.x, p.to.z - p.from.z); }
+    if (p.kind === 'slash') p.o.material.rotation = Math.atan2(p.to.x - p.from.x, -(p.to.z - p.from.z)) * .3;
+    if (p.kind === 'orb' && Math.random() < .7) b3Burst(p.o.position.x, p.o.position.y, p.o.position.z, p.col, p.big ? .45 : .28, .25, -.2);
+    if (k >= 1) { p.done = 1; B3.scene.remove(p.o); b3Burst(p.to.x, p.to.y, p.to.z, p.col || '#fff', p.big ? 1.4 : .8, .3, p.big ? 2.5 : 1.2); }
+  }
+  B3.proj = B3.proj.filter(p => !p.done);
+  for (const r of B3.rings) { r.t += dt; const s = 1 + r.t * 5; r.m.scale.set(s, 1, s); r.m.material.opacity = Math.max(0, .8 - r.t * 1.6); }
+  B3.rings = B3.rings.filter(r => { if (r.t > .5) { B3.scene.remove(r.m); r.m.material.dispose(); return false; } return true; });
 }
 /* ---------- per-frame update ---------- */
 function b3Frame() {
@@ -192,10 +228,11 @@ function b3Frame() {
   B3.dying = B3.dying.filter(d => { if (d.t > 2.2) { b3PutZ(d.m); return false; } return true; });
   for (const f of B.fx) {
     if (f.lit || f.t < 0) continue;
-    if (f.k === 'boom') { f.lit = 1; const x = b3X(f.x), z = b3Z(f.y); B3.flash.position.set(x, 1.5, z); B3.flash.intensity = 5; b3Burst(x, .8, z, '#ffb050', f.r / B3.U * 1.4, .45, f.r / B3.U * 2); }
+    if (f.k === 'tr' && f.hid) { f.lit = 1; b3Shot(f); }
+    else if (f.k === 'boom') { f.lit = 1; const x = b3X(f.x), z = b3Z(f.y); B3.flash.position.set(x, 1.5, z); B3.flash.intensity = f.small ? 1.5 : 5; b3Burst(x, .8, z, '#ffb050', f.r / B3.U * 1.4, .45, f.r / B3.U * 2); }
     else if (f.k === 'heal') { f.lit = 1; b3Burst(b3X(f.x), 1, b3Z(f.y), '#7dff7a', .8, .6, 1.6); }
   }
-  B3.flash.intensity *= Math.pow(.003, rdt);
+  B3.flash.intensity *= Math.pow(.003, rdt); b3Proj(rdt);
   for (const p of B3.parts) { p.life -= rdt; const k = 1 - p.life / p.l0; const sc = p.s0 + k * p.grow; p.s.scale.set(sc, sc, 1); p.s.material.opacity = Math.max(0, p.life / p.l0) * .9; }
   B3.parts = B3.parts.filter(p => { if (p.life <= 0) { B3.scene.remove(p.s); p.s.material.dispose(); return false; } return true; });
   for (const f of B3.fires) { const k = .8 + Math.sin(t * 11 + f.ph) * .12 + Math.random() * .1; f.spr.forEach((s, i) => s.scale.set(s.userData.b * k, s.userData.b * k * 1.3, 1)); if (f.pl) f.pl.intensity = 1.8 + k; }
@@ -222,6 +259,8 @@ function b3Draw() {
   }
   for (const f of B.fx) {
     if (f.t < 0) continue; const pr = f.t / f.life;
+    if (f.k === 'tr' && f.p3 && f.w < 5) continue;
+    if (f.k === 'arc') { const a = f.fz && f.fz.m ? b3PW(f.fz.m.position.x, 1, f.fz.m.position.z) : b3PW(b3X(f.x), 1, b3Z(f.y)), bt = f.tz && f.tz.m ? b3PW(f.tz.m.position.x, 1, f.tz.m.position.z) : b3PW(b3X(f.tx), 1, b3Z(f.ty)); c.globalAlpha = 1 - pr; for (const [lw, col] of [[6, '#9a5aff66'], [2, '#f0d8ff']]) { c.strokeStyle = col; c.lineWidth = lw; c.beginPath(); c.moveTo(a[0], a[1]); for (let i = 1; i < 6; i++) c.lineTo(lerp(a[0], bt[0], i / 6) + (Math.random() - .5) * 12, lerp(a[1], bt[1], i / 6) + (Math.random() - .5) * 12); c.lineTo(bt[0], bt[1]); c.stroke(); } c.globalAlpha = 1; continue; }
     if (f.k === 'tr') {
       const hh = B.heroes.find(x => x.id === f.hid), a = hh && hh.m ? b3PW(hh.m.position.x, hh.m3h * .62, hh.m.position.z) : b3PW(b3X(f.x), 1.2, b3Z(f.y));
       const zt = f.tz && f.tz.m ? f.tz.m.position : null, bt = zt ? b3PW(zt.x, (f.tz.m3h || 1.5) * .6, zt.z) : b3PW(b3X(f.tx), 1, b3Z(f.ty));
@@ -243,4 +282,4 @@ function b3Draw() {
   c.textAlign = 'right'; c.fillText(B.cfg.boss ? `💥 ${fmt(B.dealt)}` : `🧟 ${B.kills}`, W - 10, 14);
   if (B.cfg.boss) { const z = B.z.find(z => z.type === 'wb'); if (z) { const w = W * .7, x = (W - w) / 2; c.fillStyle = '#000a'; c.fillRect(x, 26, w, 8); c.fillStyle = '#e2513f'; c.fillRect(x, 26, w * Math.max(0, z.hp / z.maxhp), 8); } }
 }
-window.B3DBG = { fight: (sc, waves, boss) => startBattle({ title: 'test', waves, sc, boss, onEnd: () => null }), on: () => !!(B && B.m3), zombies: () => B ? B.z.filter(z => z.m).length : 0, heroes: () => B ? B.heroes.filter(h => h.m).length : 0, calls: () => V3.renderer.info.render.calls };
+window.B3DBG = { fight: (sc, waves, boss, squad) => { if (squad) { squad.forEach(id => { if (!S.heroes[id]) S.heroes[id] = { lv: 30, st: 3, sh: 0 }; }); S.squad = squad; } startBattle({ title: 'test', waves, sc, boss, onEnd: () => null }); }, on: () => !!(B && B.m3), zombies: () => B ? B.z.filter(z => z.m).length : 0, heroes: () => B ? B.heroes.filter(h => h.m).length : 0, calls: () => V3.renderer.info.render.calls, texs: () => { const set = new Map(); B3.scene.traverse(o => { const ms = o.material ? [].concat(o.material) : []; for (const m of ms) for (const k of ['map', 'emissiveMap']) if (m[k]) set.set(m[k].uuid, (o.name || o.type) + ':' + (m[k].image && m[k].image.width)); }); return [set.size, [...set.values()].slice(0, 60).join(',')]; }, mem: () => { const i = V3.renderer.info; return `geo ${i.memory.geometries} tex ${i.memory.textures} prog ${i.programs.length} heap ${(performance.memory ? performance.memory.usedJSHeapSize / 1e6 : 0).toFixed(0)}MB`; } };

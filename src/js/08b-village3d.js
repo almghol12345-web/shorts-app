@@ -201,7 +201,9 @@ function v3PlaceTag() {
   el.style.transform = `translate(calc(${pr.x.toFixed(0)}px - 50%), calc(${pr.y.toFixed(0)}px - 100%))`;
 }
 function v3SpawnZombie() {
-  const s = m3Human('zombie'), a = Math.random() * Math.PI * 2, r = 34 + Math.random() * 10;
+  // reuse fallen zombies: each animated model owns GPU memory for its skeleton
+  const pool = V3.zpool || (V3.zpool = []), s = pool.pop() || m3Human('zombie'), a = Math.random() * Math.PI * 2, r = 34 + Math.random() * 10;
+  s.rotation.set(0, 0, 0); s.position.y = 0; if (s.userData.kk) { const u = s.userData; u.mixer.stopAllAction(); u.cur = null; u.curA = null; u.once = false; u.hold = false; u.lt = undefined; kkPlay(s, u.idle); }
   s.position.set(Math.cos(a) * r, 0, Math.sin(a) * r); s.rotation.y = Math.atan2(-s.position.x, -s.position.z);
   V3.scene.add(s); V3.zombies.push({ s, spd: .6 + Math.random() * .7, hp: 2 + Math.floor(Math.random() * 3), ph: Math.random() * 6, dead: 0 });
 }
@@ -347,7 +349,7 @@ function v3Loop(ts) {
     }
   }
   for (const gd of V3.guards || []) if (gd.userData.kk) kkWalk(gd, t, 1, false);
-  V3.zombies = V3.zombies.filter(zb => { if (zb.dead > 2.2) { V3.scene.remove(zb.s); return false; } return true; });
+  V3.zombies = V3.zombies.filter(zb => { if (zb.dead > 2.2) { V3.scene.remove(zb.s); (V3.zpool || (V3.zpool = [])).push(zb.s); return false; } return true; });
   for (const s of V3.shots) { s.life -= dt; s.line.material.opacity = Math.max(0, s.life / .12); }
   V3.shots = V3.shots.filter(s => { if (s.life <= 0) { V3.scene.remove(s.line); s.line.geometry.dispose(); s.line.material.dispose(); return false; } return true; });
   // slow dusk light breathing

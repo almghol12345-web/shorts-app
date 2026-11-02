@@ -93,6 +93,7 @@ function mountWorld() {
   wCan = $('#wcan'); if (!wCan) return; wCtx = wCan.getContext('2d');
   if (!cam) cam = homeCam();
   sizeWorld(); ptrs.clear(); gest = null; wPat = null;
+  W3.on = w3Mount();
   const pos = e => { const r = wCan.getBoundingClientRect(); return { x: e.clientX - r.left, y: e.clientY - r.top }; };
   wCan.onpointerdown = e => {
     wCan.setPointerCapture(e.pointerId); const p = pos(e); ptrs.set(e.pointerId, p); anim = null; vel = { x: 0, y: 0 };
@@ -106,8 +107,8 @@ function mountWorld() {
       cam.z = clamp(gest.z0 * d / gest.d0, ZMIN, ZMAX); cam.x = gest.wx - (mid.x - wW / 2) / cam.z; cam.y = gest.wy - (mid.y - wH / 2) / cam.z; clampCam();
     } else if (gest.mode === 'pan') {
       const dx = p.x - gest.sx, dy = p.y - gest.sy; gest.moved = Math.max(gest.moved, Math.hypot(dx, dy));
-      cam.x = gest.cx - dx / cam.z; cam.y = gest.cy - dy / cam.z; clampCam();
-      const tn = performance.now(), dt = Math.max(1, tn - gest.lt); vel = { x: -(p.x - gest.lx) / cam.z / dt * 16, y: -(p.y - gest.ly) / cam.z / dt * 16 }; gest.lx = p.x; gest.ly = p.y; gest.lt = tn;
+      const ky = W3.on ? 1 / Math.sin(W3.el) : 1; cam.x = gest.cx - dx / cam.z; cam.y = gest.cy - dy / cam.z * ky; clampCam();
+      const tn = performance.now(), dt = Math.max(1, tn - gest.lt); vel = { x: -(p.x - gest.lx) / cam.z / dt * 12, y: -(p.y - gest.ly) / cam.z / dt * 12 * ky }; gest.lx = p.x; gest.ly = p.y; gest.lt = tn;
     }
   };
   const up = e => {
@@ -128,7 +129,7 @@ function mountWorld() {
   wCan.onpointerup = up; wCan.onpointercancel = e => { ptrs.delete(e.pointerId); gest = null; };
   wCan.onwheel = e => { e.preventDefault(); const p = pos(e); zoomAt(p.x, p.y, cam.z * Math.exp(-e.deltaY * .0016)); };
   cancelAnimationFrame(wRaf); lastFrame = 0;
-  const loop = ts => { if (tab !== 'world' || !wCan || !wCan.isConnected) return; const dt = lastFrame ? Math.min(50, ts - lastFrame) : 16; lastFrame = ts; worldStep(dt); if (!B) drawWorld(ts); wRaf = requestAnimationFrame(loop); };
+  const loop = ts => { if (tab !== 'world' || !wCan || !wCan.isConnected) return; const dt = lastFrame ? Math.min(50, ts - lastFrame) : 16; lastFrame = ts; worldStep(dt); if (!B) { if (W3.on) w3Draw(ts); else drawWorld(ts); } wRaf = requestAnimationFrame(loop); };
   wRaf = requestAnimationFrame(loop);
 }
 let tapTimer = 0;
@@ -136,7 +137,7 @@ function worldTap(p) {
   clearTimeout(tapTimer);
   tapTimer = setTimeout(() => {
     if (lastTapAt === 0) return;
-    const w = s2w(p.x, p.y); const tx = Math.floor(w.x / TS), ty = Math.floor(w.y / TS);
+    const w = (W3.on && w3Pick(p.x, p.y)) || s2w(p.x, p.y); const tx = Math.floor(w.x / TS), ty = Math.floor(w.y / TS);
     let n = S.world.nodes.find(n => n.x === tx && n.y === ty);
     if (!n && cam.z < .8) { let best = null, bd = 1e9; for (const m of S.world.nodes) { const dd = Math.hypot((m.x + .5) * TS - w.x, (m.y + .5) * TS - w.y); if (dd < bd) { bd = dd; best = m; } } if (bd < TS * .9) n = best; }
     if (n) { SND.click(); openModal(() => mNode(n.id)); }
@@ -159,7 +160,7 @@ function findTarget() {
   flyTo((best.x + .5) * TS, (best.y + .5) * TS, Math.max(1.2, cam.z));
   setTimeout(() => openModal(() => mNode(best.id)), 650);
 }
-function sizeWorld() { if (!wCan) return; const r = wCan.parentElement.getBoundingClientRect(); wW = r.width; wH = r.height; wDpr = Math.min(2, window.devicePixelRatio || 1); wCan.width = wW * wDpr; wCan.height = wH * wDpr; }
+function sizeWorld() { if (!wCan) return; const r = wCan.parentElement.getBoundingClientRect(); wW = r.width; wH = r.height; wDpr = Math.min(2, window.devicePixelRatio || 1); wCan.width = wW * wDpr; wCan.height = wH * wDpr; if (W3.on) w3Size(); }
 function stopWorld() { cancelAnimationFrame(wRaf); wCan = null; }
 function drawWorld(ts) {
   const c = wCtx, tm = now(); if (!c) return; const z = cam.z;

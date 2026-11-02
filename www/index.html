@@ -440,6 +440,7 @@ input[type=range]{width:100%;accent-color:var(--rust)}
 .story-line img{width:58px;height:74px;object-fit:cover;object-position:50% 10%;border-radius:10px;border:2px solid #b8873a;flex:none}
 .story-line b{font-family:var(--fd);color:var(--amber)}
 .story-line p{margin-top:2px;font-size:14px;line-height:1.6}
+.w3canvas{position:absolute;inset:0;width:100%;height:100%;display:block;pointer-events:none}
 
 </style>
 </head>
@@ -488,6 +489,7 @@ const CFG = {
   supabaseUrl: '',        // example: 'https://abcdefgh.supabase.co'
   supabaseAnonKey: '',    // Project Settings > API Keys > anon / publishable key
   productPrefix: 'com.almghol.fajrsurvivors.', // App Store in-app purchase product IDs start with this
+  privacyUrl: '',         // link to the privacy policy page (docs/privacy.html once hosted); shown in Settings
   devPurchases: false,    // true = fake purchases for testing in a browser. Keep false for release.
 };
 
@@ -587,6 +589,10 @@ ar: {
   upgrade_to: 'تطوير إلى المستوى {0}', buy_missing: 'شراء الناقص', builders_busy: 'البناؤون مشغولين', upgrade: 'تطوير', instant: 'فوري', open_heroes: 'فتح الأبطال', base_def: 'دفاع القاعدة الكلي', base_def_note: 'السور + الجنود + نصف قوة الفريق. الهجوم القادم', level_n: 'المستوى {0}',
   tier0: 'مشاة', tier1: 'رماة', tier2: 'قناصة', tier3: 'مدرعات', tier4: 'نخبة', troops: 'الجنود', troops_note: 'كل جندي يرفع هجوم الأبطال. الدعم الحالي +{0}%', troops_full: 'وصلت للحد الأقصى. طوّر الثكنة لرفعه.', count: 'العدد', train: 'تدريب',
   wounded: 'الجرحى', heal_all: 'علاج الكل', no_wounded: 'لا يوجد جرحى. الجنود يتصابون في المعارك والهجمات.', research: 'الأبحاث', lab_n: 'مختبر {0}', do_research: 'بحث',
+  trait: 'ضربته الخاصة', privacy: 'سياسة الخصوصية',
+  tr_redking: 'ضربة واسعة: كل ضربة تصيب زومبي ثاني جنبه بنصف القوة.', tr_destroyer: 'برق سحري: الطلقة تنتقل لزومبيين ثانيين بثلث القوة.', tr_fire: 'كرة نار: تنفجر وتحرق اللي حولها بـ40% من القوة.',
+  tr_knight: 'درع الفارس: كل ضربة تعطيه درع صغير يحميه.', tr_lightning: 'قناص: فرصة الضربة القاضية 30% بدل 12%.', tr_shadow: 'خنجرين: تضرب مرتين، الثانية بـ60% من القوة.',
+  tr_medic: 'شفاء: كل ضربة تعالج أضعف بطل بربع قوتها.', tr_mountain: 'ضربة الأرض: يرجّع الزومبي لورا وأحياناً يدوّخه.', tr_hawk: 'سهم خارق: يخترق ويصيب الزومبي اللي وراه.', tr_wind: 'سرعة الريح: يضرب أسرع بـ40% ويشحن طاقة الفريق.',
   sk_snipe: 'طلقة واحدة بقوة {0}% من الهجوم على أقوى زومبي.', sk_shield: 'درع لكل الفريق يعادل {0}% من صحة البطل لمدة 6 ثوانٍ.', sk_heal: 'يعالج كل الفريق بقوة {0}% من الهجوم + 10% من الصحة.', sk_air: 'قصف جوي يضرب كل الزومبي بقوة {0}% من الهجوم.',
   sk_aoe: 'قنبلة تصيب الزومبي القريبين بقوة {0}% من الهجوم.', sk_stun: 'يشلّ كل الزومبي {0} ثانية ويجرحهم.', sk_rapid: 'يضاعف سرعة الإطلاق 3 مرات لمدة {0} ثانية.', sk_buff: '+40% هجوم لكل الفريق لمدة {0} ثانية.',
   atk: 'هجوم', hp: 'صحة', def: 'دفاع', level_of: 'المستوى {0} / {1}', raise_cap: 'طوّر قاعة الأبطال لرفع الحد.', stars: 'النجوم', star_up: 'ترقية النجمة (+22% لكل الإحصائيات)', shard_note: 'كل نسخة مكررة من التجنيد تعطي 10 شظايا.', max_stars: 'أقصى عدد نجوم',
@@ -671,6 +677,10 @@ en: {
   upgrade_to: 'Upgrade to level {0}', buy_missing: 'Buy missing', builders_busy: 'Builders busy', upgrade: 'Upgrade', instant: 'Instant', open_heroes: 'Open heroes', base_def: 'Total base defense', base_def_note: 'Wall + troops + half your squad power. Next raid in', level_n: 'Level {0}',
   tier0: 'Infantry', tier1: 'Riflemen', tier2: 'Snipers', tier3: 'Armor', tier4: 'Elite', troops: 'Troops', troops_note: 'Every soldier boosts hero attack. Current bonus +{0}%', troops_full: 'At max troops. Upgrade the Barracks to raise it.', count: 'Count', train: 'Train',
   wounded: 'Wounded', heal_all: 'Heal all', no_wounded: 'No wounded. Troops get hurt in battles and raids.', research: 'Research', lab_n: 'Lab {0}', do_research: 'Research',
+  trait: 'Special attack', privacy: 'Privacy policy',
+  tr_redking: 'Cleave: every hit also strikes a nearby zombie for half damage.', tr_destroyer: 'Arc bolt: the shot jumps to two more zombies for a third of the damage.', tr_fire: 'Fireball: explodes and burns everything around for 40%.',
+  tr_knight: 'Knight’s guard: every hit gives him a small shield.', tr_lightning: 'Marksman: 30% critical chance instead of 12%.', tr_shadow: 'Twin blades: strikes twice, the second for 60%.',
+  tr_medic: 'Mending: every hit heals the weakest hero for a quarter of its damage.', tr_mountain: 'Earth slam: knocks zombies back and sometimes stuns them.', tr_hawk: 'Piercing arrow: goes through and hits the zombie behind.', tr_wind: 'Gale speed: attacks 40% faster and charges the squad’s energy.',
   sk_snipe: 'One shot for {0}% attack at the toughest zombie.', sk_shield: 'Shields the whole squad for {0}% of this hero’s health for 6s.', sk_heal: 'Heals the squad for {0}% attack + 10% health.', sk_air: 'Airstrike hits every zombie for {0}% attack.',
   sk_aoe: 'A bomb hits nearby zombies for {0}% attack.', sk_stun: 'Stuns all zombies for {0}s and damages them.', sk_rapid: 'Triples fire rate for {0}s.', sk_buff: '+40% attack for the whole squad for {0}s.',
   atk: 'Attack', hp: 'Health', def: 'Defense', level_of: 'Level {0} / {1}', raise_cap: 'Upgrade the Hero Hall to raise the cap.', stars: 'Stars', star_up: 'Star up (+22% all stats)', shard_note: 'Every duplicate recruit gives 10 shards.', max_stars: 'Max stars',
@@ -2080,6 +2090,7 @@ function mHero(id) {
   <p class="muted">${L(Hh.q)}</p>
   <div class="grid4"><div class="stat"><small>${t('atk')}</small><b class="num">${fmt(x.atk)}</b></div><div class="stat"><small>${t('hp')}</small><b class="num">${fmt(x.hp)}</b></div><div class="stat"><small>${t('def')}</small><b class="num">${fmt(x.def)}</b></div><div class="stat"><small>${t('power')}</small><b class="num" style="color:var(--amber)">${fmt(heroPower(id))}</b></div></div>
   <div class="li"><span class="lic">⚡</span><div class="lit"><b>${L(Hh.skn)}</b><small>${skillText(Hh.sk, RM[Hh.r])}</small></div></div>
+  <div class="li"><span class="lic">🎯</span><div class="lit"><b>${t('trait')}</b><small>${t('tr_' + id)}</small></div></div>
   <div class="panel"><div class="row between"><b>${t('level_of', h.lv, cap)}</b><span class="cc ${S.res.exp >= lc ? '' : 'lack'}">✨ ${fmt(lc)}</span></div>
   <div class="grid2"><button class="btn pri" data-a="hlv" data-x="${id}|1" ${h.lv < cap && S.res.exp >= lc ? '' : 'disabled'}>⬆️ +1</button><button class="btn" data-a="hlv" data-x="${id}|10" ${h.lv < cap && S.res.exp >= lc ? '' : 'disabled'}>⏫ +10</button></div>
   ${h.lv >= cap ? `<small class="muted">${t('raise_cap')}</small>` : ''}</div>
@@ -2243,6 +2254,7 @@ function mSettings() {
   <button class="btn wide" data-a="vip">👑 VIP ${vipLv()}</button>
   <button class="btn wide" data-a="tut">📖 ${t('how_to_play')}</button>
   <button class="btn wide" data-a="restore">${t('restore')}</button>
+  ${CFG.privacyUrl ? `<a class="btn wide" href="${esc(CFG.privacyUrl)}" target="_blank" rel="noopener">🔒 ${t('privacy')}</a>` : ''}
   <button class="btn wide ${resetArm > now() ? 'danger' : ''}" data-a="reset">${resetArm > now() ? t('reset_confirm') : '🗑️ ' + t('new_game')}</button>
   <button class="btn wide ${delArm > now() ? 'danger' : ''}" data-a="delAcc">${delArm > now() ? t('delete_confirm') : '⚠️ ' + t('delete_account')}</button>
   <button class="muted sm" data-a="verTap" style="justify-self:center;padding:8px">${t('version')} ${CFG.appVersion}</button>`;
@@ -2476,7 +2488,9 @@ function v3PlaceTag() {
   el.style.transform = `translate(calc(${pr.x.toFixed(0)}px - 50%), calc(${pr.y.toFixed(0)}px - 100%))`;
 }
 function v3SpawnZombie() {
-  const s = m3Human('zombie'), a = Math.random() * Math.PI * 2, r = 34 + Math.random() * 10;
+  // reuse fallen zombies: each animated model owns GPU memory for its skeleton
+  const pool = V3.zpool || (V3.zpool = []), s = pool.pop() || m3Human('zombie'), a = Math.random() * Math.PI * 2, r = 34 + Math.random() * 10;
+  s.rotation.set(0, 0, 0); s.position.y = 0; if (s.userData.kk) { const u = s.userData; u.mixer.stopAllAction(); u.cur = null; u.curA = null; u.once = false; u.hold = false; u.lt = undefined; kkPlay(s, u.idle); }
   s.position.set(Math.cos(a) * r, 0, Math.sin(a) * r); s.rotation.y = Math.atan2(-s.position.x, -s.position.z);
   V3.scene.add(s); V3.zombies.push({ s, spd: .6 + Math.random() * .7, hp: 2 + Math.floor(Math.random() * 3), ph: Math.random() * 6, dead: 0 });
 }
@@ -2622,7 +2636,7 @@ function v3Loop(ts) {
     }
   }
   for (const gd of V3.guards || []) if (gd.userData.kk) kkWalk(gd, t, 1, false);
-  V3.zombies = V3.zombies.filter(zb => { if (zb.dead > 2.2) { V3.scene.remove(zb.s); return false; } return true; });
+  V3.zombies = V3.zombies.filter(zb => { if (zb.dead > 2.2) { V3.scene.remove(zb.s); (V3.zpool || (V3.zpool = [])).push(zb.s); return false; } return true; });
   for (const s of V3.shots) { s.life -= dt; s.line.material.opacity = Math.max(0, s.life / .12); }
   V3.shots = V3.shots.filter(s => { if (s.life <= 0) { V3.scene.remove(s.line); s.line.geometry.dispose(); s.line.material.dispose(); return false; } return true; });
   // slow dusk light breathing
@@ -3378,10 +3392,26 @@ function kkLoad(done) {
     let buf; try { const s = atob(CHARS[n]); buf = new Uint8Array(s.length); for (let i = 0; i < s.length; i++) buf[i] = s.charCodeAt(i); } catch (e) { fin(); continue; }
     L.parse(buf.buffer, '', g => {
       if (n.startsWith('anims')) g.animations.forEach(c => { KK.clips[c.name] = c; });
-      else { KK.gltf[n] = g; g.scene.traverse(o => { if (o.isMesh && o.material && o.material.map && !KK.img[n]) KK.img[n] = o.material.map.image; }); }
+      else { KK.gltf[n] = g; g.scene.traverse(o => { if (o.isMesh && o.material && o.material.map && !KK.img[n]) KK.img[n] = o.material.map.image; }); kkMergeSkins(g.scene); }
       fin();
     }, e => { console.warn('character ' + n, e); fin(); });
   }
+}
+/* the body parts all share one skeleton, so join them into one mesh: one draw instead of seven */
+function kkMergeSkins(scene) {
+  try {
+    const parts = []; scene.traverse(o => { if (o.isSkinnedMesh) parts.push(o); }); if (parts.length < 2) return;
+    const f = parts[0], same = parts.every(p => p.skeleton.bones.length === f.skeleton.bones.length && p.skeleton.bones.every((b, i) => b === f.skeleton.bones[i]) && p.bindMatrix.equals(f.bindMatrix) && p.parent === f.parent && p.matrix.equals(f.matrix));
+    if (!same) return;
+    const keys = Object.keys(f.geometry.attributes).sort().join();
+    if (!parts.every(p => Object.keys(p.geometry.attributes).sort().join() === keys && !!p.geometry.index === !!f.geometry.index)) return;
+    const flat = g => { const o = new THREE.BufferGeometry(), get = ['getX', 'getY', 'getZ', 'getW']; if (g.index) o.setIndex(g.index.clone());
+      for (const k in g.attributes) { const a = g.attributes[k]; if (!a.isInterleavedBufferAttribute) { o.setAttribute(k, a.clone()); continue; } const arr = new a.array.constructor(a.count * a.itemSize); for (let i = 0; i < a.count; i++) for (let c = 0; c < a.itemSize; c++) arr[i * a.itemSize + c] = a[get[c]](i); o.setAttribute(k, new THREE.BufferAttribute(arr, a.itemSize, a.normalized)); }
+      return o; };
+    const geo = THREE.BufferGeometryUtils.mergeBufferGeometries(parts.map(p => flat(p.geometry))); if (!geo) return;
+    const m = new THREE.SkinnedMesh(geo, f.material); m.name = 'Body'; m.position.copy(f.position); m.quaternion.copy(f.quaternion); m.scale.copy(f.scale);
+    f.parent.add(m); m.bind(f.skeleton, f.bindMatrix); for (const p of parts) p.parent.remove(p);
+  } catch (e) { console.warn('merge skins', e); }
 }
 /* ---------- recolor the palette texture: each of the 8x4 swatches can get a new color (shading kept) ---------- */
 function kkTex(base, look) {
@@ -3422,7 +3452,7 @@ function kkMake(look) {
   const mat = kkMat(base, look), show = look.show || [], bones = {};
   body.traverse(o => {
     if (o.isBone || o.type === 'Bone') bones[o.name] = o;
-    if (!o.isMesh) return; o.material = o.isSkinnedMesh ? mat.skin : mat.rigid; o.castShadow = true; o.frustumCulled = false;
+    if (!o.isMesh) return; o.material = o.isSkinnedMesh ? mat.skin : mat.rigid; o.castShadow = !!look.shadow; o.frustumCulled = false;
     if (!o.isSkinnedMesh) o.visible = show.includes(o.name);
     else if ((look.hide || []).includes(o.name)) o.visible = false;
   });
@@ -3482,7 +3512,7 @@ const KKH = {
   wind: { base: 'knight', height: 2.15, show: ['1H_Sword', 'Knight_Cape'], rec: { 1: '#eef0f6', 3: '#4a525c', 4: '#3a4048', 7: '#5aa6ff', 6: '#2a4a8a', 8: '#2a4a8a', 9: '#5aa6ff', 10: '#2a3038', 15: '#2a4a8a', 11: '#d8ecff', 13: '#5aa6ff' }, glow: { 11: '#5aa6ff' }, glowI: .6, metal: .4,
     extra: (r, b, u) => kkGlowAt(b, 'handslotr', u, '#7ac8ff', .8, 0, .5, 0, .45) },
 };
-function kkHero(id) { const L = KKH[id]; if (!L || !KK.ready) return null; const h = kkMake(L); if (h) h.userData.heroId = id; return h; }
+function kkHero(id) { const L = KKH[id]; if (!L || !KK.ready) return null; const h = kkMake(Object.assign({ shadow: true }, L)); if (h) h.userData.heroId = id; return h; }
 /* ---------- citizens, guards and zombies ---------- */
 const KK_SHIRTS = ['#6a5a40', '#5a3a2a', '#3a4a5a', '#7a2a22', '#4a5a3a', '#8a7a5a', '#3a3a44', '#6a4a6a'], KK_PANTS = ['#3a3226', '#26282c', '#3a4048', '#4a3a2a'], KK_SKIN = ['#e8c4a0', '#c99068', '#a87a58', '#8a5a3a'], KK_HAIR = ['#2a1a10', '#1a1410', '#5a3a20', '#3a2a1a', '#7a7a7a', '#141010'];
 function kkCitizen(i) {
@@ -3516,6 +3546,7 @@ let kkCit = 0;
 function kkSwapIn() {
   if (typeof B3 !== 'undefined') B3.pool = {};
   if (!V3.inited) return;
+  V3.zpool = [];
   for (const u of V3.units) V3.scene.remove(u.s); for (const g of V3.guards || []) V3.scene.remove(g); for (const z of V3.zombies) V3.scene.remove(z.s);
   V3.units = []; V3.heroUnits = {}; V3.zombies = []; kkCit = 0; v3Units(); v3SyncHeroes();
 }
@@ -3616,6 +3647,7 @@ function mountWorld() {
   wCan = $('#wcan'); if (!wCan) return; wCtx = wCan.getContext('2d');
   if (!cam) cam = homeCam();
   sizeWorld(); ptrs.clear(); gest = null; wPat = null;
+  W3.on = w3Mount();
   const pos = e => { const r = wCan.getBoundingClientRect(); return { x: e.clientX - r.left, y: e.clientY - r.top }; };
   wCan.onpointerdown = e => {
     wCan.setPointerCapture(e.pointerId); const p = pos(e); ptrs.set(e.pointerId, p); anim = null; vel = { x: 0, y: 0 };
@@ -3629,8 +3661,8 @@ function mountWorld() {
       cam.z = clamp(gest.z0 * d / gest.d0, ZMIN, ZMAX); cam.x = gest.wx - (mid.x - wW / 2) / cam.z; cam.y = gest.wy - (mid.y - wH / 2) / cam.z; clampCam();
     } else if (gest.mode === 'pan') {
       const dx = p.x - gest.sx, dy = p.y - gest.sy; gest.moved = Math.max(gest.moved, Math.hypot(dx, dy));
-      cam.x = gest.cx - dx / cam.z; cam.y = gest.cy - dy / cam.z; clampCam();
-      const tn = performance.now(), dt = Math.max(1, tn - gest.lt); vel = { x: -(p.x - gest.lx) / cam.z / dt * 16, y: -(p.y - gest.ly) / cam.z / dt * 16 }; gest.lx = p.x; gest.ly = p.y; gest.lt = tn;
+      const ky = W3.on ? 1 / Math.sin(W3.el) : 1; cam.x = gest.cx - dx / cam.z; cam.y = gest.cy - dy / cam.z * ky; clampCam();
+      const tn = performance.now(), dt = Math.max(1, tn - gest.lt); vel = { x: -(p.x - gest.lx) / cam.z / dt * 12, y: -(p.y - gest.ly) / cam.z / dt * 12 * ky }; gest.lx = p.x; gest.ly = p.y; gest.lt = tn;
     }
   };
   const up = e => {
@@ -3651,7 +3683,7 @@ function mountWorld() {
   wCan.onpointerup = up; wCan.onpointercancel = e => { ptrs.delete(e.pointerId); gest = null; };
   wCan.onwheel = e => { e.preventDefault(); const p = pos(e); zoomAt(p.x, p.y, cam.z * Math.exp(-e.deltaY * .0016)); };
   cancelAnimationFrame(wRaf); lastFrame = 0;
-  const loop = ts => { if (tab !== 'world' || !wCan || !wCan.isConnected) return; const dt = lastFrame ? Math.min(50, ts - lastFrame) : 16; lastFrame = ts; worldStep(dt); if (!B) drawWorld(ts); wRaf = requestAnimationFrame(loop); };
+  const loop = ts => { if (tab !== 'world' || !wCan || !wCan.isConnected) return; const dt = lastFrame ? Math.min(50, ts - lastFrame) : 16; lastFrame = ts; worldStep(dt); if (!B) { if (W3.on) w3Draw(ts); else drawWorld(ts); } wRaf = requestAnimationFrame(loop); };
   wRaf = requestAnimationFrame(loop);
 }
 let tapTimer = 0;
@@ -3659,7 +3691,7 @@ function worldTap(p) {
   clearTimeout(tapTimer);
   tapTimer = setTimeout(() => {
     if (lastTapAt === 0) return;
-    const w = s2w(p.x, p.y); const tx = Math.floor(w.x / TS), ty = Math.floor(w.y / TS);
+    const w = (W3.on && w3Pick(p.x, p.y)) || s2w(p.x, p.y); const tx = Math.floor(w.x / TS), ty = Math.floor(w.y / TS);
     let n = S.world.nodes.find(n => n.x === tx && n.y === ty);
     if (!n && cam.z < .8) { let best = null, bd = 1e9; for (const m of S.world.nodes) { const dd = Math.hypot((m.x + .5) * TS - w.x, (m.y + .5) * TS - w.y); if (dd < bd) { bd = dd; best = m; } } if (bd < TS * .9) n = best; }
     if (n) { SND.click(); openModal(() => mNode(n.id)); }
@@ -3682,7 +3714,7 @@ function findTarget() {
   flyTo((best.x + .5) * TS, (best.y + .5) * TS, Math.max(1.2, cam.z));
   setTimeout(() => openModal(() => mNode(best.id)), 650);
 }
-function sizeWorld() { if (!wCan) return; const r = wCan.parentElement.getBoundingClientRect(); wW = r.width; wH = r.height; wDpr = Math.min(2, window.devicePixelRatio || 1); wCan.width = wW * wDpr; wCan.height = wH * wDpr; }
+function sizeWorld() { if (!wCan) return; const r = wCan.parentElement.getBoundingClientRect(); wW = r.width; wH = r.height; wDpr = Math.min(2, window.devicePixelRatio || 1); wCan.width = wW * wDpr; wCan.height = wH * wDpr; if (W3.on) w3Size(); }
 function stopWorld() { cancelAnimationFrame(wRaf); wCan = null; }
 function drawWorld(ts) {
   const c = wCtx, tm = now(); if (!c) return; const z = cam.z;
@@ -3746,6 +3778,195 @@ function drawWorld(ts) {
   const g = c.createRadialGradient(wW / 2, wH / 2, Math.min(wW, wH) * .35, wW / 2, wH / 2, Math.max(wW, wH) * .75); g.addColorStop(0, '#0000'); g.addColorStop(1, '#000b'); c.fillStyle = g; c.fillRect(0, 0, wW, wH);
 }
 function badge(c, x, y, L, col) { c.font = '800 11px Changa, sans-serif'; const w = Math.max(20, c.measureText(String(L)).width + 10); c.fillStyle = col; c.beginPath(); if (c.roundRect) c.roundRect(x - w / 2, y - 8, w, 16, 5); else c.rect(x - w / 2, y - 8, w, 16); c.fill(); c.fillStyle = '#fff'; c.fillText(String(L), x, y + 1); }
+
+/* ---- 09b-world3d.js ---- */
+/* ================= 3D world map =================
+ * The same world (camps, resources, other bases, marches) drawn as a 3D landscape with the shared renderer.
+ * The camera follows the 2D map camera in 09-world.js (cam.x / cam.y in map pixels, cam.z zoom), so the
+ * gestures, fly-to and buttons keep working. Static scenery is built once with instanced meshes, and every
+ * map object is one vertex-colored mesh, so the whole map costs only a few dozen draw calls.
+ * Level badges, names and march lines are drawn on the 2D canvas on top.
+ */
+const W3 = { on: false, objs: {}, live: [], el: .95, sig: '' };
+const W3K = 2 / TS; // map pixels -> 3D units (one tile = 2 units)
+const w3X = px => px * W3K, w3Z = py => py * W3K;
+const _w3v = typeof THREE !== 'undefined' ? new THREE.Vector3() : null;
+function w3M(x, y, z, rx, ry, rz, sx, sy, sz) { return new THREE.Matrix4().compose(new THREE.Vector3(x || 0, y || 0, z || 0), new THREE.Quaternion().setFromEuler(new THREE.Euler(rx || 0, ry || 0, rz || 0)), new THREE.Vector3(sx || 1, sy === undefined ? (sx || 1) : sy, sz === undefined ? (sx || 1) : sz)); }
+/* merge shapes into one geometry, each part with its own vertex color */
+function w3Geo(parts) {
+  const gs = parts.map(([g, col, m]) => {
+    const x = g.index ? g.toNonIndexed() : g.clone(); if (m) x.applyMatrix4(m);
+    for (const k of Object.keys(x.attributes)) if (k !== 'position' && k !== 'normal') x.deleteAttribute(k);
+    const c = new THREE.Color(col).convertSRGBToLinear(), n = x.attributes.position.count, a = new Float32Array(n * 3);
+    for (let i = 0; i < n; i++) { a[i * 3] = c.r; a[i * 3 + 1] = c.g; a[i * 3 + 2] = c.b; }
+    x.setAttribute('color', new THREE.BufferAttribute(a, 3)); return x;
+  });
+  return THREE.BufferGeometryUtils.mergeBufferGeometries(gs);
+}
+const WG = {
+  box: (w, h, d) => new THREE.BoxGeometry(w, h, d), cyl: (a, b, h, n) => new THREE.CylinderGeometry(a, b, h, n || 8), cone: (r, h, n) => new THREE.ConeGeometry(r, h, n || 7),
+  rock: r => new THREE.DodecahedronGeometry(r), ball: r => new THREE.SphereGeometry(r, 8, 6), oct: r => new THREE.OctahedronGeometry(r),
+};
+function w3Templates() {
+  if (W3.tpl) return W3.tpl; const T = {};
+  const pine = (x, z, s) => [[WG.cyl(.06, .09, .5), '#3a2a1a', w3M(x, .25 * s, z, 0, 0, 0, s)], [WG.cone(.55, 1, 7), '#1e3a26', w3M(x, .85 * s, z, 0, 0, 0, s)], [WG.cone(.42, .8, 7), '#24452e', w3M(x, 1.25 * s, z, 0, 0, 0, s)], [WG.cone(.28, .6, 7), '#2a5034', w3M(x, 1.6 * s, z, 0, 0, 0, s)]];
+  T.pine = w3Geo(pine(0, 0, 1));
+  T.dead = w3Geo([[WG.cyl(.05, .1, 1.3, 5), '#3a2c22', w3M(0, .65, 0)], [WG.cyl(.025, .04, .6, 4), '#3a2c22', w3M(.18, 1.05, 0, 0, 0, -.8)], [WG.cyl(.02, .035, .5, 4), '#3a2c22', w3M(-.15, .9, .05, 0, 0, .9)]]);
+  T.rock = w3Geo([[WG.rock(.4), '#5a5650', w3M(0, .2, 0, 0, 0, 0, 1, .6, 1)], [WG.rock(.22), '#4a4640', w3M(.35, .1, .15)]]);
+  T.house = w3Geo([[WG.box(1.4, .9, 1.1), '#5a4a3e', w3M(0, .45, 0)], [WG.cone(1.05, .6, 4), '#4a2a22', w3M(0, 1.2, 0, 0, Math.PI / 4, 0, 1, 1, .8)], [WG.box(.3, .4, .02), '#ffb050', w3M(-.3, .45, .56)], [WG.box(.25, .35, .02), '#1a1612', w3M(.35, .5, .56)], [WG.box(.4, .5, .4), '#4a3a2e', w3M(.5, 1.1, -.2)]]);
+  T.ruin = w3Geo([[WG.box(1.3, .5, .12), '#6a5a4a', w3M(0, .25, -.5)], [WG.box(.12, .8, 1.1), '#6a5a4a', w3M(-.6, .4, 0)], [WG.box(.12, .35, .6), '#5a4a3a', w3M(.6, .17, -.2)], [WG.rock(.18), '#5a5048', w3M(.2, .1, .3)], [WG.rock(.12), '#5a5048', w3M(-.2, .06, .4)]]);
+  T.car = w3Geo([[WG.box(.7, .26, 1.4), '#5a3a2a', w3M(0, .2, 0)], [WG.box(.6, .22, .7), '#1a2228', w3M(0, .42, -.05)], ...[[-.33, .45], [.33, .45], [-.33, -.45], [.33, -.45]].map(([x, z]) => [WG.cyl(.13, .13, .1, 8), '#141414', w3M(x, .13, z, 0, 0, Math.PI / 2)])]);
+  // zombie camp and boss lair
+  const camp = boss => {
+    const p = [[new THREE.CylinderGeometry(boss ? 2.1 : 1.6, boss ? 2.3 : 1.8, .06, 18), boss ? '#3a1a16' : '#3a2a20', w3M(0, .03, 0)]];
+    for (let i = 0; i < (boss ? 3 : 2); i++) { const a = i * 2.2 + .5, r = boss ? 1.1 : .8; p.push([WG.cone(.6, .95, 6), ['#5a4a3a', '#4a3e30', '#6a2a20'][i], w3M(Math.cos(a) * r, .47, Math.sin(a) * r)]); }
+    for (let i = 0; i < 9; i++) { const a = i / 9 * Math.PI * 2, r = boss ? 1.95 : 1.5; p.push([WG.cyl(.03, .05, .9, 5), '#4a3626', w3M(Math.cos(a) * r, .35, Math.sin(a) * r, Math.sin(a) * .5, 0, -Math.cos(a) * .5)]); }
+    p.push([WG.cyl(.25, .3, .12, 8), '#2a2420', w3M(0, .06, .2)]); for (let i = 0; i < 4; i++) p.push([WG.cyl(.04, .04, .45, 5), '#3a2a1a', w3M(Math.cos(i * 1.6) * .1, .12, .2 + Math.sin(i * 1.6) * .1, 0, i * 1.6, Math.PI / 2.4)]);
+    p.push([WG.ball(.09), '#d8ccb0', w3M(.6, .08, .6)], [WG.ball(.08), '#d8ccb0', w3M(-.7, .07, .4)]);
+    if (boss) { p.push([WG.cyl(.06, .08, 1.8, 6), '#2a1e16', w3M(-1.2, .9, -1)], [WG.ball(.16), '#d8ccb0', w3M(-1.2, 1.9, -1)], [WG.box(.5, .7, .02), '#8a1410', w3M(-.95, 1.4, -1)]); }
+    return w3Geo(p);
+  };
+  T.camp = camp(false); T.lair = camp(true);
+  T.food = w3Geo([[WG.box(2, .05, 1.6), '#6a6a2a', w3M(0, .03, 0)], ...[[-.5, -.3], [.4, -.2], [0, .4]].map(([x, z]) => [WG.cyl(.3, .3, .5, 10), '#c8a848', w3M(x, .3, z, 0, x, Math.PI / 2)]), ...Array.from({ length: 10 }, (_, i) => [WG.cone(.05, .35, 4), '#a8a040', w3M(-.8 + (i % 5) * .4, .2, .65 + Math.floor(i / 5) * .1 - .1)])]);
+  T.wood = w3Geo([...pine(-.55, -.4, .9), ...pine(.6, -.3, .75), ...[0, 1, 2, 3].map(i => [WG.cyl(.11, .11, .9, 7), '#6a4a2a', w3M(-.1 + (i % 2) * .05, .11 + Math.floor(i / 2) * .2, .35 + (i % 2) * .22 - Math.floor(i / 2) * .1, 0, .3, Math.PI / 2)])]);
+  T.iron = w3Geo([[WG.rock(.45), '#4a4a4e', w3M(-.3, .25, 0)], [WG.rock(.35), '#55555a', w3M(.4, .2, .1)], [WG.rock(.25), '#3e3e44', w3M(0, .15, .5)], [WG.oct(.18), '#8aa0b8', w3M(-.2, .6, .1, .4, 0, .3, 1, 1.6, 1)], [WG.oct(.14), '#9ab0c8', w3M(.45, .5, .2, .2, 0, -.4, 1, 1.5, 1)], [WG.oct(.12), '#8aa0b8', w3M(.1, .35, .55, 0, 0, .5, 1, 1.4, 1)]]);
+  T.fuel = w3Geo([...[[-.5, .3], [-.15, .45], [-.35, -.05], [.1, .2]].map(([x, z], i) => [WG.cyl(.17, .17, .5, 10), ['#6a1a14', '#2a2a2a', '#3a4a2a', '#6a1a14'][i], w3M(x, .25, z)]), ...[[-.25, -.25], [.25, -.25], [-.25, .25], [.25, .25]].map(([x, z]) => [WG.cyl(.025, .025, 1.6, 4), '#4a4a4a', w3M(.55 + x * .5, .8, -.3 + z * .5, z * .25, 0, -x * .25)]), [WG.box(.5, .1, .1), '#5a5a5a', w3M(.55, 1.55, -.3)]]);
+  T.base = w3Geo([...[[0, -.9, 1.9, .12], [0, .9, 1.9, .12], [-.9, 0, .12, 1.9], [.9, 0, .12, 1.9]].map(([x, z, w, d]) => [WG.box(w, .45, d), '#6a6058', w3M(x, .22, z)]), [WG.box(.9, .7, .8), '#5a4a3e', w3M(0, .35, 0)], [WG.cone(.72, .5, 4), '#3a3a42', w3M(0, .95, 0, 0, Math.PI / 4, 0, 1, 1, .9)], [WG.cyl(.025, .025, 1.6, 4), '#3a3a3a', w3M(.7, .8, .7)]]);
+  T.flag = new THREE.PlaneGeometry(.45, .3); T.flag.translate(.22, 0, 0);
+  T.mat = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: .85, flatShading: true });
+  return (W3.tpl = T);
+}
+/* ---------- the static landscape ---------- */
+function w3Ground() {
+  return canvasTex(512, 512, (c, w, h) => {
+    const R = rng(23); c.fillStyle = '#4a3a2a'; c.fillRect(0, 0, w, h);
+    for (let i = 0; i < 260; i++) { c.fillStyle = ['#3e3224', '#56442e', '#3a4a2a', '#44502e', '#4e3c2a'][i % 5] + '88'; c.beginPath(); c.ellipse(R() * w, R() * h, 8 + R() * 40, 6 + R() * 28, R() * 3, 0, 7); c.fill(); }
+    for (let i = 0; i < 3500; i++) { c.fillStyle = R() < .5 ? '#2a2018' : '#6a5a40'; c.globalAlpha = .4; c.fillRect(R() * w, R() * h, 2, 2); } c.globalAlpha = 1;
+  }, 1);
+}
+function w3Init() {
+  if (W3.scene) return;
+  const T = w3Templates(), scene = new THREE.Scene(); W3.scene = scene;
+  scene.background = new THREE.Color('#141a20'); scene.fog = new THREE.Fog('#141a20', 40, 110);
+  W3.cam = new THREE.PerspectiveCamera(40, 1, .5, 300);
+  scene.add(new THREE.HemisphereLight('#a8b8d8', '#3a2a1a', .9));
+  const sun = new THREE.DirectionalLight('#ffc89a', .95); sun.position.set(-30, 50, 20); scene.add(sun);
+  const S2 = N * TS * W3K, mid = S2 / 2;
+  const gt = w3Ground(); gt.repeat.set(10, 10);
+  const ground = new THREE.Mesh(new THREE.PlaneGeometry(S2, S2), new THREE.MeshStandardMaterial({ map: gt, roughness: 1 })); ground.rotation.x = -Math.PI / 2; ground.position.set(mid, 0, mid); scene.add(ground); W3.ground = ground;
+  const outer = new THREE.Mesh(new THREE.PlaneGeometry(S2 * 3, S2 * 3), c3M({ color: '#1a1612', roughness: 1 })); outer.rotation.x = -Math.PI / 2; outer.position.set(mid, -.05, mid); scene.add(outer);
+  // roads along the old map grid lines
+  const roadM = c3M({ color: '#2e2a24', roughness: .95 }), cc = (C + .5) * 2;
+  const road = (x0, z0, x1, z1) => { const len = Math.hypot(x1 - x0, z1 - z0), m = new THREE.Mesh(new THREE.PlaneGeometry(.75, len), roadM); m.rotation.set(-Math.PI / 2, 0, Math.atan2(x1 - x0, z1 - z0)); m.position.set((x0 + x1) / 2, .02, (z0 + z1) / 2); scene.add(m); };
+  road(cc, 0, cc, S2); road(0, cc, S2, cc);
+  for (const k of [10, 30]) { const p = (k + .5) * 2; road(p, cc - 32, p, cc + 32); road(cc - 32, p, cc + 32, p); }
+  const onRoad = (x, y) => x === C || y === C || ((x % 10 === 0) && Math.abs(y - C) < 16) || ((y % 10 === 0) && Math.abs(x - C) < 16);
+  // scenery: forests, dead trees, rocks, houses, ruins and wrecked cars
+  const place = { pine: [], dead: [], rock: [], house: [], ruin: [], car: [] };
+  for (let y = -6; y < N + 6; y++) for (let x = -6; x < N + 6; x++) {
+    if (Math.abs(x - C) <= 2 && Math.abs(y - C) <= 2) continue;
+    const h = hash(x + 99, y + 7), h2 = hash(x * 3 + 1, y * 5 + 2), out = x < 0 || y < 0 || x >= N || y >= N, bx = x * 2, bz = y * 2;
+    if (onRoad(x, y) && !out) { if (h < .05) place.car.push([bx + .6 + h2, bz + .8, h * 40]); continue; }
+    const forest = hash(Math.floor(x / 4) + 50, Math.floor(y / 4) + 9) < .38 || out;
+    if (forest && h < .85) { const n = 1 + Math.floor(h2 * 3); for (let i = 0; i < n; i++) place.pine.push([bx + .2 + hash(x + i, y) * 1.6, bz + .2 + hash(x, y + i) * 1.6, .7 + hash(i, x + y) * .7]); }
+    else if (h < .08) place.dead.push([bx + .3, bz + .3, .8 + h2 * .5]);
+    else if (h < .13) place.rock.push([bx + 1.6, bz + .4, .7 + h2 * .6]);
+    else if (h < .16) place.house.push([bx + .4, bz + 1.5, h2 * 6.3]);
+    else if (h < .19) place.ruin.push([bx + 1.4, bz + 1.4, h2 * 6.3]);
+  }
+  for (const k in place) {
+    const arr = place[k]; if (!arr.length) continue; const im = new THREE.InstancedMesh(T[k], T.mat, arr.length);
+    arr.forEach(([x, z, s], i) => im.setMatrixAt(i, k === 'pine' || k === 'dead' || k === 'rock' ? w3M(x, 0, z, 0, x * 7 % 6.3, 0, s) : w3M(x, 0, z, 0, s, 0)));
+    im.instanceMatrix.needsUpdate = true; scene.add(im);
+  }
+  // our own base in the middle: the headquarters inside a stone wall with towers
+  const home = new THREE.Group(); home.position.set(cc, 0, cc); scene.add(home);
+  try { const hq = m3Build('hq', 3.4); home.add(hq); } catch (e) { }
+  const wall = []; const wr = 2.7; for (const [x, z, w, d] of [[0, -wr, wr * 2, .3], [0, wr, wr * 2, .3], [-wr, 0, .3, wr * 2], [wr, 0, .3, wr * 2]]) wall.push([WG.box(w, .7, d), '#7a7068', w3M(x, .35, z)]);
+  for (const [x, z] of [[-wr, -wr], [wr, -wr], [-wr, wr], [wr, wr]]) wall.push([WG.cyl(.4, .45, 1.3, 8), '#6a6058', w3M(x, .65, z)], [WG.cone(.5, .5, 8), '#5a2a22', w3M(x, 1.55, z)]);
+  home.add(new THREE.Mesh(w3Geo(wall), T.mat));
+  const ring = c3Glow('#cf6a2c', 9, .25); ring.position.set(0, .3, 0); home.add(ring); W3.ring = ring;
+  for (const [x, z] of [[-wr, -wr], [wr, -wr], [-wr, wr], [wr, wr]]) { const g = c3Glow('#ff9a3a', 1.2, .7); g.position.set(x, 1.95, z); home.add(g); }
+  W3.cc = cc;
+}
+/* ---------- map objects ---------- */
+function w3Obj(n) {
+  const T = w3Templates(); let g;
+  if (n.k === 'z') { g = new THREE.Mesh(n.L % 5 === 0 ? T.lair : T.camp, T.mat); const f = c3Glow('#ff8a3a', 1, .8); f.position.set(0, .35, .2); g.add(f); g.userData.fire = f; }
+  else if (n.k === 'r') g = new THREE.Mesh(T[n.rt] || T.food, T.mat);
+  else { g = new THREE.Mesh(T.base, T.mat); const col = (ALLIES.find(a => a.tag === n.tag) || {}).col || '#8a8a8a'; const fl = new THREE.Mesh(T.flag, new THREE.MeshBasicMaterial({ color: col, side: THREE.DoubleSide })); fl.position.set(.7, 1.45, .7); g.add(fl); g.userData.flag = fl; }
+  g.position.set((n.x + .5) * 2, 0, (n.y + .5) * 2); g.rotation.y = hash(n.x, n.y) * 6.3; return g;
+}
+function w3Sync() {
+  const ids = new Set(S.world.nodes.map(n => n.id));
+  for (const id in W3.objs) if (!ids.has(id)) { W3.scene.remove(W3.objs[id]); delete W3.objs[id]; }
+  for (const n of S.world.nodes) if (!W3.objs[n.id]) { const o = w3Obj(n); o.userData.node = n; W3.scene.add(o); W3.objs[n.id] = o; }
+  W3.sig = S.world.nodes.length + '|' + (S.world.nodes[S.world.nodes.length - 1] || {}).id;
+}
+/* a few animated zombies at the camps nearest to the camera */
+function w3Live(tx, tz) {
+  const camps = S.world.nodes.filter(n => n.k === 'z').map(n => ({ n, d: Math.hypot((n.x + .5) * 2 - tx, (n.y + .5) * 2 - tz) })).filter(o => o.d < 26).sort((a, b) => a.d - b.d).slice(0, 8);
+  const want = new Set(camps.map(c => c.n.id));
+  W3.live = W3.live.filter(l => { if (want.has(l.id)) return true; W3.scene.remove(l.m); (W3.pool[l.type] = W3.pool[l.type] || []).push(l.m); return false; });
+  for (const { n } of camps) if (!W3.live.some(l => l.id === n.id)) {
+    const type = n.L % 5 === 0 ? 'boss' : n.L >= 6 ? 'br' : n.L >= 3 ? 'run' : 'w', pool = W3.pool[type] || [];
+    const m = pool.pop() || m3Zombie(type); m.scale.multiplyScalar(1); m.userData.ws = m.userData.ws || m.scale.x; m.scale.setScalar(m.userData.ws * .55);
+    W3.scene.add(m); W3.live.push({ id: n.id, m, type, cx: (n.x + .5) * 2, cz: (n.y + .5) * 2, a: Math.random() * 6, r: .6 + Math.random() * .4, ph: Math.random() * 6 });
+  }
+}
+function w3Mount() {
+  try {
+    if (!v3Supported() || !v3Init()) return false;
+    W3.pool = W3.pool || {}; w3Init(); w3Sync();
+    const host = $('.world'), cv = V3.renderer.domElement; if (!host) return false;
+    host.insertBefore(cv, host.firstChild); cv.className = 'w3canvas'; w3Size(); W3.lt = 0; W3.t = 0; W3.liveT = 0;
+    return true;
+  } catch (e) { console.warn('3D world off', e); return false; }
+}
+function w3Size() { if (!W3.cam || !wW) return; V3.renderer.setSize(wW, wH, false); W3.cam.aspect = wW / Math.max(1, wH); W3.cam.updateProjectionMatrix(); }
+/* camera from the 2D map camera; one screen pixel ≈ one map pixel / zoom at the target */
+function w3Cam() {
+  const thf = Math.tan(THREE.MathUtils.degToRad(W3.cam.fov / 2)) * W3.cam.aspect, D = (wW / cam.z * W3K) / (2 * thf);
+  const tx = w3X(cam.x), tz = w3Z(cam.y), el = W3.el; W3.cam.position.set(tx, Math.sin(el) * D, tz + Math.cos(el) * D); W3.cam.lookAt(tx, 0, tz); W3.D = D; return [tx, tz];
+}
+function w3Pick(sx, sy) {
+  const r = new THREE.Raycaster(); r.setFromCamera({ x: sx / wW * 2 - 1, y: -(sy / wH) * 2 + 1 }, W3.cam);
+  const hit = new THREE.Vector3(); if (!r.ray.intersectPlane(new THREE.Plane(new THREE.Vector3(0, 1, 0), 0), hit)) return null;
+  return { x: hit.x / W3K, y: hit.z / W3K };
+}
+function w3P(x, y, z) { _w3v.set(x, y, z).project(W3.cam); return [(_w3v.x + 1) / 2 * wW, (1 - _w3v.y) / 2 * wH, _w3v.z]; }
+function w3Draw(ts) {
+  if (V3.renderer.domElement.parentNode !== $('.world')) { const host = $('.world'); if (host) { host.insertBefore(V3.renderer.domElement, host.firstChild); V3.renderer.domElement.className = 'w3canvas'; w3Size(); } }
+  const tn = performance.now(), dt = W3.lt ? Math.min(.05, (tn - W3.lt) / 1000) : .016; W3.lt = tn; W3.t += dt; const tt = W3.t;
+  if ((S.world.nodes.length + '|' + (S.world.nodes[S.world.nodes.length - 1] || {}).id) !== W3.sig) w3Sync();
+  const [tx, tz] = w3Cam(), viewR = W3.D * 1.25 + 8;
+  for (const id in W3.objs) { const o = W3.objs[id], p = o.position, vis = Math.abs(p.x - tx) < viewR && Math.abs(p.z - tz) < viewR * 1.2; o.visible = vis; if (vis) { if (o.userData.fire) { const f = .8 + Math.sin(tt * 11 + p.x) * .15 + Math.random() * .08; o.userData.fire.scale.set(f, f * 1.3, 1); } if (o.userData.flag) o.userData.flag.rotation.y = Math.sin(tt * 3 + p.x) * .3; } }
+  if ((W3.liveT -= dt) <= 0) { W3.liveT = .5; w3Live(tx, tz); }
+  for (const l of W3.live) { l.a += dt * .5; const x = l.cx + Math.cos(l.a) * l.r, z = l.cz + Math.sin(l.a) * l.r; l.m.position.set(x, 0, z); l.m.rotation.y = l.a + Math.PI; m3Walk(l.m, tt + l.ph, .7, true); }
+  W3.ring.material.opacity = .2 + Math.sin(tt * 2) * .06;
+  V3.renderer.render(W3.scene, W3.cam);
+  // overlay: march lines, level badges, names, vignette
+  const c = wCtx; if (!c) return; c.setTransform(wDpr, 0, 0, wDpr, 0, 0); c.clearRect(0, 0, wW, wH);
+  c.textAlign = 'center'; c.textBaseline = 'middle'; c.direction = isRTL() ? 'rtl' : 'ltr';
+  const tm = now(), home = w3P(W3.cc, .4, W3.cc);
+  for (const m of S.world.marches) {
+    const pt = w3P((m.x + .5) * 2, .4, (m.y + .5) * 2); c.setLineDash([8, 8]); c.lineDashOffset = -(ts || 0) / 40; c.strokeStyle = '#64b66ecc'; c.lineWidth = 2.5; c.beginPath(); c.moveTo(home[0], home[1]); c.lineTo(pt[0], pt[1]); c.stroke(); c.setLineDash([]);
+    let f = tm < m.arr ? (tm - m.go) / (m.arr - m.go) : tm < m.fin ? 1 : 1 - (tm - m.fin) / (m.back - m.fin); f = clamp(f, 0, 1);
+    c.fillStyle = '#64b66e'; c.beginPath(); c.arc(lerp(home[0], pt[0], f), lerp(home[1], pt[1], f), 6, 0, 7); c.fill(); c.strokeStyle = '#fff'; c.lineWidth = 1.5; c.stroke();
+  }
+  if (cam.z > .6) { c.font = '700 13px Changa, sans-serif'; c.lineWidth = 3; c.strokeStyle = '#000a'; const p = w3P(W3.cc, 0, W3.cc + 3.4); c.strokeText(S.name || t('commander'), p[0], p[1]); c.fillStyle = '#ffd9a8'; c.fillText(S.name || t('commander'), p[0], p[1]); }
+  const lbl = cam.z > .75;
+  for (const n of S.world.nodes) {
+    const o = W3.objs[n.id]; if (!o || !o.visible) continue; const p = w3P(o.position.x, 0, o.position.z + 1.3); if (p[0] < -30 || p[1] < -30 || p[0] > wW + 30 || p[1] > wH + 30 || p[2] > 1) continue;
+    if (n.k === 'z') {
+      const ok = n.L <= S.world.maxZ + 1, top = ok && n.L === S.world.maxZ + 1;
+      if (lbl || n.L % 5 === 0 || top) badge(c, p[0], p[1], n.L, ok ? '#e2513f' : '#555');
+      if (top) { const q = w3P(o.position.x, 0, o.position.z); c.strokeStyle = '#f1b23c'; c.lineWidth = 2; c.beginPath(); c.ellipse(q[0], q[1], 30 * cam.z + Math.sin(tt * 5) * 2, 15 * cam.z, 0, 0, 7); c.stroke(); }
+    } else if (n.k === 'r') { if (lbl) badge(c, p[0], p[1], n.L, '#64b66e'); if (S.world.marches.some(m => m.nid === n.id)) { const q = w3P(o.position.x, 0, o.position.z); c.strokeStyle = '#64b66e'; c.lineWidth = 2; c.beginPath(); c.ellipse(q[0], q[1], 26 * cam.z, 13 * cam.z, 0, 0, 7); c.stroke(); } }
+    else if (lbl) { c.font = '700 11px Tajawal, sans-serif'; c.lineWidth = 3; c.strokeStyle = '#000a'; const s = `[${n.tag}] ${L(BOTS[n.bot])}`; c.strokeText(s, p[0], p[1]); c.fillStyle = '#d8dee4'; c.fillText(s, p[0], p[1]); }
+  }
+  const g = c.createRadialGradient(wW / 2, wH / 2, Math.min(wW, wH) * .4, wW / 2, wH / 2, Math.max(wW, wH) * .78); g.addColorStop(0, '#0000'); g.addColorStop(1, '#0009'); c.fillStyle = g; c.fillRect(0, 0, wW, wH);
+}
 
 /* ---- 10-battle.js ---- */
 /* ================= battle ================= */
@@ -3840,6 +4061,21 @@ function cast(h) {
     case 'air': B.shake = .5; for (let i = 0; i < 6; i++) B.fx.push({ k: 'boom', x: B.W * (.15 + Math.random() * .7), y: B.lineY * (.2 + Math.random() * .7), r: 60, t: -i * .06, life: .5 }); for (const z of vz) dmgZ(z, h.atk * 3.5 * m); break;
   }
 }
+/* each hero's own touch on a normal attack */
+function heroTrait(h, tg, d) {
+  const vz = visibleZ(), others = vz.filter(z => z !== tg && z.alive), byDist = (o, p) => o.slice().sort((a, b) => Math.hypot(a.x - p.x, a.y - p.y) - Math.hypot(b.x - p.x, b.y - p.y));
+  switch (h.id) {
+    case 'redking': { const z = byDist(others, tg)[0]; if (z && Math.hypot(z.x - tg.x, z.y - tg.y) < 80) { dmgZ(z, d * .5); B.fx.push({ k: 'tr', x: tg.x, y: tg.y, tx: z.x, ty: z.y, t: 0, life: .12, w: 2, col: '#ff6a3a', hid: 'redking', tz: z, sub: 1 }); } break; }
+    case 'destroyer': { let from = tg; for (const z of byDist(others, tg).slice(0, 2)) { dmgZ(z, d * .35); B.fx.push({ k: 'arc', x: from.x, y: from.y, tx: z.x, ty: z.y, t: 0, life: .25, fz: from, tz: z }); from = z; } break; }
+    case 'fire': { for (const z of others) if (Math.hypot(z.x - tg.x, z.y - tg.y) < 48 + z.T.r) dmgZ(z, d * .4); B.fx.push({ k: 'boom', x: tg.x, y: tg.y, r: 48, t: .05, life: .4, small: 1 }); break; }
+    case 'knight': h.shield = Math.min(h.maxhp * .3, h.shield + h.maxhp * .03); h.shT = Math.max(h.shT, 3); break;
+    case 'shadow': setTimeout(() => { if (!B || B.done) return; const z = tg.alive ? tg : nearestZ(); if (z) { dmgZ(z, d * .6); B.fx.push({ k: 'tr', x: h.x, y: h.y - 12, tx: z.x, ty: z.y, t: 0, life: .07, w: 2, col: '#c8d0ff', hid: 'shadow', tz: z }); } }, 140); break;
+    case 'medic': { const al = B.heroes.filter(x => x.alive).sort((a, b) => a.hp / a.maxhp - b.hp / b.maxhp)[0]; if (al && al.hp < al.maxhp) { const v = d * .25; al.hp = Math.min(al.maxhp, al.hp + v); B.fx.push({ k: 'txt', x: al.x, y: al.y - 26, s: '+' + fmt(v), col: '#64b66e', t: 0, life: .7 }); } break; }
+    case 'mountain': if (tg.alive && tg.type !== 'wb' && tg.type !== 'boss') { tg.y = Math.max(-20, tg.y - 22); if (Math.random() < .12) tg.stun = Math.max(tg.stun, .6); } break;
+    case 'hawk': { const z = others.filter(o => o.y < tg.y && Math.abs(o.x - tg.x) < 45).sort((a, b) => b.y - a.y)[0]; if (z) dmgZ(z, d * .6); break; }
+    case 'wind': if (Math.random() < .1) for (const x of B.heroes) if (x.alive) x.en = Math.min(100, x.en + 5); break;
+  }
+}
 function bStep(dt) {
   B.t += dt; if (B.buff > 0) B.buff -= dt; if (B.shake > 0) B.shake -= dt;
   const nW = B.cfg.waves.length;
@@ -3872,7 +4108,7 @@ function bStep(dt) {
     h.cd -= dt;
     if (h.cd <= 0) {
       const tg = nearestZ();
-      if (tg) { const rate = { tank: 1, atk: .6, sup: .9 }[h.H.c]; h.cd = rate / (h.rapid > 0 ? 3 : 1); let d = h.atk * (B.buff > 0 ? 1.4 : 1); const cr = Math.random() < .12; if (cr) d *= 2; B.fx.push({ k: 'tr', x: h.x, y: h.y - 12, tx: tg.x, ty: tg.y, t: 0, life: .07, w: 2, col: '#ffe9a8', hid: h.id, tz: tg }); h.shotT = .22; dmgZ(tg, d, cr); SND.shot(); h.en = Math.min(100, h.en + (h.H.c === 'sup' ? 11 : 8)); }
+      if (tg) { const rate = { tank: 1, atk: .6, sup: .9 }[h.H.c] * (h.id === 'wind' ? .6 : 1); h.cd = rate / (h.rapid > 0 ? 3 : 1); let d = h.atk * (B.buff > 0 ? 1.4 : 1); const cr = Math.random() < (h.id === 'lightning' ? .3 : .12); if (cr) d *= 2; B.fx.push({ k: 'tr', x: h.x, y: h.y - 12, tx: tg.x, ty: tg.y, t: 0, life: .07, w: 2, col: '#ffe9a8', hid: h.id, tz: tg }); h.shotT = .22; dmgZ(tg, d, cr); heroTrait(h, tg, d); SND.shot(); h.en = Math.min(100, h.en + (h.H.c === 'sup' ? 11 : 8)); }
       else h.cd = .15;
     }
     if (h.en >= 100 && S.auto) cast(h);
@@ -3927,6 +4163,7 @@ function bDraw() {
     else if (f.k === 'boom') { c.globalAlpha = 1 - p; const g = c.createRadialGradient(f.x, f.y, 0, f.x, f.y, f.r * (.4 + p * .6)); g.addColorStop(0, '#fff3c0'); g.addColorStop(.4, '#f1b23c'); g.addColorStop(1, '#cf6a2c00'); c.fillStyle = g; c.beginPath(); c.arc(f.x, f.y, f.r * (.4 + p * .6), 0, 7); c.fill(); c.globalAlpha = 1; }
     else if (f.k === 'spit') { const x = f.x + (f.tx - f.x) * p, y = f.y + (f.ty - f.y) * p - Math.sin(p * Math.PI) * 40; c.fillStyle = '#8fcf3a'; c.beginPath(); c.arc(x, y, 5, 0, 7); c.fill(); }
     else if (f.k === 'heal') { c.globalAlpha = 1 - p; c.strokeStyle = '#64b66e'; c.lineWidth = 3; c.beginPath(); c.arc(f.x, f.y, 18 + p * 20, 0, 7); c.stroke(); c.globalAlpha = 1; }
+    else if (f.k === 'arc') { c.strokeStyle = '#c07aff'; c.globalAlpha = 1 - p; c.lineWidth = 2; c.beginPath(); c.moveTo(f.x, f.y); c.lineTo(f.tx, f.ty); c.stroke(); c.globalAlpha = 1; }
     else if (f.k === 'claw') { c.globalAlpha = 1 - p; c.strokeStyle = '#e2513f'; c.lineWidth = 2; for (let i = -1; i <= 1; i++) { c.beginPath(); c.moveTo(f.x + i * 6 - 6, f.y - 6); c.lineTo(f.x + i * 6 + 6, f.y + 6); c.stroke(); } c.globalAlpha = 1; }
   }
   const fog = c.createLinearGradient(0, 0, 0, 90); fog.addColorStop(0, '#0b0e10'); fog.addColorStop(1, '#0b0e1000'); c.fillStyle = fog; c.fillRect(0, 0, W, 90);
@@ -3973,7 +4210,7 @@ function startCampaign() {
  * shots are drawn on the 2D canvas on top, at the projected 3D positions. It borrows the village renderer,
  * so the phone only ever holds one WebGL context.
  */
-const B3 = { pool: {}, dying: [], parts: [], fires: [], t: 0 };
+const B3 = { pool: {}, dying: [], parts: [], fires: [], proj: [], rings: [], t: 0 };
 const B3_ZOFF = { w: .3, run: .3, sp: .4, br: .55, boss: .75, wb: 1.3 };
 const b3X = x => (x - B.W / 2) / B3.U, b3Z = y => (y - B.lineY) / B3.U;
 const _b3v = typeof THREE !== 'undefined' ? new THREE.Vector3() : null;
@@ -4087,7 +4324,7 @@ function b3TakeZ(type) {
   B3.scene.add(m); return m;
 }
 function b3PutZ(m) { B3.scene.remove(m); const p = B3.pool[m.userData.ztype] || (B3.pool[m.userData.ztype] = []); if (p.length < 24) p.push(m); else b3Dispose(m); }
-function b3Dispose(o) { o.traverse(x => { if (x.isMesh && x.geometry && !C3.cached.has(x.geometry)) x.geometry.dispose(); }); }
+function b3Dispose(o) { o.traverse(x => { if (x.isSkinnedMesh && x.skeleton) x.skeleton.dispose(); if (x.isMesh && x.geometry && !C3.cached.has(x.geometry) && !x.isSkinnedMesh) x.geometry.dispose(); }); }
 function b3Start() {
   try {
     if (!v3Supported() || !v3Init()) return false;
@@ -4110,6 +4347,7 @@ function b3Stop() {
   for (const h of B.heroes) if (h.m) { B3.scene.remove(h.m); b3Dispose(h.m); h.m = null; }
   for (const z of B.z) if (z.m) { b3PutZ(z.m); z.m = null; }
   B3.dying.forEach(d => b3PutZ(d.m)); B3.dying = []; B3.parts.forEach(p => B3.scene.remove(p.s)); B3.parts = [];
+  B3.proj.forEach(p => B3.scene.remove(p.o)); B3.proj = []; B3.rings.forEach(r => B3.scene.remove(r.m)); B3.rings = [];
 }
 function b3Burst(x, y, z, col, size, life, grow) { const s = c3Glow(col, size, .9); s.position.set(x, y, z); B3.scene.add(s); B3.parts.push({ s, life, l0: life, s0: size, grow }); }
 function b3Attack(h, u, p) {
@@ -4119,6 +4357,41 @@ function b3Attack(h, u, p) {
   else if (w === 'orb') { u.armL.rotation.x = u.poseL - Math.sin(p * Math.PI) * 1; if (u.orb) u.orb.scale.setScalar(1 + Math.sin(p * Math.PI) * .6); }
   else if (w === 'daggers') { u.armR.rotation.x = u.poseR - Math.sin(p * Math.PI) * 1.3; u.armL.rotation.x = u.poseL - Math.sin(Math.min(1, p * 1.4) * Math.PI) * 1.1; }
   else { const a = p < .35 ? lerp(u.poseR, -2.6, p / .35) : lerp(-2.6, .35, (p - .35) / .65); u.armR.rotation.x = a; }
+}
+/* ---------- each hero's own shot ---------- */
+const B3_PROJ = { redking: ['slash', '#ff6a3a', 20], destroyer: ['orb', '#c07aff', 15], fire: ['orb', '#ff7a1a', 13, 1], knight: ['slash', '#ffd77a', 20], lightning: ['bullet'], shadow: ['dagger', '#c8d0ff', 24], medic: ['orb', '#7dff7a', 15], mountain: ['quake', '#ffb070'], hawk: ['arrow', '#e8d8a0', 24], wind: ['slash', '#7ac8ff', 26] };
+const texCrescent = () => c3Tex('crescent', (c, w, h) => { c.strokeStyle = '#fff'; c.lineCap = 'round'; for (const [lw, a] of [[18, .25], [10, .55], [4, 1]]) { c.globalAlpha = a; c.lineWidth = lw; c.beginPath(); c.arc(w / 2, h * .75, w * .36, Math.PI * 1.1, Math.PI * 1.9); c.stroke(); } });
+function b3Shot(f) {
+  const P = B3_PROJ[f.hid], hh = B.heroes.find(x => x.id === f.hid); if (!P || !hh || !hh.m || P[0] === 'bullet') return;
+  const tz = f.tz, to = tz && tz.m ? tz.m.position.clone().setY((tz.m3h || 1.6) * .55) : new THREE.Vector3(b3X(f.tx), 1, b3Z(f.ty));
+  const from = f.sub && tz ? to.clone() : hh.m.position.clone().setY(hh.m3h * .6);
+  if (f.sub) { const z0 = B.z.find(z => z.m && Math.hypot(z.x - f.x, z.y - f.y) < 1); if (z0) from.copy(z0.m.position).setY(1); }
+  f.p3 = 1;
+  if (P[0] === 'quake') { b3Ring(to.x, to.z, P[1]); for (let i = 0; i < 4; i++) b3Burst(to.x + (Math.random() - .5), .3, to.z + (Math.random() - .5), '#8a6a4a', .3, .4, .2); return; }
+  let o;
+  if (P[0] === 'orb') o = c3Glow(P[1], P[3] ? 1 : .6, 1);
+  else if (P[0] === 'slash') { o = new THREE.Sprite(new THREE.SpriteMaterial({ map: texCrescent(), color: P[1], blending: THREE.AdditiveBlending, transparent: true, depthWrite: false })); o.scale.set(1.3, 1.3, 1); }
+  else if (P[0] === 'dagger') { o = new THREE.Group(); A(o, c3Box(.05, .32, .015), c3M({ color: '#d8e0ea', metalness: .9, roughness: .2 }), 0, 0, 0); A(o, c3Box(.09, .03, .03), c3M({ color: '#3a2a20' }), 0, -.14, 0); o.scale.setScalar(1.4); }
+  else { o = new THREE.Group(); A(o, c3Cyl(.012, .012, .8, 4), c3M({ color: '#6a4a2a' }), 0, 0, 0, Math.PI / 2); A(o, c3Cone(.035, .1, 4), c3M({ color: '#c8c8c8', metalness: .7 }), 0, 0, .45, Math.PI / 2); A(o, c3Box(.005, .06, .14), c3M({ color: '#e8e0d0' }), 0, 0, -.36); }
+  o.position.copy(from); B3.scene.add(o);
+  B3.proj.push({ o, from, to, tz, t: 0, dur: Math.max(.08, from.distanceTo(to) / P[2]), kind: P[0], col: P[1], big: P[3] });
+}
+function b3Ring(x, z, col) { const m = new THREE.Mesh(c3G('ring3', () => { const g = new THREE.RingGeometry(.5, .75, 28); g.rotateX(-Math.PI / 2); return g; }), new THREE.MeshBasicMaterial({ color: col, transparent: true, opacity: .8, depthWrite: false, blending: THREE.AdditiveBlending })); m.position.set(x, .06, z); B3.scene.add(m); B3.rings.push({ m, t: 0 }); }
+function b3Proj(dt) {
+  for (const p of B3.proj) {
+    p.t += dt / p.dur; const k = Math.min(1, p.t);
+    if (p.tz && p.tz.m && p.tz.alive) p.to.set(p.tz.m.position.x, (p.tz.m3h || 1.6) * .55, p.tz.m.position.z);
+    const arc = p.kind === 'arrow' ? 1.2 : p.kind === 'orb' ? .25 : p.kind === 'dagger' ? .3 : 0;
+    p.o.position.lerpVectors(p.from, p.to, k); p.o.position.y += Math.sin(k * Math.PI) * arc;
+    if (p.kind === 'arrow') { const nx = _b3v.copy(p.to).sub(p.from); p.o.rotation.set(0, Math.atan2(nx.x, nx.z), 0); p.o.rotateX(-Math.cos(k * Math.PI) * .7); }
+    if (p.kind === 'dagger') { p.o.rotation.x += dt * 30; p.o.rotation.y = Math.atan2(p.to.x - p.from.x, p.to.z - p.from.z); }
+    if (p.kind === 'slash') p.o.material.rotation = Math.atan2(p.to.x - p.from.x, -(p.to.z - p.from.z)) * .3;
+    if (p.kind === 'orb' && Math.random() < .7) b3Burst(p.o.position.x, p.o.position.y, p.o.position.z, p.col, p.big ? .45 : .28, .25, -.2);
+    if (k >= 1) { p.done = 1; B3.scene.remove(p.o); b3Burst(p.to.x, p.to.y, p.to.z, p.col || '#fff', p.big ? 1.4 : .8, .3, p.big ? 2.5 : 1.2); }
+  }
+  B3.proj = B3.proj.filter(p => !p.done);
+  for (const r of B3.rings) { r.t += dt; const s = 1 + r.t * 5; r.m.scale.set(s, 1, s); r.m.material.opacity = Math.max(0, .8 - r.t * 1.6); }
+  B3.rings = B3.rings.filter(r => { if (r.t > .5) { B3.scene.remove(r.m); r.m.material.dispose(); return false; } return true; });
 }
 /* ---------- per-frame update ---------- */
 function b3Frame() {
@@ -4161,10 +4434,11 @@ function b3Frame() {
   B3.dying = B3.dying.filter(d => { if (d.t > 2.2) { b3PutZ(d.m); return false; } return true; });
   for (const f of B.fx) {
     if (f.lit || f.t < 0) continue;
-    if (f.k === 'boom') { f.lit = 1; const x = b3X(f.x), z = b3Z(f.y); B3.flash.position.set(x, 1.5, z); B3.flash.intensity = 5; b3Burst(x, .8, z, '#ffb050', f.r / B3.U * 1.4, .45, f.r / B3.U * 2); }
+    if (f.k === 'tr' && f.hid) { f.lit = 1; b3Shot(f); }
+    else if (f.k === 'boom') { f.lit = 1; const x = b3X(f.x), z = b3Z(f.y); B3.flash.position.set(x, 1.5, z); B3.flash.intensity = f.small ? 1.5 : 5; b3Burst(x, .8, z, '#ffb050', f.r / B3.U * 1.4, .45, f.r / B3.U * 2); }
     else if (f.k === 'heal') { f.lit = 1; b3Burst(b3X(f.x), 1, b3Z(f.y), '#7dff7a', .8, .6, 1.6); }
   }
-  B3.flash.intensity *= Math.pow(.003, rdt);
+  B3.flash.intensity *= Math.pow(.003, rdt); b3Proj(rdt);
   for (const p of B3.parts) { p.life -= rdt; const k = 1 - p.life / p.l0; const sc = p.s0 + k * p.grow; p.s.scale.set(sc, sc, 1); p.s.material.opacity = Math.max(0, p.life / p.l0) * .9; }
   B3.parts = B3.parts.filter(p => { if (p.life <= 0) { B3.scene.remove(p.s); p.s.material.dispose(); return false; } return true; });
   for (const f of B3.fires) { const k = .8 + Math.sin(t * 11 + f.ph) * .12 + Math.random() * .1; f.spr.forEach((s, i) => s.scale.set(s.userData.b * k, s.userData.b * k * 1.3, 1)); if (f.pl) f.pl.intensity = 1.8 + k; }
@@ -4191,6 +4465,8 @@ function b3Draw() {
   }
   for (const f of B.fx) {
     if (f.t < 0) continue; const pr = f.t / f.life;
+    if (f.k === 'tr' && f.p3 && f.w < 5) continue;
+    if (f.k === 'arc') { const a = f.fz && f.fz.m ? b3PW(f.fz.m.position.x, 1, f.fz.m.position.z) : b3PW(b3X(f.x), 1, b3Z(f.y)), bt = f.tz && f.tz.m ? b3PW(f.tz.m.position.x, 1, f.tz.m.position.z) : b3PW(b3X(f.tx), 1, b3Z(f.ty)); c.globalAlpha = 1 - pr; for (const [lw, col] of [[6, '#9a5aff66'], [2, '#f0d8ff']]) { c.strokeStyle = col; c.lineWidth = lw; c.beginPath(); c.moveTo(a[0], a[1]); for (let i = 1; i < 6; i++) c.lineTo(lerp(a[0], bt[0], i / 6) + (Math.random() - .5) * 12, lerp(a[1], bt[1], i / 6) + (Math.random() - .5) * 12); c.lineTo(bt[0], bt[1]); c.stroke(); } c.globalAlpha = 1; continue; }
     if (f.k === 'tr') {
       const hh = B.heroes.find(x => x.id === f.hid), a = hh && hh.m ? b3PW(hh.m.position.x, hh.m3h * .62, hh.m.position.z) : b3PW(b3X(f.x), 1.2, b3Z(f.y));
       const zt = f.tz && f.tz.m ? f.tz.m.position : null, bt = zt ? b3PW(zt.x, (f.tz.m3h || 1.5) * .6, zt.z) : b3PW(b3X(f.tx), 1, b3Z(f.ty));
@@ -4212,7 +4488,7 @@ function b3Draw() {
   c.textAlign = 'right'; c.fillText(B.cfg.boss ? `💥 ${fmt(B.dealt)}` : `🧟 ${B.kills}`, W - 10, 14);
   if (B.cfg.boss) { const z = B.z.find(z => z.type === 'wb'); if (z) { const w = W * .7, x = (W - w) / 2; c.fillStyle = '#000a'; c.fillRect(x, 26, w, 8); c.fillStyle = '#e2513f'; c.fillRect(x, 26, w * Math.max(0, z.hp / z.maxhp), 8); } }
 }
-window.B3DBG = { fight: (sc, waves, boss) => startBattle({ title: 'test', waves, sc, boss, onEnd: () => null }), on: () => !!(B && B.m3), zombies: () => B ? B.z.filter(z => z.m).length : 0, heroes: () => B ? B.heroes.filter(h => h.m).length : 0, calls: () => V3.renderer.info.render.calls };
+window.B3DBG = { fight: (sc, waves, boss, squad) => { if (squad) { squad.forEach(id => { if (!S.heroes[id]) S.heroes[id] = { lv: 30, st: 3, sh: 0 }; }); S.squad = squad; } startBattle({ title: 'test', waves, sc, boss, onEnd: () => null }); }, on: () => !!(B && B.m3), zombies: () => B ? B.z.filter(z => z.m).length : 0, heroes: () => B ? B.heroes.filter(h => h.m).length : 0, calls: () => V3.renderer.info.render.calls, texs: () => { const set = new Map(); B3.scene.traverse(o => { const ms = o.material ? [].concat(o.material) : []; for (const m of ms) for (const k of ['map', 'emissiveMap']) if (m[k]) set.set(m[k].uuid, (o.name || o.type) + ':' + (m[k].image && m[k].image.width)); }); return [set.size, [...set.values()].slice(0, 60).join(',')]; }, mem: () => { const i = V3.renderer.info; return `geo ${i.memory.geometries} tex ${i.memory.textures} prog ${i.programs.length} heap ${(performance.memory ? performance.memory.usedJSHeapSize / 1e6 : 0).toFixed(0)}MB`; } };
 
 /* ---- 11-admin.js ---- */
 /* ================= admin panel (hidden: tap the version label 7 times in Settings) ================= */

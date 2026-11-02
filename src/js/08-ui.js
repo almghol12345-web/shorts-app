@@ -281,6 +281,7 @@ function mHero(id) {
   <p class="muted">${L(Hh.q)}</p>
   <div class="grid4"><div class="stat"><small>${t('atk')}</small><b class="num">${fmt(x.atk)}</b></div><div class="stat"><small>${t('hp')}</small><b class="num">${fmt(x.hp)}</b></div><div class="stat"><small>${t('def')}</small><b class="num">${fmt(x.def)}</b></div><div class="stat"><small>${t('power')}</small><b class="num" style="color:var(--amber)">${fmt(heroPower(id))}</b></div></div>
   <div class="li"><span class="lic">⚡</span><div class="lit"><b>${L(Hh.skn)}</b><small>${skillText(Hh.sk, RM[Hh.r])}</small></div></div>
+  <div class="li"><span class="lic">🎯</span><div class="lit"><b>${t('trait')}</b><small>${t('tr_' + id)}</small></div></div>
   <div class="panel"><div class="row between"><b>${t('level_of', h.lv, cap)}</b><span class="cc ${S.res.exp >= lc ? '' : 'lack'}">✨ ${fmt(lc)}</span></div>
   <div class="grid2"><button class="btn pri" data-a="hlv" data-x="${id}|1" ${h.lv < cap && S.res.exp >= lc ? '' : 'disabled'}>⬆️ +1</button><button class="btn" data-a="hlv" data-x="${id}|10" ${h.lv < cap && S.res.exp >= lc ? '' : 'disabled'}>⏫ +10</button></div>
   ${h.lv >= cap ? `<small class="muted">${t('raise_cap')}</small>` : ''}</div>
@@ -444,6 +445,7 @@ function mSettings() {
   <button class="btn wide" data-a="vip">👑 VIP ${vipLv()}</button>
   <button class="btn wide" data-a="tut">📖 ${t('how_to_play')}</button>
   <button class="btn wide" data-a="restore">${t('restore')}</button>
+  ${CFG.privacyUrl ? `<a class="btn wide" href="${esc(CFG.privacyUrl)}" target="_blank" rel="noopener">🔒 ${t('privacy')}</a>` : ''}
   <button class="btn wide ${resetArm > now() ? 'danger' : ''}" data-a="reset">${resetArm > now() ? t('reset_confirm') : '🗑️ ' + t('new_game')}</button>
   <button class="btn wide ${delArm > now() ? 'danger' : ''}" data-a="delAcc">${delArm > now() ? t('delete_confirm') : '⚠️ ' + t('delete_account')}</button>
   <button class="muted sm" data-a="verTap" style="justify-self:center;padding:8px">${t('version')} ${CFG.appVersion}</button>`;
