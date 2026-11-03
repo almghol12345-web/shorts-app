@@ -25,7 +25,7 @@ HASHTAG = re.compile(r"#([\w؀-ۿ]+)")
 # gaming / off-topic words: a 'stories' hashtag about a game is not our audience
 OFF_TOPIC = ("روبلوكس", "roblox", "ماينكرافت", "minecraft", "فورتنايت", "fortnite", "ببجي", "pubg",
              "قيمز", "gaming", "game", "لعبة", "العاب", "ألعاب", "ماب", "سكن", "فري_فاير", "freefire",
-             "انمي", "anime", "مسلسل", "مسلسلات", "فلم", "فيلم")
+             "انمي", "anime", "مسلسل", "مسلسلات", "فلم", "فيلم", "محاكي", "simulator")
 
 
 def _relevant(tag: str) -> bool:
