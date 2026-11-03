@@ -1,0 +1,24 @@
+name: Refresh Hashtags
+
+on:
+  workflow_dispatch:
+    inputs:
+      video_id:
+        description: "YouTube video id(s), comma-separated"
+        required: true
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -r requirements.txt
+      - name: Rebuild title, description and tags
+        env:
+          YOUTUBE_CLIENT_ID: ${{ secrets.YOUTUBE_CLIENT_ID }}
+          YOUTUBE_CLIENT_SECRET: ${{ secrets.YOUTUBE_CLIENT_SECRET }}
+          YOUTUBE_REFRESH_TOKEN: ${{ secrets.YOUTUBE_REFRESH_TOKEN }}
+        run: python scripts/refresh_seo.py "${{ inputs.video_id }}"
