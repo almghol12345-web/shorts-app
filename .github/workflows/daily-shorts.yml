@@ -76,6 +76,8 @@ jobs:
           POLLINATIONS_TOKEN: ${{ secrets.POLLINATIONS_TOKEN }}
           ELEVENLABS_API_KEY: ${{ secrets.ELEVENLABS_API_KEY }}
           DARIJAT_API_KEY: ${{ secrets.DARIJAT_API_KEY }}
+          REPLICATE_API_TOKEN: ${{ secrets.REPLICATE_API_TOKEN }}
+          REPLICATE_VIDEO_SHOTS: ${{ vars.REPLICATE_VIDEO_SHOTS }}
           DARIJAT_VOICE: ${{ inputs.darijat_voice || vars.DARIJAT_VOICE }}
           DARIJAT_API_URL: ${{ vars.DARIJAT_API_URL }}
           ELEVENLABS_VOICE_ID: ${{ vars.ELEVENLABS_VOICE_ID }}

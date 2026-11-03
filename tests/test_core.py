@@ -410,3 +410,24 @@ def test_music_mood_and_bed(tmp_path):
         x = compose(mood, 3.0)
         assert len(x) == 3 * 44100 and abs(x).max() < 0.95
     assert write_bed("desert", 2.0, tmp_path / "m.wav").stat().st_size > 100_000
+
+
+def test_replicate_scene_art_and_motion(tmp_path, monkeypatch):
+    from shorts import background, replicate
+    from shorts.media import run
+    monkeypatch.setenv("REPLICATE_API_TOKEN", "x")
+    assert replicate.video_shots(15) == {0, 1, 12}
+    monkeypatch.setenv("REPLICATE_VIDEO_SHOTS", "none")
+    assert replicate.video_shots(15) == set()
+    img = tmp_path / "src.jpg"
+    run(["ffmpeg", "-y", "-f", "lavfi", "-i", "color=c=red:s=360x640", "-frames:v", "1", str(img)])
+    vid = tmp_path / "src.mp4"
+    run(["ffmpeg", "-y", "-f", "lavfi", "-i", "color=c=blue:s=480x832:d=1", "-pix_fmt", "yuv420p", str(vid)])
+    monkeypatch.setattr(replicate, "_run", lambda model, inputs, timeout: "video" if "image" in inputs else "image")
+    monkeypatch.setattr(replicate, "_save", lambda link, out: out.write_bytes((vid if link == "video" else img).read_bytes()))
+    src = background.Sources()
+    for moving in (False, True):
+        out = tmp_path / f"shot_{int(moving)}.mp4"
+        assert background.paid_scene("a desert", 2.0, out, src, 360, 640, 0, moving)
+        assert out.stat().st_size > 0
+    assert src.ai_images == 2

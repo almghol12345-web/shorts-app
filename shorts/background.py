@@ -248,12 +248,48 @@ def gradient(seconds: float, out: Path, width: int, height: int) -> None:
 
 # ---------- Timeline ----------
 
+def motion_clip(video: Path, seconds: float, out: Path, width: int, height: int) -> None:
+    """An AI-animated scene: filled to 9:16, looped if the line is longer than the clip."""
+    run(["ffmpeg", "-y", "-stream_loop", "-1", "-i", str(video), "-t", f"{seconds:.3f}", "-an",
+         "-vf", f"scale={width}:{height}:force_original_aspect_ratio=increase,crop={width}:{height},"
+                f"setsar=1,fps=30,eq=contrast=1.05:saturation=0.9",
+         *ENCODE, str(out)])
+
+
+def paid_scene(scene: str, seconds: float, out: Path, src: Sources, width: int, height: int,
+               index: int, moving: bool) -> bool:
+    """Scene art from Replicate; the key moments also get real motion."""
+    from . import replicate
+    raw = out.with_suffix(".jpg")
+    try:
+        link = replicate.image(f"{scene}, {ART_STYLE}", raw)
+    except Exception as exc:
+        print(f"[visual] replicate image failed: {str(exc)[:200]}")
+        return False
+    src.ai_images += 1
+    if moving:
+        clip = out.with_suffix(".motion.mp4")
+        try:
+            replicate.animate(link, scene, clip)
+            motion_clip(clip, seconds, out, width, height)
+            print(f"[visual] {out.stem}: ai video for '{scene[:60]}'")
+            return True
+        except Exception as exc:
+            print(f"[visual] replicate video failed ({str(exc)[:200]}); using the still")
+    art_clip(raw, seconds, out, width, height, index)
+    print(f"[visual] {out.stem}: ai art (replicate) for '{scene[:60]}'")
+    return True
+
+
 def shot(spec: str, seconds: float, out: Path, src: Sources, width: int, height: int,
-         index: int = 0) -> None:
+         index: int = 0, moving: bool = False) -> None:
     """Make one shot for one line, trying the best source first."""
     raw = out.with_suffix(".src")
     if spec.startswith("ai:"):
         scene, _, fallback = spec[3:].partition(" >> ")
+        from . import replicate
+        if replicate.token() and paid_scene(scene.strip(), seconds, out, src, width, height, index, moving):
+            return
         # after two shots in a row fail, the generator is down: go straight to the
         # real photo / footage of the event instead of waiting on retries
         if src.ai_failures < 2 and fetch_ai_image(scene.strip(), raw, src, width, height,
@@ -296,10 +332,12 @@ def build(visuals: list[str], spans: list[float], workdir: Path, width: int, hei
     joined background video and the credit lines for the description."""
     workdir.mkdir(parents=True, exist_ok=True)
     src = Sources(pexels_key=pexels_key, pixabay_key=pixabay_key)
+    from . import replicate
+    moving = replicate.video_shots(len(visuals)) if replicate.token() else set()
     parts = []
     for i, (spec, seconds) in enumerate(zip(visuals, spans)):
         part = workdir / f"shot_{i:02d}.mp4"
-        shot(spec, max(seconds, 0.5), part, src, width, height, index=i)
+        shot(spec, max(seconds, 0.5), part, src, width, height, index=i, moving=i in moving)
         parts.append(part)
     listing = workdir / "shots.txt"
     listing.write_text("\n".join(f"file '{p.resolve()}'" for p in parts), encoding="utf-8")
