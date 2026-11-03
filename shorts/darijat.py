@@ -21,7 +21,7 @@ PAUSE = 0.18          # breath between lines, seconds
 def _cfg():
     return (os.environ.get("DARIJAT_API_URL", "").strip() or DEFAULT_URL).rstrip("/"), \
         os.environ.get("DARIJAT_API_KEY", "").strip(), \
-        os.environ.get("DARIJAT_VOICE", "").strip() or "جسار"   # the channel voice, approved by the owner
+        os.environ.get("DARIJAT_VOICE", "").strip() or "فيصل"   # the channel voice, approved by the owner
 
 
 def _save_audio(resp: requests.Response, out: Path, headers: dict) -> None:
