@@ -81,6 +81,23 @@ def hashtags_for(topic_tags: list[str], trending: list[str], evergreen: list[str
 
 
 NEWS_EVERGREEN = ["اكتشاف", "علوم", "تقنية", "أخبار_العلم", "معلومات", "هل_تعلم"]
+# broad Arabic hashtags with big search volume, mixed with the subject's own ones
+NEWS_BROAD = ["معلومات", "هل_تعلم", "اكتشاف", "معلومة_تهمك", "ترند"]
+
+
+def news_hashtags(topic_tags: list[str], trending: list[str]) -> list[str]:
+    """YouTube shows the first three hashtags above the title, so they are: the subject's
+    field (علوم/تقنية...), a big general one, and the subject itself; then a niche trend
+    and one more broad tag. Five in total (more dilutes them)."""
+    topic = [t.replace(" ", "_").lstrip("#") for t in topic_tags if t.strip()]
+    field_tag = topic[0] if topic else "علوم"
+    specific = next((t for t in topic[3:] if "_" in t), topic[3] if len(topic) > 3 else "اكتشاف")
+    picked = [field_tag, NEWS_BROAD[0], specific] + trending[:1] + NEWS_BROAD[1:]
+    out: list[str] = []
+    for tag in picked:
+        if tag and tag.lower() not in {o.lower() for o in out}:
+            out.append(tag)
+    return out[:5]
 NEWS_SEARCH_TAGS = ["اكتشاف جديد", "أخبار العلم", "تقنية جديدة", "اختراع جديد", "فضاء",
                     "معلومات جديدة", "علوم", "دهشة"]
 
@@ -89,9 +106,13 @@ def build(title: str, hook: str, topic_tags: list[str], trending: list[str],
           kind: str = "mystery", source: str = "") -> tuple[str, str, list[str]]:
     """Returns (title, description, tags) ready for upload."""
     news = kind == "news"
-    tags_line = hashtags_for(list(topic_tags) if not news else ["", "", "", "", ""] + list(topic_tags),
-                             trending, NEWS_EVERGREEN if news else EVERGREEN)
-    final_title = f"{clean_title(title)} {'🤯' if news else '😳'} #shorts"[:100]
+    if news:
+        tags_line = news_hashtags(topic_tags, trending)
+        # one searchable topic hashtag in the title too (titles show it as a link)
+        final_title = f"{clean_title(title)} 🤯 #{tags_line[0]} #shorts"[:100]
+    else:
+        tags_line = hashtags_for(list(topic_tags), trending, EVERGREEN)
+        final_title = f"{clean_title(title)} 😳 #shorts"[:100]
     if news:
         description = (
             f"{hook}\n\n"
