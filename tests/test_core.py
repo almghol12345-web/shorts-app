@@ -448,3 +448,20 @@ def test_news_feed_parsing_and_seo():
                                   kind="news", source="https://example.com/b")
     assert "🤯" in title and "المصدر: https://example.com/b" in desc and "#تقنية" in desc
     assert "لغز" not in desc and "تقنية" in tags
+
+
+def test_daily_slot_plan():
+    import importlib.util
+    from datetime import datetime, timezone
+    spec = importlib.util.spec_from_file_location("slot", "scripts/slot.py")
+    slot = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(slot)
+    utc = lambda h, m=0: datetime(2026, 11, 3, h, m, tzinfo=timezone.utc)   # Riyadh = UTC+3
+    assert slot.decide([], set(), utc(7)) == (False, "news")          # 10am Riyadh: too early
+    assert slot.decide([], set(), utc(10)) == (True, "news")
+    one = [{"topic": "x", "date": "2026-11-03T10:00:00+00:00"}]
+    assert slot.decide(one, set(), utc(11))[0] is False                # under 3 hours apart
+    assert slot.decide(one, set(), utc(13)) == (True, "news")
+    assert slot.decide(one, set(), utc(19, 30)) == (True, "mystery")  # 10:30pm Riyadh
+    four = [{"topic": str(i), "date": f"2026-11-03T{9 + 3 * i:02d}:30:00+00:00"} for i in range(4)]
+    assert slot.decide(four, set(), utc(21, 30))[0] is False           # 4 already today

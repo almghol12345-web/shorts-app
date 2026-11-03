@@ -2,12 +2,10 @@ name: Daily Shorts
 
 on:
   schedule:
-    # Four a day for Gulf viewers (UTC+3): ~1pm, ~5pm, ~8:45pm and ~11:30pm Riyadh.
-    # (YouTube API quota allows about 6 uploads a day.)
-    - cron: "07 10 * * *"
-    - cron: "13 14 * * *"
-    - cron: "47 17 * * *"
-    - cron: "29 20 * * *"
+    # GitHub sometimes delays or drops scheduled runs, so the job wakes every hour from
+    # noon to 1am Riyadh (UTC+3) and scripts/slot.py keeps the plan: 4 Shorts a day,
+    # 3+ hours apart, the late-night one a mystery story.
+    - cron: "11 9-22 * * *"
   workflow_dispatch:
     inputs:
       count:
@@ -44,12 +42,23 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Decide (scheduled runs follow the daily plan)
+        id: gate
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "run=true" >> "$GITHUB_OUTPUT"; echo "kind=${{ inputs.kind }}" >> "$GITHUB_OUTPUT"
+          else
+            python3 scripts/slot.py | tee -a "$GITHUB_OUTPUT"
+          fi
+
       - uses: actions/setup-python@v5
+        if: steps.gate.outputs.run == 'true'
         with:
           python-version: "3.12"
           cache: pip
 
       - name: Install ffmpeg
+        if: steps.gate.outputs.run == 'true'
         timeout-minutes: 8
         run: |
           # Static build (has libass for Arabic captions); apt is the fallback.
@@ -66,12 +75,15 @@ jobs:
           fi
 
       - name: Install dependencies
+        if: steps.gate.outputs.run == 'true'
         run: pip install -r requirements.txt
 
       - name: Tests
+        if: steps.gate.outputs.run == 'true'
         run: python -m pytest -q
 
       - name: Make Shorts
+        if: steps.gate.outputs.run == 'true'
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
@@ -80,8 +92,7 @@ jobs:
           ELEVENLABS_API_KEY: ${{ secrets.ELEVENLABS_API_KEY }}
           DARIJAT_API_KEY: ${{ secrets.DARIJAT_API_KEY }}
           REPLICATE_API_TOKEN: ${{ secrets.REPLICATE_API_TOKEN }}
-          # three news Shorts a day, the late-night slot is a mystery story
-          SHORTS_KIND: ${{ github.event_name == 'workflow_dispatch' && inputs.kind || (github.event.schedule == '29 20 * * *' && 'mystery' || 'news') }}
+          SHORTS_KIND: ${{ steps.gate.outputs.kind }}
           REPLICATE_VIDEO_SHOTS: ${{ vars.REPLICATE_VIDEO_SHOTS }}
           DARIJAT_VOICE: ${{ inputs.darijat_voice || vars.DARIJAT_VOICE }}
           DARIJAT_API_URL: ${{ vars.DARIJAT_API_URL }}
@@ -100,7 +111,7 @@ jobs:
           python -m shorts --count "${{ inputs.count || '1' }}" $UPLOAD_FLAG
 
       - name: Keep the videos (7 days)
-        if: always()
+        if: steps.gate.outputs.run == 'true' && always()
         uses: actions/upload-artifact@v4
         with:
           name: shorts-${{ github.run_number }}
@@ -109,7 +120,7 @@ jobs:
           if-no-files-found: ignore
 
       - name: Publish preview frames (branch "previews")
-        if: always()
+        if: steps.gate.outputs.run == 'true' && always()
         run: |
           [ -f output/preview.jpg ] || exit 0
           mkdir -p /tmp/prev && cp output/preview.jpg /tmp/prev/latest.jpg
@@ -120,7 +131,7 @@ jobs:
           git push -qf "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" previews
 
       - name: Save published-topics history
-        if: always()
+        if: steps.gate.outputs.run == 'true' && always()
         run: |
           [ -f output/published.jsonl ] || exit 0
           git config user.name "shorts-bot"
