@@ -13,15 +13,17 @@ def _slug(text: str) -> str:
     return re.sub(r"[^a-z0-9]+", "-", text.lower()).strip("-")[:40] or "short"
 
 
-# A clear ending (the stories close on an open question) that also invites comments.
-OUTRO = "وأنت.. تصدق هالتفسير؟ اكتب لي رأيك في التعليقات"
+# The story already told the viewer what happened; this closing line invites comments
+# about a detail of the story, never about its outcome.
+OUTRO = "وأنت لو كنت مكانهم.. وش كنت بتسوي؟ اكتب لي في التعليقات"
 
 
 def add_outro(script: content.Script) -> None:
     n = len(script.lines)
-    if script.lines and script.lines[-1] == OUTRO:
+    closing = script.question.strip() or OUTRO
+    if script.lines and script.lines[-1] == closing:
         return
-    script.lines = script.lines + [OUTRO]
+    script.lines = script.lines + [closing]
     if len(script.scenes) == n:
         script.scenes = script.scenes + [script.scenes[-1]]
     if len(script.visuals) == n:

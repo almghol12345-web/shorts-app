@@ -20,6 +20,7 @@ class Script:
     search_terms: list[str] = field(default_factory=list)  # English, for stock footage
     visuals: list[str] = field(default_factory=list)       # one per line, see background.py
     scenes: list[str] = field(default_factory=list)        # one illustration prompt per line
+    question: str = ""          # closing comment prompt about a detail of the story (not its outcome)
 
     def visual_plan(self) -> list[str]:
         """One visual per line: an AI illustration of the scene when the script has
@@ -49,6 +50,7 @@ SCHEMA = {
         "search_terms": {"type": "array", "items": {"type": "string"}},
         "visuals": {"type": "array", "items": {"type": "string"}},
         "scenes": {"type": "array", "items": {"type": "string"}},
+        "question": {"type": "string", "description": "Closing comment prompt about a detail of the story, not its outcome"},
     },
     "required": ["topic", "title", "lines", "description", "tags", "search_terms", "visuals", "scenes"],
     "additionalProperties": False,
@@ -76,6 +78,9 @@ Write ONE new Short. Rules:
 - Ending: never leave the viewer hanging. The last 2-3 lines reveal what really
   happened, or the strongest explanation investigators reached (say so honestly when
   it is still unproven), starting like "وش اللي صار؟" or "والنهاية؟".
+- question: one Gulf-dialect line asking viewers about a detail inside the story (what
+  would you do in their place, which clue is strangest), never asking them to guess the
+  outcome, ending with "اكتب لي في التعليقات".
 - title: under 55 characters, mysterious, does not reveal the answer, ends with " #shorts".
 - description: the hook sentence, then "تابع القناة.. لغز حقيقي جديد كل يوم 🔍", then 3 hashtags.
 - tags: 8 short tags in the video language.

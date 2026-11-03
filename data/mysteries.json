@@ -2511,7 +2511,8 @@
    "a 1940s radio compass needle in a bomber cockpit pointing backwards",
    "a bomber flying south deep into the Sahara at night",
    "search team finding remains in the desert, one footprint trail vanishing"
-  ]
+  ],
+  "question": "لو كنت معهم في الصحراء.. تمشي ولا تنتظر جنب الطيارة؟ اكتب لي في التعليقات"
  },
  {
   "topic": "star dust stendec",
@@ -2587,7 +2588,8 @@
    "pilots descending into clouds believing they passed the mountains",
    "a plane crashing into a snowy mountain face in clouds",
    "the word STENDEC glowing over snowy peaks"
-  ]
+  ],
+  "question": "وأنت وش تتوقع معنى كلمة ستنديك؟ اكتب لي في التعليقات"
  },
  {
   "topic": "wabar craters",
@@ -2776,7 +2778,8 @@
    "an empty jungle trail with fallen leaves",
    "a 1960s truck on a foggy mountain road at night",
    "an open police file on a desk in Malaysia"
-  ]
+  ],
+  "question": "لو كنت من فريق البحث.. وين أول مكان بتدوّر فيه؟ اكتب لي في التعليقات"
  },
  {
   "topic": "franklin expedition",
@@ -2852,7 +2855,8 @@
    "a line of starving sailors walking south across frozen land",
    "abandoned sledges and boats on an arctic shore",
    "a sunken sailing ship resting upright on the seabed"
-  ]
+  ],
+  "question": "لو كنت معهم.. تترك السفينة وتمشي ولا تبقى فيها؟ اكتب لي في التعليقات"
  },
  {
   "topic": "ss waratah",
@@ -2980,7 +2984,8 @@
    "a man falling off the back of a catamaran into the sea",
    "a sailboat drifting away from men in the water",
    "a boat sailing away alone over the horizon"
-  ]
+  ],
+  "question": "لو صاحبك طاح في البحر.. تنط وراه ولا ترمي له شي من القارب؟ اكتب لي في التعليقات"
  },
  {
   "topic": "joyita",
@@ -3169,7 +3174,8 @@
    "an empty dug hole in a forest",
    "researchers comparing writing styles of two old documents",
    "a 19th century man selling pamphlets on a street"
-  ]
+  ],
+  "question": "لو لقيت ورقة فيها مكان كنز.. تصدقها وتروح تحفر؟ اكتب لي في التعليقات"
  },
  {
   "topic": "cicada 3301",
@@ -3502,7 +3508,8 @@
    "ancient people carving tunnels in soft volcanic rock",
    "villagers fleeing underground with lamps as an army approaches",
    "a sealed tunnel entrance forgotten under a house"
-  ]
+  ],
+  "question": "تقدر تعيش شهر كامل تحت الأرض؟ اكتب لي في التعليقات"
  },
  {
   "topic": "longyou caves",
@@ -3994,7 +4001,8 @@
    "a fire investigator closing a file",
    "a determined father and mother holding photos of their children",
    "an old couple beside a faded roadside billboard"
-  ]
+  ],
+  "question": "وش أغرب شي في القصة بالنسبة لك.. السلم ولا التلفون؟ اكتب لي في التعليقات"
  },
  {
   "topic": "bennington triangle",
@@ -4119,7 +4127,8 @@
    "an old doctor's office in Georgia in the 1970s",
    "question marks over a blurred photograph",
    "a blurry security camera image of a figure at night"
-  ]
+  ],
+  "question": "لو بتكتب وصية وحدة للبشرية.. وش بتكون؟ اكتب لي في التعليقات"
  },
  {
   "topic": "toynbee tiles",
@@ -4299,6 +4308,7 @@
    "1920s German police interrogating villagers",
    "a suspicious neighbor standing at the edge of a farm",
    "an empty farmhouse being demolished"
-  ]
+  ],
+  "question": "لو سمعت خطوات في علية بيتك بالليل.. وش أول شي بتسوي؟ اكتب لي في التعليقات"
  }
 ]
