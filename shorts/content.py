@@ -63,7 +63,7 @@ unexplained events, disappearances, undeciphered writings, strange places and ee
 Your only goal is retention: viewers must watch to the last second and replay.
 
 Niche: {niche}
-Language of the video: colloquial Saudi / Gulf Arabic (spoken dialect, like a friend telling a story: تخيل، والسالفة إن، طيب ليش...), not Modern Standard Arabic
+Language of the video: simple everyday Saudi Arabic that every Saudi understands (لهجة سعودية بيضاء: تخيل، والقصة إن، طيب ليش، يعني، بس، اللي...), like a friend telling a story. No Modern Standard Arabic and no heavy local words from one region (no ذا/ذي، مير، حيل، واجد، شلون، إيش، دحين)
 
 Write ONE new Short. Rules:
 - Only real, documented cases. State facts accurately (dates, places, numbers). If a case has
@@ -80,7 +80,7 @@ Write ONE new Short. Rules:
 - Ending: never leave the viewer hanging. The last 2-3 lines reveal what really
   happened, or the strongest explanation investigators reached (say so honestly when
   it is still unproven), starting like "وش اللي صار؟" or "والنهاية؟".
-- question: one Gulf-dialect line asking viewers about a detail inside the story (what
+- question: one line in simple Saudi dialect asking viewers about a detail inside the story (what
   would you do in their place, which clue is strangest), never asking them to guess the
   outcome, ending with "اكتب لي في التعليقات".
 - title: under 55 characters, mysterious, does not reveal the answer, ends with " #shorts".
@@ -161,7 +161,7 @@ NEWS_RULES = """- Line 1 (under 3 seconds): the most amazing fact, said so a vie
 - Ending: a clear takeaway (what happens next / when we will see it). Never end on a
   cliffhanger: the viewer must understand everything.
 - 10 to 14 lines, each 3 to 14 words, about 40-55 seconds. Numbers written as words.
-- question: one Gulf-dialect line asking viewers their opinion about a detail
+- question: one line in simple Saudi dialect asking viewers their opinion about a detail
   (would you use it, would you try it...), ending with "اكتب لي في التعليقات".
 - title: under 55 characters, exciting, ends with " #shorts".
 - description: the first line, then "تابع القناة.. كل يوم شي يبهرك من العالم 🌍",
@@ -173,8 +173,9 @@ NEWS_RULES = """- Line 1 (under 3 seconds): the most amazing fact, said so a vie
   a real photo of the subject likely exists, else a short English stock-video query.
 - scenes: exactly one English illustration prompt per line showing what that line says
   (objects, places, people, action). No text in images, no style words.
-- Language: colloquial Saudi / Gulf Arabic, like a friend excitedly telling you
-  (تخيل، يعني، والأقوى إن...), not Modern Standard Arabic.
+- Language: simple everyday Saudi Arabic every Saudi understands (لهجة سعودية بيضاء), like a
+  friend excitedly telling you (تخيل، يعني، والأقوى إن...). No Modern Standard Arabic and no
+  heavy local words from one region (no ذا/ذي، مير، حيل، واجد، شلون، إيش، دحين).
 """
 
 NEWS_PROMPT = """You write a YouTube Short for a Gulf-Arabic channel about AMAZING real things
