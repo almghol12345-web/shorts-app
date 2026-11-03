@@ -134,22 +134,51 @@ PICK_SCHEMA = {
     "additionalProperties": False,
 }
 
-PICK_PROMPT = """You run a Gulf-Arabic YouTube Shorts channel about NEW things happening in the
-world right now: space discoveries, science breakthroughs, new technology and inventions.
-From these fresh headlines pick the ONE that would make an ordinary Saudi viewer stop
-scrolling and say "really?!": surprising, easy to picture, about something new.
-Skip politics, war, crime, deaths, disasters, health scares, company earnings and
-anything already covered: {used}
+PICK_PROMPT = """You run a Gulf-Arabic YouTube Shorts channel of AMAZING real things from
+science, space, technology and inventions. What matters most is the WOW: it does not have to
+be from this week, it has to make an ordinary Saudi viewer stop scrolling and say "مستحيل!".
+From these headlines pick the ONE with the strongest wow: an incredible ability, a record,
+a crazy invention, something that sounds impossible but is real, easy to picture in one
+image. Skip routine studies, small improvements, politics, war, crime, deaths, disasters,
+health scares, company earnings and anything already covered: {used}
 
 {items}
 
-Answer with the index of the best headline."""
+Answer with the index of the best headline, or -1 if none of them is truly amazing."""
 
-NEWS_PROMPT = """You write a YouTube Short for a Gulf-Arabic channel about NEW things
-happening in the world (space, science, technology, inventions). This is NEWS, not a story.
+WOW_PROMPT = """Pick ONE real, mind-blowing development from science, space, technology or
+inventions of the last few years that most people in the Gulf have never heard of
+(an invention, a discovery, a record, an ability that sounds impossible but is real).
+Only well-documented facts you are sure about; no rumours, no unconfirmed claims.
+Do NOT reuse any of these previous topics: {used}
 
-Language: colloquial Saudi / Gulf Arabic, like a friend excitedly telling you news
-(تخيل، يعني، والأقوى إن...), not Modern Standard Arabic.
+Write the Short about it following these rules:
+"""
+
+NEWS_RULES = """- Line 1 (under 3 seconds): the most amazing fact, said so a viewer cannot scroll away.
+- Then: what exactly it is, who did it and where, how it works in simple words with an
+  everyday comparison, and why it matters for normal people.
+- Ending: a clear takeaway (what happens next / when we will see it). Never end on a
+  cliffhanger: the viewer must understand everything.
+- 10 to 14 lines, each 3 to 14 words, about 40-55 seconds. Numbers written as words.
+- question: one Gulf-dialect line asking viewers their opinion about a detail
+  (would you use it, would you try it...), ending with "اكتب لي في التعليقات".
+- title: under 55 characters, exciting, ends with " #shorts".
+- description: the first line, then "تابع القناة.. كل يوم شي يبهرك من العالم 🌍",
+  then 3 Arabic hashtags.
+- tags: 8 short Arabic tags about this subject (علوم, تقنية, فضاء, اكتشاف...).
+- topic: a short English id for this subject.
+- search_terms: 6 simple English stock-footage keywords for this subject.
+- visuals: exactly one per line: "wiki:<English Wikimedia Commons search>|<stock query>" when
+  a real photo of the subject likely exists, else a short English stock-video query.
+- scenes: exactly one English illustration prompt per line showing what that line says
+  (objects, places, people, action). No text in images, no style words.
+- Language: colloquial Saudi / Gulf Arabic, like a friend excitedly telling you
+  (تخيل، يعني، والأقوى إن...), not Modern Standard Arabic.
+"""
+
+NEWS_PROMPT = """You write a YouTube Short for a Gulf-Arabic channel about AMAZING real things
+from science, space, technology and inventions. This is information, not a story.
 
 Article ({date}): {title}
 Link: {link}
@@ -159,36 +188,32 @@ Text:
 Rules:
 - Use ONLY facts stated in the article. Never invent numbers, names or claims. If the
   article says "may" or "could", say it the same careful way.
-- Line 1 (under 3 seconds): the most surprising fact, said so a viewer cannot scroll away.
-- Then: what exactly happened, who did it and where, how it works in simple words with an
-  everyday comparison, and why it matters for normal people.
-- Ending: a clear takeaway (what happens next / when we will see it). Never end on a
-  cliffhanger: the viewer must understand everything.
-- 10 to 14 lines, each 3 to 14 words, about 40-55 seconds. Numbers written as words.
-- question: one Gulf-dialect line asking viewers their opinion about a detail of the news
-  (would you use it, would you try it...), ending with "اكتب لي في التعليقات".
-- title: under 55 characters, exciting, ends with " #shorts".
-- description: the first line, then "تابع القناة.. كل يوم شي جديد صاير في العالم 🌍",
-  then 3 Arabic hashtags.
-- tags: 8 short Arabic tags about this news (علوم, تقنية, فضاء, اكتشاف...).
-- topic: a short English id for this news item.
-- search_terms: 6 simple English stock-footage keywords for this subject.
-- visuals: exactly one per line: "wiki:<English Wikimedia Commons search>|<stock query>" when
-  a real photo of the subject likely exists, else a short English stock-video query.
-- scenes: exactly one English illustration prompt per line showing what that line says
-  (objects, places, people, action). No text in images, no style words.
 """
+
+
+NEWS_PROMPT += NEWS_RULES
+WOW_PROMPT += NEWS_RULES
+
+
+def generate_wow(cfg: Config, used: list[str]) -> Script:
+    """An amazing real development from Claude's own knowledge (no fresh article needed)."""
+    script = Script(**_ask_json(cfg, WOW_PROMPT.format(used=", ".join(used[-200:]) or "none"), SCHEMA))
+    script.kind = "news"
+    return script
 
 
 def generate_news(cfg: Config, used: list[str]) -> Script:
     from . import news
     items = news.headlines(used)
     if not items:
-        raise RuntimeError("no fresh headlines")
+        return generate_wow(cfg, used)
     listing = "\n".join(f"{i}. {it['title']} - {it['summary'][:220]}" for i, it in enumerate(items))
     pick = _ask_json(cfg, PICK_PROMPT.format(used=", ".join(used[-120:]) or "none", items=listing),
                      PICK_SCHEMA)
-    item = items[max(0, min(len(items) - 1, int(pick["index"])))]
+    if int(pick["index"]) < 0:
+        print("[news] nothing amazing in the feeds today; picking a mind-blowing development instead")
+        return generate_wow(cfg, used)
+    item = items[min(len(items) - 1, int(pick["index"]))]
     print(f"[news] picked: {item['title']} ({pick['why'][:120]})")
     body = news.article_text(item["link"]) or item["summary"]
     data = _ask_json(cfg, NEWS_PROMPT.format(

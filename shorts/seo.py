@@ -96,7 +96,7 @@ def build(title: str, hook: str, topic_tags: list[str], trending: list[str],
         description = (
             f"{hook}\n\n"
             "وش رأيك فيها؟ اكتب لي في التعليقات 👇\n"
-            "تابع القناة.. كل يوم شي جديد صاير في العالم 🌍\n\n"
+            "تابع القناة.. كل يوم شي يبهرك من العالم 🌍\n\n"
             + (f"المصدر: {source}\n\n" if source else "")
             + " ".join(f"#{t}" for t in tags_line) + " #shorts"
         )

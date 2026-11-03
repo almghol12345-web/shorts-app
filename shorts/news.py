@@ -24,7 +24,7 @@ FEEDS = [
     "https://www.newscientist.com/feed/home/",
 ]
 UA = {"User-Agent": "Mozilla/5.0 (shorts-bot; news headlines)"}
-MAX_AGE_DAYS = 4
+MAX_AGE_DAYS = 60   # amazing matters more than brand new
 
 
 def _text(el, *names) -> str:
@@ -68,7 +68,7 @@ def parse_feed(xml_text: str) -> list[dict]:
     return out
 
 
-def headlines(used: list[str], limit: int = 30) -> list[dict]:
+def headlines(used: list[str], limit: int = 60) -> list[dict]:
     """Recent headlines not covered before (`used` holds earlier topics / links)."""
     cutoff = datetime.now(timezone.utc) - timedelta(days=MAX_AGE_DAYS)
     seen = {u.lower() for u in used}
@@ -81,7 +81,7 @@ def headlines(used: list[str], limit: int = 30) -> list[dict]:
         except Exception as exc:  # one dead feed must not stop the others
             print(f"[news] feed failed {url.split('/')[2]}: {type(exc).__name__}")
             continue
-        for it in items[:15]:
+        for it in items[:40]:
             if it["date"] and it["date"] < cutoff:
                 continue
             key = it["title"].lower()[:60]
@@ -89,7 +89,8 @@ def headlines(used: list[str], limit: int = 30) -> list[dict]:
                 continue
             titles.add(key)
             picked.append(it)
-    picked.sort(key=lambda it: it["date"] or cutoff, reverse=True)
+    import random
+    random.shuffle(picked)          # mix outlets and dates; the pick step chooses on wow, not age
     print(f"[news] {len(picked)} fresh headlines")
     return picked[:limit]
 
