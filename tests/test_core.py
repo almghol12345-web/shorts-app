@@ -465,3 +465,21 @@ def test_daily_slot_plan():
     assert slot.decide(one, set(), utc(19, 30)) == (True, "mystery")  # 10:30pm Riyadh
     four = [{"topic": str(i), "date": f"2026-11-03T{9 + 3 * i:02d}:30:00+00:00"} for i in range(4)]
     assert slot.decide(four, set(), utc(21, 30))[0] is False           # 4 already today
+
+
+def test_learning_favours_strong_groups():
+    import random
+    from datetime import datetime, timedelta, timezone
+    from shorts import learn
+    from shorts.content import Script
+    sea = Script("sea1", "سفينة #shorts", ["سفينة في البحر"], "", tags=["بحر"])
+    sea2 = Script("sea2", "سفينة ثانية #shorts", ["البحر والسفن"], "", tags=["بحر"])
+    space = Script("sp1", "نجم #shorts", ["تلسكوب ونجوم"], "", tags=["فضاء"])
+    old = (datetime.now(timezone.utc) - timedelta(days=2)).isoformat().replace("+00:00", "Z")
+    stats = {"a": {"views": 3000, "published": old}, "b": {"views": 20, "published": old}}
+    history = [{"topic": "sea1", "video_id": "a"}, {"topic": "sp1", "video_id": "b"}]
+    scores = learn.group_scores(history, stats, {"sea1": sea, "sp1": space})
+    assert scores["story:sea"] > scores["story:space"]
+    random.seed(1)
+    picks = [learn.pick([sea2, space], scores).topic for _ in range(300)]
+    assert picks.count("sea2") > 2 * picks.count("sp1")

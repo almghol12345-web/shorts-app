@@ -375,7 +375,8 @@ def load_bank() -> list[Script]:
     return _load_json("mysteries.json") + _load_json("facts.json") + list(FALLBACK_BANK)
 
 
-def generate_offline(used: list[str]) -> Script:
+def generate_offline(used: list[str], scores: dict | None = None) -> Script:
+    from .learn import pick
     bank = load_bank()
     fresh = [s for s in bank if s.topic not in used]
     if not fresh:
@@ -384,15 +385,16 @@ def generate_offline(used: list[str]) -> Script:
     preferred = [s for s in fresh if s in _load_json("mysteries.json")]
     # full stories (45-60 s) hold viewers longer than short ones, so they go first
     full = [s for s in preferred if len(s.lines) >= 12]
-    return random.choice(full or preferred or fresh)
+    return pick(full or preferred or fresh, scores or {})
 
 
-def generate(cfg: Config, used: list[str]) -> Script:
+def generate(cfg: Config, used: list[str], scores: dict | None = None) -> Script:
+    from .learn import pick
     if cfg.kind == "news":
         # hand-written "wow" Shorts first (free), then live news when a Claude key is set
         fresh = [s for s in _load_json("wow.json") if s.topic not in used]
         if fresh:
-            return random.choice(fresh)
+            return pick(fresh, scores or {})
         if cfg.anthropic_key:
             try:
                 return generate_news(cfg, used)
@@ -401,7 +403,7 @@ def generate(cfg: Config, used: list[str]) -> Script:
         print("[news] no amazing-facts Shorts left; making a mystery Short")
     if cfg.anthropic_key and not _has_fresh_long(used):
         return generate_with_claude(cfg, used)
-    return generate_offline(used)
+    return generate_offline(used, scores)
 
 
 def _has_fresh_long(used: list[str]) -> bool:

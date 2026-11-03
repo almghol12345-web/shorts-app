@@ -40,9 +40,27 @@ def line_spans(narration: voice.Narration, n_lines: int) -> list[float]:
     return [b - a for a, b in zip(starts, starts[1:] + [total])]
 
 
+def _learn(cfg: Config) -> dict:
+    """Which kinds of Shorts got the most views so far (empty when offline)."""
+    if not cfg.can_upload:
+        return {}
+    from . import learn
+    try:
+        scripts = {s.topic: s for s in content.load_bank() + content._load_json("wow.json")}
+        scores = learn.group_scores(history.load(cfg.history_file), learn.fetch_views(cfg), scripts)
+        best = sorted(scores.items(), key=lambda kv: kv[1], reverse=True)[:4]
+        print("[learn] best groups: " + ", ".join(f"{g} ~{round(__import__('math').expm1(v))} views" for g, v in best))
+        learn.save_report(cfg.output_dir / "performance.json", scores)
+        return scores
+    except Exception as exc:  # learning is a bonus; never block a Short on it
+        print(f"[learn] skipped ({type(exc).__name__}: {str(exc)[:150]})")
+        return {}
+
+
 def make_one(cfg: Config, do_upload: bool, keep_work: bool = False) -> dict:
     used = history.used_topics(cfg.history_file)
-    script = content.generate(cfg, used)
+    scores = _learn(cfg)
+    script = content.generate(cfg, used, scores)
     add_outro(script)
     print(f"[script] {script.title}")
 
