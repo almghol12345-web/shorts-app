@@ -32,6 +32,7 @@ class Config:
     privacy: str = field(default_factory=lambda: _env("SHORTS_PRIVACY", "public"))
     anthropic_key: str = field(default_factory=lambda: _env("ANTHROPIC_API_KEY"))
     model: str = field(default_factory=lambda: _env("SHORTS_MODEL", "claude-opus-5-5"))
+    kind: str = field(default_factory=lambda: _env("SHORTS_KIND", "mystery"))  # mystery | news
     pexels_key: str = field(default_factory=lambda: _env("PEXELS_API_KEY"))
     pixabay_key: str = field(default_factory=lambda: _env("PIXABAY_API_KEY"))
     yt_client_id: str = field(default_factory=lambda: _env("YOUTUBE_CLIENT_ID"))

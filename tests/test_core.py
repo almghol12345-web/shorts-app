@@ -78,7 +78,7 @@ def test_claude_response_is_parsed(monkeypatch):
     monkeypatch.setattr(anthropic, "Anthropic", FakeClient)
     cfg = Config()
     cfg.anthropic_key = "k"
-    script = content.generate(cfg, [])
+    script = content.generate_with_claude(cfg, [])
     assert script.lines == ["a", "b"] and script.search_terms == ["sea"]
 
 
@@ -431,3 +431,20 @@ def test_replicate_scene_art_and_motion(tmp_path, monkeypatch):
         assert background.paid_scene("a desert", 2.0, out, src, 360, 640, 0, moving)
         assert out.stat().st_size > 0
     assert src.ai_images == 2
+
+
+def test_news_feed_parsing_and_seo():
+    from shorts import news, seo
+    rss = """<rss><channel><item><title>Telescope finds water &amp; ice</title>
+    <link>https://example.com/a</link><description>&lt;p&gt;Big find on a moon&lt;/p&gt;</description>
+    <pubDate>Mon, 02 Nov 2026 10:00:00 GMT</pubDate></item></channel></rss>"""
+    items = news.parse_feed(rss)
+    assert items[0]["title"] == "Telescope finds water & ice"
+    assert items[0]["summary"] == "Big find on a moon" and items[0]["date"].year == 2026
+    atom = """<feed xmlns="http://www.w3.org/2005/Atom"><entry><title>Robot</title>
+    <link href="https://example.com/b"/><updated>2026-11-02T10:00:00Z</updated></entry></feed>"""
+    assert news.parse_feed(atom)[0]["link"] == "https://example.com/b"
+    title, desc, tags = seo.build("روبوت جديد #shorts", "روبوت يطبخ!", ["تقنية", "روبوت"], [],
+                                  kind="news", source="https://example.com/b")
+    assert "🤯" in title and "المصدر: https://example.com/b" in desc and "#تقنية" in desc
+    assert "لغز" not in desc and "تقنية" in tags

@@ -26,6 +26,9 @@ on:
       privacy:
         description: "public / unlisted / private"
         default: "public"
+      kind:
+        description: "news (something new in the world) / mystery (story)"
+        default: "news"
 
 permissions:
   contents: write
@@ -77,6 +80,8 @@ jobs:
           ELEVENLABS_API_KEY: ${{ secrets.ELEVENLABS_API_KEY }}
           DARIJAT_API_KEY: ${{ secrets.DARIJAT_API_KEY }}
           REPLICATE_API_TOKEN: ${{ secrets.REPLICATE_API_TOKEN }}
+          # three news Shorts a day, the late-night slot is a mystery story
+          SHORTS_KIND: ${{ github.event_name == 'workflow_dispatch' && inputs.kind || (github.event.schedule == '29 20 * * *' && 'mystery' || 'news') }}
           REPLICATE_VIDEO_SHOTS: ${{ vars.REPLICATE_VIDEO_SHOTS }}
           DARIJAT_VOICE: ${{ inputs.darijat_voice || vars.DARIJAT_VOICE }}
           DARIJAT_API_URL: ${{ vars.DARIJAT_API_URL }}

@@ -12,7 +12,7 @@ video has more than 15, so we keep it to a handful.
 import re
 from collections import Counter
 
-NICHE_WORDS = ("لغز", "ألغاز", "الغاز", "غموض", "غامض", "غامضة", "قصص", "قصة", "قصه", "حقيقية",
+NICHE_WORDS = ("اكتشاف", "علوم", "علم", "تقنية", "اختراع", "ناسا", "لغز", "ألغاز", "الغاز", "غموض", "غامض", "غامضة", "قصص", "قصة", "قصه", "حقيقية",
                "حقيقي", "اختفاء", "اختفت", "اختفى", "جريمة", "جرائم", "رعب", "مرعب", "غريب", "غرائب",
                "تاريخ", "فضاء", "حقائق", "هل_تعلم", "معلومات", "وثائقي", "اسرار", "أسرار",
                "mystery", "mysteries", "unsolved", "truestory", "documentary", "facts")
@@ -68,10 +68,10 @@ def clean_title(title: str) -> str:
     return base
 
 
-def hashtags_for(topic_tags: list[str], trending: list[str]) -> list[str]:
+def hashtags_for(topic_tags: list[str], trending: list[str], evergreen: list[str] | None = None) -> list[str]:
     """Up to 5 unique hashtags: niche trends first, then the story's topic, then evergreen."""
     out: list[str] = []
-    for tag in trending + [t.replace(" ", "_") for t in topic_tags[5:]] + EVERGREEN:
+    for tag in trending + [t.replace(" ", "_") for t in topic_tags[5:]] + (evergreen or EVERGREEN):
         tag = tag.lstrip("#")
         if tag and tag.lower() not in {o.lower() for o in out}:
             out.append(tag)
@@ -80,18 +80,36 @@ def hashtags_for(topic_tags: list[str], trending: list[str]) -> list[str]:
     return out
 
 
-def build(title: str, hook: str, topic_tags: list[str], trending: list[str]) -> tuple[str, str, list[str]]:
+NEWS_EVERGREEN = ["اكتشاف", "علوم", "تقنية", "أخبار_العلم", "معلومات", "هل_تعلم"]
+NEWS_SEARCH_TAGS = ["اكتشاف جديد", "أخبار العلم", "تقنية جديدة", "اختراع جديد", "فضاء",
+                    "معلومات جديدة", "علوم", "دهشة"]
+
+
+def build(title: str, hook: str, topic_tags: list[str], trending: list[str],
+          kind: str = "mystery", source: str = "") -> tuple[str, str, list[str]]:
     """Returns (title, description, tags) ready for upload."""
-    tags_line = hashtags_for(topic_tags, trending)
-    final_title = f"{clean_title(title)} 😳 #shorts"[:100]
-    description = (
-        f"{hook}\n\n"
-        "وش تتوقع صار؟ اكتب رأيك في التعليقات 👇\n"
-        "تابع القناة.. لغز حقيقي جديد كل يوم 🔍\n\n"
-        + " ".join(f"#{t}" for t in tags_line) + " #shorts"
-    )
+    news = kind == "news"
+    tags_line = hashtags_for(list(topic_tags) if not news else ["", "", "", "", ""] + list(topic_tags),
+                             trending, NEWS_EVERGREEN if news else EVERGREEN)
+    final_title = f"{clean_title(title)} {'🤯' if news else '😳'} #shorts"[:100]
+    if news:
+        description = (
+            f"{hook}\n\n"
+            "وش رأيك فيها؟ اكتب لي في التعليقات 👇\n"
+            "تابع القناة.. كل يوم شي جديد صاير في العالم 🌍\n\n"
+            + (f"المصدر: {source}\n\n" if source else "")
+            + " ".join(f"#{t}" for t in tags_line) + " #shorts"
+        )
+    else:
+        description = (
+            f"{hook}\n\n"
+            "وش رأيك أنت؟ اكتب لي في التعليقات 👇\n"
+            "تابع القناة.. لغز حقيقي جديد كل يوم 🔍\n\n"
+            + " ".join(f"#{t}" for t in tags_line) + " #shorts"
+        )
     tags, seen, total = [], set(), 0
-    for t in [x.replace("_", " ") for x in topic_tags] + SEARCH_TAGS + [x.replace("_", " ") for x in trending]:
+    for t in [x.replace("_", " ") for x in topic_tags if x] + (NEWS_SEARCH_TAGS if news else SEARCH_TAGS) \
+            + [x.replace("_", " ") for x in trending]:
         if t.lower() in seen or total + len(t) > 450:    # YouTube caps tags at 500 characters
             continue
         seen.add(t.lower())

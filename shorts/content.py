@@ -21,6 +21,8 @@ class Script:
     visuals: list[str] = field(default_factory=list)       # one per line, see background.py
     scenes: list[str] = field(default_factory=list)        # one illustration prompt per line
     question: str = ""          # closing comment prompt about a detail of the story (not its outcome)
+    source: str = ""            # news Shorts: link to the article the facts come from
+    kind: str = "mystery"       # "mystery" story or "news" (something new in the world)
 
     def visual_plan(self) -> list[str]:
         """One visual per line: an AI illustration of the scene when the script has
@@ -52,7 +54,7 @@ SCHEMA = {
         "scenes": {"type": "array", "items": {"type": "string"}},
         "question": {"type": "string", "description": "Closing comment prompt about a detail of the story, not its outcome"},
     },
-    "required": ["topic", "title", "lines", "description", "tags", "search_terms", "visuals", "scenes"],
+    "required": ["topic", "title", "lines", "description", "tags", "search_terms", "visuals", "scenes", "question"],
     "additionalProperties": False,
 }
 
@@ -97,16 +99,15 @@ Write ONE new Short. Rules:
 """
 
 
-def generate_with_claude(cfg: Config, used: list[str]) -> Script:
+def _ask_json(cfg: Config, prompt: str, schema: dict) -> dict:
     import anthropic
 
     client = anthropic.Anthropic(api_key=cfg.anthropic_key)
     request = dict(
         model=cfg.model,
         max_tokens=4000,
-        output_config={"effort": "medium", "format": {"type": "json_schema", "schema": SCHEMA}},
-        messages=[{"role": "user", "content": PROMPT.format(
-            niche=cfg.niche, language=cfg.language, used=", ".join(used[-200:]) or "none")}],
+        output_config={"effort": "medium", "format": {"type": "json_schema", "schema": schema}},
+        messages=[{"role": "user", "content": prompt}],
     )
     try:
         # Server-side fallback: if the model declines, another model finishes the request.
@@ -118,7 +119,85 @@ def generate_with_claude(cfg: Config, used: list[str]) -> Script:
     if response.stop_reason == "refusal":
         raise RuntimeError("Claude declined to write this script")
     text = next(b.text for b in response.content if b.type == "text")
-    return Script(**json.loads(text))
+    return json.loads(text)
+
+
+def generate_with_claude(cfg: Config, used: list[str]) -> Script:
+    return Script(**_ask_json(cfg, PROMPT.format(
+        niche=cfg.niche, language=cfg.language, used=", ".join(used[-200:]) or "none"), SCHEMA))
+
+
+PICK_SCHEMA = {
+    "type": "object",
+    "properties": {"index": {"type": "integer"}, "why": {"type": "string"}},
+    "required": ["index", "why"],
+    "additionalProperties": False,
+}
+
+PICK_PROMPT = """You run a Gulf-Arabic YouTube Shorts channel about NEW things happening in the
+world right now: space discoveries, science breakthroughs, new technology and inventions.
+From these fresh headlines pick the ONE that would make an ordinary Saudi viewer stop
+scrolling and say "really?!": surprising, easy to picture, about something new.
+Skip politics, war, crime, deaths, disasters, health scares, company earnings and
+anything already covered: {used}
+
+{items}
+
+Answer with the index of the best headline."""
+
+NEWS_PROMPT = """You write a YouTube Short for a Gulf-Arabic channel about NEW things
+happening in the world (space, science, technology, inventions). This is NEWS, not a story.
+
+Language: colloquial Saudi / Gulf Arabic, like a friend excitedly telling you news
+(تخيل، يعني، والأقوى إن...), not Modern Standard Arabic.
+
+Article ({date}): {title}
+Link: {link}
+Text:
+{body}
+
+Rules:
+- Use ONLY facts stated in the article. Never invent numbers, names or claims. If the
+  article says "may" or "could", say it the same careful way.
+- Line 1 (under 3 seconds): the most surprising fact, said so a viewer cannot scroll away.
+- Then: what exactly happened, who did it and where, how it works in simple words with an
+  everyday comparison, and why it matters for normal people.
+- Ending: a clear takeaway (what happens next / when we will see it). Never end on a
+  cliffhanger: the viewer must understand everything.
+- 10 to 14 lines, each 3 to 14 words, about 40-55 seconds. Numbers written as words.
+- question: one Gulf-dialect line asking viewers their opinion about a detail of the news
+  (would you use it, would you try it...), ending with "اكتب لي في التعليقات".
+- title: under 55 characters, exciting, ends with " #shorts".
+- description: the first line, then "تابع القناة.. كل يوم شي جديد صاير في العالم 🌍",
+  then 3 Arabic hashtags.
+- tags: 8 short Arabic tags about this news (علوم, تقنية, فضاء, اكتشاف...).
+- topic: a short English id for this news item.
+- search_terms: 6 simple English stock-footage keywords for this subject.
+- visuals: exactly one per line: "wiki:<English Wikimedia Commons search>|<stock query>" when
+  a real photo of the subject likely exists, else a short English stock-video query.
+- scenes: exactly one English illustration prompt per line showing what that line says
+  (objects, places, people, action). No text in images, no style words.
+"""
+
+
+def generate_news(cfg: Config, used: list[str]) -> Script:
+    from . import news
+    items = news.headlines(used)
+    if not items:
+        raise RuntimeError("no fresh headlines")
+    listing = "\n".join(f"{i}. {it['title']} - {it['summary'][:220]}" for i, it in enumerate(items))
+    pick = _ask_json(cfg, PICK_PROMPT.format(used=", ".join(used[-120:]) or "none", items=listing),
+                     PICK_SCHEMA)
+    item = items[max(0, min(len(items) - 1, int(pick["index"])))]
+    print(f"[news] picked: {item['title']} ({pick['why'][:120]})")
+    body = news.article_text(item["link"]) or item["summary"]
+    data = _ask_json(cfg, NEWS_PROMPT.format(
+        date=item["date"].date().isoformat() if item["date"] else "this week",
+        title=item["title"], link=item["link"], body=body), SCHEMA)
+    script = Script(**data)
+    script.kind, script.source = "news", item["link"]
+    script.description += f"\n\nالمصدر: {item['link']}"
+    return script
 
 
 FALLBACK_BANK = [
@@ -283,6 +362,15 @@ def generate_offline(used: list[str]) -> Script:
 
 
 def generate(cfg: Config, used: list[str]) -> Script:
-    if cfg.anthropic_key:
+    if cfg.kind == "news" and cfg.anthropic_key:
+        try:
+            return generate_news(cfg, used)
+        except Exception as exc:  # no fresh news today: a mystery story still goes out
+            print(f"[news] failed ({type(exc).__name__}: {str(exc)[:200]}); making a mystery Short")
+    if cfg.anthropic_key and not _has_fresh_long(used):
         return generate_with_claude(cfg, used)
     return generate_offline(used)
+
+
+def _has_fresh_long(used: list[str]) -> bool:
+    return any(len(s.lines) >= 12 and s.topic not in used for s in _load_json("mysteries.json"))
