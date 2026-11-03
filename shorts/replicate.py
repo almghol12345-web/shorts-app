@@ -57,8 +57,17 @@ def _save(link: str, out: Path) -> None:
 def image(prompt: str, out: Path) -> str:
     """Saves a 9:16 illustration to `out` and returns its URL (reused for motion)."""
     model = os.environ.get("REPLICATE_IMAGE_MODEL", "").strip() or IMAGE_MODEL
-    link = _run(model, {"prompt": prompt, "aspect_ratio": "9:16", "output_format": "jpg",
-                        "num_outputs": 1, "output_quality": 92}, timeout=120)
+    inputs = {"prompt": prompt, "aspect_ratio": "9:16", "output_format": "jpg",
+              "num_outputs": 1, "output_quality": 92}
+    try:
+        link = _run(model, inputs, timeout=120)
+    except RuntimeError as exc:
+        # the safety filter sometimes flags harmless scenes (a person in a wheelchair,
+        # children at home); one retry with a calmer wording usually passes
+        if "NSFW" not in str(exc):
+            raise
+        inputs["prompt"] = f"safe family friendly scene, fully clothed people, {prompt}"
+        link = _run(model, inputs, timeout=120)
     _save(link, out)
     return link
 
@@ -66,8 +75,13 @@ def image(prompt: str, out: Path) -> str:
 def animate(image_url: str, prompt: str, out: Path) -> None:
     """Saves a short clip that brings the illustration to life."""
     model = os.environ.get("REPLICATE_VIDEO_MODEL", "").strip() or VIDEO_MODEL
-    link = _run(model, {"image": image_url, "prompt": f"{prompt}, subtle natural motion, cinematic camera move",
-                        "resolution": "480p"}, timeout=420)
+    inputs = {"image": image_url, "prompt": f"{prompt}, subtle natural motion, cinematic camera move",
+              "resolution": "480p"}
+    try:
+        link = _run(model, inputs, timeout=420)
+    except (RuntimeError, TimeoutError):
+        time.sleep(5)                       # brief hiccups ("model not found") pass on retry
+        link = _run(model, inputs, timeout=420)
     _save(link, out)
 
 
