@@ -387,11 +387,17 @@ def generate_offline(used: list[str]) -> Script:
 
 
 def generate(cfg: Config, used: list[str]) -> Script:
-    if cfg.kind == "news" and cfg.anthropic_key:
-        try:
-            return generate_news(cfg, used)
-        except Exception as exc:  # no fresh news today: a mystery story still goes out
-            print(f"[news] failed ({type(exc).__name__}: {str(exc)[:200]}); making a mystery Short")
+    if cfg.kind == "news":
+        # hand-written "wow" Shorts first (free), then live news when a Claude key is set
+        fresh = [s for s in _load_json("wow.json") if s.topic not in used]
+        if fresh:
+            return random.choice(fresh)
+        if cfg.anthropic_key:
+            try:
+                return generate_news(cfg, used)
+            except Exception as exc:  # a mystery story still goes out
+                print(f"[news] failed ({type(exc).__name__}: {str(exc)[:200]}); making a mystery Short")
+        print("[news] no amazing-facts Shorts left; making a mystery Short")
     if cfg.anthropic_key and not _has_fresh_long(used):
         return generate_with_claude(cfg, used)
     return generate_offline(used)
