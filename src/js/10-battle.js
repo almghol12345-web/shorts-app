@@ -2,7 +2,7 @@
 let B = null;
 const stageEl = () => $('#b-stage');
 function startBattle(cfg) {
-  const list = S.squad.map((id, i) => id ? { id, slot: i } : null).filter(Boolean);
+  const list = S.squad.map((id, i) => id && HB[id] ? { id, slot: i } : null).filter(Boolean);
   if (!list.length) { toast(t('need_squad'), 1); return; }
   const tb = troopBonus();
   B = {
@@ -93,7 +93,7 @@ function cast(h) {
 /* each hero's own touch on a normal attack */
 function heroTrait(h, tg, d) {
   const vz = visibleZ(), others = vz.filter(z => z !== tg && z.alive), byDist = (o, p) => o.slice().sort((a, b) => Math.hypot(a.x - p.x, a.y - p.y) - Math.hypot(b.x - p.x, b.y - p.y));
-  switch (h.id) {
+  switch (h.H.tpl || h.id) {
     case 'redking': { const z = byDist(others, tg)[0]; if (z && Math.hypot(z.x - tg.x, z.y - tg.y) < 80) { dmgZ(z, d * .5); B.fx.push({ k: 'tr', x: tg.x, y: tg.y, tx: z.x, ty: z.y, t: 0, life: .12, w: 2, col: '#ff6a3a', hid: 'redking', tz: z, sub: 1 }); } break; }
     case 'destroyer': { let from = tg; for (const z of byDist(others, tg).slice(0, 2)) { dmgZ(z, d * .35); B.fx.push({ k: 'arc', x: from.x, y: from.y, tx: z.x, ty: z.y, t: 0, life: .25, fz: from, tz: z }); from = z; } break; }
     case 'fire': { for (const z of others) if (Math.hypot(z.x - tg.x, z.y - tg.y) < 48 + z.T.r) dmgZ(z, d * .4); B.fx.push({ k: 'boom', x: tg.x, y: tg.y, r: 48, t: .05, life: .4, small: 1 }); break; }

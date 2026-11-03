@@ -157,6 +157,37 @@ create policy "news read" on public.news for select using (true);
 drop policy if exists "news admin write" on public.news;
 create policy "news admin write" on public.news for all using (public.is_admin()) with check (public.is_admin());
 
+-- ---------- heroes added by the admin after release (no app update needed) ----------
+create table if not exists public.heroes_extra (
+  id text primary key check (id ~ '^[a-z][a-z0-9_]{1,23}$'),
+  data jsonb not null default '{}'::jsonb,   -- names, rarity, class, skill, look template, color
+  portrait text,                             -- public picture link
+  model text,                                -- optional 3D model link (.glb)
+  banner_until timestamptz,                  -- limited summon banner with a higher chance for this hero
+  active boolean not null default true,
+  created_at timestamptz not null default now()
+);
+alter table public.heroes_extra enable row level security;
+drop policy if exists "heroes read" on public.heroes_extra;
+create policy "heroes read" on public.heroes_extra for select using (active or public.is_admin());
+drop policy if exists "heroes admin write" on public.heroes_extra;
+create policy "heroes admin write" on public.heroes_extra for all using (public.is_admin()) with check (public.is_admin());
+
+-- public file storage for hero pictures and models (only where Supabase Storage exists)
+do $$ begin
+  if exists (select 1 from pg_namespace where nspname = 'storage') then
+    insert into storage.buckets (id, name, public) values ('heroes', 'heroes', true) on conflict (id) do nothing;
+    execute 'drop policy if exists "heroes files read" on storage.objects';
+    execute 'create policy "heroes files read" on storage.objects for select using (bucket_id = ''heroes'')';
+    execute 'drop policy if exists "heroes files admin insert" on storage.objects';
+    execute 'create policy "heroes files admin insert" on storage.objects for insert with check (bucket_id = ''heroes'' and public.is_admin())';
+    execute 'drop policy if exists "heroes files admin update" on storage.objects';
+    execute 'create policy "heroes files admin update" on storage.objects for update using (bucket_id = ''heroes'' and public.is_admin())';
+    execute 'drop policy if exists "heroes files admin delete" on storage.objects';
+    execute 'create policy "heroes files admin delete" on storage.objects for delete using (bucket_id = ''heroes'' and public.is_admin())';
+  end if;
+end $$;
+
 -- ---------- remote config ----------
 create table if not exists public.config (
   key text primary key,
@@ -233,10 +264,10 @@ end $$;
 -- ---------- permissions for the API roles ----------
 grant usage on schema public to anon, authenticated;
 grant select, insert, update on public.players to authenticated;
-grant select, insert, update, delete on public.grants, public.events, public.news, public.config to authenticated;
+grant select, insert, update, delete on public.grants, public.events, public.news, public.config, public.heroes_extra to authenticated;
 grant select on public.grant_claims, public.admins to authenticated;
 grant select, insert on public.purchases to authenticated;
-grant select on public.events, public.news, public.config to anon;
+grant select on public.events, public.news, public.config, public.heroes_extra to anon;
 grant execute on function public.is_admin(), public.claim_grants(), public.leaderboard(), public.admin_stats(), public.delete_my_account() to authenticated;
 grant execute on function public.leaderboard() to anon;
 

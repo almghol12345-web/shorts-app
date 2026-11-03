@@ -34,7 +34,7 @@ function renderModal(fresh) {
   if (!modalFn) { m.hidden = true; m.innerHTML = ''; m.classList.remove('full'); return; }
   const prev = m.querySelector('.sh-b'), sc = prev && !fresh ? prev.scrollTop : 0;
   const focusId = document.activeElement && document.activeElement.id, vals = {};
-  m.querySelectorAll('input[id],textarea[id],select[id]').forEach(e => { if (e.type !== 'range') vals[e.id] = e.value; });
+  m.querySelectorAll('input[id],textarea[id],select[id]').forEach(e => { if (e.type !== 'range' && e.type !== 'file') vals[e.id] = e.value; });
   m.classList.toggle('full', modalFull);
   m.innerHTML = `<div class="sheet" role="dialog" aria-modal="true">${modalFn()}</div>`; m.hidden = false;
   if (!fresh) for (const id in vals) { const e = document.getElementById(id); if (e && e.dataset.keep !== '0') e.value = vals[id]; }
@@ -132,14 +132,14 @@ function tileHTML(p) {
 }
 VIEWS.heroes = () => {
   const own = ownedHeroes().sort((a, b) => heroPower(b) - heroPower(a));
-  const lockd = HEROES.filter(h => !S.heroes[h.id]).sort((a, b) => b.r - a.r);
+  const lockd = hxPool().filter(h => !S.heroes[h.id]).sort((a, b) => b.r - a.r);
   const slot = i => { const id = S.squad[i]; return `<button class="slot" data-a="slot" data-x="${i}">${id ? avHTML(id) : '<span class="empty">+</span>'}<span>${id ? esc(hname(id)) : t('empty')}</span></button>`; };
   return `<div class="pad">
   <div class="row between"><div><h2>${t('squad')}</h2><div class="muted">${t('squad_power')} <b class="num" style="color:var(--amber)">${fmt(teamPower())}</b> · ${t('troop_bonus')} +${Math.round(troopBonus() * 100)}%</div></div>
   <button class="btn pri" data-a="openRecruit">🎟️ ${t('recruit')}${S.inv.ticket ? ` (${S.inv.ticket})` : ''}</button></div>
   <div class="formation"><div class="flabel">${t('front_row')}</div><div class="frow">${slot(0)}${slot(1)}</div><div class="flabel">${t('back_row')}</div><div class="frow">${slot(2)}${slot(3)}${slot(4)}</div>
   <button class="btn sm" data-a="autoSquad" style="justify-self:center">✨ ${t('auto_squad')}</button></div>
-  <div class="row between"><h3>${t('your_heroes')} ${own.length}/${HEROES.length}</h3><span class="cc">✨ ${fmt(S.res.exp)}</span></div>
+  <div class="row between"><h3>${t('your_heroes')} ${own.length}/${hxPool().length}</h3><span class="cc">✨ ${fmt(S.res.exp)}</span></div>
   <div class="roster">${own.map(id => { const Hh = HB[id], h = S.heroes[id]; const dot = (h.st < 5 && h.sh >= starNeed(h.st)) || (h.lv < heroCap(lvOf('tavern')) && S.res.exp >= lvCost(h.lv)); return `<button class="hc r${Hh.r}" data-a="hero" data-x="${id}">${S.squad.includes(id) ? `<span class="in">${t('in_squad')}</span>` : ''}${dot ? '<span class="dot"></span>' : ''}${cardHTML(id, `<span class="plv num">Lv ${h.lv}</span>`)}<b>${esc(hname(id))}</b><small class="role">${esc(L(Hh.role))}</small>${starsHTML(h.st)}<small>💪 ${fmt(heroPower(id))}</small></button>`; }).join('')}
   ${lockd.map(Hh => `<div class="hc lockd">${cardHTML(Hh.id, '<span class="plock">🔒</span>')}<b>${esc(L(Hh.n))}</b><small style="color:${RAR[Hh.r].c}">${L(RAR[Hh.r].n)}</small></div>`).join('')}</div>
   </div>`;
@@ -281,7 +281,7 @@ function mHero(id) {
   <p class="muted">${L(Hh.q)}</p>
   <div class="grid4"><div class="stat"><small>${t('atk')}</small><b class="num">${fmt(x.atk)}</b></div><div class="stat"><small>${t('hp')}</small><b class="num">${fmt(x.hp)}</b></div><div class="stat"><small>${t('def')}</small><b class="num">${fmt(x.def)}</b></div><div class="stat"><small>${t('power')}</small><b class="num" style="color:var(--amber)">${fmt(heroPower(id))}</b></div></div>
   <div class="li"><span class="lic">⚡</span><div class="lit"><b>${L(Hh.skn)}</b><small>${skillText(Hh.sk, RM[Hh.r])}</small></div></div>
-  <div class="li"><span class="lic">🎯</span><div class="lit"><b>${t('trait')}</b><small>${t('tr_' + id)}</small></div></div>
+  <div class="li"><span class="lic">🎯</span><div class="lit"><b>${t('trait')}</b><small>${t('tr_' + (Hh.tpl || id))}</small></div></div>
   <div class="panel"><div class="row between"><b>${t('level_of', h.lv, cap)}</b><span class="cc ${S.res.exp >= lc ? '' : 'lack'}">✨ ${fmt(lc)}</span></div>
   <div class="grid2"><button class="btn pri" data-a="hlv" data-x="${id}|1" ${h.lv < cap && S.res.exp >= lc ? '' : 'disabled'}>⬆️ +1</button><button class="btn" data-a="hlv" data-x="${id}|10" ${h.lv < cap && S.res.exp >= lc ? '' : 'disabled'}>⏫ +10</button></div>
   ${h.lv >= cap ? `<small class="muted">${t('raise_cap')}</small>` : ''}</div>
@@ -302,7 +302,8 @@ function mSlotPick(id) {
 }
 function mRecruit() {
   const tk = S.inv.ticket;
-  const body = `<div class="grid3">${[1, 2, 3].map(r => `<div class="stat"><small style="color:${RAR[r].c}">${L(RAR[r].n)}</small><b>${[0, 70, 25, 5][r]}%</b></div>`).join('')}</div>
+  const bn = hxBanner();
+  const body = `${bn ? `<div class="hxban r${bn.r}"><img src="${portraitURI(bn.id)}" alt=""><div><small>🌟 ${t('hx_banner')}</small><b>${esc(L(bn.n))}</b><small style="color:${RAR[bn.r].c}">${L(RAR[bn.r].n)} · ${esc(L(bn.role))}</small><small>⏳ ${t('hx_until', fmtT((bn.banner - now()) / 1000))} · ${t('hx_rate')}</small></div></div>` : ''}<div class="grid3">${[1, 2, 3].map(r => `<div class="stat"><small style="color:${RAR[r].c}">${L(RAR[r].n)}</small><b>${[0, 70, 25, 5][r]}%</b></div>`).join('')}</div>
   <div class="li"><span class="lic">🌟</span><div class="lit"><b>${t('pity', 40 - S.pity)}</b><small>${t('dupes_note')}</small></div></div>
   <div class="grid2"><button class="btn pri" data-a="recruit" data-x="1">×1 ${tk ? '🎟️ 1' : '💎 150'}</button><button class="btn gold" data-a="recruit" data-x="10">×10 ${tk >= 10 ? '🎟️ 10' : '💎 ' + (tk ? (10 - Math.min(tk, 10)) * 150 : 1350)}</button></div>
   ${lastPull.length ? `<h3>${t('result')}</h3><div class="pull">${lastPull.map((p, i) => `<div class="hc r${HB[p.id].r}" style="animation-delay:${i * .08}s">${p.isNew ? `<span class="new">${t('new')}</span>` : ''}${cardHTML(p.id)}<b style="font-size:12px">${esc(hname(p.id))}</b><small style="color:${RAR[HB[p.id].r].c}">${p.isNew ? L(RAR[HB[p.id].r].n) : '+10 🧩'}</small></div>`).join('')}</div>` : ''}`;

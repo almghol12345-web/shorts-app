@@ -26,6 +26,7 @@ async function admLoad(kind, force) {
     if (kind === 'news') ADM.data.news = await adm('/rest/v1/news?select=*&order=created_at.desc&limit=60');
     if (kind === 'config') { const rows = await adm('/rest/v1/config?select=key,value'); const c = {}; (rows || []).forEach(r => c[r.key] = r.value); ADM.data.config = c; }
     if (kind === 'buys') ADM.data.buys = await adm('/rest/v1/purchases?select=*,players(short_id,name)&order=created_at.desc&limit=80');
+    if (kind === 'heroes') ADM.data.heroes = await adm('/rest/v1/heroes_extra?select=*&order=created_at.desc');
     if (kind === 'gifts') ADM.data.gifts = await adm('/rest/v1/grants?select=*,players(short_id,name)&order=created_at.desc&limit=60');
   });
 }
@@ -33,7 +34,7 @@ function mAdmin() {
   if (!netConfigured()) return sheet('🛡️', t('admin'), '', `<div class="li"><span class="lic">⚙️</span><div class="lit"><b>${t('adm_no_server')}</b><small>${t('adm_no_server_b')}</small></div></div>`);
   const logged = NET.adm || loadSess(ADM_KEY);
   if (!logged) return sheet('🛡️', t('admin'), t('adm_login_sub'), `<form id="admLoginF" style="display:grid;gap:10px"><label class="lbl">${t('email')}<input class="field ltr" id="admEmail" type="email" autocomplete="username" required></label><label class="lbl">${t('password')}<input class="field ltr" id="admPass" type="password" autocomplete="current-password" required></label><button class="btn pri" type="submit" ${ADM.busy ? 'disabled' : ''}>${ADM.busy ? t('loading') : t('login')}</button></form>${ADM.err ? `<p class="bad sm">${esc(ADM.err)}</p>` : ''}`);
-  const tabs = ['dash', 'players', 'gifts', 'events', 'news', 'config', 'buys'];
+  const tabs = ['dash', 'players', 'gifts', 'events', 'news', 'heroes', 'config', 'buys'];
   let body = `<div class="subtabs">${tabs.map(k => `<button class="${ADM.tab === k ? 'on' : ''}" data-a="admTab" data-x="${k}">${t('adm_' + k)}</button>`).join('')}</div>${ADM.busy ? `<p class="muted sm">${t('loading')}</p>` : ''}`;
   const d = ADM.data;
   if (ADM.tab === 'dash') {
@@ -79,6 +80,24 @@ function mAdmin() {
     <button class="btn gold" data-a="admNewsAdd">📰 ${t('publish')}</button></div>
     ${(d.news || []).map(n => `<div class="adm-row"><span>📰</span><span><b>${esc(L(n.title))}</b><br><small class="muted">${dt(n.created_at)}</small></span><button class="btn sm danger" data-a="admNewsDel" data-x="${n.id}">🗑</button></div>`).join('')}`;
   }
+  if (ADM.tab === 'heroes') {
+    const opt = (list, cur) => list.map(([v, l]) => `<option value="${v}" ${v == cur ? 'selected' : ''}>${l}</option>`).join('');
+    body += `<div class="panel"><h3>🌟 ${t('hx_add')}</h3><p class="muted sm">${t('hx_add_b')}</p>
+    <label class="lbl">${t('hx_id')}<input class="field ltr" id="hx_id" maxlength="24" placeholder="storm" autocapitalize="off"></label>
+    <div class="grid2"><label class="lbl">${t('title_ar')}<input class="field" id="hx_nar" maxlength="20"></label><label class="lbl">${t('title_en')}<input class="field ltr" id="hx_nen" maxlength="20"></label></div>
+    <div class="grid2"><label class="lbl">${t('hx_role')} (ع)<input class="field" id="hx_rar" maxlength="16"></label><label class="lbl">${t('hx_role')} (En)<input class="field ltr" id="hx_ren" maxlength="16"></label></div>
+    <div class="grid3"><label class="lbl">${t('hx_rarity')}<select class="field" id="hx_r">${opt([[3, L(RAR[3].n)], [2, L(RAR[2].n)], [1, L(RAR[1].n)]], 3)}</select></label>
+    <label class="lbl">${t('hx_class')}<select class="field" id="hx_c">${opt(Object.keys(CLS).map(k => [k, CLS[k].i + ' ' + L(CLS[k].n)]), 'atk')}</select></label>
+    <label class="lbl">${t('hx_tpl')}<select class="field" id="hx_tpl">${opt(HEROES.filter(h => !h.x).map(h => [h.id, L(h.n)]), 'knight')}</select></label></div>
+    <label class="lbl">${t('hx_skill')}<select class="field" id="hx_sk">${opt(HX_SKILLS.map(k => [k, skillText(k, 1)]), 'aoe')}</select></label>
+    <div class="grid2"><label class="lbl">${t('hx_skn')} (ع)<input class="field" id="hx_skar" maxlength="24"></label><label class="lbl">${t('hx_skn')} (En)<input class="field ltr" id="hx_sken" maxlength="24"></label></div>
+    <div class="grid2"><label class="lbl">${t('hx_story')} (ع)<textarea class="field" id="hx_qar" maxlength="200"></textarea></label><label class="lbl">${t('hx_story')} (En)<textarea class="field ltr" id="hx_qen" maxlength="200"></textarea></label></div>
+    <div class="grid3"><label class="lbl">${t('hx_color')}<input class="field" id="hx_col" type="color" value="#7a2a22"></label><label class="lbl">${t('hx_days')}<input class="field num" id="hx_days" type="number" min="0" value="7"></label><span></span></div>
+    <label class="lbl">🖼️ ${t('hx_pic')}<input class="field" id="hx_pic" type="file" accept="image/*"></label>
+    <label class="lbl">🧊 ${t('hx_model')}<input class="field" id="hx_glb" type="file" accept=".glb,model/gltf-binary"></label>
+    <button class="btn gold" data-a="admHxAdd">🌟 ${t('hx_publish')}</button></div>
+    <h3>${t('hx_list')}</h3>${(d.heroes || []).map(h => { const dd = h.data || {}, bn = h.banner_until && Date.parse(h.banner_until) > now(); return `<div class="adm-row"><span>${h.portrait ? `<img src="${esc(h.portrait)}" alt="" style="width:40px;height:52px;object-fit:cover;border-radius:6px">` : '🌟'}</span><span><b>${esc(L(dd.n || {}))}</b> <span class="num muted ltr">${esc(h.id)}</span><br><small class="muted">${L(RAR[dd.r || 2].n)} · ${h.model ? '🧊 3D' : esc(L((HB[dd.tpl] || HB.knight).n))}${bn ? ' · 🌟 ' + t('hx_until', fmtT((Date.parse(h.banner_until) - now()) / 1000)) : ''}</small></span><span class="row"><button class="btn sm ${h.active ? 'ok' : ''}" data-a="admHxToggle" data-x="${esc(h.id)}|${h.active ? 0 : 1}">${h.active ? t('on') : t('off')}</button><button class="btn sm danger" data-a="admHxDel" data-x="${esc(h.id)}">🗑</button></span></div>`; }).join('') || `<p class="muted sm">${t('hx_none')}</p>`}`;
+  }
   if (ADM.tab === 'config') {
     const c = d.config || {}, gp = c.gem_packs || {}, mt = c.maintenance || {};
     body += `<div class="panel"><h3>${t('gem_packs')}</h3><p class="muted sm">${t('gem_packs_b')}</p><div class="grid3">${IAP.filter(p => p.kind === 'gems').map(p => `<label class="lbl">${p.i} $${p.usd}<input class="field num" id="cf_${p.id}" type="number" min="1" value="${gp[p.id] || p.gems}"></label>`).join('')}</div><button class="btn pri" data-a="admCfgPacks">${t('save')}</button></div>
@@ -117,5 +136,39 @@ const ADMIN_ACT = {
   admCfgPacks: () => { const v = {}; IAP.filter(p => p.kind === 'gems').forEach(p => { const n = Math.floor(Number(val('cf_' + p.id))); if (n > 0) v[p.id] = n; }); admCfg('gem_packs', v); },
   admCfgMaint: () => { const e = $('#cf_mon'); admCfg('maintenance', { on: !!(e && e.checked), msg: { ar: val('cf_mar'), en: val('cf_men') } }); },
   admCfgVer: () => admCfg('min_version', val('cf_minv') || null),
+  admHxAdd: () => {
+    const id = val('hx_id').toLowerCase(), nar = val('hx_nar'), nen = val('hx_nen');
+    if (!/^[a-z][a-z0-9_]{1,23}$/.test(id)) { toast(t('hx_bad_id'), 1); return; }
+    if (HB[id] && !HB[id].x) { toast(t('hx_taken'), 1); return; }
+    if (!nar && !nen) { toast(t('enter_title'), 1); return; }
+    const pic = $('#hx_pic') && $('#hx_pic').files[0], glb = $('#hx_glb') && $('#hx_glb').files[0], days = Math.max(0, Number(val('hx_days')) || 0);
+    if (glb && glb.size > 8e6) { toast(t('hx_too_big'), 1); return; }
+    const two = (a, b) => ({ ar: a || b, en: b || a });
+    const data = { n: two(nar, nen), role: two(val('hx_rar'), val('hx_ren')), q: two(val('hx_qar'), val('hx_qen')), skn: two(val('hx_skar'), val('hx_sken')), r: Number(val('hx_r')) || 3, c: val('hx_c'), sk: val('hx_sk'), tpl: val('hx_tpl'), col: val('hx_col') };
+    admRun(async () => {
+      const row = { id, data, active: true, banner_until: days ? new Date(now() + days * 864e5).toISOString() : null };
+      if (pic) row.portrait = await admUpload(`${id}/portrait-${Date.now()}.jpg`, await hxShrink(pic), 'image/jpeg');
+      if (glb) row.model = await admUpload(`${id}/model-${Date.now()}.glb`, glb, 'model/gltf-binary');
+      await adm('/rest/v1/heroes_extra?on_conflict=id', { method: 'POST', headers: { Prefer: 'resolution=merge-duplicates,return=minimal' }, body: row });
+      await admLoad('heroes', true); fetchHeroesX().catch(() => { });
+    }, t('hx_done'));
+  },
+  admHxToggle: x => { const [id, on] = x.split('|'); admRun(async () => { await adm('/rest/v1/heroes_extra?id=eq.' + encodeURIComponent(id), { method: 'PATCH', headers: { Prefer: 'return=minimal' }, body: { active: on === '1' } }); await admLoad('heroes', true); fetchHeroesX().catch(() => { }); }); },
+  admHxDel: (x, el) => { if (!el.dataset.arm) { el.dataset.arm = 1; el.textContent = t('sure'); return; } admRun(async () => { await adm('/rest/v1/heroes_extra?id=eq.' + encodeURIComponent(x), { method: 'DELETE', headers: { Prefer: 'return=minimal' } }); await admLoad('heroes', true); }, t('deleted')); },
 };
 function admCfg(key, value) { admRun(async () => { await adm('/rest/v1/config?on_conflict=key', { method: 'POST', headers: { Prefer: 'resolution=merge-duplicates,return=minimal' }, body: { key, value } }); await admLoad('config', true); fetchConfig().catch(() => { }); }, t('saved')); }
+/* upload a file to the public 'heroes' storage folder and return its public link */
+async function admUpload(path, blob, type) {
+  const base = CFG.supabaseUrl.replace(/\/$/, ''), tok = await admToken();
+  const r = await fetch(`${base}/storage/v1/object/heroes/${path}`, { method: 'POST', headers: { apikey: CFG.supabaseAnonKey, Authorization: 'Bearer ' + tok, 'Content-Type': type, 'x-upsert': 'true' }, body: blob });
+  if (!r.ok) { let m = 'HTTP ' + r.status; try { const j = await r.json(); m = j.message || j.error || m; } catch (e) { } throw new Error(t('hx_upload_fail') + ': ' + m); }
+  return `${base}/storage/v1/object/public/heroes/${path}`;
+}
+/* make the hero picture light (max 600 px wide) before upload */
+function hxShrink(file) {
+  return new Promise(res => {
+    const im = new Image(), u = URL.createObjectURL(file);
+    im.onload = () => { const k = Math.min(1, 600 / im.naturalWidth), c = document.createElement('canvas'); c.width = Math.round(im.naturalWidth * k); c.height = Math.round(im.naturalHeight * k); c.getContext('2d').drawImage(im, 0, 0, c.width, c.height); URL.revokeObjectURL(u); c.toBlob(b => res(b || file), 'image/jpeg', .86); };
+    im.onerror = () => res(file); im.src = u;
+  });
+}

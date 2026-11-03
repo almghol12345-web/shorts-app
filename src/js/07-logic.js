@@ -210,7 +210,9 @@ function rollHero() {
   S.pity++; let r; const x = Math.random();
   if (S.pity >= 40) r = 3; else r = x < .05 ? 3 : x < .30 ? 2 : 1;
   if (r === 3) S.pity = 0;
-  return pick(HEROES.filter(h => h.r === r)).id;
+  // a running banner gives its new hero half of the pulls of its rarity
+  const b = hxBanner(); if (b && b.r === r && Math.random() < .5) return b.id;
+  return pick(hxPool().filter(h => h.r === r)).id;
 }
 function recruit(n) {
   const tk = Math.min(S.inv.ticket, n); let gem = (n - tk) * 150; if (n === 10 && tk === 0) gem = 1350;

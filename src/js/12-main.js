@@ -148,9 +148,11 @@ try { const P = plugin('App'); if (P) P.addListener('pause', () => { save(); syn
 /* ================= boot ================= */
 function start(data) {
   try { kkLoad(kkSwapIn); } catch (e) { }
+  hxBoot();
   let info = null;
   if (data && data.S) { S = migrate(data.S); if (typeof data.tab === 'string') tab = data.tab; }
   else { const st = loadLocal(); if (st) info = catchUp(st); else S = newState(); }
+  S.squad = (S.squad || []).map(id => id && HB[id] ? id : null);
   setLang(S.lang || guessLang());
   preloadArt(); $$('[data-ico]').forEach(e => { const h = ico(e.dataset.ico); if (h.startsWith('<img')) e.innerHTML = h; });
   lastTick = now(); ensureDaily(); ensurePass();

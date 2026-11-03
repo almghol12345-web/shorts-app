@@ -91,6 +91,23 @@ try {
   await closeAll();
   // leaderboard
   await pg.click('[data-a=rank]'); await pg.waitForTimeout(800); ok((await pg.textContent('.sh-b')).includes('Tester'), 'leaderboard lists the player'); await closeAll();
+  // admin adds a new hero with a picture → every player gets it without an app update
+  await pg.click('[data-a=settings]'); await pg.waitForTimeout(300); for (let i = 0; i < 7; i++) await pg.click('[data-a=verTap]'); await pg.waitForTimeout(800);
+  await pg.click('[data-a=admTab][data-x=heroes]'); await pg.waitForTimeout(500);
+  await pg.fill('#hx_id', 'storm'); await pg.fill('#hx_nar', 'العاصفة'); await pg.fill('#hx_nen', 'Storm King'); await pg.fill('#hx_ren', 'Stormcaller'); await pg.selectOption('#hx_tpl', 'wind'); await pg.selectOption('#hx_r', '3');
+  await pg.setInputFiles('#hx_pic', 'assets/heroes/wind.jpg'); if (process.env.SHOTS) await pg.screenshot({ path: process.env.SHOTS + '/adm-hero.png', fullPage: false }); await pg.click('[data-a=admHxAdd]');
+  await until(async () => (await q('select count(*)::int n from public.heroes_extra')).at(0).n === 1);
+  const hx = (await q('select id, portrait, banner_until, data from public.heroes_extra'))[0] || {};
+  ok(hx.id === 'storm' && hx.data.n.en === 'Storm King' && hx.banner_until, 'admin published a new hero with a banner');
+  ok(hx.portrait && [...mock.files.keys()].some(k => k.startsWith('heroes/storm/portrait')), 'hero picture uploaded to storage');
+  { let seen = false; for (let i = 0; i < 6 && !seen; i++) { const x = await pg.$('#modal:not([hidden]) .sh-h [data-a=close]'); if (x) await x.click(); await pg.waitForTimeout(500); seen = (await pg.textContent('#modal').catch(() => '')).includes('Storm King'); } ok(seen, 'new hero popup shows its name'); }
+  await closeAll();
+  await pg.reload(); await until(async () => pg.evaluate(() => (JSON.parse(localStorage.getItem('fajr-naajin-save-v1')).hxSeen || []).includes('storm')));
+  ok(await pg.evaluate(() => (JSON.parse(localStorage.getItem('fajr-naajin-save-v1')).hxSeen || []).includes('storm')), 'new hero announced to the player');
+  await closeAll();
+  await pg.click('[data-x=heroes]'); await pg.waitForTimeout(400); ok((await pg.textContent('#view')).includes('Storm King'), 'new hero appears in the hero list');
+  await pg.click('[data-a=openRecruit]'); await pg.waitForTimeout(400); if (process.env.SHOTS) await pg.screenshot({ path: process.env.SHOTS + '/banner.png' }); ok((await pg.textContent('#modal')).includes('Storm King'), 'summon screen shows the new hero banner'); await closeAll();
+  await pg.click('[data-x=base]'); await pg.waitForTimeout(300);
   // ban → blocked screen
   await mock.db.query("update public.players set banned = true, ban_reason = 'Test ban'");
   await pg.reload(); await pg.waitForSelector('#block', { timeout: 15000 }).catch(() => { });

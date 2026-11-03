@@ -442,6 +442,10 @@ input[type=range]{width:100%;accent-color:var(--rust)}
 .story-line p{margin-top:2px;font-size:14px;line-height:1.6}
 .w3canvas{position:absolute;inset:0;width:100%;height:100%;display:block;pointer-events:none}
 
+.hxpop{display:grid;grid-template-columns:110px 1fr;gap:12px;align-items:center}.hxpop img{width:110px;border-radius:12px;border:2px solid var(--gold)}
+.hxban{display:grid;grid-template-columns:72px 1fr;gap:10px;align-items:center;padding:10px;border-radius:14px;background:linear-gradient(135deg,#3a2a10,#1a1612);border:1px solid #f1b23c88;box-shadow:0 0 18px #f1b23c33}
+.hxban img{width:72px;height:96px;object-fit:cover;border-radius:10px}.hxban div{display:grid;gap:2px}.hxban b{font-family:var(--fd);font-size:18px}
+
 </style>
 </head>
 <body>
@@ -595,7 +599,7 @@ ar: {
   upgrade_to: 'تطوير إلى المستوى {0}', buy_missing: 'شراء الناقص', builders_busy: 'البناؤون مشغولين', upgrade: 'تطوير', instant: 'فوري', open_heroes: 'فتح الأبطال', base_def: 'دفاع القاعدة الكلي', base_def_note: 'السور + الجنود + نصف قوة الفريق. الهجوم القادم', level_n: 'المستوى {0}',
   tier0: 'مشاة', tier1: 'رماة', tier2: 'قناصة', tier3: 'مدرعات', tier4: 'نخبة', troops: 'الجنود', troops_note: 'كل جندي يرفع هجوم الأبطال. الدعم الحالي +{0}%', troops_full: 'وصلت للحد الأقصى. طوّر الثكنة لرفعه.', count: 'العدد', train: 'تدريب',
   wounded: 'الجرحى', heal_all: 'علاج الكل', no_wounded: 'لا يوجد جرحى. الجنود يتصابون في المعارك والهجمات.', research: 'الأبحاث', lab_n: 'مختبر {0}', do_research: 'بحث',
-  trait: 'ضربته الخاصة', privacy: 'سياسة الخصوصية', gfx_high: 'الرسوميات: عالية (توهج وظلال)', gfx_low: 'الرسوميات: خفيفة (أسرع)',
+  trait: 'ضربته الخاصة', privacy: 'سياسة الخصوصية', hx_new: 'بطل جديد وصل!', hx_until: 'لفترة محدودة: باقي {0}', hx_go: 'استدعه الحين', hx_banner: 'بوابة البطل الجديد', hx_rate: 'فرصته مضاعفة', adm_heroes: 'الأبطال', hx_add: 'إضافة بطل جديد', hx_add_b: 'البطل ينزل لكل اللاعبين على طول بدون تحديث اللعبة. اختر شكل مبدئي من بطل موجود ولون خاص، وارفع صورته (ومجسمه 3D إذا عندك).', hx_id: 'رمز البطل (حروف إنجليزية صغيرة)', hx_role: 'الدور', hx_rarity: 'الندرة', hx_class: 'النوع', hx_tpl: 'الشكل والضربة من', hx_skill: 'المهارة', hx_skn: 'اسم المهارة', hx_story: 'نبذة', hx_color: 'لونه', hx_days: 'أيام البوابة', hx_pic: 'صورة البطل', hx_model: 'مجسم 3D (اختياري، ملف glb)', hx_publish: 'انشر البطل', hx_list: 'الأبطال المضافين', hx_none: 'ما فيه أبطال مضافين للحين.', hx_bad_id: 'الرمز لازم يكون حروف إنجليزية صغيرة وأرقام (مثل storm)', hx_taken: 'هذا الرمز لبطل موجود، اختر غيره', hx_too_big: 'ملف المجسم كبير (الحد 8 ميقا)', hx_done: 'نُشر البطل', hx_upload_fail: 'فشل رفع الملف', on: 'شغّال', off: 'موقف', gfx_high: 'الرسوميات: عالية (توهج وظلال)', gfx_low: 'الرسوميات: خفيفة (أسرع)',
   tr_redking: 'ضربة واسعة: كل ضربة تصيب زومبي ثاني جنبه بنصف القوة.', tr_destroyer: 'برق سحري: الطلقة تنتقل لزومبيين ثانيين بثلث القوة.', tr_fire: 'كرة نار: تنفجر وتحرق اللي حولها بـ40% من القوة.',
   tr_knight: 'درع الفارس: كل ضربة تعطيه درع صغير يحميه.', tr_lightning: 'قناص: فرصة الضربة القاضية 30% بدل 12%.', tr_shadow: 'خنجرين: تضرب مرتين، الثانية بـ60% من القوة.',
   tr_medic: 'شفاء: كل ضربة تعالج أضعف بطل بربع قوتها.', tr_mountain: 'ضربة الأرض: يرجّع الزومبي لورا وأحياناً يدوّخه.', tr_hawk: 'سهم خارق: يخترق ويصيب الزومبي اللي وراه.', tr_wind: 'سرعة الريح: يضرب أسرع بـ40% ويشحن طاقة الفريق.',
@@ -683,7 +687,7 @@ en: {
   upgrade_to: 'Upgrade to level {0}', buy_missing: 'Buy missing', builders_busy: 'Builders busy', upgrade: 'Upgrade', instant: 'Instant', open_heroes: 'Open heroes', base_def: 'Total base defense', base_def_note: 'Wall + troops + half your squad power. Next raid in', level_n: 'Level {0}',
   tier0: 'Infantry', tier1: 'Riflemen', tier2: 'Snipers', tier3: 'Armor', tier4: 'Elite', troops: 'Troops', troops_note: 'Every soldier boosts hero attack. Current bonus +{0}%', troops_full: 'At max troops. Upgrade the Barracks to raise it.', count: 'Count', train: 'Train',
   wounded: 'Wounded', heal_all: 'Heal all', no_wounded: 'No wounded. Troops get hurt in battles and raids.', research: 'Research', lab_n: 'Lab {0}', do_research: 'Research',
-  trait: 'Special attack', privacy: 'Privacy policy', gfx_high: 'Graphics: High (glow and shadows)', gfx_low: 'Graphics: Light (faster)',
+  trait: 'Special attack', privacy: 'Privacy policy', hx_new: 'A new hero has arrived!', hx_until: 'Limited time: {0} left', hx_go: 'Summon now', hx_banner: 'New hero banner', hx_rate: 'boosted chance', adm_heroes: 'Heroes', hx_add: 'Add a new hero', hx_add_b: 'The hero reaches every player right away, no app update needed. Pick a starting look from an existing hero and a color, then upload a picture (and a 3D model if you have one).', hx_id: 'Hero code (small English letters)', hx_role: 'Role', hx_rarity: 'Rarity', hx_class: 'Class', hx_tpl: 'Look and attack from', hx_skill: 'Skill', hx_skn: 'Skill name', hx_story: 'Story', hx_color: 'Color', hx_days: 'Banner days', hx_pic: 'Hero picture', hx_model: '3D model (optional, .glb)', hx_publish: 'Publish hero', hx_list: 'Added heroes', hx_none: 'No added heroes yet.', hx_bad_id: 'The code must be small English letters and numbers (like storm)', hx_taken: 'That code belongs to an existing hero, pick another', hx_too_big: 'The model file is too big (8 MB max)', hx_done: 'Hero published', hx_upload_fail: 'Upload failed', on: 'On', off: 'Off', gfx_high: 'Graphics: High (glow and shadows)', gfx_low: 'Graphics: Light (faster)',
   tr_redking: 'Cleave: every hit also strikes a nearby zombie for half damage.', tr_destroyer: 'Arc bolt: the shot jumps to two more zombies for a third of the damage.', tr_fire: 'Fireball: explodes and burns everything around for 40%.',
   tr_knight: 'Knight’s guard: every hit gives him a small shield.', tr_lightning: 'Marksman: 30% critical chance instead of 12%.', tr_shadow: 'Twin blades: strikes twice, the second for 60%.',
   tr_medic: 'Mending: every hit heals the weakest hero for a quarter of its damage.', tr_mountain: 'Earth slam: knocks zombies back and sometimes stuns them.', tr_hawk: 'Piercing arrow: goes through and hits the zombie behind.', tr_wind: 'Gale speed: attacks 40% faster and charges the squad’s energy.',
@@ -1159,7 +1163,7 @@ function totalPower() {
 const recPower = s => Math.round(650 * Math.pow(1.14, s - 1));
 const starNeed = st => [0, 10, 20, 40, 80][st] || 0;
 const lvCost = lv => Math.round(80 * Math.pow(1.17, lv - 1));
-const ownedHeroes = () => Object.keys(S.heroes);
+const ownedHeroes = () => Object.keys(S.heroes).filter(id => HB[id]);
 const xpNeed = lv => Math.round(100 * Math.pow(1.35, lv - 1));
 const season = () => Math.floor((dayNum() - 20000) / 28);
 const seasonEnds = () => { const d = (season() + 1) * 28 + 20000; return d * 864e5 + new Date().getTimezoneOffset() * 60000; };
@@ -1275,7 +1279,7 @@ async function netInit() {
     await ensureSession();
     NET.on = true;
     await syncPlayer(true);
-    await Promise.all([fetchConfig(), fetchEvents(), fetchNews()]);
+    await Promise.all([fetchConfig(), fetchEvents(), fetchNews(), fetchHeroesX().catch(e => console.warn('heroes', e.message))]);
     await claimGrants();
     NET.ready = true; NET.err = '';
     checkBlocking();
@@ -1364,6 +1368,57 @@ async function adminLogin(email, password) {
   NET.adm = s; saveSess(ADM_KEY, s); return s;
 }
 function adminLogout() { NET.adm = null; saveSess(ADM_KEY, null); }
+
+/* ---- 05b-heroesx.js ---- */
+/* ================= heroes added by the admin after release =================
+ * The admin panel saves a hero (names, rarity, class, skill, a look based on an existing hero, a picture and
+ * an optional 3D model) to the server. Every player's game downloads it, keeps a copy on the phone, and adds it
+ * to the hero list and the summon pool, so new heroes arrive without an App Store update.
+ * While its banner runs, the new hero has a higher chance in summons and is announced once.
+ */
+const HX_KEY = 'fajr-heroes-x-v1';
+const HX = { list: [], loaded: {} };
+const HX_SKILLS = ['snipe', 'shield', 'heal', 'aoe', 'stun', 'rapid', 'buff', 'air'];
+/* main colored parts of each base model, recolored with the hero's own color */
+const HX_MAIN = { knight: [3, 8], rogue: [8, 6], rogue_hooded: [9, 8], barbarian: [10, 8], mage: [8, 4] };
+function hxDef(row) {
+  const d = row.data || {}, tpl = HB[d.tpl] && !HB[d.tpl].x ? d.tpl : 'knight';
+  return { id: row.id, x: 1, tpl, n: d.n || { ar: row.id, en: row.id }, r: clamp(d.r | 0 || 2, 1, 3), c: ['tank', 'atk', 'sup'].includes(d.c) ? d.c : HB[tpl].c, sk: HX_SKILLS.includes(d.sk) ? d.sk : HB[tpl].sk, skn: d.skn || HB[tpl].skn, q: d.q || { ar: '', en: '' }, role: d.role || HB[tpl].role, col: d.col || '', portrait: row.portrait || '', model: row.model || '', banner: row.banner_until ? Date.parse(row.banner_until) : 0 };
+}
+function hxRegister(rows) {
+  for (const row of rows || []) {
+    if (!row || !row.id || (HB[row.id] && !HB[row.id].x)) continue; // never replace a built-in hero
+    const h = hxDef(row), old = HB[row.id];
+    if (old) Object.assign(old, h); else { HEROES.push(h); HB[h.id] = h; }
+    // look: copy the template hero, painted in the new color
+    const base = KKH[h.tpl]; if (base) { const look = Object.assign({}, base, { rec: Object.assign({}, base.rec) }); if (/^#[0-9a-f]{6}$/i.test(h.col)) for (const k of HX_MAIN[base.base] || []) look.rec[k] = h.col; KKH[h.id] = look; }
+    HERO3[h.id] = HERO3[h.tpl]; if (typeof B3_PROJ !== 'undefined') B3_PROJ[h.id] = B3_PROJ[h.tpl];
+    if (h.portrait) { PORTRAIT[h.id] = h.portrait; delete PORTRAIT_IMG[h.id]; } else PORTRAIT[h.id] = portraitURI(h.tpl);
+    if (h.model && !HX.loaded[h.id] && typeof THREE !== 'undefined' && THREE.GLTFLoader) {
+      HX.loaded[h.id] = 1;
+      new THREE.GLTFLoader().load(h.model, g => { KK.custom['h_' + h.id] = g; KK.gltf['h_' + h.id] = g; hxRefresh3D(h.id); }, undefined, e => console.warn('hero model ' + h.id, e));
+    }
+  }
+  // heroes the admin switched off disappear from new summons but stay with players who own them
+  HX.list = HEROES.filter(h => h.x);
+}
+function hxRefresh3D(id) { if (typeof V3 !== 'undefined' && V3.inited && V3.heroUnits && V3.heroUnits[id]) { V3.scene.remove(V3.heroUnits[id]); V3.units = V3.units.filter(u => u.s !== V3.heroUnits[id]); delete V3.heroUnits[id]; v3SyncHeroes(); } }
+function hxBoot() { try { hxRegister(JSON.parse(storeGet(HX_KEY) || '[]')); } catch (e) { } }
+async function fetchHeroesX() {
+  const rows = await http('/rest/v1/heroes_extra?select=id,data,portrait,model,banner_until,active&active=eq.true&order=created_at.asc');
+  if (!Array.isArray(rows)) return;
+  storeSet(HX_KEY, JSON.stringify(rows)); hxRegister(rows);
+  const live = new Set(rows.map(r => r.id)); HX.off = HX.list.filter(h => !live.has(h.id)).map(h => h.id);
+  hxAnnounce();
+}
+/* heroes in the summon pool: built-in ones plus active added ones */
+const hxPool = () => HEROES.filter(h => !h.x || !(HX.off || []).includes(h.id));
+const hxBanner = () => HX.list.filter(h => h.banner > now() && !(HX.off || []).includes(h.id)).sort((a, b) => a.banner - b.banner)[0] || null;
+function hxAnnounce() {
+  const b = hxBanner(); if (!b) return; S.hxSeen = S.hxSeen || []; if (S.hxSeen.includes(b.id)) return;
+  S.hxSeen.push(b.id); save();
+  queuePopup(() => sheet('🌟', t('hx_new'), L(b.n), `<div class="hxpop"><img src="${portraitURI(b.id)}" alt=""><div><b style="color:${RAR[b.r].c}">${L(RAR[b.r].n)} · ${esc(L(b.role))}</b><p class="muted sm">${esc(L(b.q))}</p><p class="sm">⏳ ${t('hx_until', fmtT((b.banner - now()) / 1000))}</p></div></div><button class="btn gold wide" data-a="openRecruit">🎟️ ${t('hx_go')}</button>`));
+}
 
 /* ---- 06-iap.js ---- */
 /* ================= in-app purchases (StoreKit via @capgo/native-purchases) ================= */
@@ -1637,7 +1692,9 @@ function rollHero() {
   S.pity++; let r; const x = Math.random();
   if (S.pity >= 40) r = 3; else r = x < .05 ? 3 : x < .30 ? 2 : 1;
   if (r === 3) S.pity = 0;
-  return pick(HEROES.filter(h => h.r === r)).id;
+  // a running banner gives its new hero half of the pulls of its rarity
+  const b = hxBanner(); if (b && b.r === r && Math.random() < .5) return b.id;
+  return pick(hxPool().filter(h => h.r === r)).id;
 }
 function recruit(n) {
   const tk = Math.min(S.inv.ticket, n); let gem = (n - tk) * 150; if (n === 10 && tk === 0) gem = 1350;
@@ -1849,7 +1906,7 @@ function renderModal(fresh) {
   if (!modalFn) { m.hidden = true; m.innerHTML = ''; m.classList.remove('full'); return; }
   const prev = m.querySelector('.sh-b'), sc = prev && !fresh ? prev.scrollTop : 0;
   const focusId = document.activeElement && document.activeElement.id, vals = {};
-  m.querySelectorAll('input[id],textarea[id],select[id]').forEach(e => { if (e.type !== 'range') vals[e.id] = e.value; });
+  m.querySelectorAll('input[id],textarea[id],select[id]').forEach(e => { if (e.type !== 'range' && e.type !== 'file') vals[e.id] = e.value; });
   m.classList.toggle('full', modalFull);
   m.innerHTML = `<div class="sheet" role="dialog" aria-modal="true">${modalFn()}</div>`; m.hidden = false;
   if (!fresh) for (const id in vals) { const e = document.getElementById(id); if (e && e.dataset.keep !== '0') e.value = vals[id]; }
@@ -1947,14 +2004,14 @@ function tileHTML(p) {
 }
 VIEWS.heroes = () => {
   const own = ownedHeroes().sort((a, b) => heroPower(b) - heroPower(a));
-  const lockd = HEROES.filter(h => !S.heroes[h.id]).sort((a, b) => b.r - a.r);
+  const lockd = hxPool().filter(h => !S.heroes[h.id]).sort((a, b) => b.r - a.r);
   const slot = i => { const id = S.squad[i]; return `<button class="slot" data-a="slot" data-x="${i}">${id ? avHTML(id) : '<span class="empty">+</span>'}<span>${id ? esc(hname(id)) : t('empty')}</span></button>`; };
   return `<div class="pad">
   <div class="row between"><div><h2>${t('squad')}</h2><div class="muted">${t('squad_power')} <b class="num" style="color:var(--amber)">${fmt(teamPower())}</b> · ${t('troop_bonus')} +${Math.round(troopBonus() * 100)}%</div></div>
   <button class="btn pri" data-a="openRecruit">🎟️ ${t('recruit')}${S.inv.ticket ? ` (${S.inv.ticket})` : ''}</button></div>
   <div class="formation"><div class="flabel">${t('front_row')}</div><div class="frow">${slot(0)}${slot(1)}</div><div class="flabel">${t('back_row')}</div><div class="frow">${slot(2)}${slot(3)}${slot(4)}</div>
   <button class="btn sm" data-a="autoSquad" style="justify-self:center">✨ ${t('auto_squad')}</button></div>
-  <div class="row between"><h3>${t('your_heroes')} ${own.length}/${HEROES.length}</h3><span class="cc">✨ ${fmt(S.res.exp)}</span></div>
+  <div class="row between"><h3>${t('your_heroes')} ${own.length}/${hxPool().length}</h3><span class="cc">✨ ${fmt(S.res.exp)}</span></div>
   <div class="roster">${own.map(id => { const Hh = HB[id], h = S.heroes[id]; const dot = (h.st < 5 && h.sh >= starNeed(h.st)) || (h.lv < heroCap(lvOf('tavern')) && S.res.exp >= lvCost(h.lv)); return `<button class="hc r${Hh.r}" data-a="hero" data-x="${id}">${S.squad.includes(id) ? `<span class="in">${t('in_squad')}</span>` : ''}${dot ? '<span class="dot"></span>' : ''}${cardHTML(id, `<span class="plv num">Lv ${h.lv}</span>`)}<b>${esc(hname(id))}</b><small class="role">${esc(L(Hh.role))}</small>${starsHTML(h.st)}<small>💪 ${fmt(heroPower(id))}</small></button>`; }).join('')}
   ${lockd.map(Hh => `<div class="hc lockd">${cardHTML(Hh.id, '<span class="plock">🔒</span>')}<b>${esc(L(Hh.n))}</b><small style="color:${RAR[Hh.r].c}">${L(RAR[Hh.r].n)}</small></div>`).join('')}</div>
   </div>`;
@@ -2096,7 +2153,7 @@ function mHero(id) {
   <p class="muted">${L(Hh.q)}</p>
   <div class="grid4"><div class="stat"><small>${t('atk')}</small><b class="num">${fmt(x.atk)}</b></div><div class="stat"><small>${t('hp')}</small><b class="num">${fmt(x.hp)}</b></div><div class="stat"><small>${t('def')}</small><b class="num">${fmt(x.def)}</b></div><div class="stat"><small>${t('power')}</small><b class="num" style="color:var(--amber)">${fmt(heroPower(id))}</b></div></div>
   <div class="li"><span class="lic">⚡</span><div class="lit"><b>${L(Hh.skn)}</b><small>${skillText(Hh.sk, RM[Hh.r])}</small></div></div>
-  <div class="li"><span class="lic">🎯</span><div class="lit"><b>${t('trait')}</b><small>${t('tr_' + id)}</small></div></div>
+  <div class="li"><span class="lic">🎯</span><div class="lit"><b>${t('trait')}</b><small>${t('tr_' + (Hh.tpl || id))}</small></div></div>
   <div class="panel"><div class="row between"><b>${t('level_of', h.lv, cap)}</b><span class="cc ${S.res.exp >= lc ? '' : 'lack'}">✨ ${fmt(lc)}</span></div>
   <div class="grid2"><button class="btn pri" data-a="hlv" data-x="${id}|1" ${h.lv < cap && S.res.exp >= lc ? '' : 'disabled'}>⬆️ +1</button><button class="btn" data-a="hlv" data-x="${id}|10" ${h.lv < cap && S.res.exp >= lc ? '' : 'disabled'}>⏫ +10</button></div>
   ${h.lv >= cap ? `<small class="muted">${t('raise_cap')}</small>` : ''}</div>
@@ -2117,7 +2174,8 @@ function mSlotPick(id) {
 }
 function mRecruit() {
   const tk = S.inv.ticket;
-  const body = `<div class="grid3">${[1, 2, 3].map(r => `<div class="stat"><small style="color:${RAR[r].c}">${L(RAR[r].n)}</small><b>${[0, 70, 25, 5][r]}%</b></div>`).join('')}</div>
+  const bn = hxBanner();
+  const body = `${bn ? `<div class="hxban r${bn.r}"><img src="${portraitURI(bn.id)}" alt=""><div><small>🌟 ${t('hx_banner')}</small><b>${esc(L(bn.n))}</b><small style="color:${RAR[bn.r].c}">${L(RAR[bn.r].n)} · ${esc(L(bn.role))}</small><small>⏳ ${t('hx_until', fmtT((bn.banner - now()) / 1000))} · ${t('hx_rate')}</small></div></div>` : ''}<div class="grid3">${[1, 2, 3].map(r => `<div class="stat"><small style="color:${RAR[r].c}">${L(RAR[r].n)}</small><b>${[0, 70, 25, 5][r]}%</b></div>`).join('')}</div>
   <div class="li"><span class="lic">🌟</span><div class="lit"><b>${t('pity', 40 - S.pity)}</b><small>${t('dupes_note')}</small></div></div>
   <div class="grid2"><button class="btn pri" data-a="recruit" data-x="1">×1 ${tk ? '🎟️ 1' : '💎 150'}</button><button class="btn gold" data-a="recruit" data-x="10">×10 ${tk >= 10 ? '🎟️ 10' : '💎 ' + (tk ? (10 - Math.min(tk, 10)) * 150 : 1350)}</button></div>
   ${lastPull.length ? `<h3>${t('result')}</h3><div class="pull">${lastPull.map((p, i) => `<div class="hc r${HB[p.id].r}" style="animation-delay:${i * .08}s">${p.isNew ? `<span class="new">${t('new')}</span>` : ''}${cardHTML(p.id)}<b style="font-size:12px">${esc(hname(p.id))}</b><small style="color:${RAR[HB[p.id].r].c}">${p.isNew ? L(RAR[HB[p.id].r].n) : '+10 🧩'}</small></div>`).join('')}</div>` : ''}`;
@@ -4058,7 +4116,7 @@ function w3Draw(ts) {
 let B = null;
 const stageEl = () => $('#b-stage');
 function startBattle(cfg) {
-  const list = S.squad.map((id, i) => id ? { id, slot: i } : null).filter(Boolean);
+  const list = S.squad.map((id, i) => id && HB[id] ? { id, slot: i } : null).filter(Boolean);
   if (!list.length) { toast(t('need_squad'), 1); return; }
   const tb = troopBonus();
   B = {
@@ -4149,7 +4207,7 @@ function cast(h) {
 /* each hero's own touch on a normal attack */
 function heroTrait(h, tg, d) {
   const vz = visibleZ(), others = vz.filter(z => z !== tg && z.alive), byDist = (o, p) => o.slice().sort((a, b) => Math.hypot(a.x - p.x, a.y - p.y) - Math.hypot(b.x - p.x, b.y - p.y));
-  switch (h.id) {
+  switch (h.H.tpl || h.id) {
     case 'redking': { const z = byDist(others, tg)[0]; if (z && Math.hypot(z.x - tg.x, z.y - tg.y) < 80) { dmgZ(z, d * .5); B.fx.push({ k: 'tr', x: tg.x, y: tg.y, tx: z.x, ty: z.y, t: 0, life: .12, w: 2, col: '#ff6a3a', hid: 'redking', tz: z, sub: 1 }); } break; }
     case 'destroyer': { let from = tg; for (const z of byDist(others, tg).slice(0, 2)) { dmgZ(z, d * .35); B.fx.push({ k: 'arc', x: from.x, y: from.y, tx: z.x, ty: z.y, t: 0, life: .25, fz: from, tz: z }); from = z; } break; }
     case 'fire': { for (const z of others) if (Math.hypot(z.x - tg.x, z.y - tg.y) < 48 + z.T.r) dmgZ(z, d * .4); B.fx.push({ k: 'boom', x: tg.x, y: tg.y, r: 48, t: .05, life: .4, small: 1 }); break; }
@@ -4617,6 +4675,7 @@ async function admLoad(kind, force) {
     if (kind === 'news') ADM.data.news = await adm('/rest/v1/news?select=*&order=created_at.desc&limit=60');
     if (kind === 'config') { const rows = await adm('/rest/v1/config?select=key,value'); const c = {}; (rows || []).forEach(r => c[r.key] = r.value); ADM.data.config = c; }
     if (kind === 'buys') ADM.data.buys = await adm('/rest/v1/purchases?select=*,players(short_id,name)&order=created_at.desc&limit=80');
+    if (kind === 'heroes') ADM.data.heroes = await adm('/rest/v1/heroes_extra?select=*&order=created_at.desc');
     if (kind === 'gifts') ADM.data.gifts = await adm('/rest/v1/grants?select=*,players(short_id,name)&order=created_at.desc&limit=60');
   });
 }
@@ -4624,7 +4683,7 @@ function mAdmin() {
   if (!netConfigured()) return sheet('🛡️', t('admin'), '', `<div class="li"><span class="lic">⚙️</span><div class="lit"><b>${t('adm_no_server')}</b><small>${t('adm_no_server_b')}</small></div></div>`);
   const logged = NET.adm || loadSess(ADM_KEY);
   if (!logged) return sheet('🛡️', t('admin'), t('adm_login_sub'), `<form id="admLoginF" style="display:grid;gap:10px"><label class="lbl">${t('email')}<input class="field ltr" id="admEmail" type="email" autocomplete="username" required></label><label class="lbl">${t('password')}<input class="field ltr" id="admPass" type="password" autocomplete="current-password" required></label><button class="btn pri" type="submit" ${ADM.busy ? 'disabled' : ''}>${ADM.busy ? t('loading') : t('login')}</button></form>${ADM.err ? `<p class="bad sm">${esc(ADM.err)}</p>` : ''}`);
-  const tabs = ['dash', 'players', 'gifts', 'events', 'news', 'config', 'buys'];
+  const tabs = ['dash', 'players', 'gifts', 'events', 'news', 'heroes', 'config', 'buys'];
   let body = `<div class="subtabs">${tabs.map(k => `<button class="${ADM.tab === k ? 'on' : ''}" data-a="admTab" data-x="${k}">${t('adm_' + k)}</button>`).join('')}</div>${ADM.busy ? `<p class="muted sm">${t('loading')}</p>` : ''}`;
   const d = ADM.data;
   if (ADM.tab === 'dash') {
@@ -4670,6 +4729,24 @@ function mAdmin() {
     <button class="btn gold" data-a="admNewsAdd">📰 ${t('publish')}</button></div>
     ${(d.news || []).map(n => `<div class="adm-row"><span>📰</span><span><b>${esc(L(n.title))}</b><br><small class="muted">${dt(n.created_at)}</small></span><button class="btn sm danger" data-a="admNewsDel" data-x="${n.id}">🗑</button></div>`).join('')}`;
   }
+  if (ADM.tab === 'heroes') {
+    const opt = (list, cur) => list.map(([v, l]) => `<option value="${v}" ${v == cur ? 'selected' : ''}>${l}</option>`).join('');
+    body += `<div class="panel"><h3>🌟 ${t('hx_add')}</h3><p class="muted sm">${t('hx_add_b')}</p>
+    <label class="lbl">${t('hx_id')}<input class="field ltr" id="hx_id" maxlength="24" placeholder="storm" autocapitalize="off"></label>
+    <div class="grid2"><label class="lbl">${t('title_ar')}<input class="field" id="hx_nar" maxlength="20"></label><label class="lbl">${t('title_en')}<input class="field ltr" id="hx_nen" maxlength="20"></label></div>
+    <div class="grid2"><label class="lbl">${t('hx_role')} (ع)<input class="field" id="hx_rar" maxlength="16"></label><label class="lbl">${t('hx_role')} (En)<input class="field ltr" id="hx_ren" maxlength="16"></label></div>
+    <div class="grid3"><label class="lbl">${t('hx_rarity')}<select class="field" id="hx_r">${opt([[3, L(RAR[3].n)], [2, L(RAR[2].n)], [1, L(RAR[1].n)]], 3)}</select></label>
+    <label class="lbl">${t('hx_class')}<select class="field" id="hx_c">${opt(Object.keys(CLS).map(k => [k, CLS[k].i + ' ' + L(CLS[k].n)]), 'atk')}</select></label>
+    <label class="lbl">${t('hx_tpl')}<select class="field" id="hx_tpl">${opt(HEROES.filter(h => !h.x).map(h => [h.id, L(h.n)]), 'knight')}</select></label></div>
+    <label class="lbl">${t('hx_skill')}<select class="field" id="hx_sk">${opt(HX_SKILLS.map(k => [k, skillText(k, 1)]), 'aoe')}</select></label>
+    <div class="grid2"><label class="lbl">${t('hx_skn')} (ع)<input class="field" id="hx_skar" maxlength="24"></label><label class="lbl">${t('hx_skn')} (En)<input class="field ltr" id="hx_sken" maxlength="24"></label></div>
+    <div class="grid2"><label class="lbl">${t('hx_story')} (ع)<textarea class="field" id="hx_qar" maxlength="200"></textarea></label><label class="lbl">${t('hx_story')} (En)<textarea class="field ltr" id="hx_qen" maxlength="200"></textarea></label></div>
+    <div class="grid3"><label class="lbl">${t('hx_color')}<input class="field" id="hx_col" type="color" value="#7a2a22"></label><label class="lbl">${t('hx_days')}<input class="field num" id="hx_days" type="number" min="0" value="7"></label><span></span></div>
+    <label class="lbl">🖼️ ${t('hx_pic')}<input class="field" id="hx_pic" type="file" accept="image/*"></label>
+    <label class="lbl">🧊 ${t('hx_model')}<input class="field" id="hx_glb" type="file" accept=".glb,model/gltf-binary"></label>
+    <button class="btn gold" data-a="admHxAdd">🌟 ${t('hx_publish')}</button></div>
+    <h3>${t('hx_list')}</h3>${(d.heroes || []).map(h => { const dd = h.data || {}, bn = h.banner_until && Date.parse(h.banner_until) > now(); return `<div class="adm-row"><span>${h.portrait ? `<img src="${esc(h.portrait)}" alt="" style="width:40px;height:52px;object-fit:cover;border-radius:6px">` : '🌟'}</span><span><b>${esc(L(dd.n || {}))}</b> <span class="num muted ltr">${esc(h.id)}</span><br><small class="muted">${L(RAR[dd.r || 2].n)} · ${h.model ? '🧊 3D' : esc(L((HB[dd.tpl] || HB.knight).n))}${bn ? ' · 🌟 ' + t('hx_until', fmtT((Date.parse(h.banner_until) - now()) / 1000)) : ''}</small></span><span class="row"><button class="btn sm ${h.active ? 'ok' : ''}" data-a="admHxToggle" data-x="${esc(h.id)}|${h.active ? 0 : 1}">${h.active ? t('on') : t('off')}</button><button class="btn sm danger" data-a="admHxDel" data-x="${esc(h.id)}">🗑</button></span></div>`; }).join('') || `<p class="muted sm">${t('hx_none')}</p>`}`;
+  }
   if (ADM.tab === 'config') {
     const c = d.config || {}, gp = c.gem_packs || {}, mt = c.maintenance || {};
     body += `<div class="panel"><h3>${t('gem_packs')}</h3><p class="muted sm">${t('gem_packs_b')}</p><div class="grid3">${IAP.filter(p => p.kind === 'gems').map(p => `<label class="lbl">${p.i} $${p.usd}<input class="field num" id="cf_${p.id}" type="number" min="1" value="${gp[p.id] || p.gems}"></label>`).join('')}</div><button class="btn pri" data-a="admCfgPacks">${t('save')}</button></div>
@@ -4708,8 +4785,42 @@ const ADMIN_ACT = {
   admCfgPacks: () => { const v = {}; IAP.filter(p => p.kind === 'gems').forEach(p => { const n = Math.floor(Number(val('cf_' + p.id))); if (n > 0) v[p.id] = n; }); admCfg('gem_packs', v); },
   admCfgMaint: () => { const e = $('#cf_mon'); admCfg('maintenance', { on: !!(e && e.checked), msg: { ar: val('cf_mar'), en: val('cf_men') } }); },
   admCfgVer: () => admCfg('min_version', val('cf_minv') || null),
+  admHxAdd: () => {
+    const id = val('hx_id').toLowerCase(), nar = val('hx_nar'), nen = val('hx_nen');
+    if (!/^[a-z][a-z0-9_]{1,23}$/.test(id)) { toast(t('hx_bad_id'), 1); return; }
+    if (HB[id] && !HB[id].x) { toast(t('hx_taken'), 1); return; }
+    if (!nar && !nen) { toast(t('enter_title'), 1); return; }
+    const pic = $('#hx_pic') && $('#hx_pic').files[0], glb = $('#hx_glb') && $('#hx_glb').files[0], days = Math.max(0, Number(val('hx_days')) || 0);
+    if (glb && glb.size > 8e6) { toast(t('hx_too_big'), 1); return; }
+    const two = (a, b) => ({ ar: a || b, en: b || a });
+    const data = { n: two(nar, nen), role: two(val('hx_rar'), val('hx_ren')), q: two(val('hx_qar'), val('hx_qen')), skn: two(val('hx_skar'), val('hx_sken')), r: Number(val('hx_r')) || 3, c: val('hx_c'), sk: val('hx_sk'), tpl: val('hx_tpl'), col: val('hx_col') };
+    admRun(async () => {
+      const row = { id, data, active: true, banner_until: days ? new Date(now() + days * 864e5).toISOString() : null };
+      if (pic) row.portrait = await admUpload(`${id}/portrait-${Date.now()}.jpg`, await hxShrink(pic), 'image/jpeg');
+      if (glb) row.model = await admUpload(`${id}/model-${Date.now()}.glb`, glb, 'model/gltf-binary');
+      await adm('/rest/v1/heroes_extra?on_conflict=id', { method: 'POST', headers: { Prefer: 'resolution=merge-duplicates,return=minimal' }, body: row });
+      await admLoad('heroes', true); fetchHeroesX().catch(() => { });
+    }, t('hx_done'));
+  },
+  admHxToggle: x => { const [id, on] = x.split('|'); admRun(async () => { await adm('/rest/v1/heroes_extra?id=eq.' + encodeURIComponent(id), { method: 'PATCH', headers: { Prefer: 'return=minimal' }, body: { active: on === '1' } }); await admLoad('heroes', true); fetchHeroesX().catch(() => { }); }); },
+  admHxDel: (x, el) => { if (!el.dataset.arm) { el.dataset.arm = 1; el.textContent = t('sure'); return; } admRun(async () => { await adm('/rest/v1/heroes_extra?id=eq.' + encodeURIComponent(x), { method: 'DELETE', headers: { Prefer: 'return=minimal' } }); await admLoad('heroes', true); }, t('deleted')); },
 };
 function admCfg(key, value) { admRun(async () => { await adm('/rest/v1/config?on_conflict=key', { method: 'POST', headers: { Prefer: 'resolution=merge-duplicates,return=minimal' }, body: { key, value } }); await admLoad('config', true); fetchConfig().catch(() => { }); }, t('saved')); }
+/* upload a file to the public 'heroes' storage folder and return its public link */
+async function admUpload(path, blob, type) {
+  const base = CFG.supabaseUrl.replace(/\/$/, ''), tok = await admToken();
+  const r = await fetch(`${base}/storage/v1/object/heroes/${path}`, { method: 'POST', headers: { apikey: CFG.supabaseAnonKey, Authorization: 'Bearer ' + tok, 'Content-Type': type, 'x-upsert': 'true' }, body: blob });
+  if (!r.ok) { let m = 'HTTP ' + r.status; try { const j = await r.json(); m = j.message || j.error || m; } catch (e) { } throw new Error(t('hx_upload_fail') + ': ' + m); }
+  return `${base}/storage/v1/object/public/heroes/${path}`;
+}
+/* make the hero picture light (max 600 px wide) before upload */
+function hxShrink(file) {
+  return new Promise(res => {
+    const im = new Image(), u = URL.createObjectURL(file);
+    im.onload = () => { const k = Math.min(1, 600 / im.naturalWidth), c = document.createElement('canvas'); c.width = Math.round(im.naturalWidth * k); c.height = Math.round(im.naturalHeight * k); c.getContext('2d').drawImage(im, 0, 0, c.width, c.height); URL.revokeObjectURL(u); c.toBlob(b => res(b || file), 'image/jpeg', .86); };
+    im.onerror = () => res(file); im.src = u;
+  });
+}
 
 /* ---- 12-main.js ---- */
 /* ================= tick ================= */
@@ -4862,9 +4973,11 @@ try { const P = plugin('App'); if (P) P.addListener('pause', () => { save(); syn
 /* ================= boot ================= */
 function start(data) {
   try { kkLoad(kkSwapIn); } catch (e) { }
+  hxBoot();
   let info = null;
   if (data && data.S) { S = migrate(data.S); if (typeof data.tab === 'string') tab = data.tab; }
   else { const st = loadLocal(); if (st) info = catchUp(st); else S = newState(); }
+  S.squad = (S.squad || []).map(id => id && HB[id] ? id : null);
   setLang(S.lang || guessLang());
   preloadArt(); $$('[data-ico]').forEach(e => { const h = ico(e.dataset.ico); if (h.startsWith('<img')) e.innerHTML = h; });
   lastTick = now(); ensureDaily(); ensurePass();

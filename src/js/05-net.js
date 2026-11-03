@@ -40,7 +40,7 @@ async function netInit() {
     await ensureSession();
     NET.on = true;
     await syncPlayer(true);
-    await Promise.all([fetchConfig(), fetchEvents(), fetchNews()]);
+    await Promise.all([fetchConfig(), fetchEvents(), fetchNews(), fetchHeroesX().catch(e => console.warn('heroes', e.message))]);
     await claimGrants();
     NET.ready = true; NET.err = '';
     checkBlocking();

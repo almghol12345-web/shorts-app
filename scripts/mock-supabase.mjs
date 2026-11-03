@@ -74,11 +74,22 @@ export async function startMock(port = 54321) {
       if (method === 'DELETE') { await db.query(`delete from ${T} t` + where(params, vals), vals); return null; }
     });
   }
+  const files = new Map();
   const server = http.createServer(async (req, res) => {
-    const cors = { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Headers': '*', 'Access-Control-Allow-Methods': 'GET,POST,PATCH,DELETE,OPTIONS' };
+    const cors = { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Headers': '*', 'Access-Control-Allow-Methods': 'GET,POST,PUT,PATCH,DELETE,OPTIONS' };
     if (req.method === 'OPTIONS') { res.writeHead(204, cors); return res.end(); }
-    let raw = ''; for await (const c of req) raw += c;
-    const body = raw ? JSON.parse(raw) : null; const url = new URL(req.url, 'http://x');
+    const chunks = []; for await (const c of req) chunks.push(c); const buf = Buffer.concat(chunks); const url = new URL(req.url, 'http://x');
+    // file storage: admins upload to /storage/v1/object/<bucket>/<path>, anyone reads /storage/v1/object/public/<bucket>/<path>
+    if (url.pathname.startsWith('/storage/v1/object/')) {
+      const rest = url.pathname.slice('/storage/v1/object/'.length);
+      if (req.method === 'GET' && rest.startsWith('public/')) { const f = files.get(rest.slice(7)); if (!f) { res.writeHead(404, cors); return res.end(); } res.writeHead(200, { ...cors, 'Content-Type': f.type }); return res.end(f.data); }
+      if (req.method === 'POST' || req.method === 'PUT') {
+        const uid = tokens.get((req.headers.authorization || '').replace('Bearer ', '')); const ok = uid && (await db.query('select 1 from public.admins where user_id = $1', [uid])).rows.length;
+        if (!ok) { res.writeHead(403, { ...cors, 'Content-Type': 'application/json' }); return res.end(JSON.stringify({ message: 'new row violates row-level security policy' })); }
+        files.set(rest, { type: req.headers['content-type'] || 'application/octet-stream', data: buf }); res.writeHead(200, { ...cors, 'Content-Type': 'application/json' }); return res.end(JSON.stringify({ Key: rest }));
+      }
+    }
+    const raw = buf.toString(); const body = raw ? JSON.parse(raw) : null;
     const send = (code, obj) => { res.writeHead(code, { ...cors, 'Content-Type': 'application/json' }); res.end(obj == null ? '' : JSON.stringify(obj)); };
     try {
       if (url.pathname === '/auth/v1/signup') { const id = crypto.randomUUID(); await (q = q.then(() => db.query('insert into auth.users(id) values ($1)', [id]))); return send(200, issue(id)); }
@@ -97,6 +108,6 @@ export async function startMock(port = 54321) {
     } catch (e) { if (process.env.MOCK_DEBUG) console.log('MOCK ERR', req.method, req.url.slice(0, 80), e.message); send(e.status || 400, { message: e.message }); }
   });
   await new Promise(r => server.listen(port, r));
-  return { url: `http://127.0.0.1:${port}`, db, addAdmin, close: () => server.close() };
+  return { url: `http://127.0.0.1:${port}`, db, addAdmin, files, close: () => server.close() };
 }
 if (import.meta.url === `file://${process.argv[1]}`) { const m = await startMock(Number(process.argv[2]) || 54321); await m.addAdmin('admin@test.local', 'secret123'); console.log('mock supabase on', m.url, '· admin: admin@test.local / secret123'); }

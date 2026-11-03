@@ -87,7 +87,7 @@ function totalPower() {
 const recPower = s => Math.round(650 * Math.pow(1.14, s - 1));
 const starNeed = st => [0, 10, 20, 40, 80][st] || 0;
 const lvCost = lv => Math.round(80 * Math.pow(1.17, lv - 1));
-const ownedHeroes = () => Object.keys(S.heroes);
+const ownedHeroes = () => Object.keys(S.heroes).filter(id => HB[id]);
 const xpNeed = lv => Math.round(100 * Math.pow(1.35, lv - 1));
 const season = () => Math.floor((dayNum() - 20000) / 28);
 const seasonEnds = () => { const d = (season() + 1) * 28 + 20000; return d * 864e5 + new Date().getTimezoneOffset() * 60000; };
