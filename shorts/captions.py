@@ -16,6 +16,8 @@ def _ts(seconds: float) -> str:
 
 
 def _escape(text: str) -> str:
+    from .spoken import plain
+    text = plain(text)
     return text.replace("\\", "").replace("{", "(").replace("}", ")").replace("\n", " ")
 
 

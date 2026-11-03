@@ -71,3 +71,11 @@ def speakable(text: str) -> str:
     text = re.sub(r"\s*\.{2,}\s*$", end, text)
     text = re.sub(r"\s*\.{2,}\s*(?=[^\s.])", "، ", text)       # inner '..' is a breath
     return re.sub(r"\s{2,}", " ", text).strip()
+
+
+HARAKAT = re.compile("[\u064B-\u0652\u0670]")
+
+
+def plain(text: str) -> str:
+    """Text without tashkeel: the voice reads the vowelled script, viewers see clean words."""
+    return HARAKAT.sub("", text)

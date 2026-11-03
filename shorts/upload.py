@@ -30,10 +30,11 @@ def upload(cfg: Config, script: Script, video: Path) -> str:
     from googleapiclient.http import MediaFileUpload
 
     from . import seo
+    from .spoken import plain
 
     yt = _client(cfg)
     credits = script.description.split("\n\nالصور:\n", 1)
-    title, description, tags = seo.build(script.title, script.lines[0], script.tags,
+    title, description, tags = seo.build(script.title, plain(script.lines[0]), script.tags,
                                          seo.trending_hashtags(yt), kind=script.kind,
                                          source=script.source)
     if len(credits) == 2:
