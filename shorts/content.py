@@ -73,6 +73,9 @@ Write ONE new Short. Rules:
   NO "follow", "like" or "subscribe" lines.
 - 12 to 15 lines, each 3 to 14 words, spoken in about 45-60 seconds: a full story
   with a twist near the end, never a list of facts.
+- Ending: never leave the viewer hanging. The last 2-3 lines reveal what really
+  happened, or the strongest explanation investigators reached (say so honestly when
+  it is still unproven), starting like "وش اللي صار؟" or "والنهاية؟".
 - title: under 55 characters, mysterious, does not reveal the answer, ends with " #shorts".
 - description: the hook sentence, then "تابع القناة.. لغز حقيقي جديد كل يوم 🔍", then 3 hashtags.
 - tags: 8 short tags in the video language.

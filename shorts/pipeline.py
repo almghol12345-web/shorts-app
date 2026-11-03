@@ -14,7 +14,7 @@ def _slug(text: str) -> str:
 
 
 # A clear ending (the stories close on an open question) that also invites comments.
-OUTRO = "وش رأيك أنت؟ اكتب لي توقعك في التعليقات"
+OUTRO = "وأنت.. تصدق هالتفسير؟ اكتب لي رأيك في التعليقات"
 
 
 def add_outro(script: content.Script) -> None:
