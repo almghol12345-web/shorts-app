@@ -360,7 +360,7 @@ def test_numbers_are_spoken_in_gulf_arabic():
     from shorts.spoken import number_words, speakable
     assert number_words(1959) == "ألف وتسعمية وتسعة وخمسين"
     assert number_words(239) == "ميتين وتسعة وثلاثين"
-    assert number_words(3000) == "ثلاث آلاف" and number_words(11600) == "احدعش ألف وستمية"
+    assert number_words(3000) == "ثلاث آلاف" and number_words(11600) == "إحدعش ألف وستمية"
     assert number_words(80_000_000) == "ثمانين مليون"
     assert speakable("72 ثانية.. واختفت...") == "اثنين وسبعين ثانية، واختفت."
     assert speakable("طيب مين قص هالصخرة...") == "طيب مين قص هالصخرة؟"
