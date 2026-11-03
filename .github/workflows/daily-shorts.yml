@@ -2,9 +2,12 @@ name: Daily Shorts
 
 on:
   schedule:
-    # Twice a day, timed for Gulf evening viewers (UTC): ~5pm and ~9pm Riyadh.
+    # Four a day for Gulf viewers (UTC+3): ~1pm, ~5pm, ~8:45pm and ~11:30pm Riyadh.
+    # (YouTube API quota allows about 6 uploads a day.)
+    - cron: "07 10 * * *"
     - cron: "13 14 * * *"
     - cron: "47 17 * * *"
+    - cron: "29 20 * * *"
   workflow_dispatch:
     inputs:
       count:
@@ -14,6 +17,15 @@ on:
         description: "Upload to YouTube"
         type: boolean
         default: true
+      voice:
+        description: "Try a specific ElevenLabs voice by name (empty = channel voice)"
+        default: ""
+      darijat_voice:
+        description: "Darijat voice name to try (empty = channel voice)"
+        default: ""
+      privacy:
+        description: "public / unlisted / private"
+        default: "public"
 
 permissions:
   contents: write
@@ -62,12 +74,19 @@ jobs:
           PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
           PIXABAY_API_KEY: ${{ secrets.PIXABAY_API_KEY }}
           POLLINATIONS_TOKEN: ${{ secrets.POLLINATIONS_TOKEN }}
+          ELEVENLABS_API_KEY: ${{ secrets.ELEVENLABS_API_KEY }}
+          DARIJAT_API_KEY: ${{ secrets.DARIJAT_API_KEY }}
+          DARIJAT_VOICE: ${{ inputs.darijat_voice || vars.DARIJAT_VOICE }}
+          DARIJAT_API_URL: ${{ vars.DARIJAT_API_URL }}
+          ELEVENLABS_VOICE_ID: ${{ vars.ELEVENLABS_VOICE_ID }}
+          ELEVENLABS_VOICE_PICK: ${{ inputs.voice }}
           YOUTUBE_CLIENT_ID: ${{ secrets.YOUTUBE_CLIENT_ID }}
           YOUTUBE_CLIENT_SECRET: ${{ secrets.YOUTUBE_CLIENT_SECRET }}
           YOUTUBE_REFRESH_TOKEN: ${{ secrets.YOUTUBE_REFRESH_TOKEN }}
           SHORTS_NICHE: ${{ vars.SHORTS_NICHE }}
           SHORTS_VOICE: ${{ vars.SHORTS_VOICE }}
-          SHORTS_PRIVACY: ${{ vars.SHORTS_PRIVACY }}
+          SHORTS_PRIVACY: ${{ inputs.privacy || vars.SHORTS_PRIVACY }}
+          SHORTS_NARRATOR: ${{ vars.SHORTS_NARRATOR }}
         run: |
           UPLOAD_FLAG="--upload"
           if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "${{ inputs.upload }}" != "true" ]; then UPLOAD_FLAG=""; fi
@@ -94,12 +113,19 @@ jobs:
           git push -qf "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" previews
 
       - name: Save published-topics history
+        if: always()
         run: |
-          if [ -n "$(git status --porcelain data/history.json)" ]; then
-            git config user.name "shorts-bot"
-            git config user.email "shorts-bot@users.noreply.github.com"
+          [ -f output/published.jsonl ] || exit 0
+          git config user.name "shorts-bot"
+          git config user.email "shorts-bot@users.noreply.github.com"
+          # merge onto the latest branch tip (no rebase conflicts with other edits)
+          for i in 1 2 3; do
+            git fetch -q origin "${GITHUB_REF_NAME}"
+            git checkout -q -f -B history-update "origin/${GITHUB_REF_NAME}"
+            python scripts/merge_history.py output/published.jsonl data/history.json
             git add data/history.json
-            git commit -m "chore: record published Shorts"
-            git pull --rebase origin "${GITHUB_REF_NAME}"
-            git push
-          fi
+            git commit -qm "chore: record published Shorts" || exit 0
+            git push -q origin "HEAD:${GITHUB_REF_NAME}" && exit 0
+            sleep 5
+          done
+          exit 1

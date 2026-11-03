@@ -4,13 +4,28 @@ import shutil
 from datetime import datetime
 from pathlib import Path
 
-from . import background, content, history, render, voice
+from . import animate, background, content, history, render, voice
 from .captions import split_lines
 from .config import Config
 
 
 def _slug(text: str) -> str:
     return re.sub(r"[^a-z0-9]+", "-", text.lower()).strip("-")[:40] or "short"
+
+
+# A clear ending (the stories close on an open question) that also invites comments.
+OUTRO = "وش رأيك أنت؟ اكتب لي توقعك في التعليقات"
+
+
+def add_outro(script: content.Script) -> None:
+    n = len(script.lines)
+    if script.lines and script.lines[-1] == OUTRO:
+        return
+    script.lines = script.lines + [OUTRO]
+    if len(script.scenes) == n:
+        script.scenes = script.scenes + [script.scenes[-1]]
+    if len(script.visuals) == n:
+        script.visuals = script.visuals + [script.visuals[-1]]
 
 
 def line_spans(narration: voice.Narration, n_lines: int) -> list[float]:
@@ -26,6 +41,7 @@ def line_spans(narration: voice.Narration, n_lines: int) -> list[float]:
 def make_one(cfg: Config, do_upload: bool, keep_work: bool = False) -> dict:
     used = history.used_topics(cfg.history_file)
     script = content.generate(cfg, used)
+    add_outro(script)
     print(f"[script] {script.title}")
 
     stamp = datetime.now().strftime("%Y%m%d-%H%M%S")
@@ -41,10 +57,18 @@ def make_one(cfg: Config, do_upload: bool, keep_work: bool = False) -> dict:
                                    pexels_key=cfg.pexels_key, pixabay_key=cfg.pixabay_key)
     if credits:
         script.description += "\n\nالصور:\n" + "\n".join(credits)
-    video = render.render(cfg, narration, bg, work, cfg.output_dir / f"{name}.mp4")
-    print(f"[video] {video}")
     spans = line_spans(narration, len(script.lines))
-    mids = [sum(spans[:i]) + spans[i] / 2 for i in range(len(spans))]
+    starts = [sum(spans[:i]) for i in range(len(spans))]
+    narrator = None
+    if cfg.show_narrator:
+        narrator, _ = animate.character_track(narration.audio, starts, narration.length, work / "narrator.mov")
+    from .music import mood_for
+    mood = mood_for(script.title, " ".join(script.tags), " ".join(script.visual_plan()), " ".join(script.lines))
+    print(f"[music] mood: {mood}")
+    video = render.render(cfg, narration, bg, work, cfg.output_dir / f"{name}.mp4",
+                          narrator=narrator, mood=mood)
+    print(f"[video] {video}")
+    mids = [starts[i] + spans[i] / 2 for i in range(len(spans))]
     render.contact_sheet(video, mids, cfg.output_dir / "preview.jpg")
 
     video_id = None
@@ -57,7 +81,8 @@ def make_one(cfg: Config, do_upload: bool, keep_work: bool = False) -> dict:
             from .upload import upload
             video_id = upload(cfg, script, video)
             print(f"[upload] https://youtube.com/shorts/{video_id}")
-            history.record(cfg.history_file, script.topic, script.title, video_id)
+            history.record(cfg.history_file, script.topic, script.title, video_id,
+                           journal=cfg.output_dir / "published.jsonl")
 
     if not keep_work:
         shutil.rmtree(work, ignore_errors=True)

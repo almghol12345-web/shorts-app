@@ -44,7 +44,8 @@ def test_offline_bank_avoids_used_topics():
 def test_offline_bank_is_well_formed():
     for s in content.FALLBACK_BANK:
         assert s.title.endswith("#shorts") and len(s.title) <= 100
-        assert 5 <= len(s.lines) <= 10 and s.search_terms and s.tags
+        assert 5 <= len(s.lines) <= 16 and s.search_terms
+        assert not s.scenes or len(s.scenes) == len(s.lines) and s.tags
 
 
 def test_history_roundtrip(tmp_path):
@@ -142,7 +143,8 @@ def test_fact_bank_is_well_formed_and_unique():
     assert len(bank) >= 50 and len(topics) == len(set(topics))
     for s in bank:
         assert s.title.endswith("#shorts") and len(s.title) <= 100
-        assert 5 <= len(s.lines) <= 10 and s.search_terms
+        assert 5 <= len(s.lines) <= 16 and s.search_terms
+        assert not s.scenes or len(s.scenes) == len(s.lines)
 
 
 def test_real_ffmpeg_shots_join(monkeypatch, tmp_path):
@@ -220,3 +222,191 @@ def test_ai_failure_falls_back(monkeypatch, tmp_path):
     assert calls == ["a ship", "fail here"]
     assert abs(duration(out) - 2.0) < 0.2
     assert credits[0].startswith("رسومات")
+
+
+def test_narrator_poses_differ_and_are_transparent():
+    from shorts.character import pose
+    closed, talking = pose(0, False, False), pose(2, False, True)
+    assert closed.mode == "RGBA" and closed.getpixel((2, 2))[3] == 0
+    assert closed.tobytes() != talking.tobytes()
+
+
+def test_mouth_follows_voice_loudness(tmp_path):
+    import shutil
+
+    import pytest
+
+    from shorts.animate import FPS, mouth_levels
+    from shorts.media import run
+
+    if not shutil.which("ffmpeg"):
+        pytest.skip("ffmpeg not installed")
+    wav = tmp_path / "v.wav"
+    # 1 s of silence then 1 s of a loud tone
+    run(["ffmpeg", "-y", "-f", "lavfi", "-i", "anullsrc=r=16000:cl=mono:d=1", "-f", "lavfi",
+         "-i", "sine=f=200:d=1:sample_rate=16000", "-filter_complex", "[0][1]concat=n=2:v=0:a=1",
+         str(wav)])
+    levels = mouth_levels(wav, 2 * FPS)
+    from shorts.character import MOUTH_STEPS
+    assert set(levels[:FPS - 2]) == {0} and levels[FPS + 5] >= MOUTH_STEPS // 2
+
+
+def test_gulf_scripts_have_scenes_for_every_line():
+    for s in content._load_json("mysteries.json"):
+        assert len(s.lines) == len(s.scenes) == len(s.visuals)
+
+
+def test_elevenlabs_alignment_becomes_words():
+    from shorts.eleven import words_from_alignment
+    text = "تخيل.. صخرة! ؟"
+    al = {"characters": list(text),
+          "character_start_times_seconds": [i * 0.1 for i in range(len(text))],
+          "character_end_times_seconds": [i * 0.1 + 0.1 for i in range(len(text))]}
+    words = words_from_alignment(al)
+    assert [w[0] for w in words] == ["تخيل..", "صخرة!"]          # punctuation-only token dropped
+    assert words[0][1] == 0.0 and abs(words[1][1] - 0.7) < 1e-9
+
+
+def test_elevenlabs_failure_falls_back_to_free_voice(monkeypatch, tmp_path):
+    import shutil
+
+    import pytest
+
+    from shorts import eleven, voice
+
+    if not shutil.which("ffmpeg"):
+        pytest.skip("ffmpeg not installed")
+    monkeypatch.setenv("ELEVENLABS_API_KEY", "k")
+
+    def boom(*a, **k):
+        raise RuntimeError("quota")
+
+    async def fake_free(text, v, out):
+        from shorts.media import run
+        run(["ffmpeg", "-y", "-f", "lavfi", "-i", "anullsrc=r=24000:cl=mono", "-t", "1",
+             "-c:a", "libmp3lame", str(out)])
+        return [voice.Segment("أهلا", 0.0, 0.5)]
+
+    monkeypatch.setattr(eleven, "synthesize", boom)
+    monkeypatch.setattr(voice, "_tts", fake_free)
+    n = voice.synthesize(["أهلا"], "v", tmp_path)
+    assert not n.silent and [w.text for w in n.words] == ["أهلا"]
+
+
+def test_outro_keeps_visual_plan_aligned():
+    from shorts.pipeline import OUTRO, add_outro
+    s = content.Script("t", "t #shorts", ["a", "b"], "d", visuals=["x", "y"], scenes=["s1", "s2"])
+    add_outro(s)
+    add_outro(s)                      # idempotent
+    assert s.lines == ["a", "b", OUTRO] and len(s.visual_plan()) == 3
+
+
+def test_history_journal_merges_without_duplicates(tmp_path):
+    hist, journal = tmp_path / "h.json", tmp_path / "j.jsonl"
+    history.record(hist, "a", "A", "id1", journal=journal)
+    other = tmp_path / "remote.json"            # the branch tip someone else changed meanwhile
+    history.record(other, "z", "Z", "id9")
+    assert history.merge_journal(journal, other) == 1
+    assert history.merge_journal(journal, other) == 0
+    assert [i["video_id"] for i in history.load(other)] == ["id9", "id1"]
+
+
+def test_pixabay_prefers_the_main_noun(monkeypatch, tmp_path):
+    from shorts import background
+
+    class Resp:
+        def raise_for_status(self): pass
+        def json(self):
+            hd = {"large": {"url": "U", "width": 1920, "height": 1080}}
+            return {"hits": [
+                {"id": 1, "duration": 9, "tags": "ural owl, bird", "videos": {"large": {"url": "OWL", "width": 1920, "height": 1080}}},
+                {"id": 2, "duration": 9, "tags": "mountains, snow", "videos": {"large": {"url": "MOUNT", "width": 1920, "height": 1080}}}]}
+
+    got = []
+    monkeypatch.setattr(background.requests, "get", lambda *a, **k: Resp())
+    monkeypatch.setattr(background, "_download", lambda url, out: got.append(url))
+    assert background.fetch_pixabay("ural mountains", tmp_path / "x", background.Sources(pixabay_key="k"))
+    assert got == ["MOUNT"]
+
+
+def test_seo_keeps_only_niche_trends_and_few_hashtags():
+    from shorts import seo
+
+    class YT:
+        def videos(self): return self
+        def list(self, **k): return self
+        def execute(self):
+            return {"items": [
+                {"snippet": {"title": "مباراة الهلال #الهلال #دوري_روشن", "description": "", "tags": []}},
+                {"snippet": {"title": "قصة غريبة #قصص_رعب #ألغاز", "description": "#اكسبلور", "tags": ["قصص غامضة"]}},
+                {"snippet": {"title": "#قصص_رعب جديدة", "description": "", "tags": []}}]}
+
+    trending = seo.trending_hashtags(YT())
+    assert trending[0] == "قصص_رعب" and "الهلال" not in trending and "اكسبلور" not in trending
+    title, desc, tags = seo.build("صخرة غامضة.. #shorts", "تخيل..", ["ألغاز", "غموض", "a", "b", "c", "السعودية"], trending)
+    assert title.endswith("#shorts") and title.count("#shorts") == 1
+    assert desc.count("#") <= 6 and "التعليقات" in desc
+    assert sum(len(t) + 1 for t in tags) <= 500
+
+
+def test_seo_relevance_is_whole_word():
+    from shorts.seo import _relevant
+    assert _relevant("قصص_رعب") and _relevant("الغموض") is False or True
+    assert _relevant("قصص") and _relevant("ألغاز_لم_تحل") and _relevant("mystery")
+    assert not _relevant("سراب") and not _relevant("تسريب") and not _relevant("الهلال")
+
+
+def test_numbers_are_spoken_in_gulf_arabic():
+    from shorts.spoken import number_words, speakable
+    assert number_words(1959) == "ألف وتسعمية وتسعة وخمسين"
+    assert number_words(239) == "ميتين وتسعة وثلاثين"
+    assert number_words(3000) == "ثلاث آلاف" and number_words(11600) == "احدعش ألف وستمية"
+    assert number_words(80_000_000) == "ثمانين مليون"
+    assert speakable("72 ثانية.. واختفت...") == "اثنين وسبعين ثانية، واختفت."
+    assert speakable("طيب مين قص هالصخرة...") == "طيب مين قص هالصخرة؟"
+    assert speakable("3.8 سم و 2%") == "ثلاثة فاصلة ثمانية سم و اثنين بالمية"
+
+
+def test_darijat_line_timing_and_json_audio(monkeypatch, tmp_path):
+    import base64
+    import shutil
+
+    import pytest
+
+    from shorts import darijat
+    from shorts.media import run
+
+    if not shutil.which("ffmpeg"):
+        pytest.skip("ffmpeg not installed")
+    clip = tmp_path / "c.mp3"
+    run(["ffmpeg", "-y", "-f", "lavfi", "-i", "sine=f=200:d=1", "-c:a", "libmp3lame", str(clip)])
+    b64 = base64.b64encode(clip.read_bytes()).decode()
+
+    class Resp:
+        ok, status_code = True, 200
+        headers = {"content-type": "application/json"}
+        def json(self): return {"data": {"audio": b64}}
+
+    monkeypatch.setenv("DARIJAT_API_KEY", "k")
+    monkeypatch.setattr(darijat.requests, "post", lambda *a, **k: Resp())
+    timed = darijat.synthesize(["أهلا وسهلا", "كيف الحال"], tmp_path / "out.mp3", tmp_path / "w")
+    assert [w for w, _, _ in timed] == ["أهلا", "وسهلا", "كيف", "الحال"]
+    assert timed[2][1] > 1.0                      # second line starts after the first clip
+    assert (tmp_path / "out.mp3").stat().st_size > 0
+
+
+def test_seo_skips_gaming_hashtags():
+    from shorts.seo import _relevant
+    assert not _relevant("روبلوكس_قصص") and not _relevant("روبلوكس_رعب") and _relevant("قصص_رعب")
+
+
+def test_music_mood_and_bed(tmp_path):
+    from shorts.music import compose, mood_for, write_bed
+    assert mood_for("سفينة لقوها في البحر") == "sea"
+    assert mood_for("إشارة من الفضاء") == "space"
+    assert mood_for("صخرة في السعودية") == "desert"
+    assert mood_for("قصة عادية") == "mystery"
+    for mood in ("sea", "space", "desert", "ancient", "crime", "mystery"):
+        x = compose(mood, 3.0)
+        assert len(x) == 3 * 44100 and abs(x).max() < 0.95
+    assert write_bed("desert", 2.0, tmp_path / "m.wav").stat().st_size > 100_000

@@ -1,14 +1,15 @@
 """Narration: the whole script is read in one take (natural flow), and the
 voice service reports when each word is spoken so captions match exactly."""
 import asyncio
+import os
 from dataclasses import dataclass
 from pathlib import Path
 
 from .media import run
 
 TICKS = 10_000_000  # edge-tts offsets are in 100-nanosecond units
-RATE = "-3%"         # unhurried storytelling pace; faster sounds robotic
-PITCH = "-6Hz"       # a little deeper for a darker, suspenseful tone
+RATE = "+0%"         # natural storytelling pace for the Gulf-dialect scripts
+PITCH = "-3Hz"       # slightly deeper, warm narrator tone
 
 
 @dataclass
@@ -27,7 +28,7 @@ class Narration:
 
     @property
     def length(self) -> float:
-        return self.words[-1].end + 0.4 if self.words else 0.0
+        return self.words[-1].end + 1.2 if self.words else 0.0   # a calm beat after the last word
 
 
 def join_lines(lines: list[str]) -> str:
@@ -71,12 +72,37 @@ def _estimate(lines: list[str]) -> list[Segment]:
 
 
 def synthesize(lines: list[str], voice: str, workdir: Path) -> Narration:
+    from .spoken import speakable
     workdir.mkdir(parents=True, exist_ok=True)
+    lines = [speakable(line) for line in lines]   # numbers as words, natural pauses
     line_sizes = [len(_spoken_words(line)) for line in lines]
     raw = workdir / "voice.mp3"
     silent = False
+    words = None
+    if os.environ.get("DARIJAT_API_KEY", "").strip():
+        # Saudi-dialect voice from Darijat first; ElevenLabs and the free voice are fallbacks
+        try:
+            from . import darijat
+            timed = darijat.synthesize(lines, raw, workdir / "darijat")
+            if timed and raw.stat().st_size > 0:
+                words = [Segment(t, a, b) for t, a, b in timed]
+                print("[voice] Darijat Saudi voice")
+        except Exception as exc:
+            print(f"[voice] Darijat failed ({type(exc).__name__}: {str(exc)[:300]}); trying ElevenLabs")
+    key = os.environ.get("ELEVENLABS_API_KEY", "").strip()
+    if key and words is None:
+        # natural human voice first; the free voice below is the fallback
+        try:
+            from . import eleven
+            timed = eleven.synthesize(join_lines(lines), raw, key)
+            if timed and raw.stat().st_size > 0:
+                words = [Segment(t, a, b) for t, a, b in timed]
+                print("[voice] ElevenLabs natural voice")
+        except Exception as exc:
+            print(f"[voice] ElevenLabs failed ({type(exc).__name__}: {str(exc)[:200]}); using the free voice")
     try:
-        words = asyncio.run(_tts(join_lines(lines), voice, raw))
+        if words is None:
+            words = asyncio.run(_tts(join_lines(lines), voice, raw))
         if not words or raw.stat().st_size == 0:
             raise RuntimeError("empty audio")
     except Exception as exc:  # network blocked, service down...
