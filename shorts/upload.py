@@ -26,7 +26,7 @@ def _client(cfg: Config):
     return build("youtube", "v3", credentials=creds, cache_discovery=False)
 
 
-def upload(cfg: Config, script: Script, video: Path) -> str:
+def upload(cfg: Config, script: Script, video: Path, cover: Path | None = None) -> str:
     from googleapiclient.http import MediaFileUpload
 
     from . import seo
@@ -63,6 +63,13 @@ def upload(cfg: Config, script: Script, video: Path) -> str:
         status, response = request.next_chunk()
         if status:
             print(f"[upload] {int(status.progress() * 100)}%")
+    if cover and cover.exists():
+        try:
+            yt.thumbnails().set(videoId=response["id"],
+                                media_body=MediaFileUpload(str(cover), mimetype="image/jpeg")).execute()
+            print("[upload] cover set")
+        except Exception as exc:
+            print(f"[upload] cover not set ({str(exc)[:200]})")
     question = plain(script.question or (script.lines[-1] if script.lines else ""))
     if question:
         post_comment(yt, response["id"], question + " 👇")

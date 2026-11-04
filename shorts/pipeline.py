@@ -93,6 +93,14 @@ def make_one(cfg: Config, do_upload: bool, keep_work: bool = False) -> dict:
     from .spoken import plain
     reveal = [starts[i] for i, l in enumerate(script.lines)
               if any(k in plain(l) for k in ("وش اللي صار", "والنهاية", "والمفاجأة", "والأغرب", "بس الغريب"))]
+    from . import cover as cover_mod
+    cover = None
+    try:
+        cover = cover_mod.make(bg, min(spans[0] * 0.6, 2.0), script.title, work / "cover.jpg",
+                               cfg.font_name, cfg.font_dir)
+        shutil.copy(cover, cfg.output_dir / "cover.jpg")
+    except Exception as exc:  # a cover is polish; never lose the Short over it
+        print(f"[cover] skipped ({str(exc)[:150]})")
     video = render.render(cfg, narration, bg, work, cfg.output_dir / f"{name}.mp4",
                           narrator=narrator, mood=mood, cuts=starts[1:], booms=reveal[:2])
     print(f"[video] {video}")
@@ -107,7 +115,7 @@ def make_one(cfg: Config, do_upload: bool, keep_work: bool = False) -> dict:
             print("[upload] skipped: YouTube credentials are not configured")
         else:
             from .upload import upload
-            video_id = upload(cfg, script, video)
+            video_id = upload(cfg, script, video, cover)
             print(f"[upload] https://youtube.com/shorts/{video_id}")
             history.record(cfg.history_file, script.source or script.topic, script.title, video_id,
                            journal=cfg.output_dir / "published.jsonl")
