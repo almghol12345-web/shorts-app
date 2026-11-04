@@ -10,8 +10,8 @@ on:
         description: "mystery (stories) / news (amazing facts)"
         default: "mystery"
       stories:
-        description: "How many stories"
-        default: "7"
+        description: "How many stories (0 = enough for 9+ minutes)"
+        default: "0"
       privacy:
         description: "public / unlisted / private"
         default: "public"
@@ -55,7 +55,7 @@ jobs:
           # alternate: stories on Tuesdays, amazing facts on Fridays
           KIND="${{ inputs.kind }}"
           if [ -z "$KIND" ]; then KIND=$([ "$(date -u +%u)" = "5" ] && echo news || echo mystery); fi
-          python -m shorts --long "$KIND" --stories "${{ inputs.stories || '7' }}" --upload
+          python -m shorts --long "$KIND" --stories "${{ inputs.stories || '0' }}" --upload
       - name: Keep the video (7 days)
         if: always()
         uses: actions/upload-artifact@v4

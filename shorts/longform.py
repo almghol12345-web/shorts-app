@@ -18,7 +18,8 @@ from .spoken import plain
 WIDTH, HEIGHT = 1920, 1080
 LONG_HISTORY = ROOT / "data" / "long_history.json"
 ORDINALS = ["الأُولَى", "الثَّانْيَة", "الثَّالْثَة", "الرَّابْعَة", "الخَامْسَة", "السَّادْسَة",
-            "السَّابْعَة", "الثَّامْنَة", "التَّاسْعَة", "العَاشْرَة"]
+            "السَّابْعَة", "الثَّامْنَة", "التَّاسْعَة", "العَاشْرَة", "رَقَم إِحْدَعْش", "رَقَم ثِنَعْش",
+            "رَقَم ثَلَطَعْش", "رَقَم أَرْبَعْطَعْش", "رَقَم خَمْسَطَعْش"]
 PLAIN_ORDINALS = [plain(o) for o in ORDINALS]
 
 THEMES = {
@@ -44,20 +45,41 @@ THEMES = {
 
 
 def _numbers(n: int) -> str:
-    return {5: "خَمْس", 6: "سِت", 7: "سَبْع", 8: "ثَمَان", 9: "تِسْع", 10: "عَشْر"}.get(n, str(n))
+    return {5: "خَمْس", 6: "سِت", 7: "سَبْع", 8: "ثَمَان", 9: "تِسْع", 10: "عَشْر", 11: "إِحْدَعْش",
+            12: "ثِنَعْش", 13: "ثَلَطَعْش", 14: "أَرْبَعْطَعْش", 15: "خَمْسَطَعْش"}.get(n, str(n))
 
 
-def choose(kind: str, history: list[dict], stats: dict, done: set[str], count: int) -> list[Script]:
+TARGET_MINUTES = 9.5    # 8+ minutes lets YouTube place ads in the middle; keep a margin
+
+
+def estimate_seconds(lines: list[str]) -> float:
+    """Spoken length of lines in the channel voice (measured: ~0.42 s per word + a breath per line)."""
+    words = sum(len(l.split()) for l in lines)
+    return words * 0.42 + len(lines) * 0.25
+
+
+def choose(kind: str, history: list[dict], stats: dict, done: set[str], count: int = 0) -> list[Script]:
     """The best-performing published stories of this kind (not used in a long video yet),
-    topped up with unpublished ones. The strongest goes last, as the promised finale."""
+    topped up with unpublished ones, until the video reaches TARGET_MINUTES (or `count`
+    stories when given). The strongest goes last, as the promised finale."""
     bank = {s.topic: s for s in content._load_json("wow.json" if kind == "news" else "mysteries.json")}
     views = {h["topic"]: stats.get(h.get("video_id") or "", {}).get("views", 0) for h in history}
-    ranked = sorted((t for t in bank if t in views and t not in done), key=lambda t: views[t], reverse=True)
-    picked = [bank[t] for t in ranked[:count]]
-    if len(picked) < count:
-        picked += [s for t, s in bank.items() if t not in views and t not in done][:count - len(picked)]
-    picked = sorted(picked, key=lambda s: views.get(s.topic, 0))      # weakest first, best last
-    return picked
+    # full-length stories first (they carry the watch time), each group by views
+    ranked = sorted((t for t in bank if t in views and t not in done),
+                    key=lambda t: (len(bank[t].lines) >= 12, views[t]), reverse=True)
+    unseen = sorted((s for t, s in bank.items() if t not in views and t not in done),
+                    key=lambda s: len(s.lines) >= 12, reverse=True)
+    pool = [bank[t] for t in ranked] + unseen
+    picked, seconds = [], 25.0                      # intro, outro and chapter cards
+    for s in pool:
+        if count and len(picked) >= count:
+            break
+        if not count and (seconds >= TARGET_MINUTES * 60 or len(picked) >= len(ORDINALS)):
+            break
+        picked.append(s)
+        seconds += estimate_seconds(s.lines) + 2.5
+    print(f"[long] {len(picked)} stories, about {seconds / 60:.1f} min")
+    return sorted(picked, key=lambda s: views.get(s.topic, 0))      # weakest first, best last
 
 
 def assemble(kind: str, stories: list[Script]) -> tuple[Script, list[int]]:
@@ -82,6 +104,10 @@ def assemble(kind: str, stories: list[Script]) -> tuple[Script, list[int]]:
     lines += outro
     scenes += [scenes[-1]] * len(outro)
     visuals += [visuals[-1]] * len(outro)
+    if n > 10:   # Arabic: 3-10 take a plural noun, 11+ a singular one
+        lines = [l.replace("قِصَص", "قِصَّة").replace("اكتِشَافَات وْاخْتِرَاعَات", "اكتِشَاف وْاخْتِرَاع") for l in lines]
+        outro = [l.replace("قِصَص", "قِصَّة").replace("مَعْلُومَات", "مَعْلُومَة") for l in outro]
+        theme = dict(theme, title=theme["title"].replace("قصص", "قصة").replace("اكتشافات", "اكتشاف"))
     title = theme["title"].format(n=str(len(stories)).translate(str.maketrans("0123456789", "٠١٢٣٤٥٦٧٨٩")))
     script = Script(topic=f"long:{kind}:{'+'.join(s.topic for s in stories)}", title=title, lines=lines,
                     description="", tags=theme["tags"], visuals=visuals, scenes=scenes, kind=kind)
@@ -136,7 +162,7 @@ Dialogue: 0,0:00:00.00,0:00:05.00,Bottom,,0,0,0,,{bottom}
     return out
 
 
-def make_long(cfg: Config, kind: str, do_upload: bool, count: int = 7) -> dict:
+def make_long(cfg: Config, kind: str, do_upload: bool, count: int = 0) -> dict:
     from . import history, learn
     from .pipeline import line_spans
     hist = history.load(cfg.history_file)

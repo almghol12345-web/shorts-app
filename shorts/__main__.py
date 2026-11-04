@@ -12,7 +12,7 @@ def main() -> int:
     parser.add_argument("--offline", action="store_true", help="ignore the Claude key, use the built-in fact bank")
     parser.add_argument("--keep-work", action="store_true", help="keep intermediate files for debugging")
     parser.add_argument("--long", choices=["mystery", "news"], help="make one long horizontal video instead")
-    parser.add_argument("--stories", type=int, default=7, help="stories in a long video")
+    parser.add_argument("--stories", type=int, default=0, help="stories in a long video (0 = enough for 9+ minutes)")
     args = parser.parse_args()
 
     cfg = Config()
