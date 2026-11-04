@@ -84,7 +84,7 @@ def make_one(cfg: Config, do_upload: bool, keep_work: bool = False) -> dict:
     from . import mascot
     if mascot.available():
         # the channel's character tells the story from the bottom-left corner
-        narrator = mascot.track(script.lines, spans, work / "narrator.mov", height=int(cfg.height * 0.36))
+        narrator = mascot.track(script.lines, spans, work / "narrator.mov", height=int(cfg.height * 0.46))
     elif cfg.show_narrator:
         narrator, _ = animate.character_track(narration.audio, starts, narration.length, work / "narrator.mov")
     from .music import mood_for
