@@ -3,8 +3,8 @@ import subprocess
 from pathlib import Path
 
 
-def run(cmd: list[str]) -> None:
-    result = subprocess.run(cmd, capture_output=True, text=True)
+def run(cmd: list[str], cwd: Path | str | None = None) -> None:
+    result = subprocess.run(cmd, capture_output=True, text=True, cwd=cwd)
     if result.returncode != 0:
         raise RuntimeError(f"command failed: {' '.join(cmd[:4])}...\n{result.stderr[-2000:]}")
 

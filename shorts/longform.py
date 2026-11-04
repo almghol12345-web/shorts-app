@@ -120,8 +120,8 @@ ScaledBorderAndShadow: yes
 
 [V4+ Styles]
 Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
-Style: Top,{cfg.font_name},110,&H00FFFFFF,&H00FFFFFF,&H00000000,&H00000000,-1,0,0,0,100,100,0,0,1,9,4,8,40,40,40,1
-Style: Bottom,{cfg.font_name},120,&H0000E1FF,&H0000E1FF,&H00000000,&H00000000,-1,0,0,0,100,100,0,0,1,10,4,2,40,40,50,1
+Style: Top,{cfg.font_name},128,&H00FFFFFF,&H00FFFFFF,&H00000000,&H00000000,-1,0,0,0,100,100,0,0,1,9,4,8,40,40,40,1
+Style: Bottom,{cfg.font_name},140,&H0000E1FF,&H0000E1FF,&H00000000,&H00000000,-1,0,0,0,100,100,0,0,1,10,4,2,40,40,50,1
 
 [Events]
 Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
@@ -176,8 +176,12 @@ def make_long(cfg: Config, kind: str, do_upload: bool, count: int = 7) -> dict:
                           cuts=t[1:], booms=[t[k] for k in starts], cards=cards)
     print(f"[long] video {video}")
     finale = stories[-1]
-    thumb = thumbnail(finale.scenes[0] if finale.scenes else finale.title,
-                      plain(finale.title).replace("#shorts", "").strip(" .!"), work, cfg)
+    try:
+        thumb = thumbnail(finale.scenes[0] if finale.scenes else finale.title,
+                          plain(finale.title).replace("#shorts", "").strip(" .!"), work, cfg)
+    except Exception as exc:   # a missing thumbnail must never cost the whole video
+        print(f"[long] thumbnail failed: {str(exc)[:200]}")
+        thumb = None
     if thumb:
         shutil.copy(thumb, cfg.output_dir / "long_thumbnail.jpg")
 
