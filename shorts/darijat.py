@@ -10,12 +10,15 @@ by their length. Captions therefore stay in sync line by line.
 import base64
 import os
 import subprocess
+import time
 from pathlib import Path
 
 import requests
 
 DEFAULT_URL = "https://tts.darijat.com"
 PAUSE = 0.18          # breath between lines, seconds
+GAP = 1.2             # seconds between requests (the service rate-limits bursts)
+_last_call = [0.0]
 
 
 def _cfg():
@@ -52,8 +55,20 @@ def generate(text: str, out: Path) -> None:
     url, key, voice = _cfg()
     headers = {"Authorization": f"Bearer {key}", "X-API-Key": key, "api-key": key,
                "Content-Type": "application/json", "Accept": "audio/mpeg, application/json"}
-    resp = requests.post(f"{url}/api/v2/external/generate-audio", headers=headers, timeout=180,
-                         json={"text": text, "voice_name": voice, "speed": 1.0})
+    # the service limits how fast requests may come: space them out and wait out a 429
+    for attempt in range(7):
+        wait = _last_call[0] + GAP - time.time()
+        if wait > 0:
+            time.sleep(wait)
+        _last_call[0] = time.time()
+        resp = requests.post(f"{url}/api/v2/external/generate-audio", headers=headers, timeout=180,
+                             json={"text": text, "voice_name": voice, "speed": 1.0})
+        if resp.status_code in (429, 502, 503) and attempt < 6:
+            pause = int(resp.headers.get("retry-after", "0") or 0) or 10 * (attempt + 1)
+            print(f"[voice] Darijat busy ({resp.status_code}); waiting {pause}s")
+            time.sleep(pause)
+            continue
+        break
     if not resp.ok:
         raise RuntimeError(f"Darijat HTTP {resp.status_code}: {resp.text[:300]}")
     _save_audio(resp, out, headers)

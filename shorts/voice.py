@@ -88,6 +88,10 @@ def synthesize(lines: list[str], voice: str, workdir: Path) -> Narration:
                 words = [Segment(t, a, b) for t, a, b in timed]
                 print("[voice] Darijat Saudi voice")
         except Exception as exc:
+            # the channel has one voice: never swap it silently for another one
+            if not os.environ.get("VOICE_FALLBACK", "").strip():
+                raise RuntimeError(f"Darijat voice unavailable ({type(exc).__name__}: {str(exc)[:200]}); "
+                                   "not using another voice") from exc
             print(f"[voice] Darijat failed ({type(exc).__name__}: {str(exc)[:300]}); trying ElevenLabs")
     key = os.environ.get("ELEVENLABS_API_KEY", "").strip()
     if key and words is None:
