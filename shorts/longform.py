@@ -57,7 +57,8 @@ TARGET_MINUTES = 10.5   # at least 10 minutes (owner's choice); 8+ lets YouTube 
 def estimate_seconds(lines: list[str]) -> float:
     """Spoken length of lines in the channel voice (measured: ~0.42 s per word + a breath per line)."""
     words = sum(len(l.split()) for l in lines)
-    return words * 0.42 + len(lines) * 0.25
+    # calibrated on the first long video: 8 stories estimated 4.94 min, real 4.5 min
+    return (words * 0.42 + len(lines) * 0.25) * 0.91
 
 
 def choose(kind: str, history: list[dict], stats: dict, done: set[str], count: int = 0) -> list[Script]:
