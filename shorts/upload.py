@@ -36,7 +36,7 @@ def upload(cfg: Config, script: Script, video: Path) -> str:
     credits = script.description.split("\n\nالصور:\n", 1)
     title, description, tags = seo.build(script.title, plain(script.lines[0]), script.tags,
                                          seo.trending_hashtags(yt), kind=script.kind,
-                                         source=script.source)
+                                         source=script.source, question=plain(script.question))
     if len(credits) == 2:
         description += "\n\nالصور:\n" + credits[1]
     body = {

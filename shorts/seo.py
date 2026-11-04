@@ -103,7 +103,7 @@ NEWS_SEARCH_TAGS = ["اكتشاف جديد", "أخبار العلم", "تقني�
 
 
 def build(title: str, hook: str, topic_tags: list[str], trending: list[str],
-          kind: str = "mystery", source: str = "") -> tuple[str, str, list[str]]:
+          kind: str = "mystery", source: str = "", question: str = "") -> tuple[str, str, list[str]]:
     """Returns (title, description, tags) ready for upload."""
     news = kind == "news"
     if news:
@@ -116,7 +116,7 @@ def build(title: str, hook: str, topic_tags: list[str], trending: list[str],
     if news:
         description = (
             f"{hook}\n\n"
-            "وش رأيك فيها؟ اكتب لي في التعليقات 👇\n"
+            f"{question or 'وش رأيك فيها؟ اكتب لي في التعليقات'} 👇\n"
             "تابع القناة.. كل يوم شي يبهرك من العالم 🌍\n\n"
             + (f"المصدر: {source}\n\n" if source else "")
             + " ".join(f"#{t}" for t in tags_line) + " #shorts"
@@ -124,7 +124,7 @@ def build(title: str, hook: str, topic_tags: list[str], trending: list[str],
     else:
         description = (
             f"{hook}\n\n"
-            "وش رأيك أنت؟ اكتب لي في التعليقات 👇\n"
+            f"{question or 'وش رأيك أنت؟ اكتب لي في التعليقات'} 👇\n"
             "تابع القناة.. لغز حقيقي جديد كل يوم 🔍\n\n"
             + " ".join(f"#{t}" for t in tags_line) + " #shorts"
         )
