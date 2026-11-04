@@ -38,7 +38,8 @@ def render(cfg: Config, narration: Narration, background: Path, workdir: Path, o
     fade = max(total - 1.5, 0)
     # sound design: soft whooshes on the cuts, low booms on the big moments (index 3 input)
     from .music import write_sfx
-    sfx = write_sfx(total, cuts or [], [0.0] + (booms or []), workdir / "sfx.wav")
+    # no whoosh on the cuts (the owner finds it cheap); only a soft low boom on the big moments
+    sfx = write_sfx(total, [], [0.0] + (booms or []), workdir / "sfx.wav", boom_gain=0.25)
     sfx_idx = 3
     cmd += ["-i", str(sfx.resolve())]
     af = (f"[1:a]asplit=2[v1][v2];"
