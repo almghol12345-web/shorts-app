@@ -385,9 +385,12 @@ def generate_offline(used: list[str], scores: dict | None = None) -> Script:
         return random.choice(bank)
     # Keep the bank's order of preference: the first unused mystery comes before any fact.
     preferred = [s for s in fresh if s in _load_json("mysteries.json")]
-    # full stories (45-60 s) hold viewers longer than short ones, so they go first
-    full = [s for s in preferred if len(s.lines) >= 12]
-    return pick(full or preferred or fresh, scores or {})
+    # full stories (45-60 s) hold viewers longer than short ones, so they go first, and
+    # fully vowelled ones first of all (the voice mispronounces unvowelled dialect)
+    from .spoken import vowel_coverage
+    voweled = [s for s in preferred if min(vowel_coverage(l) for l in s.lines) >= 0.35]
+    full = [s for s in (voweled or preferred) if len(s.lines) >= 12]
+    return pick(full or voweled or preferred or fresh, scores or {})
 
 
 def generate(cfg: Config, used: list[str], scores: dict | None = None) -> Script:

@@ -518,3 +518,13 @@ def test_long_video_assembly_and_chapters():
     spans = [5.0] * len(script.lines)
     ch = longform.chapters(starts, stories, spans, "mystery").splitlines()
     assert ch[0] == "0:00 البداية" and ch[1].startswith("0:10 الأولى: قصة رقم 0") and len(ch) == 5
+
+
+def test_tashkeel_rules_and_amazing_facts_are_vowelled():
+    import json
+    from shorts.spoken import speakable, vowel_coverage
+    assert "القَهْوَةُ قَدِيمَة" in speakable("قَال: القَهْوَة قَدِيمَة")
+    assert speakable("السَّالْفَة..").endswith("السَّالْفَة.")          # no damma before a pause
+    for s in json.load(open("data/wow.json", encoding="utf-8")):
+        for line in s["lines"]:
+            assert vowel_coverage(line) >= 0.35, (s["topic"], line)

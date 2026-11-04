@@ -70,6 +70,9 @@ def speakable(text: str) -> str:
     end = "؟" if QUESTION.search(text) else "."
     text = re.sub(r"\s*\.{2,}\s*$", end, text)
     text = re.sub(r"\s*\.{2,}\s*(?=[^\s.])", "، ", text)       # inner '..' is a breath
+    # taa marbuta joined to the next word (no pause between): give it a damma so the voice
+    # links them ("القَهْوَةُ قَدِيمَة") instead of stopping or reading it as a 'h'
+    text = re.sub(r"ة(?=\s+[\u0621-\u064A])", "ةُ", text)
     # a sukun on a word's first letter (dialect spelling like نْدَفْعَه، وْشْوَي) trips the voice:
     # drop it and let the voice choose the opening vowel
     text = re.sub(r"(^|[\s،.؟!])([\u0621-\u064A])\u0652", r"\1\2", text)
@@ -82,3 +85,18 @@ HARAKAT = re.compile("[\u064B-\u0652\u0670]")
 def plain(text: str) -> str:
     """Text without tashkeel: the voice reads the vowelled script, viewers see clean words."""
     return HARAKAT.sub("", text)
+
+
+ARABIC_LETTER = re.compile("[\u0621-\u064A]")
+
+
+def vowel_coverage(text: str) -> float:
+    """Share of Arabic letters followed by a vowel mark (tashkeel quality, 0..1).
+    Long vowels and a word's last letter often go unmarked, so ~0.6+ is fully vowelled."""
+    letters = marked = 0
+    for i, ch in enumerate(text):
+        if ARABIC_LETTER.match(ch):
+            letters += 1
+            if i + 1 < len(text) and HARAKAT.match(text[i + 1]):
+                marked += 1
+    return marked / letters if letters else 1.0
