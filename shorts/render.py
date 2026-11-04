@@ -57,7 +57,10 @@ def render(cfg: Config, narration: Narration, background: Path, workdir: Path, o
         vf = (f"[0:v]vignette=PI/3.2,noise=alls=3:allf=t[bgv];"
               f"[{idx}:v]scale=iw*{NARRATOR_SCALE}:-1:flags=lanczos[nar];"
               # feet above YouTube's title/channel strip at the bottom of a Short
-              f"[bgv][nar]overlay=x=20:y={'H-h+40' if cfg.width > cfg.height else 'H-h-H*0.15'}:format=auto,{subs}[v]")
+              # slides in from the right edge in the first 0.6 s, then stands on the right
+              # (a little in from the edge, clear of YouTube's like/comment buttons)
+              f"[bgv][nar]overlay=x='W-w-{'40' if cfg.width > cfg.height else 'W*0.11'}+max(0,(0.6-t)/0.6)*(w+60)'"
+              f":y={'H-h+40' if cfg.width > cfg.height else 'H-h-H*0.15'}:format=auto,{subs}[v]")
     else:
         vf = f"[0:v]vignette=PI/3.2,noise=alls=3:allf=t,{subs}[v]"
     cmd += ["-filter_complex", f"{vf};{af}", "-map", "[v]", "-map", "[a]",
