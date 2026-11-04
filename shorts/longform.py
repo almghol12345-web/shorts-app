@@ -81,7 +81,12 @@ def choose(kind: str, history: list[dict], stats: dict, done: set[str], count: i
         picked.append(s)
         seconds += estimate_seconds(s.lines) + 2.5
     print(f"[long] {len(picked)} stories, about {seconds / 60:.1f} min")
-    return sorted(picked, key=lambda s: views.get(s.topic, 0))      # weakest first, best last
+    # the first minute decides whether people stay: open with the second-strongest story,
+    # keep the strongest for the promised finale, the rest in between
+    ranked_picks = sorted(picked, key=lambda s: views.get(s.topic, 0), reverse=True)
+    if len(ranked_picks) < 3:
+        return ranked_picks[::-1]
+    return [ranked_picks[1]] + ranked_picks[2:][::-1] + [ranked_picks[0]]
 
 
 def assemble(kind: str, stories: list[Script]) -> tuple[Script, list[int]]:
