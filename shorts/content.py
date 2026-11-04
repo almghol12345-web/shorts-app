@@ -392,6 +392,12 @@ def generate_offline(used: list[str], scores: dict | None = None) -> Script:
 
 def generate(cfg: Config, used: list[str], scores: dict | None = None) -> Script:
     from .learn import pick
+    import os
+    wanted = os.environ.get("SHORTS_TOPIC", "").strip()
+    if wanted:   # a specific script asked for by the owner (e.g. a test of one story)
+        for s in _load_json("wow.json") + load_bank():
+            if s.topic == wanted:
+                return s
     if cfg.kind == "news":
         # hand-written "wow" Shorts first (free), then live news when a Claude key is set
         fresh = [s for s in _load_json("wow.json") if s.topic not in used]

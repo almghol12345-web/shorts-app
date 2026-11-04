@@ -27,6 +27,9 @@ on:
       kind:
         description: "news (something new in the world) / mystery (story)"
         default: "news"
+      topic:
+        description: "Make this exact script (topic id), empty = automatic choice"
+        default: ""
 
 permissions:
   contents: write
@@ -93,6 +96,7 @@ jobs:
           DARIJAT_API_KEY: ${{ secrets.DARIJAT_API_KEY }}
           REPLICATE_API_TOKEN: ${{ secrets.REPLICATE_API_TOKEN }}
           SHORTS_KIND: ${{ steps.gate.outputs.kind }}
+          SHORTS_TOPIC: ${{ inputs.topic }}
           REPLICATE_VIDEO_SHOTS: ${{ vars.REPLICATE_VIDEO_SHOTS }}
           DARIJAT_VOICE: ${{ inputs.darijat_voice || vars.DARIJAT_VOICE }}
           DARIJAT_API_URL: ${{ vars.DARIJAT_API_URL }}
