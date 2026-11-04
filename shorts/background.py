@@ -170,7 +170,7 @@ def art_clip(image: Path, seconds: float, out: Path, width: int, height: int, in
     frames = int(seconds * 30) + 1
     zoom = "min(1+0.0012*on,1.18)" if index % 2 == 0 else "max(1.18-0.0012*on,1)"
     drift = "+on*0.15" if index % 3 == 0 else "-on*0.15" if index % 3 == 1 else ""
-    vf = (f"scale={width * 2}:{height * 2}:force_original_aspect_ratio=increase,"
+    vf = (f"scale={width * 2}:{height * 2}:force_original_aspect_ratio=increase:flags=lanczos,"
           f"crop={width * 2}:{height * 2},setsar=1,"
           f"zoompan=z='{zoom}':x='iw/2-iw/zoom/2{drift}':y='ih/2-ih/zoom/2'"
           f":d={frames}:s={width}x{height}:fps=30,eq=contrast=1.05:saturation=0.9")
@@ -321,8 +321,8 @@ def gradient(seconds: float, out: Path, width: int, height: int) -> None:
 def motion_clip(video: Path, seconds: float, out: Path, width: int, height: int) -> None:
     """An AI-animated scene: filled to 9:16, looped if the line is longer than the clip."""
     run(["ffmpeg", "-y", "-stream_loop", "-1", "-i", str(video), "-t", f"{seconds:.3f}", "-an",
-         "-vf", f"scale={width}:{height}:force_original_aspect_ratio=increase,crop={width}:{height},"
-                f"setsar=1,fps=30,eq=contrast=1.05:saturation=0.9",
+         "-vf", f"scale={width}:{height}:force_original_aspect_ratio=increase:flags=lanczos,crop={width}:{height},"
+                f"setsar=1,fps=30,unsharp=5:5:0.6:5:5:0.0,eq=contrast=1.05:saturation=0.9",
          *ENCODE, str(out)])
 
 

@@ -61,7 +61,7 @@ def render(cfg: Config, narration: Narration, background: Path, workdir: Path, o
         vf = f"[0:v]vignette=PI/3.2,noise=alls=3:allf=t,{subs}[v]"
     cmd += ["-filter_complex", f"{vf};{af}", "-map", "[v]", "-map", "[a]",
             "-t", f"{total:.2f}", "-r", "30",
-            "-c:v", "libx264", "-preset", "medium", "-crf", "21", "-maxrate", "8M", "-bufsize", "16M",
+            "-c:v", "libx264", "-preset", "medium", "-crf", "19", "-maxrate", "12M", "-bufsize", "24M",
             "-pix_fmt", "yuv420p",
             "-c:a", "aac", "-b:a", "192k", "-movflags", "+faststart", str(out.resolve())]
     result = subprocess.run(cmd, cwd=workdir, capture_output=True, text=True)
