@@ -72,7 +72,8 @@ def speakable(text: str) -> str:
     text = re.sub(r"\s*\.{2,}\s*(?=[^\s.])", "، ", text)       # inner '..' is a breath
     # taa marbuta joined to the next word (no pause between): give it a damma so the voice
     # links them ("القَهْوَةُ قَدِيمَة") instead of stopping or reading it as a 'h'
-    text = re.sub(r"ة(?=\s+[\u0621-\u064A])", "ةُ", text)
+    # (only in vowelled words: unvowelled text and spelled-out numbers are left alone)
+    text = re.sub(r"(?<=[\u064B-\u0652])ة(?![\u064B-\u0652])(?=\s+[\u0621-\u064A])", "ةُ", text)
     # a sukun on a word's first letter (dialect spelling like نْدَفْعَه، وْشْوَي) trips the voice:
     # drop it and let the voice choose the opening vowel
     text = re.sub(r"(^|[\s،.؟!])([\u0621-\u064A])\u0652", r"\1\2", text)

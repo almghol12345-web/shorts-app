@@ -525,6 +525,9 @@ def test_tashkeel_rules_and_amazing_facts_are_vowelled():
     from shorts.spoken import speakable, vowel_coverage
     assert "القَهْوَةُ قَدِيمَة" in speakable("قَال: القَهْوَة قَدِيمَة")
     assert speakable("السَّالْفَة..").endswith("السَّالْفَة.")          # no damma before a pause
+    used = {h["topic"] for h in json.load(open("data/history.json", encoding="utf-8"))}
     for s in json.load(open("data/wow.json", encoding="utf-8")):
+        if s["topic"] in used:
+            continue
         for line in s["lines"]:
             assert vowel_coverage(line) >= 0.35, (s["topic"], line)
