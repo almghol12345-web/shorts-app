@@ -63,4 +63,20 @@ def upload(cfg: Config, script: Script, video: Path) -> str:
         status, response = request.next_chunk()
         if status:
             print(f"[upload] {int(status.progress() * 100)}%")
+    question = plain(script.question or (script.lines[-1] if script.lines else ""))
+    if question:
+        post_comment(yt, response["id"], question + " 👇")
     return response["id"]
+
+
+def post_comment(yt, video_id: str, text: str) -> bool:
+    """The channel's own first comment (the story's question) gets the discussion going.
+    YouTube's API cannot pin comments; that one tap stays manual."""
+    try:
+        yt.commentThreads().insert(part="snippet", body={"snippet": {
+            "videoId": video_id, "topLevelComment": {"snippet": {"textOriginal": text}}}}).execute()
+        print("[comment] posted the question")
+        return True
+    except Exception as exc:  # e.g. the token lacks the comment permission
+        print(f"[comment] not posted ({str(exc)[:200]})")
+        return False
