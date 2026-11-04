@@ -11,9 +11,8 @@ from shorts import darijat  # noqa: E402
 
 SAMPLE = "قَال: القَهْوَة قَدِيمَة.. وْالقِصَّة صَارَت فِي القَرْيَة"
 VARIANTS = {
-    "1_alqahwa": "قَال: اَلْقَهْوَة قَدِيمَة",            # the article spelled out with sukun
-    "2_qahwa_shadda": "قَال: القَّهْوَة قَدِيمَة",        # stressed qaf
-    "3_gahwa": "قَال: الگَهْوَة قَدِيمَة",               # the Saudi 'g' on this word only
+    "1_damma": "قَال: القَهْوَةُ قَدِيمَة",          # damma on the taa marbuta of القهوة
+    "2_damma_both": "قَال: القَهْوَةُ قَدِيمَةٌ",    # and on قديمة too
 }
 
 
