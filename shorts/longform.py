@@ -163,7 +163,9 @@ def make_long(cfg: Config, kind: str, do_upload: bool, count: int = 7) -> dict:
     print(f"[long] voice {narration.length / 60:.1f} min")
     spans = line_spans(narration, len(script.lines))
     if not os.environ.get("REPLICATE_VIDEO_SHOTS"):
-        os.environ["REPLICATE_VIDEO_SHOTS"] = "0"            # motion only on the opening shot
+        # real motion on every third shot (AI-animated scene or real NASA footage); the
+        # shots between are illustrations with camera moves. About a dollar per video.
+        os.environ["REPLICATE_VIDEO_SHOTS"] = "every:3"
     bg, credits = background.build(script.visual_plan(), spans, work / "bg", WIDTH, HEIGHT,
                                    pexels_key=cfg.pexels_key, pixabay_key=cfg.pixabay_key)
     from .music import mood_for

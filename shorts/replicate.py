@@ -92,6 +92,12 @@ def video_shots(count: int) -> set[int]:
         return set()
     if spec == "all":
         return set(range(count))
+    if spec.startswith("every:"):          # e.g. "every:3": a moving shot every third line
+        try:
+            step = max(1, int(spec.split(":")[1]))
+        except ValueError:
+            step = 3
+        return set(range(0, count, step))
     picked = set()
     for part in spec.split(","):
         try:
