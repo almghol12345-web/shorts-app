@@ -49,7 +49,7 @@ def _numbers(n: int) -> str:
             12: "ثِنَعْش", 13: "ثَلَطَعْش", 14: "أَرْبَعْطَعْش", 15: "خَمْسَطَعْش"}.get(n, str(n))
 
 
-TARGET_MINUTES = 9.5    # 8+ minutes lets YouTube place ads in the middle; keep a margin
+TARGET_MINUTES = 10.5   # at least 10 minutes (owner's choice); 8+ lets YouTube place mid-roll ads
 
 
 def estimate_seconds(lines: list[str]) -> float:
