@@ -1,0 +1,28 @@
+name: Design Mascot
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  design:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -r requirements.txt
+      - name: Generate candidate characters
+        env:
+          REPLICATE_API_TOKEN: ${{ secrets.REPLICATE_API_TOKEN }}
+        run: python scripts/design_mascot.py
+      - name: Publish them on the 'mascot' branch
+        run: |
+          mkdir -p /tmp/m && cp output/mascot/*.jpg /tmp/m/ && cd /tmp/m
+          git init -q && git checkout -q -b mascot
+          git config user.name "shorts-bot" && git config user.email "shorts-bot@users.noreply.github.com"
+          git add . && git commit -qm "mascot candidates"
+          git push -qf "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" mascot
