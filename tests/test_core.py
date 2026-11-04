@@ -505,3 +505,16 @@ def test_nasa_footage_is_framed_vertically(tmp_path, monkeypatch):
     size = subprocess.run(["ffprobe", "-v", "error", "-select_streams", "v", "-show_entries",
                            "stream=width,height", "-of", "csv=p=0", str(out)], capture_output=True, text=True)
     assert size.stdout.strip() == "360,640" and "NASA" in src.credits
+
+
+def test_long_video_assembly_and_chapters():
+    from shorts import longform
+    from shorts.content import Script
+    stories = [Script(f"t{i}", f"قصة رقم {i} #shorts", ["سطر أول", "سطر ثاني"], "", scenes=["a", "b"],
+                      visuals=["x", "y"]) for i in range(4)]
+    script, starts = longform.assemble("mystery", stories)
+    assert len(script.lines) == len(script.scenes) == len(script.visuals)
+    assert script.title.startswith("٤ قصص") and starts[0] == 2 and "الأخيرة" in longform.plain(script.lines[starts[-1]])
+    spans = [5.0] * len(script.lines)
+    ch = longform.chapters(starts, stories, spans, "mystery").splitlines()
+    assert ch[0] == "0:00 البداية" and ch[1].startswith("0:10 الأولى: قصة رقم 0") and len(ch) == 5

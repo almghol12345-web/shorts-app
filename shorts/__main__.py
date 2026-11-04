@@ -11,12 +11,18 @@ def main() -> int:
     parser.add_argument("--upload", action="store_true", help="upload to YouTube after rendering")
     parser.add_argument("--offline", action="store_true", help="ignore the Claude key, use the built-in fact bank")
     parser.add_argument("--keep-work", action="store_true", help="keep intermediate files for debugging")
+    parser.add_argument("--long", choices=["mystery", "news"], help="make one long horizontal video instead")
+    parser.add_argument("--stories", type=int, default=7, help="stories in a long video")
     args = parser.parse_args()
 
     cfg = Config()
     if args.offline:
         cfg.anthropic_key = ""
     cfg.output_dir.mkdir(parents=True, exist_ok=True)
+    if args.long:
+        from .longform import make_long
+        make_long(cfg, args.long, args.upload, args.stories)
+        return 0
 
     failures = 0
     for i in range(args.count):

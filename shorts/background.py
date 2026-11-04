@@ -294,6 +294,11 @@ def real_clip(video: Path, seconds: float, out: Path, width: int, height: int) -
     blurred, darkened copy, starting past any intro slate."""
     dur = _duration(video)
     start = min(max(2.0, dur * 0.2), max(0.0, dur - seconds - 0.5)) if dur > seconds + 3 else 0.0
+    if width > height:   # wide video on a wide screen: just fill it
+        run(["ffmpeg", "-y", "-ss", f"{start:.2f}", "-stream_loop", "-1", "-i", str(video), "-t", f"{seconds:.3f}",
+             "-vf", f"fps=30,scale={width}:{height}:force_original_aspect_ratio=increase,crop={width}:{height},"
+                    f"setsar=1,{GRADE}", *ENCODE, str(out)])
+        return
     vf = (f"[0:v]fps=30,split=2[a][b];"
           f"[a]scale={width}:{height}:force_original_aspect_ratio=increase,crop={width}:{height},"
           f"boxblur=25:2,eq=brightness=-0.3[bg];"
@@ -326,7 +331,7 @@ def paid_scene(scene: str, seconds: float, out: Path, src: Sources, width: int, 
     from . import replicate
     raw = out.with_suffix(".jpg")
     try:
-        link = replicate.image(f"{scene}, {ART_STYLE}", raw)
+        link = replicate.image(f"{scene}, {ART_STYLE}", raw, "16:9" if width > height else "9:16")
     except Exception as exc:
         print(f"[visual] replicate image failed: {str(exc)[:200]}")
         return False

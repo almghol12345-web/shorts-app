@@ -80,3 +80,34 @@ def post_comment(yt, video_id: str, text: str) -> bool:
     except Exception as exc:  # e.g. the token lacks the comment permission
         print(f"[comment] not posted ({str(exc)[:200]})")
         return False
+
+
+def upload_long(cfg: Config, title: str, description: str, tags: list[str], video: Path,
+                thumbnail: Path | None = None) -> str:
+    """A normal (horizontal) video: counts toward the Partner Program's watch hours."""
+    from googleapiclient.http import MediaFileUpload
+
+    yt = _client(cfg)
+    body = {
+        "snippet": {"title": title[:100], "description": description[:4900], "tags": tags,
+                    "categoryId": EDUCATION, "defaultLanguage": cfg.language,
+                    "defaultAudioLanguage": cfg.language},
+        "status": {"privacyStatus": cfg.privacy, "selfDeclaredMadeForKids": False,
+                   "containsSyntheticMedia": False},
+    }
+    media = MediaFileUpload(str(video), mimetype="video/mp4", chunksize=16 * 1024 * 1024, resumable=True)
+    request = yt.videos().insert(part="snippet,status", body=body, media_body=media)
+    response = None
+    while response is None:
+        status, response = request.next_chunk()
+        if status:
+            print(f"[upload] {int(status.progress() * 100)}%")
+    vid = response["id"]
+    if thumbnail and thumbnail.exists():
+        try:
+            yt.thumbnails().set(videoId=vid, media_body=MediaFileUpload(str(thumbnail), mimetype="image/jpeg")).execute()
+            print("[upload] thumbnail set")
+        except Exception as exc:  # custom thumbnails need a phone-verified channel
+            print(f"[upload] thumbnail not set ({str(exc)[:200]})")
+    post_comment(yt, vid, "وش أغرب وحدة فيهم بالنسبة لك؟ اكتب رقمها 👇")
+    return vid

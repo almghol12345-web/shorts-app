@@ -48,6 +48,11 @@ def pieces(words: list[Segment], line_sizes: list[int], total: float) -> list[tu
 
 def build_ass(words: list[Segment], line_sizes: list[int], total: float,
               width: int, height: int, font: str, caption_y: float = CAPTION_Y) -> str:
+    landscape = width > height
+    k = 0.6 if landscape else 1.0          # smaller words on a wide screen (subtitle size)
+    if landscape:
+        caption_y = 0.86                   # bottom of the frame, like normal subtitles
+    fs, hs, ol, hol = int(140 * k), int(150 * k), int(12 * k), int(13 * k)
     header = f"""[Script Info]
 ScriptType: v4.00+
 PlayResX: {width}
@@ -57,8 +62,8 @@ ScaledBorderAndShadow: yes
 
 [V4+ Styles]
 Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
-Style: Caption,{font},140,&H00FFFFFF,&H00FFFFFF,&H00000000,&H96000000,-1,0,0,0,100,100,0,0,1,12,6,5,70,70,0,1
-Style: Hook,{font},150,&H00303BFF,&H00303BFF,&H00000000,&H96000000,-1,0,0,0,100,100,0,0,1,13,7,5,70,70,0,1
+Style: Caption,{font},{fs},&H00FFFFFF,&H00FFFFFF,&H00000000,&H96000000,-1,0,0,0,100,100,0,0,1,{ol},6,5,70,70,0,1
+Style: Hook,{font},{hs},&H00303BFF,&H00303BFF,&H00000000,&H96000000,-1,0,0,0,100,100,0,0,1,{hol},7,5,70,70,0,1
 Style: Bar,{font},20,&H00303BFF,&H00303BFF,&H00000000,&H00000000,0,0,0,0,100,100,0,0,1,0,0,7,0,0,0,1
 
 [Events]
