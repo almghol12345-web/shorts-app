@@ -242,6 +242,8 @@ def video_clip(video: Path, seconds: float, out: Path, width: int, height: int) 
 # ---------- Real footage from NASA (public domain) ----------
 
 NASA_API = "https://images-api.nasa.gov"
+TALKING_HEADS = ("briefing", "conference", "interview", "this week", "panel", "q&a", "teleconference",
+                 "talk", "town hall", "news", "countdown", "remarks", "event", "ceremony", "webinar")
 
 
 def _duration(path: Path) -> float:
@@ -264,6 +266,9 @@ def fetch_nasa(query: str, out: Path, src: Sources, media: str = "video") -> boo
         nasa_id = data.get("nasa_id", "")
         if not nasa_id or nasa_id in src.used_ids:
             continue
+        title = data.get("title", "").lower()
+        if media == "video" and any(w in title for w in TALKING_HEADS):
+            continue    # press briefings and news shows are people talking, not the event
         files = requests.get(item["href"], headers=UA, timeout=30).json()
         if media == "video":
             prefs = ("~mobile.mp4", "~medium.mp4", "~small.mp4", "~orig.mp4")
