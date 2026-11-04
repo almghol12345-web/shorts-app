@@ -12,7 +12,15 @@ REVEAL = ("وش اللي صار", "والنهاية", "والمفاجأة", "و�
 
 
 def available() -> bool:
-    return CLIPS.exists() and any(CLIPS.glob("talk*.mp4"))
+    """On screen only once the owner approved it (assets/mascot/APPROVED), or for a test run
+    with SHORTS_NARRATOR=mascot."""
+    import os
+    if not (CLIPS.exists() and any(CLIPS.glob("talk*.mp4"))):
+        return False
+    flag = os.environ.get("SHORTS_NARRATOR", "").strip().lower()
+    if flag == "off":
+        return False
+    return flag == "mascot" or (CLIPS.parent / "APPROVED").exists()
 
 
 def _have(move: str) -> bool:

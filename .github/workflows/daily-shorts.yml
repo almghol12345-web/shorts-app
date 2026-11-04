@@ -30,6 +30,9 @@ on:
       topic:
         description: "Make this exact script (topic id), empty = automatic choice"
         default: ""
+      narrator:
+        description: "mascot = show the channel character (test before approval)"
+        default: ""
 
 permissions:
   contents: write
@@ -108,7 +111,7 @@ jobs:
           SHORTS_NICHE: ${{ vars.SHORTS_NICHE }}
           SHORTS_VOICE: ${{ vars.SHORTS_VOICE }}
           SHORTS_PRIVACY: ${{ inputs.privacy || vars.SHORTS_PRIVACY }}
-          SHORTS_NARRATOR: ${{ vars.SHORTS_NARRATOR }}
+          SHORTS_NARRATOR: ${{ inputs.narrator || vars.SHORTS_NARRATOR }}
         run: |
           UPLOAD_FLAG="--upload"
           if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "${{ inputs.upload }}" != "true" ]; then UPLOAD_FLAG=""; fi

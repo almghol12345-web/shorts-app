@@ -82,7 +82,7 @@ def make_one(cfg: Config, do_upload: bool, keep_work: bool = False) -> dict:
     starts = [sum(spans[:i]) for i in range(len(spans))]
     narrator = None
     from . import mascot
-    if mascot.available() and os.environ.get("SHORTS_NARRATOR", "").strip().lower() != "off":
+    if mascot.available():
         # the channel's character tells the story from the bottom-left corner
         narrator = mascot.track(script.lines, spans, work / "narrator.mov", height=int(cfg.height * 0.36))
     elif cfg.show_narrator:
