@@ -239,6 +239,65 @@ def video_clip(video: Path, seconds: float, out: Path, width: int, height: int) 
          *ENCODE, str(out)])
 
 
+# ---------- Real footage from NASA (public domain) ----------
+
+NASA_API = "https://images-api.nasa.gov"
+
+
+def _duration(path: Path) -> float:
+    import subprocess
+    out = subprocess.run(["ffprobe", "-v", "error", "-show_entries", "format=duration",
+                          "-of", "csv=p=0", str(path)], capture_output=True, text=True)
+    try:
+        return float(out.stdout.strip())
+    except ValueError:
+        return 0.0
+
+
+def fetch_nasa(query: str, out: Path, src: Sources, media: str = "video") -> bool:
+    """Real NASA footage (or a real photo) for the query. NASA media is public domain;
+    the description still credits NASA."""
+    resp = requests.get(f"{NASA_API}/search", params={"q": query, "media_type": media}, headers=UA, timeout=30)
+    resp.raise_for_status()
+    for item in resp.json().get("collection", {}).get("items", [])[:12]:
+        data = (item.get("data") or [{}])[0]
+        nasa_id = data.get("nasa_id", "")
+        if not nasa_id or nasa_id in src.used_ids:
+            continue
+        files = requests.get(item["href"], headers=UA, timeout=30).json()
+        if media == "video":
+            prefs = ("~mobile.mp4", "~medium.mp4", "~small.mp4", "~orig.mp4")
+        else:
+            prefs = ("~large.jpg", "~medium.jpg", "~orig.jpg")
+        link = next((f for p in prefs for f in files if isinstance(f, str) and f.endswith(p)), None)
+        if not link:
+            continue
+        _download(link.replace("http://", "https://"), out)
+        if out.stat().st_size < 50_000:
+            continue
+        src.used_ids.add(nasa_id)
+        credit = "NASA"
+        if credit not in src.credits:
+            src.credits.append(credit)
+        src.last_credit = data.get("title", nasa_id)[:80]
+        return True
+    return False
+
+
+def real_clip(video: Path, seconds: float, out: Path, width: int, height: int) -> None:
+    """Widescreen footage framed for a vertical screen: the full shot in the middle over a
+    blurred, darkened copy, starting past any intro slate."""
+    dur = _duration(video)
+    start = min(max(2.0, dur * 0.2), max(0.0, dur - seconds - 0.5)) if dur > seconds + 3 else 0.0
+    vf = (f"[0:v]fps=30,split=2[a][b];"
+          f"[a]scale={width}:{height}:force_original_aspect_ratio=increase,crop={width}:{height},"
+          f"boxblur=25:2,eq=brightness=-0.3[bg];"
+          f"[b]scale={width}:-2,crop={width}:'min(ih,{int(height * 0.7)})'[fg];"
+          f"[bg][fg]overlay=(W-w)/2:(H-h)/2,setsar=1,{GRADE}[v]")
+    run(["ffmpeg", "-y", "-ss", f"{start:.2f}", "-stream_loop", "-1", "-i", str(video),
+         "-filter_complex", vf, "-map", "[v]", "-t", f"{seconds:.3f}", *ENCODE, str(out)])
+
+
 def gradient(seconds: float, out: Path, width: int, height: int) -> None:
     c0, c1, c2 = random.choice(PALETTES)
     run(["ffmpeg", "-y", "-f", "lavfi", "-i",
@@ -285,6 +344,21 @@ def shot(spec: str, seconds: float, out: Path, src: Sources, width: int, height:
          index: int = 0, moving: bool = False) -> None:
     """Make one shot for one line, trying the best source first."""
     raw = out.with_suffix(".src")
+    if spec.startswith("nasa:"):
+        # real NASA footage first, then a real NASA photo, then the rest of the plan
+        query, _, rest = spec[5:].partition(" >> ")
+        for media in ("video", "image"):
+            try:
+                if fetch_nasa(query.strip(), raw, src, media):
+                    if media == "video":
+                        real_clip(raw, seconds, out, width, height)
+                    else:
+                        photo_clip(raw, seconds, out, width, height, zoom_in=index % 2 == 0)
+                    print(f"[visual] {out.stem}: NASA {media} {src.last_credit!r}")
+                    return
+            except Exception as exc:
+                print(f"[visual] nasa '{query}' {media} failed: {str(exc)[:120]}")
+        spec = rest.strip() or MOOD_FALLBACK
     if spec.startswith("ai:"):
         scene, _, fallback = spec[3:].partition(" >> ")
         from . import replicate

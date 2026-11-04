@@ -33,7 +33,9 @@ class Script:
             terms = self.search_terms or ["dark fog"]
             base = [terms[i % len(terms)] for i in range(len(self.lines))]
         if len(self.scenes) == len(self.lines):
-            return [f"ai:{scene} >> {fallback}" for scene, fallback in zip(self.scenes, base)]
+            # "nasa:<query>" lines try real NASA footage first, then the illustration
+            return [f"{vis} >> ai:{scene} >> space stars" if vis.startswith("nasa:")
+                    else f"ai:{scene} >> {vis}" for scene, vis in zip(self.scenes, base)]
         return base
 
     @property

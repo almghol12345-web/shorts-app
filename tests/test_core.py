@@ -483,3 +483,25 @@ def test_learning_favours_strong_groups():
     random.seed(1)
     picks = [learn.pick([sea2, space], scores).topic for _ in range(300)]
     assert picks.count("sea2") > 2 * picks.count("sp1")
+
+
+def test_nasa_footage_is_framed_vertically(tmp_path, monkeypatch):
+    import subprocess
+    from shorts import background
+    from shorts.media import run
+    wide = tmp_path / "wide.mp4"
+    run(["ffmpeg", "-y", "-f", "lavfi", "-i", "testsrc=s=640x360:d=6:r=30", "-pix_fmt", "yuv420p", str(wide)])
+
+    def fake(query, out, src, media="video"):
+        if media != "video":
+            return False
+        out.write_bytes(wide.read_bytes())
+        src.credits.append("NASA")
+        return True
+    monkeypatch.setattr(background, "fetch_nasa", fake)
+    out = tmp_path / "shot_00.mp4"
+    src = background.Sources()
+    background.shot("nasa:DART impact >> ai:asteroid >> space stars", 2.0, out, src, 360, 640)
+    size = subprocess.run(["ffprobe", "-v", "error", "-select_streams", "v", "-show_entries",
+                           "stream=width,height", "-of", "csv=p=0", str(out)], capture_output=True, text=True)
+    assert size.stdout.strip() == "360,640" and "NASA" in src.credits
