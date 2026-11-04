@@ -168,7 +168,12 @@ def make_long(cfg: Config, kind: str, do_upload: bool, count: int = 7) -> dict:
                                    pexels_key=cfg.pexels_key, pixabay_key=cfg.pixabay_key)
     from .music import mood_for
     mood = "space" if kind == "news" else mood_for(" ".join(s.title for s in stories))
-    video = render.render(wide, narration, bg, work, cfg.output_dir / f"long-{stamp}.mp4", mood=mood)
+    t = [sum(spans[:i]) for i in range(len(spans))]
+    cards = [(t[k], t[k] + 2.8, ("القصة " if kind == "mystery" else "المعلومة ") + PLAIN_ORDINALS[i],
+              plain(s.title).replace("#shorts", "").strip(" .!"))
+             for i, (k, s) in enumerate(zip(starts, stories))]
+    video = render.render(wide, narration, bg, work, cfg.output_dir / f"long-{stamp}.mp4", mood=mood,
+                          cuts=t[1:], booms=[t[k] for k in starts], cards=cards)
     print(f"[long] video {video}")
     finale = stories[-1]
     thumb = thumbnail(finale.scenes[0] if finale.scenes else finale.title,

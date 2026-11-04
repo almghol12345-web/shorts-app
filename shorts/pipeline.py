@@ -85,8 +85,11 @@ def make_one(cfg: Config, do_upload: bool, keep_work: bool = False) -> dict:
     from .music import mood_for
     mood = mood_for(script.title, " ".join(script.tags), " ".join(script.visual_plan()), " ".join(script.lines))
     print(f"[music] mood: {mood}")
+    from .spoken import plain
+    reveal = [starts[i] for i, l in enumerate(script.lines)
+              if any(k in plain(l) for k in ("وش اللي صار", "والنهاية", "والمفاجأة", "والأغرب", "بس الغريب"))]
     video = render.render(cfg, narration, bg, work, cfg.output_dir / f"{name}.mp4",
-                          narrator=narrator, mood=mood)
+                          narrator=narrator, mood=mood, cuts=starts[1:], booms=reveal[:2])
     print(f"[video] {video}")
     mids = [starts[i] + spans[i] / 2 for i in range(len(spans))]
     render.contact_sheet(video, mids, cfg.output_dir / "preview.jpg")

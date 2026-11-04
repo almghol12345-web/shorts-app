@@ -12,6 +12,7 @@ Anything that cannot be fetched falls back to a dark animated gradient.
 """
 import html
 import random
+import shutil
 import re
 import time
 from dataclasses import dataclass, field
@@ -410,6 +411,55 @@ def shot(spec: str, seconds: float, out: Path, src: Sources, width: int, height:
     gradient(seconds, out, width, height)
 
 
+FADE = 0.35   # seconds two shots overlap on a cut
+TRANSITIONS = ["fade", "smoothleft", "dissolve", "smoothright", "fade", "circleopen", "slideleft", "fadeblack"]
+
+
+def _xfade_chain(parts: list[Path], durs: list[float], out: Path, start_index: int = 0) -> float:
+    """Joins clips with short dissolves/slides. Shot k dissolves into k+1 exactly where the
+    narration moves to the next line (the extra FADE seconds of each shot cover the overlap).
+    Returns the joined clip's length."""
+    if len(parts) == 1:
+        shutil.copy(parts[0], out)
+        return durs[0]
+    inputs = sum((["-i", str(p)] for p in parts), [])
+    graph, prev, t = [], "[0:v]", 0.0
+    for k in range(1, len(parts)):
+        t += durs[k - 1] - FADE
+        kind = TRANSITIONS[(start_index + k) % len(TRANSITIONS)]
+        graph.append(f"{prev}[{k}:v]xfade=transition={kind}:duration={FADE}:offset={t:.3f}[x{k}]")
+        prev = f"[x{k}]"
+    pre = ";".join(f"[{k}:v]settb=AVTB,fps=30,format=yuv420p[{k}v]" for k in range(len(parts)))
+    body = ";".join(graph)
+    for k in range(len(parts)):
+        body = body.replace(f"[{k}:v]", f"[{k}v]")
+    run(["ffmpeg", "-y", *inputs, "-filter_complex", f"{pre};{body}", "-map", prev, *ENCODE, str(out)])
+    return t + durs[-1]
+
+
+def join_with_transitions(parts: list[Path], durs: list[float], out: Path, workdir: Path,
+                          chunk: int = 12) -> None:
+    """xfade in groups (long videos have 100+ shots), then the groups are joined the same way."""
+    try:
+        if len(parts) <= chunk:
+            _xfade_chain(parts, durs, out)
+            return
+        groups, gdurs = [], []
+        for g in range(0, len(parts), chunk):
+            sub = parts[g:g + chunk]
+            sub_d = durs[g:g + chunk]
+            gout = workdir / f"group_{g // chunk:02d}.mp4"
+            # every group but the last keeps its tail so it can dissolve into the next group
+            gdurs.append(_xfade_chain(sub, sub_d, gout, g))
+            groups.append(gout)
+        _xfade_chain(groups, gdurs, out, 3)
+    except Exception as exc:   # transitions are polish: a plain cut is better than no video
+        print(f"[visual] transitions failed ({str(exc)[:150]}); joining with plain cuts")
+        listing = workdir / "shots.txt"
+        listing.write_text("\n".join(f"file '{p.resolve()}'" for p in parts), encoding="utf-8")
+        run(["ffmpeg", "-y", "-f", "concat", "-safe", "0", "-i", str(listing), "-c", "copy", str(out)])
+
+
 def build(visuals: list[str], spans: list[float], workdir: Path, width: int, height: int,
           pexels_key: str = "", pixabay_key: str = "") -> tuple[Path, list[str]]:
     """One shot per line (spans = seconds each line is on screen). Returns the
@@ -418,15 +468,16 @@ def build(visuals: list[str], spans: list[float], workdir: Path, width: int, hei
     src = Sources(pexels_key=pexels_key, pixabay_key=pixabay_key)
     from . import replicate
     moving = replicate.video_shots(len(visuals)) if replicate.token() else set()
-    parts = []
+    parts, durs = [], []
     for i, (spec, seconds) in enumerate(zip(visuals, spans)):
         part = workdir / f"shot_{i:02d}.mp4"
-        shot(spec, max(seconds, 0.5), part, src, width, height, index=i, moving=i in moving)
+        # each shot runs a little longer so it can dissolve into the next one on the cut
+        d = max(seconds, 0.5) + (FADE if i < len(spans) - 1 else 0)
+        shot(spec, d, part, src, width, height, index=i, moving=i in moving)
         parts.append(part)
-    listing = workdir / "shots.txt"
-    listing.write_text("\n".join(f"file '{p.resolve()}'" for p in parts), encoding="utf-8")
+        durs.append(d)
     out = workdir / "bg.mp4"
-    run(["ffmpeg", "-y", "-f", "concat", "-safe", "0", "-i", str(listing), "-c", "copy", str(out)])
+    join_with_transitions(parts, durs, out, workdir)
     credits = list(src.credits)
     if src.ai_images:
         credits.insert(0, "رسومات المشاهد مولّدة بالذكاء الاصطناعي.")

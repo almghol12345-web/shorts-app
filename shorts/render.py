@@ -12,13 +12,15 @@ NARRATOR_SCALE = 0.95  # the storyteller stands bottom-left, leaving the scene a
 
 
 def render(cfg: Config, narration: Narration, background: Path, workdir: Path, out: Path,
-           narrator: Path | None = None, mood: str = "mystery") -> Path:
+           narrator: Path | None = None, mood: str = "mystery", cuts: list[float] | None = None,
+           booms: list[float] | None = None, cards: list[tuple] | None = None) -> Path:
     total = narration.length
     ass = workdir / "captions.ass"
     from .captions import CAPTION_Y, CAPTION_Y_NARRATOR
     ass.write_text(build_ass(narration.words, narration.line_sizes, total,
                              cfg.width, cfg.height, cfg.font_name,
-                             caption_y=CAPTION_Y_NARRATOR if narrator else CAPTION_Y), encoding="utf-8")
+                             caption_y=CAPTION_Y_NARRATOR if narrator else CAPTION_Y,
+                             cards=cards or []), encoding="utf-8")
 
     music = sorted(cfg.music_dir.glob("*.mp3")) if cfg.music_dir.exists() else []
     cmd = ["ffmpeg", "-y", "-stream_loop", "-1", "-i", str(background.resolve()),
@@ -34,15 +36,21 @@ def render(cfg: Config, narration: Narration, background: Path, workdir: Path, o
         cmd += ["-i", str(track.resolve())]
         bed = "[2:a]aresample=44100,volume=1.0"
     fade = max(total - 1.5, 0)
+    # sound design: soft whooshes on the cuts, low booms on the big moments (index 3 input)
+    from .music import write_sfx
+    sfx = write_sfx(total, cuts or [], [0.0] + (booms or []), workdir / "sfx.wav")
+    sfx_idx = 3
+    cmd += ["-i", str(sfx.resolve())]
     af = (f"[1:a]asplit=2[v1][v2];"
           f"{bed},afade=t=in:d=0.3,afade=t=out:st={fade:.2f}:d=1.5[bed];"
           # the bed ducks under the voice so every word stays clear
           f"[bed][v2]sidechaincompress=threshold=0.04:ratio=5:attack=20:release=500[duck];"
-          f"[v1][duck]amix=inputs=2:normalize=0:duration=longest,alimiter=limit=0.95[a]")
+          f"[{sfx_idx}:a]aresample=44100[fx];"
+          f"[v1][duck][fx]amix=inputs=3:normalize=0:duration=longest,alimiter=limit=0.95[a]")
     # Dark, grainy look: stronger vignette and film grain on top of the graded footage.
     subs = f"subtitles=captions.ass:fontsdir={cfg.font_dir.resolve()}"
     if narrator:
-        idx = 3
+        idx = 4
         cmd += ["-i", str(narrator.resolve())]
         # the storyteller stands at the bottom, a little left of centre (clear of YouTube's buttons)
         vf = (f"[0:v]vignette=PI/3.2,noise=alls=3:allf=t[bgv];"

@@ -148,3 +148,47 @@ def write_bed(mood: str, seconds: float, out: Path) -> Path:
         w.setframerate(SR)
         w.writeframes(data.tobytes())
     return out
+
+
+# ------------------------------------------------------------------ sound effects
+
+def _whoosh(seconds: float = 0.55, rng=None) -> np.ndarray:
+    """Air sweeping past: filtered noise that rises then falls."""
+    rng = rng or np.random.default_rng(3)
+    n = int(seconds * SR)
+    t = np.linspace(0, 1, n)
+    noise = rng.standard_normal(n)
+    out = np.zeros(n)
+    # sweep a simple resonant smoothing from dull to bright and back
+    win = (40 - 34 * np.sin(np.pi * t)).astype(int)
+    csum = np.cumsum(np.insert(noise, 0, 0))
+    for i in range(n):
+        w = max(2, win[i])
+        a = max(0, i - w)
+        out[i] = (csum[i + 1] - csum[a + 1]) / w
+    env = np.sin(np.pi * t) ** 2
+    return out * env / (np.abs(out).max() or 1)
+
+
+def _boom(seconds: float = 1.6) -> np.ndarray:
+    t = _t(seconds)
+    return np.sin(2 * np.pi * (55 * np.exp(-1.5 * t) + 30) * t) * np.exp(-2.2 * t)
+
+
+def write_sfx(total: float, whooshes: list[float], booms: list[float], out: Path,
+              whoosh_gain: float = 0.12, boom_gain: float = 0.35) -> Path:
+    """A track of soft whooshes on the cuts and low booms on the big moments."""
+    track = np.zeros(int((total + 2) * SR))
+    w = _whoosh()
+    b = _boom()
+    for at in whooshes:
+        _place(track, w, max(0.0, at - 0.3), whoosh_gain)    # peaks right on the cut
+    for at in booms:
+        _place(track, b, max(0.0, at), boom_gain)
+    data = (np.clip(track, -0.95, 0.95) * 32767).astype(np.int16)
+    with wave.open(str(out), "wb") as f:
+        f.setnchannels(1)
+        f.setsampwidth(2)
+        f.setframerate(SR)
+        f.writeframes(data.tobytes())
+    return out

@@ -47,7 +47,8 @@ def pieces(words: list[Segment], line_sizes: list[int], total: float) -> list[tu
 
 
 def build_ass(words: list[Segment], line_sizes: list[int], total: float,
-              width: int, height: int, font: str, caption_y: float = CAPTION_Y) -> str:
+              width: int, height: int, font: str, caption_y: float = CAPTION_Y,
+              cards: list[tuple] | None = None) -> str:
     landscape = width > height
     k = 0.6 if landscape else 1.0          # smaller words on a wide screen (subtitle size)
     if landscape:
@@ -64,6 +65,8 @@ ScaledBorderAndShadow: yes
 Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
 Style: Caption,{font},{fs},&H00FFFFFF,&H00FFFFFF,&H00000000,&H96000000,-1,0,0,0,100,100,0,0,1,{ol},6,5,70,70,0,1
 Style: Hook,{font},{hs},&H00303BFF,&H00303BFF,&H00000000,&H96000000,-1,0,0,0,100,100,0,0,1,{hol},7,5,70,70,0,1
+Style: Card,{font},{int(fs * 1.25)},&H00FFFFFF,&H00FFFFFF,&H00000000,&HA0000000,-1,0,0,0,100,100,0,0,3,{int(30 * k)},0,5,70,70,0,1
+Style: CardSub,{font},{int(fs * 0.7)},&H0000E1FF,&H0000E1FF,&H00000000,&H00000000,-1,0,0,0,100,100,0,0,1,{ol},4,5,70,70,0,1
 Style: Bar,{font},20,&H00303BFF,&H00303BFF,&H00000000,&H00000000,0,0,0,0,100,100,0,0,1,0,0,7,0,0,0,1
 
 [Events]
@@ -75,6 +78,15 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
         style = "Hook" if line_index == 0 else "Caption"
         anim = r"{\pos(%d,%d)\fscx85\fscy85\t(0,80,\fscx105\fscy105)\t(80,140,\fscx100\fscy100)}" % (width // 2, cy)
         events.append(f"Dialogue: 1,{_ts(seg.start)},{_ts(seg.end)},{style},,0,0,0,,{anim}{_escape(seg.text)}")
+
+    # Chapter cards: a boxed heading that pops in, with the story's name under it
+    for start, end, head, sub in (cards or []):
+        pop = r"{\pos(%d,%d)\fad(200,250)\fscx70\fscy70\t(0,180,\fscx105\fscy105)\t(180,300,\fscx100\fscy100)}" % (
+            width // 2, int(height * 0.42))
+        events.append(f"Dialogue: 2,{_ts(start)},{_ts(end)},Card,,0,0,0,,{pop}{_escape(head)}")
+        if sub:
+            events.append(f"Dialogue: 2,{_ts(start + 0.15)},{_ts(end)},CardSub,,0,0,0,,"
+                          + r"{\pos(%d,%d)\fad(250,250)}" % (width // 2, int(height * 0.56)) + _escape(sub))
 
     # Progress bar along the bottom edge, grows left -> right over the whole video.
     ms = int(total * 1000)
