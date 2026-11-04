@@ -18,17 +18,17 @@ from shorts import replicate  # noqa: E402
 
 KEY = (255, 0, 255)
 BASE = ("same cartoon character, same design and colors, flat 2D cartoon animation, smooth natural "
-        "motion, static camera, full body stays in frame, plain solid magenta background. ")
+        "motion, static camera, full body stays in frame, plain solid magenta background. "
+        "His mouth stays closed the whole time in his confident sly smile; he never talks or opens "
+        "his mouth. ")
 MOVES = {
-    "talk": "he talks to the camera like a storyteller, explaining with lively hand gestures, mouth "
-            "opening and closing as he speaks, small head nods",
-    "greet": "he waves hello to the camera with one hand and smiles warmly, mouth moving as he greets",
-    "surprised": "he is shocked and surprised, eyes wide, mouth open, hands up near his face, leans back",
-    "point": "he points to the side with one arm as if showing something on screen, talking, confident smile",
-    "think": "he thinks with a hand on his chin, looking up, eyebrows moving, curious expression",
-    "laugh": "he laughs happily, shoulders shaking, eyes squinting, mouth open laughing",
-    "ask": "he opens both hands toward the camera asking a question, raised eyebrows, mouth moving",
-    "excited": "he talks excitedly and fast with both hands moving, leaning forward, big expressions",
+    "talk": "he explains with calm lively hand gestures like a presenter, small head nods",
+    "greet": "he waves hello to the camera with one hand, friendly",
+    "surprised": "he is amazed, eyes wide, eyebrows up, both hands up near his face, leans back",
+    "point": "he points to the side with one arm as if showing something on screen, confident",
+    "think": "he thinks with a hand on his chin, looking up, eyebrows moving, curious",
+    "ask": "he opens both hands toward the camera with a shrug as if asking, raised eyebrows",
+    "excited": "he gestures excitedly with both hands, leaning forward, big eyebrows",
 }
 
 
@@ -46,7 +46,7 @@ def main() -> None:
     out = ROOT / "output" / "mascot"
     out.mkdir(parents=True, exist_ok=True)
     have = ROOT / "assets" / "mascot" / "clips"
-    wanted = sys.argv[1:] or [m for m in MOVES if not (have / f"{m}.mp4").exists()]
+    wanted = sys.argv[1:] or list(MOVES)
     img = start_image()
     for i, move in enumerate(wanted):
         if i:
