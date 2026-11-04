@@ -70,6 +70,9 @@ def speakable(text: str) -> str:
     end = "؟" if QUESTION.search(text) else "."
     text = re.sub(r"\s*\.{2,}\s*$", end, text)
     text = re.sub(r"\s*\.{2,}\s*(?=[^\s.])", "، ", text)       # inner '..' is a breath
+    # a sukun on a word's first letter (dialect spelling like نْدَفْعَه، وْشْوَي) trips the voice:
+    # drop it and let the voice choose the opening vowel
+    text = re.sub(r"(^|[\s،.؟!])([\u0621-\u064A])\u0652", r"\1\2", text)
     return re.sub(r"\s{2,}", " ", text).strip()
 
 
