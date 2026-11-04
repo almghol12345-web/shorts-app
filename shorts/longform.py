@@ -174,7 +174,12 @@ def make_long(cfg: Config, kind: str, do_upload: bool, count: int = 7) -> dict:
     cards = [(t[k], t[k] + 2.8, ("القصة " if kind == "mystery" else "المعلومة ") + PLAIN_ORDINALS[i],
               plain(s.title).replace("#shorts", "").strip(" .!"))
              for i, (k, s) in enumerate(zip(starts, stories))]
+    from . import mascot
+    narrator = None
+    if mascot.available():
+        narrator = mascot.track(script.lines, spans, work / "narrator.mov", height=int(HEIGHT * 0.42))
     video = render.render(wide, narration, bg, work, cfg.output_dir / f"long-{stamp}.mp4", mood=mood,
+                          narrator=narrator,
                           cuts=t[1:], booms=[t[k] for k in starts], cards=cards)
     print(f"[long] video {video}")
     finale = stories[-1]

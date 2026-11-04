@@ -8,7 +8,7 @@ from .config import Config
 from .voice import Narration
 
 
-NARRATOR_SCALE = 0.95  # the storyteller stands bottom-left, leaving the scene art visible
+NARRATOR_SCALE = 1.0   # the track is made at its final size; it stands bottom-left
 
 
 def render(cfg: Config, narration: Narration, background: Path, workdir: Path, out: Path,

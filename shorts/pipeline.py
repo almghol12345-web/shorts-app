@@ -1,5 +1,6 @@
 """One full run: script -> voice -> background -> video -> (upload)."""
 import re
+import os
 import shutil
 from datetime import datetime
 from pathlib import Path
@@ -80,7 +81,11 @@ def make_one(cfg: Config, do_upload: bool, keep_work: bool = False) -> dict:
     spans = line_spans(narration, len(script.lines))
     starts = [sum(spans[:i]) for i in range(len(spans))]
     narrator = None
-    if cfg.show_narrator:
+    from . import mascot
+    if mascot.available() and os.environ.get("SHORTS_NARRATOR", "").strip().lower() != "off":
+        # the channel's character tells the story from the bottom-left corner
+        narrator = mascot.track(script.lines, spans, work / "narrator.mov", height=int(cfg.height * 0.36))
+    elif cfg.show_narrator:
         narrator, _ = animate.character_track(narration.audio, starts, narration.length, work / "narrator.mov")
     from .music import mood_for
     mood = mood_for(script.title, " ".join(script.tags), " ".join(script.visual_plan()), " ".join(script.lines))
