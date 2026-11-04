@@ -11,9 +11,9 @@ from shorts import darijat  # noqa: E402
 
 SAMPLE = "قَال: القَهْوَة قَدِيمَة.. وْالقِصَّة صَارَت فِي القَرْيَة"
 VARIANTS = {
-    "1_qaf": SAMPLE,                                  # as written today
-    "2_gaf": SAMPLE.replace("ق", "گ"),               # Persian gaf: the Saudi 'g'
-    "3_jeem3": SAMPLE.replace("ق", "ڨ"),             # Maghrebi qaf with three dots (also 'g')
+    "1_alqahwa": "قَال: اَلْقَهْوَة قَدِيمَة",            # the article spelled out with sukun
+    "2_qahwa_shadda": "قَال: القَّهْوَة قَدِيمَة",        # stressed qaf
+    "3_gahwa": "قَال: الگَهْوَة قَدِيمَة",               # the Saudi 'g' on this word only
 }
 
 
