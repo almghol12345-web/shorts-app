@@ -416,6 +416,7 @@ def test_replicate_scene_art_and_motion(tmp_path, monkeypatch):
     from shorts import background, replicate
     from shorts.media import run
     monkeypatch.setenv("REPLICATE_API_TOKEN", "x")
+    monkeypatch.setenv("SCENE_CACHE", str(tmp_path / "cache"))
     assert replicate.video_shots(15) == {0, 1, 12}
     monkeypatch.setenv("REPLICATE_VIDEO_SHOTS", "none")
     assert replicate.video_shots(15) == set()

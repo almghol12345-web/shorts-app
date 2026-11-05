@@ -91,6 +91,14 @@ jobs:
         if: steps.gate.outputs.run == 'true'
         run: python -m pytest -q
 
+      - name: Paid scene clips from earlier runs
+        if: steps.gate.outputs.run == 'true'
+        uses: actions/cache@v4
+        with:
+          path: scene_cache
+          key: scenes-${{ github.run_id }}
+          restore-keys: scenes-
+
       - name: Make Shorts
         if: steps.gate.outputs.run == 'true'
         env:

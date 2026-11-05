@@ -5,3 +5,4 @@ output/
 client_secret*.json
 token*.json
 .pytest_cache/
+scene_cache/

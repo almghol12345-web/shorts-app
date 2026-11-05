@@ -11,6 +11,7 @@ Each line has a visual spec:
 Anything that cannot be fetched falls back to a dark animated gradient.
 """
 import html
+import os
 import random
 import shutil
 import re
@@ -338,18 +339,43 @@ def paid_scene(scene: str, seconds: float, out: Path, src: Sources, width: int, 
                index: int, moving: bool) -> bool:
     """Scene art from Replicate; the key moments also get real motion."""
     from . import replicate
+    import hashlib
+    import shutil
     raw = out.with_suffix(".jpg")
+    style = FILM_STYLE if "photorealistic" in scene else ART_STYLE
+    aspect = "16:9" if width > height else "9:16"
+    # paid clips are kept between runs (GitHub cache), so remaking a video after a voice or
+    # text fix costs nothing for the scenes that did not change
+    key = hashlib.sha1(f"{scene}|{style}|{aspect}|{os.environ.get('REPLICATE_IMAGE_MODEL', '')}".encode()).hexdigest()[:16]
+    cache = Path(os.environ.get("SCENE_CACHE", "scene_cache"))
+    cached_clip, cached_img = cache / f"{key}.mp4", cache / f"{key}.jpg"
+    if moving and cached_clip.exists():
+        motion_clip(cached_clip, seconds, out, width, height)
+        print(f"[visual] {out.stem}: cached ai video for '{scene[:60]}'")
+        return True
+    if not moving and cached_img.exists():
+        art_clip(cached_img, seconds, out, width, height, index)
+        print(f"[visual] {out.stem}: cached ai art for '{scene[:60]}'")
+        return True
     try:
-        style = FILM_STYLE if "photorealistic" in scene else ART_STYLE
-        link = replicate.image(f"{scene}, {style}", raw, "16:9" if width > height else "9:16")
+        link = replicate.image(f"{scene}, {style}", raw, aspect)
     except Exception as exc:
         print(f"[visual] replicate image failed: {str(exc)[:200]}")
         return False
     src.ai_images += 1
+    try:
+        cache.mkdir(parents=True, exist_ok=True)
+        shutil.copy(raw, cached_img)
+    except OSError:
+        pass
     if moving:
         clip = out.with_suffix(".motion.mp4")
         try:
             replicate.animate(link, scene, clip)
+            try:
+                shutil.copy(clip, cached_clip)
+            except OSError:
+                pass
             motion_clip(clip, seconds, out, width, height)
             print(f"[visual] {out.stem}: ai video for '{scene[:60]}'")
             return True
