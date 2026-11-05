@@ -64,7 +64,7 @@ export const army = {
     while (front.length < 2 && back.length > 3) front.push(back.shift());
     return [...front.map((hero, i) => ({ hero, slot: i })), ...back.slice(0, 3).map((hero, i) => ({ hero, slot: 2 + i }))];
   },
-  attackPreview(formation = this.s.formation.attack) { const { squads } = this.buildSquads(formation, this.s.troops); return { squads, power: sidePower(squads) }; },
+  attackPreview(formation = this.s.formation.attack) { const { squads } = this.buildSquads(formation, this.s.troops, { ignoreBusy: true }); return { squads, power: sidePower(squads) }; },
 
   defenseSquads() {
     const { squads } = this.buildSquads(this.s.formation.defense, this.s.troops, { forDefense: true });
@@ -104,9 +104,10 @@ export const army = {
   fightStage(index = this.s.campaign.stage) {
     if (index > this.s.campaign.stage || index >= STAGE_COUNT) return { ok: false, msg: 'Stage locked' };
     const st = stageInfo(index);
-    const { squads } = this.buildSquads(this.s.formation.attack, this.s.troops);
+    // Campaign fights are simulations: heroes away on marches still fight here, and no troops are lost
+    if (!this.s.formation.attack.length) this.s.formation.attack = this.autoFormation(Object.keys(this.s.heroes).slice(0, 5));
+    const { squads } = this.buildSquads(this.s.formation.attack, this.s.troops, { ignoreBusy: true });
     if (!squads.length) return { ok: false, msg: 'Assign heroes to your attack formation first' };
-    if (!squads.some((s) => s.troops > 0)) return { ok: false, msg: 'Train some troops first' };
     const enemy = st.squads();
     const seed = (this.now() & 0xffffff) ^ index;
     const res = simulateBattle(squads, enemy, { seed });

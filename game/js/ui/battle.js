@@ -7,25 +7,28 @@ import { rewardChips } from './dom.js';
 import { simulateBattle, sidePower } from '../core/combat.js';
 import { TROOP_TYPES } from '../data/troops.js';
 
-let view = null, raf = 0;
+let view = null, raf = 0, view3d = null, canvas3d = null;
 // opts: { a, b, result, title, rewards, extra, onDone, win }
 export function openBattle(opts) {
   const root = document.getElementById('battle');
   root.classList.remove('hidden'); root.replaceChildren();
-  const canvas = h('canvas.view');
+  if (A.use3d && !canvas3d) canvas3d = h('canvas.view');
+  let canvas = A.use3d ? canvas3d : h('canvas.view');
   const speedBtn = h('button.btn.sm.gray', { onclick: () => { view.speed = view.speed >= 4 ? 1 : view.speed * 2; speedBtn.textContent = 'x' + view.speed; } }, 'x1');
   const ui = h('div.bui', {}, h('div.coord', {}, '🔵 ', fmt(sidePower(opts.a))), h('b.gold', { style: { textShadow: '0 2px 4px #000' } }, opts.title || 'Battle'), h('div.coord', {}, '🔴 ', fmt(sidePower(opts.b))));
   const ctl = h('div.bctl', {}, speedBtn, h('button.btn.sm', { 'data-back': '1', onclick: () => view.skip() }, 'Skip ⏭'));
   root.append(canvas, ui, ctl);
   view = null;
-  if (A.use3d) { try { view = new Battle3D(canvas, A.sfx); } catch (e) { console.warn('3D battle unavailable', e); } }
-  if (!view) view = new BattleView(canvas, A.sfx);
-  view.resize(); view.load(opts.a, opts.b, opts.result);
+  if (A.use3d) {
+    try { if (!view3d) view3d = new Battle3D(canvas, A.sfx); else root.append(view3d.banner); view3d.speed = 1; view3d.resize(); view3d.load(opts.a, opts.b, opts.result); view = view3d; }
+    catch (e) { console.warn('3D battle failed, using 2D', e); A.use3dBattle = false; view = null; const c2 = h('canvas.view'); canvas.replaceWith(c2); canvas = c2; }
+  }
+  if (!view) { view = new BattleView(canvas, A.sfx); view.resize(); view.load(opts.a, opts.b, opts.result); }
   let last = performance.now(), shown = false;
   cancelAnimationFrame(raf);
   const loop = (now) => {
     const dt = Math.min(0.05, (now - last) / 1000); last = now;
-    view.render(now / 1000, dt);
+    try { view.render(now / 1000, dt); } catch (e) { console.warn('battle render error', e); view.skip?.(); view.done = true; }
     if (view.done && !shown) { shown = true; setTimeout(() => showResult(root, opts), 500); }
     raf = requestAnimationFrame(loop);
   };
@@ -34,7 +37,7 @@ export function openBattle(opts) {
 }
 function onResize() { view?.resize(); }
 function close(opts) {
-  cancelAnimationFrame(raf); window.removeEventListener('resize', onResize); view?.dispose?.();
+  cancelAnimationFrame(raf); window.removeEventListener('resize', onResize);
   document.getElementById('battle').classList.add('hidden'); document.getElementById('battle').replaceChildren();
   opts.onDone?.(); A.refreshAll();
 }

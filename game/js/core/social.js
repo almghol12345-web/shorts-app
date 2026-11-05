@@ -104,7 +104,7 @@ export const social = {
     const a = this.s.alliance; if (!a) return { ok: false, msg: 'Join an alliance first' };
     this.refreshBoss();
     const b = a.boss; if (b.attacks >= 3) return { ok: false, msg: 'Out of rally attempts today (3/day)' };
-    const { squads } = this.buildSquads(this.s.formation.attack, this.s.troops);
+    const { squads } = this.buildSquads(this.s.formation.attack, this.s.troops, { ignoreBusy: true });
     if (!squads.length) return { ok: false, msg: 'Set your attack formation' };
     const enemy = this.bossSquads(b);
     const seed = (this.now() & 0xffffff);
@@ -173,7 +173,7 @@ export const social = {
   // "0.8×" opponent is genuinely weaker and a "1.2×" one genuinely stronger.
   arenaSquadsFor(op) {
     const lvl = Math.max(1, Math.round(this.lvl('hq') * 1.3));
-    const mine = this.buildSquads(this.s.formation.attack, this.s.troops).squads;
+    const mine = this.buildSquads(this.s.formation.attack, this.s.troops, { ignoreBusy: true }).squads;
     const tot = mine.reduce((a, q) => ({ atk: a.atk + q.atk, def: a.def + q.def, hp: a.hp + q.hp, n: a.n + q.troops }), { atk: 0, def: 0, hp: 0, n: 0 });
     if (!mine.length) { const v = zombieSquads(lvl, { count: 2 }); Object.assign(tot, { atk: v[0].atk * 2, def: v[0].def * 2, hp: v[0].hp * 2, n: v[0].troops * 2 }); }
     const k = Math.max(1, mine.length || op.heroes.length), m = op.mult || 1;
@@ -184,7 +184,7 @@ export const social = {
   fightArena(opId, remote) {
     if (this.arenaAttemptsLeft() <= 0) return { ok: false, msg: 'No arena attempts left today' };
     const op = remote || this.s.arena.opponents.find((o) => o.id === opId); if (!op) return { ok: false, msg: 'Opponent not found' };
-    const { squads } = this.buildSquads(this.s.formation.attack, this.s.troops);
+    const { squads } = this.buildSquads(this.s.formation.attack, this.s.troops, { ignoreBusy: true });
     if (!squads.length) return { ok: false, msg: 'Set your attack formation' };
     const enemy = remote ? remote.squads : this.arenaSquadsFor(op);
     const seed = this.now() & 0xffffff;
