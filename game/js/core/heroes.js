@@ -88,7 +88,8 @@ export const heroes = {
       if (this.s.gems < c.gems) return { ok: false, msg: 'Not enough gems or tickets' };
       this.s.items[c.ticket] -= c.tickets; this.s.gems -= c.gems; if (c.gems) this.track('gems', c.gems);
     }
-    const rng = mulberry32((this.now() ^ (this.s.recruit.pity * 7919) ^ this.s.seed) >>> 0);
+    this.s.recruit.total = (this.s.recruit.total || 0) + 1; // unique seed per recruit action
+    const rng = mulberry32(((this.now() % 2147483647) ^ Math.imul(this.s.recruit.total, 2654435761) ^ this.s.seed) >>> 0);
     const results = [];
     const pityKey = kind === 'elite' ? 'elitePity' : 'pity';
     for (let i = 0; i < n; i++) {

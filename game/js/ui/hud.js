@@ -1,5 +1,5 @@
 import { L, t as T, tr } from '../i18n.js';
-import { h, fmt, fmtTime, tickTimers, modal } from './dom.js';
+import { h, fmt, fmtTime, tickTimers, modal, closeAll } from './dom.js';
 import { A } from './app.js';
 import { RES_INFO, VIGOR_MAX } from '../data/config.js';
 import { openProfile, openShop, openMissions, openEvents, openReports, openMail, openBag, openSettings } from './meta.js';
@@ -94,7 +94,7 @@ export function updateHud(full) {
 }
 function slotOf(type) { return Object.entries(A.g.s.buildings).find(([, b]) => b.type === type)?.[0] || BASE_LAYOUT.find((l) => l.type === type)?.id; }
 export function goEvent(ev) {
-  const g = A.g; import('./dom.js').then((d) => d.closeAll());
+  const g = A.g; closeAll();
   const map = { collect: () => { A.switchScreen('base'); A.toast('Tap the bubbles above farms and lumber yards'); }, build: () => { A.switchScreen('base'); suggestBuild(); }, train: () => openBuilding('barracks'), recruit: () => openRecruit(), research: () => g.lvl('research') ? openBuilding('research') : openBuilding('research', undefined, { upgrade: true }),
     zombie: () => { A.switchScreen('world'); A.toast('Tap a zombie horde to attack it'); }, gather: () => { A.switchScreen('world'); A.toast('Tap a resource node to gather'); }, scout: () => A.switchScreen('world'), raid: () => A.switchScreen('world'),
     arena: () => openArena(), pve: () => openCampaign(), help: () => openAlliance(), donate: () => openAlliance(), boss: () => openAlliance(), heal: () => openBuilding('hospital'), heroLevel: () => openHeroes(), forge: () => openBuilding('forge', undefined, { upgrade: !g.lvl('forge') }), gems: () => openShop() };

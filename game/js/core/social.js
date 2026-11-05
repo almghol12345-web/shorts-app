@@ -161,7 +161,7 @@ export const social = {
     if (!force && ar.opponents.length && this.now() < ar.refreshAt) return ar.opponents;
     const myPow = Math.max(800, this.attackPreview().power);
     const rng = mulberry32((this.now() & 0xffffff) ^ this.s.seed);
-    ar.opponents = [0.8, 1.0, 1.2].map((mult, i) => {
+    ar.opponents = [0.75, 0.95, 1.15].map((mult, i) => {
       const heroIds = [...HEROES].sort(() => rng() - 0.5).slice(0, 2 + Math.min(3, Math.floor(this.lvl('hq') / 3)));
       const pts = Math.round(ar.points + (i - 1) * 60 + (rng() - 0.5) * 40);
       return { id: 'ai' + i + (this.now() % 1000), name: AI_NAMES[Math.floor(rng() * 20)] + Math.floor(rng() * 90 + 10), points: Math.max(0, pts), mult: mult * (0.92 + rng() * 0.16), heroes: heroIds.map((h) => h.id), ai: true, targetPower: Math.round(myPow * mult) };
@@ -169,12 +169,17 @@ export const social = {
     ar.refreshAt = this.now() + 10 * 60000;
     return ar.opponents;
   },
+  // AI defense team built from YOUR army's real stats × the opponent's multiplier, so a
+  // "0.8×" opponent is genuinely weaker and a "1.2×" one genuinely stronger.
   arenaSquadsFor(op) {
-    // Build an AI defense team scaled to the requested power
     const lvl = Math.max(1, Math.round(this.lvl('hq') * 1.3));
-    const sq = zombieSquads(lvl, { kinds: ['raider'], count: op.heroes.length });
-    const base = sidePower(sq), scale = op.targetPower / Math.max(1, base);
-    return sq.map((s, i) => { const d = HERO_BY_ID[op.heroes[i]]; return { ...s, zombie: false, name: d.name, heroId: d.id, troopType: d.troop, icon: '⚔️', atk: s.atk * scale, def: s.def * scale, hp: s.hp * scale, troops: Math.round(s.troops * scale), skill: { ...d.skills[0], level: 1 + Math.floor(lvl / 8) }, row: d.role === 'tank' ? 0 : i < 2 ? 0 : 1 }; });
+    const mine = this.buildSquads(this.s.formation.attack, this.s.troops).squads;
+    const tot = mine.reduce((a, q) => ({ atk: a.atk + q.atk, def: a.def + q.def, hp: a.hp + q.hp, n: a.n + q.troops }), { atk: 0, def: 0, hp: 0, n: 0 });
+    if (!mine.length) { const v = zombieSquads(lvl, { count: 2 }); Object.assign(tot, { atk: v[0].atk * 2, def: v[0].def * 2, hp: v[0].hp * 2, n: v[0].troops * 2 }); }
+    const k = Math.max(1, mine.length || op.heroes.length), m = op.mult || 1;
+    return op.heroes.slice(0, k).concat(op.heroes).slice(0, k).map((id, i) => { const d = HERO_BY_ID[id], src = mine[i] || { atk: tot.atk / k, def: tot.def / k, hp: tot.hp / k, troops: tot.n / k, row: i < 2 ? 0 : 1 }; return { name: d.name, heroId: d.id, troopType: d.troop, icon: '⚔️', color: '#b0563a', zombie: false,
+      atk: src.atk * m, def: src.def, hp: src.hp * m, troops: Math.round(src.troops), crit: 0.05,
+      skill: { ...d.skills[0], level: 1 + Math.floor(lvl / 10) }, row: src.row ?? (i < 2 ? 0 : 1) }; });
   },
   fightArena(opId, remote) {
     if (this.arenaAttemptsLeft() <= 0) return { ok: false, msg: 'No arena attempts left today' };
@@ -187,7 +192,7 @@ export const social = {
     const win = res.winner === 'a';
     const delta = remote?.delta ?? (win ? Math.round(18 + Math.max(0, (op.points - this.s.arena.points) / 20)) : -10);
     this.s.arena.points = Math.max(0, this.s.arena.points + delta); this.s.arena.attempts++;
-    if (win) this.s.arena.wins++;
+    if (win) { this.s.arena.wins++; this.track('arenaWin', 1); }
     const rewards = win ? { gems: 15, food: 1500 } : { food: 500 };
     this.give(rewards); this.track('arena', 1);
     this.s.arena.opponents = this.s.arena.opponents.filter((o) => o.id !== opId);

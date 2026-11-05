@@ -162,6 +162,7 @@ export const economy = {
     this.s.troops[q.key] = (this.s.troops[q.key] || 0) + q.count;
     this.track('train', q.count); this.addXp(Math.round(q.count * 0.5));
     const { type, tier } = parseTroopKey(q.key);
+    if (type === 'infantry') this.track('trainInfantry', q.count);
     this.toast(L`${q.count} T${tier} ${TROOP_TYPES[type].name} ready`, 'good'); this.emit('change');
   },
 

@@ -17,7 +17,7 @@ export function enemyScale(level) { return 1 + (level - 1) * 0.42 + Math.pow(lev
 
 // Enemy squads are modelled as a "virtual" stack of troops so they scale like a player's army.
 export function virtual(level) {
-  const n = 50 + 35 * level, tm = Math.pow(1.55, (level - 1) / 7), hero = 100 * enemyScale(level);
+  const n = 50 + 30 * level, tm = Math.pow(1.55, (level - 1) / 11), hero = 100 * enemyScale(level);
   return { n, atk: n * 10 * tm + hero, def: n * 11 * tm + hero * 0.8, hp: n * 60 * tm + hero * 12 };
 }
 // Build defender squads for a zombie encounter. Returns combat-ready squad specs.
@@ -37,8 +37,8 @@ export function zombieSquads(level, opts = {}) {
   if (opts.boss) {
     const b = BOSSES[opts.boss];
     squads.unshift({ name: b.name, icon: b.icon, color: b.color, zombie: true, boss: true, row: 0, skill: b.skill,
-      atk: virtual(level).atk * 1.6, def: virtual(level).def * 1.2, hp: virtual(level).hp * 3, troops: virtual(level).n * 2, level });
-    if (squads.length > 5) squads.pop();
+      atk: virtual(level).atk * 1.25, def: virtual(level).def * 1.1, hp: virtual(level).hp * 1.8, troops: virtual(level).n * 2, level });
+    squads.splice(3); // boss + 2 escorts
   }
   return squads;
 }

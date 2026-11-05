@@ -1,7 +1,7 @@
 {
   "name": "ashfall-last-bastion",
   "version": "0.1.0",
-  "description": "Ashfall: Last Bastion \u2014 a post-apocalyptic survival strategy game for iOS and Android",
+  "description": "Ashfall: Last Bastion — a post-apocalyptic survival strategy game for iOS and Android",
   "type": "module",
   "private": true,
   "scripts": {
@@ -25,7 +25,8 @@
     "@capacitor/ios": "^7.6.10",
     "@capacitor/preferences": "^7.0.4",
     "@capacitor/splash-screen": "^7.0.5",
-    "@capacitor/status-bar": "^7.0.6"
+    "@capacitor/status-bar": "^7.0.6",
+    "three": "^0.170.0"
   },
   "devDependencies": {
     "@capacitor/cli": "^7.6.10"

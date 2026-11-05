@@ -22,13 +22,13 @@ export const BUILDINGS = {
     effect: (l) => ({ 'Wall durability': Math.round(g(4000, 1.32, l)) }),
   },
   farm: {
-    name: 'Hydro Farm', short: 'Farm', icon: '🌱', unique: false, maxCount: [1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 3, 4], maxLevel: 25, unlockHQ: 1,
+    name: 'Hydro Farm', short: 'Farm', icon: '🌱', unique: false, maxCount: [1, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 4], maxLevel: 25, unlockHQ: 1,
     desc: 'Grows food in salvaged greenhouse tanks. Food feeds troops and trains infantry.',
     cost: { food: 60, wood: 220, metal: 40 }, costRate: 1.4, time: 6, timeRate: 1.45, produces: 'food',
     effect: (l) => ({ 'Food / hour': prod(620, l) }),
   },
   lumber: {
-    name: 'Lumber Yard', short: 'Lumber', icon: '🪓', unique: false, maxCount: [1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 3, 4], maxLevel: 25, unlockHQ: 1,
+    name: 'Lumber Yard', short: 'Lumber', icon: '🪓', unique: false, maxCount: [1, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 4], maxLevel: 25, unlockHQ: 1,
     desc: 'Strips the dead forests for timber.',
     cost: { food: 220, wood: 60, metal: 40 }, costRate: 1.4, time: 6, timeRate: 1.45, produces: 'wood',
     effect: (l) => ({ 'Wood / hour': prod(620, l) }),

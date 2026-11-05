@@ -55,7 +55,7 @@ export const ACHIEVEMENTS = [
 export const STORY = [
   { text: 'Collect resources from a Hydro Farm', kind: 'ev', ev: 'collect', n: 1, reward: { food: 1500, wood: 1500 } },
   { text: 'Upgrade the Command Center to Lv 2', kind: 'bld', b: 'hq', lvl: 2, reward: { speed5m: 3, gems: 50 } },
-  { text: 'Train 50 Wardens at the Barracks', kind: 'ev', ev: 'train', n: 50, reward: { food: 3000 } },
+  { text: 'Train 50 Wardens at the Barracks', kind: 'ev', ev: 'trainInfantry', n: 50, reward: { food: 3000 } },
   { text: 'Recruit a hero at the Survivor Hall', kind: 'ev', ev: 'recruit', n: 1, reward: { ticket: 2 } },
   { text: 'Win campaign stage 1-2', kind: 'stage', n: 2, reward: { gems: 60, xpSmall: 3 } },
   { text: 'Build a second Lumber Yard', kind: 'count', b: 'lumber', n: 2, reward: { wood: 4000 } },
@@ -67,7 +67,7 @@ export const STORY = [
   { text: 'Send a squad to gather a resource node', kind: 'ev', ev: 'gather', n: 1, reward: { metalBox: 1 } },
   { text: 'Join an alliance', kind: 'alliance', reward: { gems: 100 } },
   { text: 'Upgrade the Command Center to Lv 5', kind: 'bld', b: 'hq', lvl: 5, reward: { eliteTicket: 1, speed1h: 2 } },
-  { text: 'Win an Arena battle', kind: 'ev', ev: 'arena', n: 1, reward: { gems: 100 } },
+  { text: 'Win an Arena battle', kind: 'ev', ev: 'arenaWin', n: 1, reward: { gems: 100 } },
   { text: 'Clear chapter 1 boss (stage 1-10)', kind: 'stage', n: 10, reward: { eliteTicket: 1, manual: 5 } },
   { text: 'Raise a hero to 1 star', kind: 'star', n: 1, reward: { wildShard: 10 } },
   { text: 'Upgrade the Command Center to Lv 8', kind: 'bld', b: 'hq', lvl: 8, reward: { gems: 200, speed1h: 4 } },
