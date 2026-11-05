@@ -84,7 +84,7 @@ Style: Tag,{cfg.font_name},66,&H00FFFFFF,&H00FFFFFF,&H00000000,&H00000000,-1,0,0
 
 [Events]
 Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
-Dialogue: 0,0:00:00.00,0:00:05.00,Name,,0,0,0,,{{\\pos({w // 2 - 180},{h // 2 - 45})}}دهشة
+Dialogue: 0,0:00:00.00,0:00:05.00,Name,,0,0,0,,{{\\pos({w // 2 - 180},{h // 2 - 45})}}غيهب
 Dialogue: 0,0:00:00.00,0:00:05.00,Tag,,0,0,0,,{{\\pos({w // 2 - 180},{h // 2 + 95})}}قصص غامضة ومعلومات تبهرك.. كل يوم
 """, encoding="utf-8")
     subprocess.run(["ffmpeg", "-y", "-v", "error", "-i", base.name, "-vf",
