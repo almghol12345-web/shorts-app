@@ -8,6 +8,7 @@ export class PanZoom {
     el.addEventListener('pointermove', (e) => this.move(e));
     el.addEventListener('pointerup', (e) => this.up(e));
     el.addEventListener('pointercancel', (e) => this.up(e, true));
+    el.addEventListener('touchend', (e) => e.preventDefault(), { passive: false }); // no ghost clicks
     el.addEventListener('wheel', (e) => { if (!this.enabled) return; e.preventDefault(); this.zoomAt(e.offsetX, e.offsetY, e.deltaY < 0 ? 1.1 : 0.9); }, { passive: false });
   }
   down(e) {

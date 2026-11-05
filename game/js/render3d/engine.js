@@ -161,6 +161,8 @@ export class CameraRig {
     canvas.addEventListener('pointerup', (e) => this.up(e));
     canvas.addEventListener('pointercancel', (e) => this.up(e, true));
     canvas.addEventListener('wheel', (e) => { e.preventDefault(); this.zoom(e.deltaY > 0 ? 1.1 : 0.9); }, { passive: false });
+    // stop the phone's delayed 'ghost click' from hitting a panel that a tap just opened
+    canvas.addEventListener('touchend', (e) => e.preventDefault(), { passive: false });
     this.apply();
   }
   down(e) {
