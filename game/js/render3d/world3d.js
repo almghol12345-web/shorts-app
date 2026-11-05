@@ -20,7 +20,7 @@ export class World3D {
     this.scene = new THREE.Scene();
     this.camera = new THREE.PerspectiveCamera(40, 1, 0.5, 400);
     const p = game.basePos();
-    this.rig = new CameraRig(canvas, this.camera, { target: new THREE.Vector3(tw(p.x), 0, tw(p.y)), dist: 36, minDist: 10, maxDist: 75, pitch: 0.98, yaw: Math.PI / 4,
+    this.rig = new CameraRig(canvas, this.camera, { target: new THREE.Vector3(tw(p.x), 0, tw(p.y)), dist: 44, minDist: 10, maxDist: 75, pitch: 0.98, yaw: Math.PI / 4,
       bounds: { minX: 0, maxX: WORLD_SIZE * TS, minZ: 0, maxZ: WORLD_SIZE * TS }, onTap: (x, y) => this.tap(x, y) });
     this.cam = this.rig;
     this.sky = new Sky(this.scene, { shadowSize: 26 });
