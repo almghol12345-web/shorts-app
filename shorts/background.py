@@ -39,6 +39,9 @@ PALETTES = [  # dark, cold tones for a mysterious mood
 ART_STYLE = ("anime style illustration, clear readable composition, the subject clearly visible, "
              "cinematic dramatic lighting, rich colors, detailed background, people are adult men "
              "unless stated, no text, no watermark")
+# scenes written as "photorealistic" (e.g. Quran stories) get a film look instead of anime
+FILM_STYLE = ("cinematic film still, photorealistic, epic historical drama, 35mm, rich detail, "
+              "atmospheric lighting, no text, no watermark")
 AI_GAP = 20       # seconds between requests: the free tier answers 402 when called too fast
 _last_ai_call = [0.0]
 
@@ -319,8 +322,13 @@ def gradient(seconds: float, out: Path, width: int, height: int) -> None:
 # ---------- Timeline ----------
 
 def motion_clip(video: Path, seconds: float, out: Path, width: int, height: int) -> None:
-    """An AI-animated scene: filled to 9:16, looped if the line is longer than the clip."""
-    run(["ffmpeg", "-y", "-stream_loop", "-1", "-i", str(video), "-t", f"{seconds:.3f}", "-an",
+    """An AI-animated scene filled to the frame. When the line is longer than the clip it
+    plays forward then backward (no visible jump back to the start)."""
+    looped = video.with_suffix(".pingpong.mp4")
+    run(["ffmpeg", "-y", "-i", str(video), "-an", "-filter_complex",
+         "[0:v]split[a][b];[b]reverse[r];[a][r]concat=n=2:v=1:a=0[v]", "-map", "[v]",
+         "-c:v", "libx264", "-preset", "veryfast", "-crf", "16", "-pix_fmt", "yuv420p", str(looped)])
+    run(["ffmpeg", "-y", "-stream_loop", "-1", "-i", str(looped), "-t", f"{seconds:.3f}", "-an",
          "-vf", f"scale={width}:{height}:force_original_aspect_ratio=increase:flags=lanczos,crop={width}:{height},"
                 f"setsar=1,fps=30,unsharp=5:5:0.6:5:5:0.0,eq=contrast=1.05:saturation=0.9",
          *ENCODE, str(out)])
@@ -332,7 +340,8 @@ def paid_scene(scene: str, seconds: float, out: Path, src: Sources, width: int, 
     from . import replicate
     raw = out.with_suffix(".jpg")
     try:
-        link = replicate.image(f"{scene}, {ART_STYLE}", raw, "16:9" if width > height else "9:16")
+        style = FILM_STYLE if "photorealistic" in scene else ART_STYLE
+        link = replicate.image(f"{scene}, {style}", raw, "16:9" if width > height else "9:16")
     except Exception as exc:
         print(f"[visual] replicate image failed: {str(exc)[:200]}")
         return False
