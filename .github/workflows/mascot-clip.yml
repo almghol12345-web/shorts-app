@@ -23,6 +23,8 @@ jobs:
       - name: Make the character clips
         env:
           REPLICATE_API_TOKEN: ${{ secrets.REPLICATE_API_TOKEN }}
+          MUAPI_API_KEY: ${{ secrets.MUAPI_API_KEY }}
+          ART_PROVIDER: ${{ vars.ART_PROVIDER }}
         run: python scripts/mascot_clip.py ${{ inputs.moves }}
       - name: Publish on the 'mascot' branch
         if: always()

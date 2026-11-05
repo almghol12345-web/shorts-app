@@ -6,6 +6,10 @@
   (default "0,1,-3": the first two lines and the twist before the ending question);
   "none" turns motion off, "all" animates every line.
 Models can be swapped with REPLICATE_IMAGE_MODEL / REPLICATE_VIDEO_MODEL.
+
+Muapi (the gateway behind the open-source Higgsfield alternative) is a drop-in choice:
+set MUAPI_API_KEY and it is used when there is no Replicate token, or always when
+ART_PROVIDER=muapi. Everything else (which shots move, caching) stays the same.
 """
 import os
 import time
@@ -13,17 +17,33 @@ from pathlib import Path
 
 import requests
 
+from . import muapi
+
 API = "https://api.replicate.com/v1"
 IMAGE_MODEL = "black-forest-labs/flux-schnell"
 VIDEO_MODEL = "wan-video/wan-2.2-i2v-fast"
 
 
-def token() -> str:
+def _own_token() -> str:
     return os.environ.get("REPLICATE_API_TOKEN", "").strip()
 
 
+def use_muapi() -> bool:
+    if not muapi.token():
+        return False
+    choice = os.environ.get("ART_PROVIDER", "").strip().lower()
+    if choice == "replicate" and _own_token():
+        return False
+    return choice == "muapi" or not _own_token()
+
+
+def token() -> str:
+    """Any key that unlocks paid scene art (Replicate or Muapi)."""
+    return _own_token() or muapi.token()
+
+
 def _headers() -> dict:
-    return {"Authorization": f"Bearer {token()}", "Content-Type": "application/json", "Prefer": "wait=60"}
+    return {"Authorization": f"Bearer {_own_token()}", "Content-Type": "application/json", "Prefer": "wait=60"}
 
 
 def _run(model: str, inputs: dict, timeout: float) -> str:
@@ -63,6 +83,8 @@ def _save(link: str, out: Path) -> None:
 
 def image(prompt: str, out: Path, aspect: str = "9:16") -> str:
     """Saves a 9:16 illustration to `out` and returns its URL (reused for motion)."""
+    if use_muapi():
+        return muapi.image(prompt, out, aspect)
     model = os.environ.get("REPLICATE_IMAGE_MODEL", "").strip() or IMAGE_MODEL
     inputs = {"prompt": prompt, "aspect_ratio": aspect, "output_format": "jpg",
               "output_quality": 92}
@@ -83,6 +105,8 @@ def image(prompt: str, out: Path, aspect: str = "9:16") -> str:
 
 def animate(image_url: str, prompt: str, out: Path) -> None:
     """Saves a short clip that brings the illustration to life."""
+    if use_muapi():
+        return muapi.animate(image_url, prompt, out)
     model = os.environ.get("REPLICATE_VIDEO_MODEL", "").strip() or VIDEO_MODEL
     inputs = {"image": image_url, "prompt": f"{prompt}, subtle natural motion, cinematic camera move",
               "resolution": "480p"}

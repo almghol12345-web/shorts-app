@@ -46,6 +46,8 @@ jobs:
           DARIJAT_API_KEY: ${{ secrets.DARIJAT_API_KEY }}
           ELEVENLABS_API_KEY: ${{ secrets.ELEVENLABS_API_KEY }}
           REPLICATE_API_TOKEN: ${{ secrets.REPLICATE_API_TOKEN }}
+          MUAPI_API_KEY: ${{ secrets.MUAPI_API_KEY }}
+          ART_PROVIDER: ${{ vars.ART_PROVIDER }}
           DARIJAT_VOICE: ${{ vars.DARIJAT_VOICE }}
           YOUTUBE_CLIENT_ID: ${{ secrets.YOUTUBE_CLIENT_ID }}
           YOUTUBE_CLIENT_SECRET: ${{ secrets.YOUTUBE_CLIENT_SECRET }}
