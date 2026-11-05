@@ -397,8 +397,8 @@ def generate(cfg: Config, used: list[str], scores: dict | None = None) -> Script
     from .learn import pick
     import os
     wanted = os.environ.get("SHORTS_TOPIC", "").strip()
-    if wanted:   # a specific script asked for by the owner (e.g. a test of one story)
-        for s in _load_json("wow.json") + load_bank():
+    if wanted:   # a specific script asked for by the owner (requests.json is only used this way)
+        for s in _load_json("requests.json") + _load_json("wow.json") + load_bank():
             if s.topic == wanted:
                 return s
     if cfg.kind == "news":
