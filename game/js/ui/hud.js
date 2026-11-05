@@ -95,7 +95,7 @@ export function updateHud(full) {
 function slotOf(type) { return Object.entries(A.g.s.buildings).find(([, b]) => b.type === type)?.[0] || BASE_LAYOUT.find((l) => l.type === type)?.id; }
 export function goEvent(ev) {
   const g = A.g; closeAll();
-  const map = { collect: () => { A.switchScreen('base'); A.toast('Tap the bubbles above farms and lumber yards'); }, build: () => { A.switchScreen('base'); suggestBuild(); }, train: () => openBuilding('barracks'), recruit: () => openRecruit(), research: () => g.lvl('research') ? openBuilding('research') : openBuilding('research', undefined, { upgrade: true }),
+  const map = { collect: () => { A.switchScreen('base'); A.toast('Tap the bubbles above farms and lumber yards'); }, build: () => { A.switchScreen('base'); suggestBuild(); }, train: () => openBuilding('barracks'), trainInfantry: () => openBuilding('barracks'), arenaWin: () => openArena(), recruit: () => openRecruit(), research: () => g.lvl('research') ? openBuilding('research') : openBuilding('research', undefined, { upgrade: true }),
     zombie: () => { A.switchScreen('world'); A.toast('Tap a zombie horde to attack it'); }, gather: () => { A.switchScreen('world'); A.toast('Tap a resource node to gather'); }, scout: () => A.switchScreen('world'), raid: () => A.switchScreen('world'),
     arena: () => openArena(), pve: () => openCampaign(), help: () => openAlliance(), donate: () => openAlliance(), boss: () => openAlliance(), heal: () => openBuilding('hospital'), heroLevel: () => openHeroes(), forge: () => openBuilding('forge', undefined, { upgrade: !g.lvl('forge') }), gems: () => openShop() };
   (map[ev] || (() => {}))();
@@ -107,8 +107,7 @@ function goQuest(q) {
   if (q.kind === 'stage') return openCampaign();
   if (q.kind === 'alliance') return openAlliance();
   if (q.kind === 'star') return openHeroes();
-  const map = { collect: () => { const t = g.collectAll(); A.sfx('collect'); const txt = Object.entries(t).map(([k, v]) => RES_INFO[k].icon + fmt(v)).join(' '); A.toast(txt ? 'Collected ' + txt : 'Nothing to collect yet — wait for the bubbles', txt ? 'good' : 'info'); }, train: () => openBuilding('barracks'), recruit: () => openRecruit(), research: () => openBuilding('research'), zombie: () => A.switchScreen('world'), gather: () => A.switchScreen('world'), arena: () => openArena(), forge: () => g.lvl('forge') ? openBuilding('forge') : openBuilding('forge') };
-  (map[q.ev] || (() => {}))();
+  if (q.kind === 'ev') { if (q.ev === 'collect') { const t = g.collectAll(); A.sfx('collect'); const txt = Object.entries(t).map(([k, v]) => RES_INFO[k].icon + fmt(v)).join(' '); A.toast(txt ? 'Collected ' + txt : 'Nothing to collect yet — wait for the bubbles', txt ? 'good' : 'info'); return; } goEvent(q.ev); }
 }
 function suggestBuild() {
   const g = A.g;

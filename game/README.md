@@ -22,7 +22,7 @@ content is missing a translation.
 ```bash
 cd game
 npm start          # http://localhost:8080  (Node 18+, no npm install needed)
-npm test           # 20 automated tests (game logic + server API)
+npm test           # automated tests: game logic, full story playthrough, translations, server API
 ```
 
 Open the URL on your phone (same Wi-Fi: `http://<your-computer-ip>:8080`) and "Add to Home
@@ -68,6 +68,7 @@ covers it, and the base terrain is pre-rendered once.
 
 | System | What works |
 |---|---|
+| **3D graphics** | Real-time 3D (three.js) base, world map and battles: lighting & shadows, day/night, smoke, animated people, zombies and vehicles. Marching squads drive visibly to their targets. Automatic 2D fallback; toggle in Settings |
 | **Base** | Isometric base, 18 building types, up to Lv 25, 5 visual tiers per building, construction timers, requirements, resource costs, builder queues, interactive menus, day/night lighting |
 | **Economy** | Food, wood, metal, fuel + gems; production with tap-to-collect bubbles, offline progress, plunder protection (Depot), speedups, instant-finish with gems |
 | **Research** | 28 technologies in 3 branches (Economy, Military, Defense & Field) with prerequisites and lab-level gates |
@@ -115,7 +116,9 @@ game/
   js/platform.js   # native bridge: storage, haptics, back button, status bar, quality
   js/data/     # all balance data: buildings, troops, heroes, research, items, missions, enemies
   js/core/     # pure game logic (no DOM) — shared by client, server and tests
-  js/render/   # canvas renderers: base (isometric), world map, battle replay, procedural art
+  js/render3d/ # 3D renderers (three.js): base, world map, battles, procedural low-poly models
+  js/render/   # 2D fallback renderers + procedural hero portraits
+  js/vendor/   # three.js (bundled, no CDN needed)
   js/ui/       # DOM panels: HUD, buildings, heroes, campaign, world, alliance, missions, shop…
   js/net.js    # server client
   server/      # zero-dependency Node server (HTTP + SSE, JSON file storage)

@@ -2,6 +2,7 @@ import { L, t as T, tr } from '../i18n.js';
 import { h, fmt } from './dom.js';
 import { A } from './app.js';
 import { BattleView } from '../render/battleview.js';
+import { Battle3D } from '../render3d/battle3d.js';
 import { rewardChips } from './dom.js';
 import { simulateBattle, sidePower } from '../core/combat.js';
 import { TROOP_TYPES } from '../data/troops.js';
@@ -16,7 +17,9 @@ export function openBattle(opts) {
   const ui = h('div.bui', {}, h('div.coord', {}, '🔵 ', fmt(sidePower(opts.a))), h('b.gold', { style: { textShadow: '0 2px 4px #000' } }, opts.title || 'Battle'), h('div.coord', {}, '🔴 ', fmt(sidePower(opts.b))));
   const ctl = h('div.bctl', {}, speedBtn, h('button.btn.sm', { 'data-back': '1', onclick: () => view.skip() }, 'Skip ⏭'));
   root.append(canvas, ui, ctl);
-  view = new BattleView(canvas, A.sfx);
+  view = null;
+  if (A.use3d) { try { view = new Battle3D(canvas, A.sfx); } catch (e) { console.warn('3D battle unavailable', e); } }
+  if (!view) view = new BattleView(canvas, A.sfx);
   view.resize(); view.load(opts.a, opts.b, opts.result);
   let last = performance.now(), shown = false;
   cancelAnimationFrame(raf);
@@ -31,7 +34,7 @@ export function openBattle(opts) {
 }
 function onResize() { view?.resize(); }
 function close(opts) {
-  cancelAnimationFrame(raf); window.removeEventListener('resize', onResize);
+  cancelAnimationFrame(raf); window.removeEventListener('resize', onResize); view?.dispose?.();
   document.getElementById('battle').classList.add('hidden'); document.getElementById('battle').replaceChildren();
   opts.onDone?.(); A.refreshAll();
 }

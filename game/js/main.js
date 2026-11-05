@@ -5,6 +5,9 @@ import { A } from './ui/app.js';
 import { h, toast, refreshAll, refreshLive, modalOpen, tickTimers, fmt } from './ui/dom.js';
 import { BaseView } from './render/base.js';
 import { WorldView } from './render/worldmap.js';
+import { Base3D } from './render3d/base3d.js';
+import { World3D } from './render3d/world3d.js';
+import { webglAvailable } from './render3d/engine.js';
 import { heroPortrait } from './render/art.js';
 import { sfx, unlockAudio } from './audio.js';
 import { buildHud, updateHud } from './ui/hud.js';
@@ -94,8 +97,16 @@ function start(state, name) {
     let prod = {}; for (const id of Object.keys(g.s.buildings)) { const b = g.s.buildings[id]; const r = BUILDINGS[b.type].produces; if (r) prod[r] = (prod[r] || 0) + g.pending(id); }
     setTimeout(() => toast(L`Welcome back! While away (${Math.round(away / 60)} min): ${Object.entries(prod).filter(([, v]) => v).map(([k, v]) => RES_INFO[k].icon + fmt(v)).join(' ') || 'nothing produced'} ready to collect`, 'good'), 600);
   }
-  const base = new BaseView(document.getElementById('baseCanvas'), g, { onSelect: (slot) => openSlot(slot), sfx: A.sfx, forceDay: () => g.s.settings.alwaysDay });
-  const world = new WorldView(document.getElementById('worldCanvas'), g, { onSelect: (sel) => showTileInfo(sel), onMarch: () => openMarches() });
+  if (g.s.settings.graphics3d === undefined) g.s.settings.graphics3d = true;
+  A.use3d = g.s.settings.graphics3d && webglAvailable();
+  const baseHandlers = { onSelect: (slot) => openSlot(slot), sfx: A.sfx, forceDay: () => g.s.settings.alwaysDay };
+  let base;
+  try { base = A.use3d ? new Base3D(document.getElementById('baseCanvas'), g, baseHandlers) : null; } catch (e) { console.warn('3D unavailable, using 2D', e); A.use3d = false; }
+  if (!base) base = new BaseView(document.getElementById('baseCanvas'), g, baseHandlers);
+  const worldHandlers = { onSelect: (sel) => showTileInfo(sel), onMarch: () => openMarches(), forceDay: () => g.s.settings.alwaysDay };
+  let world = null;
+  try { world = A.use3d ? new World3D(document.getElementById('worldCanvas'), g, worldHandlers) : null; } catch (e) { console.warn('3D world unavailable', e); }
+  if (!world) world = new WorldView(document.getElementById('worldCanvas'), g, worldHandlers);
   A.views = { base, world };
   buildHud();
   const wui = document.getElementById('worldui');

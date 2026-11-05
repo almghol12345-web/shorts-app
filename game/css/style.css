@@ -233,3 +233,9 @@ table.tbl th{color:var(--dim);font-size:10px;text-transform:uppercase}
 [dir=rtl] #splash h2{letter-spacing:0}
 [dir=rtl] .stars{direction:ltr;display:inline-block}
 .ltr{direction:ltr;unicode-bidi:isolate}
+
+/* 3D battle skill banner */
+.b3banner{position:absolute;left:0;right:0;top:46%;text-align:center;font:italic 900 24px system-ui,"Noto Sans Arabic",sans-serif;color:#fff;padding:10px 0;pointer-events:none;opacity:0;transform:translateX(60px);transition:opacity .15s,transform .2s;text-shadow:0 2px 6px #000}
+.b3banner.show{opacity:1;transform:none}
+.b3banner.a{background:linear-gradient(90deg,transparent,rgba(30,90,140,.9),transparent)}
+.b3banner.b{background:linear-gradient(90deg,transparent,rgba(140,40,30,.9),transparent)}

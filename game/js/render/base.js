@@ -28,6 +28,7 @@ export class BaseView {
     const p = iso(l.x, l.y); this.floaters.push({ text, x: p.x, y: p.y - 40, t: 0, color });
   }
   slotScreen(l) { return iso(l.x, l.y); }
+  screenOf(id) { const l = BASE_LAYOUT.find((x) => x.id === id), p = iso(l.x, l.y); return { x: p.x * this.cam.zoom + this.cam.x, y: (p.y - 14) * this.cam.zoom + this.cam.y }; }
   hit(sx, sy) {
     const w = this.cam.toWorld(sx, sy);
     // bubbles first
