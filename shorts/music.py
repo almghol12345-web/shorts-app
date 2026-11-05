@@ -126,6 +126,10 @@ def compose(mood: str, seconds: float, seed: int = 7) -> np.ndarray:
         for at in np.arange(1.0, seconds, 60 / 68):                        # heartbeat ~68 bpm
             _place(music, _drum(0.5), at, 0.8)
             _place(music, _drum(0.4), at + 0.22, 0.5)
+    elif mood == "ambience":
+        # no melody at all (Quran stories): only a soft cave wind and a low air hum
+        music = 2.0 * _noise(n, rng, 500) * (0.7 + 0.3 * np.sin(2 * np.pi * 0.08 * t))
+        music = music + 0.25 * np.sin(2 * np.pi * 41.2 * t)
     else:                                                                  # mystery
         music = _pad(t, [55.0, 82.41, 110.6, 164.8])
         music = music + 1.2 * _noise(n, rng, 600)

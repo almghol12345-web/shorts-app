@@ -22,7 +22,8 @@ class Script:
     scenes: list[str] = field(default_factory=list)        # one illustration prompt per line
     question: str = ""          # closing comment prompt about a detail of the story (not its outcome)
     source: str = ""            # news Shorts: link to the article the facts come from
-    kind: str = "mystery"       # "mystery" story or "news" (something new in the world)
+    kind: str = "mystery"       # "mystery" story, "news" (something new in the world) or "faith"
+    mood: str = ""              # sound bed; empty = picked from the words ("ambience" = no music)
 
     def visual_plan(self) -> list[str]:
         """One visual per line: an AI illustration of the scene when the script has

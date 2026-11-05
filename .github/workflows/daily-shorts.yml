@@ -33,6 +33,9 @@ on:
       narrator:
         description: "mascot = show the channel character (test before approval)"
         default: ""
+      quality:
+        description: "best = sharper images (FLUX pro) and motion on every shot (about $1.5)"
+        default: ""
 
 permissions:
   contents: write
@@ -113,6 +116,9 @@ jobs:
           SHORTS_PRIVACY: ${{ inputs.privacy || vars.SHORTS_PRIVACY }}
           SHORTS_NARRATOR: ${{ inputs.narrator || vars.SHORTS_NARRATOR }}
         run: |
+          if [ "${{ inputs.quality }}" = "best" ]; then
+            export REPLICATE_VIDEO_SHOTS=all REPLICATE_IMAGE_MODEL=black-forest-labs/flux-1.1-pro
+          fi
           UPLOAD_FLAG="--upload"
           if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "${{ inputs.upload }}" != "true" ]; then UPLOAD_FLAG=""; fi
           python -m shorts --count "${{ inputs.count || '1' }}" $UPLOAD_FLAG

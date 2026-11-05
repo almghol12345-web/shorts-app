@@ -88,7 +88,7 @@ def make_one(cfg: Config, do_upload: bool, keep_work: bool = False) -> dict:
     elif cfg.show_narrator:
         narrator, _ = animate.character_track(narration.audio, starts, narration.length, work / "narrator.mov")
     from .music import mood_for
-    mood = mood_for(script.title, " ".join(script.tags), " ".join(script.visual_plan()), " ".join(script.lines))
+    mood = script.mood or mood_for(script.title, " ".join(script.tags), " ".join(script.visual_plan()), " ".join(script.lines))
     print(f"[music] mood: {mood}")
     from .spoken import plain
     reveal = [starts[i] for i, l in enumerate(script.lines)

@@ -58,7 +58,9 @@ def image(prompt: str, out: Path, aspect: str = "9:16") -> str:
     """Saves a 9:16 illustration to `out` and returns its URL (reused for motion)."""
     model = os.environ.get("REPLICATE_IMAGE_MODEL", "").strip() or IMAGE_MODEL
     inputs = {"prompt": prompt, "aspect_ratio": aspect, "output_format": "jpg",
-              "num_outputs": 1, "output_quality": 92}
+              "output_quality": 92}
+    if "schnell" in model:
+        inputs["num_outputs"] = 1
     try:
         link = _run(model, inputs, timeout=120)
     except RuntimeError as exc:
