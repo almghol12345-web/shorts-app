@@ -28,8 +28,15 @@ def _headers() -> dict:
 
 def _run(model: str, inputs: dict, timeout: float) -> str:
     """Runs a model and returns the first output URL."""
-    resp = requests.post(f"{API}/models/{model}/predictions", headers=_headers(),
-                         json={"input": inputs}, timeout=90)
+    for attempt in range(8):
+        resp = requests.post(f"{API}/models/{model}/predictions", headers=_headers(),
+                             json={"input": inputs}, timeout=90)
+        if resp.status_code != 429 or attempt == 7:
+            break
+        # under $5 of credit Replicate allows ~6 requests a minute: wait our turn
+        wait = float(resp.headers.get("retry-after") or 0) or 11.0
+        print(f"[replicate] busy (429); waiting {wait:.0f}s")
+        time.sleep(min(wait + 1, 60))
     if not resp.ok:
         raise RuntimeError(f"Replicate HTTP {resp.status_code}: {resp.text[:300]}")
     pred = resp.json()
