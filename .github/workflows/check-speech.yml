@@ -1,0 +1,44 @@
+name: Check Speech
+
+# Listens to a finished video (speech recognition) and prints what the voice actually said,
+# line by line with times, to compare against the script and catch mispronounced words.
+on:
+  workflow_dispatch:
+    inputs:
+      run_id:
+        description: "Run id of the Daily Shorts run that made the video"
+        required: true
+      model:
+        description: "Recognition model size (small / medium / large-v3)"
+        default: "medium"
+
+permissions:
+  actions: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: ${{ inputs.run_id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: video
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -q faster-whisper
+      - name: Transcribe
+        run: |
+          f=$(find video -name '*.mp4' | head -1)
+          python - "$f" "${{ inputs.model }}" <<'PY'
+          import sys
+          from faster_whisper import WhisperModel
+          model = WhisperModel(sys.argv[2], device="cpu", compute_type="int8")
+          segments, _ = model.transcribe(sys.argv[1], language="ar", word_timestamps=True, beam_size=5)
+          for s in segments:
+              words = " ".join(f"{w.word.strip()}({w.probability:.2f})" for w in s.words)
+              print(f"[{s.start:6.2f}-{s.end:6.2f}] {s.text.strip()}")
+              print(f"      {words}")
+          PY
