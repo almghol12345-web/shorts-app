@@ -18,6 +18,8 @@ jobs:
       - name: Generate candidate characters
         env:
           REPLICATE_API_TOKEN: ${{ secrets.REPLICATE_API_TOKEN }}
+          MUAPI_API_KEY: ${{ secrets.MUAPI_API_KEY }}
+          ART_PROVIDER: ${{ vars.ART_PROVIDER }}
         run: python scripts/design_mascot.py
       - name: Publish them on the 'mascot' branch
         run: |

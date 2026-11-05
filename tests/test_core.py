@@ -532,3 +532,25 @@ def test_tashkeel_rules_and_amazing_facts_are_vowelled():
             continue
         for line in s["lines"]:
             assert vowel_coverage(line) >= 0.35, (s["topic"], line)
+
+
+def test_muapi_higgsfield_alternative_routing(tmp_path, monkeypatch):
+    from shorts import muapi, replicate
+    monkeypatch.delenv("REPLICATE_API_TOKEN", raising=False)
+    monkeypatch.delenv("ART_PROVIDER", raising=False)
+    monkeypatch.setenv("MUAPI_API_KEY", "k")
+    assert replicate.token() and replicate.use_muapi()
+    monkeypatch.setenv("REPLICATE_API_TOKEN", "r")
+    assert not replicate.use_muapi()
+    monkeypatch.setenv("ART_PROVIDER", "muapi")
+    assert replicate.use_muapi()
+    # output URLs come back in different shapes per model
+    assert muapi._link({"outputs": ["https://x/a.jpg"]}) == "https://x/a.jpg"
+    assert muapi._link({"video": {"url": "https://x/v.mp4"}}) == "https://x/v.mp4"
+    calls = []
+    monkeypatch.setattr(muapi, "_run", lambda model, inputs, timeout: calls.append((model, inputs)) or "https://x/i.jpg")
+    monkeypatch.setattr(muapi, "_save", lambda link, out: out.write_bytes(b"x"))
+    assert replicate.image("a cat", tmp_path / "a.jpg") == "https://x/i.jpg"
+    replicate.animate("https://x/i.jpg", "a cat", tmp_path / "a.mp4")
+    assert calls[0][0] == muapi.IMAGE_MODEL and calls[0][1]["width"] == 768
+    assert calls[1][0] == muapi.VIDEO_MODEL and calls[1][1]["image_url"] == "https://x/i.jpg"
