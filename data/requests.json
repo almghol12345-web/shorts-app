@@ -126,7 +126,7 @@
    "وْكَائِنَات كَثِير عَايْشَة عَلَى الشَّاطِئ.. بِتْضِيع بِيُوتْهَا.",
    "بَس الأَخْطَر.. إِن القَمَر هُو اللِّي مِثَبِّت مِيلَان الأَرْض.",
    "بِدُونَه.. الأَرْض بِتْصِير تِتْمَايَل مِثْل الدَّوَّامَة.",
-   "وْالفُصُول بِتِتْلَخْبَط.. صِيف نَار وْشِتَا ثَلْج.",
+   "وْالفُصُول بِتِتْلَخْبَط.. صِيف حَار مَرَّة.. وْشِتَا كُلَّه ثَلْج.",
    "بَس هَذَا مَا يِصِير بُكْرَة.. يَاخِذ آلَاف وْمَلَايِين السِّنِين.",
    "يَعْنِي القَمَر مُو بَس زِينَة فِي السَّمَا.. هُو حَارِس الأَرْض!"
   ],
@@ -145,17 +145,17 @@
    "night sky"
   ],
   "scenes": [
-   "doodle, a stick figure looking up at the night sky with an empty dotted circle where the moon was, big question mark",
-   "doodle, a dark night landscape, a stick figure holding a small flashlight, everything around black",
-   "doodle, a full moon drawn as a big lamp hanging over a sleeping village, then switched off",
-   "doodle, sea waves next to a beach, an arrow showing the water level going down and staying flat",
-   "doodle, the moon pulling the ocean with a rope, and a small sun pulling with a thinner rope",
-   "doodle, small crabs and starfish on rocks by the shore looking confused",
-   "doodle, planet earth tilted on its axis with the moon holding it steady like a hand",
-   "doodle, planet earth wobbling like a spinning top, motion lines around it",
-   "doodle, split picture: a stick figure sweating under a huge sun on one side, frozen in snow on the other side",
-   "doodle, a long timeline arrow with tiny calendars and an old stick figure with a long beard at the end",
-   "doodle, the moon drawn as a friendly guard with a shield standing next to planet earth"
+   "doodle, the same cute cartoon boy (round head, big shiny expressive eyes, short black hair, teal jacket with a small yellow planet badge) looking up at a dark blue starry night sky where the moon should be, an empty dotted circle and a big glowing question mark",
+   "doodle, pitch black background, the same cute cartoon boy (round head, big shiny expressive eyes, short black hair, teal jacket with a small yellow planet badge) holding a flashlight with a bright yellow cone of light cutting through the darkness, only the light area is visible",
+   "doodle, a giant full moon shaped like a glowing lamp above a small sleeping village at night, warm moonlight on the rooftops, dark blue sky",
+   "doodle, a sunny beach, the same cute cartoon boy (round head, big shiny expressive eyes, short black hair, teal jacket with a small yellow planet badge) standing on the sand pointing at the sea, the waves are tiny and flat",
+   "doodle, dark space with stars, the moon pulling the ocean of planet earth with a thick rope, a small sun far away pulling with a thin rope",
+   "doodle, cute cartoon crabs and starfish on wet rocks at a beach looking confused with question marks, sunny day",
+   "doodle, dark space with stars, planet earth tilted on its axis, the moon beside it holding it steady with a cartoon hand",
+   "doodle, dark space with stars, planet earth wobbling like a spinning top with motion lines and a dizzy face, no moon",
+   "doodle, split screen: left half the same cute cartoon boy (round head, big shiny expressive eyes, short black hair, teal jacket with a small yellow planet badge) sweating under a blazing orange sun in a hot desert, right half the same boy shivering in a blue snow storm",
+   "doodle, a long winding road with flying calendar pages, the same cute cartoon boy (round head, big shiny expressive eyes, short black hair, teal jacket with a small yellow planet badge) walking along it and growing a long white beard",
+   "doodle, dark space with stars, the moon as a brave friendly cartoon knight with a shield guarding planet earth"
   ],
   "visuals": [
    "moon",

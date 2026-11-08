@@ -13,7 +13,8 @@ NARRATOR_SCALE = 1.0   # the track is made at its final size; it stands bottom-l
 
 def render(cfg: Config, narration: Narration, background: Path, workdir: Path, out: Path,
            narrator: Path | None = None, mood: str = "mystery", cuts: list[float] | None = None,
-           booms: list[float] | None = None, cards: list[tuple] | None = None) -> Path:
+           booms: list[float] | None = None, cards: list[tuple] | None = None,
+           clean: bool = False) -> Path:
     total = narration.length
     ass = workdir / "captions.ass"
     from .captions import CAPTION_Y, CAPTION_Y_NARRATOR
@@ -61,6 +62,8 @@ def render(cfg: Config, narration: Narration, background: Path, workdir: Path, o
               # (a little in from the edge, clear of YouTube's like/comment buttons)
               f"[bgv][nar]overlay=x='W-w-{'40' if cfg.width > cfg.height else 'W*0.11'}+max(0,(0.6-t)/0.6)*(w+60)'"
               f":y={'H-h+40' if cfg.width > cfg.height else 'H-h-H*0.15'}:format=auto,{subs}[v]")
+    elif clean:      # bright drawings (doodle explainers): no dark vignette or grain
+        vf = f"[0:v]{subs}[v]"
     else:
         vf = f"[0:v]vignette=PI/3.2,noise=alls=3:allf=t,{subs}[v]"
     cmd += ["-filter_complex", f"{vf};{af}", "-map", "[v]", "-map", "[a]",

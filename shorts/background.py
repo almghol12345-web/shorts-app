@@ -44,9 +44,9 @@ ART_STYLE = ("anime style illustration, clear readable composition, the subject 
 FILM_STYLE = ("cinematic film still, photorealistic, epic historical drama, 35mm, rich detail, "
               "atmospheric lighting, no text, no watermark")
 # "doodle" scenes: simple explainer drawings (stick figures, arrows, diagrams)
-DOODLE_STYLE = ("simple hand-drawn stick figure doodle explainer illustration, clean black outlines, "
-                "flat pastel colors, plain light cream background, minimal, lots of empty space, "
-                "no text, no letters, no watermark")
+DOODLE_STYLE = ("colorful cartoon doodle explainer illustration, bold clean black outlines, vibrant flat "
+                "colors, a full colored background that fits the scene (dark scenes are dark), playful "
+                "and expressive, no realistic people, no photo, no text, no letters, no words, no watermark")
 AI_GAP = 20       # seconds between requests: the free tier answers 402 when called too fast
 _last_ai_call = [0.0]
 
