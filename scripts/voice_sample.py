@@ -10,11 +10,13 @@ sys.path.insert(0, str(ROOT))
 from shorts import darijat  # noqa: E402
 
 SAMPLE = "قَال: القَهْوَة قَدِيمَة.. وْالقِصَّة صَارَت فِي القَرْيَة"
+VOICE_TEXT = "لَو القَمَر اخْتِفَى اللَّيْلَة.. وِش بِيْصِير فِينَا؟ أَوَّل شِي بِتْلَاحْظَه.. اللَّيْل صَار ظَلَام دَامِس. وْثَانِي شِي: البَحَر.. المَد وْالجَزْر بِيْصِير أَضْعَف بِكَثِير."
+# name -> (Darijat voice, text): the same lines in each Saudi voice, to compare by ear
 VARIANTS = {
-    "a1": "لَوِطَّلَعْتَ عَلَيْهِمْ.. لَوَلَّيْتَ مِنْهُمْ فِرَارَا.",     # spelled as spoken (joined)
-    "a2": "لَوْ اِطَّلَعْتَ عَلَيْهِمْ.. لَوَلَّيْتَ مِنْهُمْ فِرَارَا.",
-    "b1": "وَلَمَّا أَخْرَجَ العُمْلَة.. إِجْتَمَعَ النَّاسُ مِنْ حَوْلِهِ مُنْدَهِشِين.",
-    "b2": "وَلَمَّا أَخْرَجَ العُمْلَةَ اجْتَمَعَ النَّاسُ مِنْ حَوْلِهِ مُنْدَهِشِين.",
+    "1_jassar": ("جسار", VOICE_TEXT),
+    "2_turki": ("تركي", VOICE_TEXT),
+    "3_faisal": ("فيصل", VOICE_TEXT),
+    "4_fayez": ("فايز", VOICE_TEXT),
 }
 
 
@@ -25,7 +27,11 @@ def main() -> None:
     beep = out / "beep.mp3"
     subprocess.run(["ffmpeg", "-y", "-v", "error", "-f", "lavfi", "-i", "sine=f=880:d=0.4",
                     "-af", "volume=0.3,apad=pad_dur=0.6", "-ar", "44100", "-ac", "1", str(beep)], check=True)
-    for name, text in VARIANTS.items():
+    import os
+    for name, item in VARIANTS.items():
+        voice, text = item if isinstance(item, tuple) else ("", item)
+        if voice:
+            os.environ["DARIJAT_VOICE"] = voice
         f = out / f"{name}.mp3"
         darijat.generate(text, f)
         print(f"[voice] {name}: {text}")
