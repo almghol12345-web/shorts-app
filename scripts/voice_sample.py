@@ -33,7 +33,8 @@ def main() -> None:
         if voice:
             os.environ["DARIJAT_VOICE"] = voice
         f = out / f"{name}.mp3"
-        darijat.generate(text, f)
+        from shorts.spoken import speakable
+        darijat.generate(speakable(text), f)      # same clean-up as real videos
         print(f"[voice] {name}: {text}")
         parts += [beep, f]
     listing = out / "list.txt"
