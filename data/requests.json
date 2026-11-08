@@ -112,5 +112,81 @@
    "cave",
    "cave"
   ]
+ },
+ {
+  "topic": "moon disappears",
+  "kind": "news",
+  "title": "لو اختفى القمر الليلة.. وش بيصير؟",
+  "lines": [
+   "تَخَيَّل القَمَر اخْتِفَى اللَّيْلَة.. وِش بِيْصِير؟",
+   "أَوَّل شِي بِتْلَاحِظْه.. اللَّيْل صَار ظَلَام دَامِس.",
+   "القَمَر هُو أَكْبَر نُور عِنْدَنَا بِاللَّيْل.. وْبِدُونَه كُل شِي يِظْلِم.",
+   "بَعْدَهَا البَحَر.. المَد وْالجَزْر بِيْصِير أَضْعَف بِكَثِير.",
+   "لِأَن القَمَر هُو اللِّي يِسْحَب مُوَيَة البَحَر.. وْالشَّمْس قُوَّتْهَا أَقَل مِن النُّص.",
+   "وْكَائِنَات كَثِير عَايْشَة عَلَى الشَّاطِئ.. بِتْضِيع بِيُوتْهَا.",
+   "بَس الأَخْطَر.. إِن القَمَر هُو اللِّي مِثَبِّت مِيلَان الأَرْض.",
+   "بِدُونَه.. الأَرْض بِتْصِير تِتْمَايَل مِثْل الدَّوَّامَة.",
+   "وْالفُصُول بِتِتْلَخْبَط.. صِيف نَار وْشِتَا ثَلْج.",
+   "بَس هَذَا مَا يِصِير بُكْرَة.. يَاخِذ آلَاف وْمَلَايِين السِّنِين.",
+   "يَعْنِي القَمَر مُو بَس زِينَة فِي السَّمَا.. هُو حَارِس الأَرْض!"
+  ],
+  "question": "تِعْرِف أَي كَوْكَب عِنْدَه أَكْثَر عَدَد قُمُور؟ اكْتِب جَوَابَك فِي التَّعْلِيقَات",
+  "description": "",
+  "tags": [
+   "فضاء",
+   "معلومات",
+   "القمر",
+   "هل تعلم",
+   "ماذا لو",
+   "علوم"
+  ],
+  "search_terms": [
+   "moon",
+   "night sky"
+  ],
+  "scenes": [
+   "doodle, a stick figure looking up at the night sky with an empty dotted circle where the moon was, big question mark",
+   "doodle, a dark night landscape, a stick figure holding a small flashlight, everything around black",
+   "doodle, a full moon drawn as a big lamp hanging over a sleeping village, then switched off",
+   "doodle, sea waves next to a beach, an arrow showing the water level going down and staying flat",
+   "doodle, the moon pulling the ocean with a rope, and a small sun pulling with a thinner rope",
+   "doodle, small crabs and starfish on rocks by the shore looking confused",
+   "doodle, planet earth tilted on its axis with the moon holding it steady like a hand",
+   "doodle, planet earth wobbling like a spinning top, motion lines around it",
+   "doodle, split picture: a stick figure sweating under a huge sun on one side, frozen in snow on the other side",
+   "doodle, a long timeline arrow with tiny calendars and an old stick figure with a long beard at the end",
+   "doodle, the moon drawn as a friendly guard with a shield standing next to planet earth"
+  ],
+  "visuals": [
+   "moon",
+   "moon",
+   "moon",
+   "moon",
+   "moon",
+   "moon",
+   "moon",
+   "moon",
+   "moon",
+   "moon",
+   "moon"
+  ],
+  "mood": "space",
+  "beats": [
+   [
+    1,
+    "١",
+    "الظلام"
+   ],
+   [
+    3,
+    "٢",
+    "البحر"
+   ],
+   [
+    6,
+    "٣",
+    "الأخطر"
+   ]
+  ]
  }
 ]

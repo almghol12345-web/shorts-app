@@ -43,6 +43,10 @@ ART_STYLE = ("anime style illustration, clear readable composition, the subject 
 # scenes written as "photorealistic" (e.g. Quran stories) get a film look instead of anime
 FILM_STYLE = ("cinematic film still, photorealistic, epic historical drama, 35mm, rich detail, "
               "atmospheric lighting, no text, no watermark")
+# "doodle" scenes: simple explainer drawings (stick figures, arrows, diagrams)
+DOODLE_STYLE = ("simple hand-drawn stick figure doodle explainer illustration, clean black outlines, "
+                "flat pastel colors, plain light cream background, minimal, lots of empty space, "
+                "no text, no letters, no watermark")
 AI_GAP = 20       # seconds between requests: the free tier answers 402 when called too fast
 _last_ai_call = [0.0]
 
@@ -342,7 +346,8 @@ def paid_scene(scene: str, seconds: float, out: Path, src: Sources, width: int, 
     import hashlib
     import shutil
     raw = out.with_suffix(".jpg")
-    style = FILM_STYLE if "photorealistic" in scene else ART_STYLE
+    style = (DOODLE_STYLE if "doodle" in scene else FILM_STYLE if "photorealistic" in scene
+             else ART_STYLE)
     aspect = "16:9" if width > height else "9:16"
     # paid clips are kept between runs (GitHub cache), so remaking a video after a voice or
     # text fix costs nothing for the scenes that did not change

@@ -130,6 +130,8 @@ jobs:
             export REPLICATE_VIDEO_SHOTS=all REPLICATE_IMAGE_MODEL=black-forest-labs/flux-1.1-pro
           elif [ "${{ inputs.quality }}" = "video" ]; then
             export REPLICATE_VIDEO_SHOTS=all          # every shot moves, cheap images
+          elif [ "${{ inputs.quality }}" = "still" ]; then
+            export REPLICATE_VIDEO_SHOTS=none         # drawings only (doodle explainers)
           fi
           UPLOAD_FLAG="--upload"
           if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "${{ inputs.upload }}" != "true" ]; then UPLOAD_FLAG=""; fi

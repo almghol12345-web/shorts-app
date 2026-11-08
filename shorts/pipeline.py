@@ -101,8 +101,11 @@ def make_one(cfg: Config, do_upload: bool, keep_work: bool = False) -> dict:
         shutil.copy(cover, cfg.output_dir / "cover.jpg")
     except Exception as exc:  # a cover is polish; never lose the Short over it
         print(f"[cover] skipped ({str(exc)[:150]})")
+    # break cards ("1, 2, 3...") with a boom at each answer, when the script asks for them
+    cards = [(starts[i], starts[i] + 1.8, head, sub) for i, head, sub in script.beats if i < len(starts)]
+    booms = reveal[:2] + [starts[i] for i, _, _ in script.beats if i < len(starts)]
     video = render.render(cfg, narration, bg, work, cfg.output_dir / f"{name}.mp4",
-                          narrator=narrator, mood=mood, cuts=starts[1:], booms=reveal[:2])
+                          narrator=narrator, mood=mood, cuts=starts[1:], booms=booms, cards=cards or None)
     print(f"[video] {video}")
     mids = [starts[i] + spans[i] / 2 for i in range(len(spans))]
     render.contact_sheet(video, mids, cfg.output_dir / "preview.jpg")

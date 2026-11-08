@@ -24,6 +24,7 @@ class Script:
     source: str = ""            # news Shorts: link to the article the facts come from
     kind: str = "mystery"       # "mystery" story, "news" (something new in the world) or "faith"
     mood: str = ""              # sound bed; empty = picked from the words ("ambience" = no music)
+    beats: list = field(default_factory=list)  # [line, heading, subtitle]: a punchy break card + boom
 
     def visual_plan(self) -> list[str]:
         """One visual per line: an AI illustration of the scene when the script has
