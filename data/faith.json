@@ -310,5 +310,455 @@
    "desert",
    "desert"
   ]
+ },
+ {
+  "topic": "people of the sabbath",
+  "kind": "faith",
+  "mood": "ambience",
+  "title": "قرية احتالت على أمر الله.. قصة أصحاب السبت",
+  "lines": [
+   "قَرْيَةٌ عَلَى البَحْر.. احْتَالَ أَهْلُهَا عَلَى أَمْرِ الله.. فَكَانَتِ العُقُوبَةُ عَجِيبَة!",
+   "هَذِهِ قِصَّةُ أَصْحَابِ السَّبْت.. كَمَا جَاءَتْ فِي القُرْآنِ الكَرِيم.",
+   "حَرَّمَ اللهُ عَلَيْهِمُ الصَّيْدَ يَوْمَ السَّبْت.. ابْتِلَاءً لَهُم.",
+   "فَكَانَتِ الحِيتَانُ تَأْتِيهِم يَوْمَ السَّبْتِ ظَاهِرَةً عَلَى المَاء.. وَفِي غَيْرِهِ تَخْتَفِي.",
+   "فَاحْتَالُوا.. نَصَبُوا الشِّبَاكَ يَوْمَ الجُمُعَة.. وَأَخَذُوا السَّمَكَ يَوْمَ الأَحَد.",
+   "فَانْقَسَمَ أَهْلُ القَرْيَة.. قَوْمٌ عَصَوْا.. وَقَوْمٌ نَهَوْهُم.. وَقَوْمٌ سَكَتُوا.",
+   "وَقَالَ السَّاكِتُون: لِمَ تَعِظُونَ قَوْمًا اللهُ مُهْلِكُهُم؟",
+   "فَقَالَ النَّاصِحُون: مَعْذِرَةً إِلَى رَبِّكُم.. وَلَعَلَّهُم يَتَّقُون.",
+   "فَلَمَّا تَمَادَوْا.. أَنْجَى اللهُ الَّذِينَ يَنْهَوْنَ عَنِ السُّوء.",
+   "وَقَالَ لِلْعُصَاة: كُونُوا قِرَدَةً خَاسِئِين.",
+   "فَجَعَلَهَا اللهُ نَكَالًا لِمَا بَيْنَ يَدَيْهَا وَمَا خَلْفَهَا.. وَمَوْعِظَةً لِلْمُتَّقِين."
+  ],
+  "question": "",
+  "description": "",
+  "tags": [
+   "أصحاب السبت",
+   "سورة الأعراف",
+   "قصص القرآن",
+   "قصص إسلامية"
+  ],
+  "search_terms": [
+   "desert",
+   "ancient"
+  ],
+  "scenes": [
+   "dark cinematic epic mood, ancient Arabia, deep shadows and dramatic light, every face hidden (seen from behind, in silhouette or covered), doodle, an ancient fishing village on a dark sea shore at night, stormy clouds",
+   "dark cinematic epic mood, ancient Arabia, deep shadows and dramatic light, every face hidden (seen from behind, in silhouette or covered), doodle, an empty sea shore under a starry sky with gentle waves, no people",
+   "dark cinematic epic mood, ancient Arabia, deep shadows and dramatic light, every face hidden (seen from behind, in silhouette or covered), doodle, fishermen in silhouette sitting beside folded nets and boats pulled onto the sand",
+   "dark cinematic epic mood, ancient Arabia, deep shadows and dramatic light, every face hidden (seen from behind, in silhouette or covered), doodle, countless big fish jumping on the surface of the sea near the shore, glittering in sunlight",
+   "dark cinematic epic mood, ancient Arabia, deep shadows and dramatic light, every face hidden (seen from behind, in silhouette or covered), doodle, men in silhouette secretly setting nets and traps in the water at dusk",
+   "dark cinematic epic mood, ancient Arabia, deep shadows and dramatic light, every face hidden (seen from behind, in silhouette or covered), doodle, three groups of villagers in silhouette standing apart on the beach, arguing",
+   "dark cinematic epic mood, ancient Arabia, deep shadows and dramatic light, every face hidden (seen from behind, in silhouette or covered), doodle, a few villagers in silhouette shrugging, turning away from the preachers",
+   "dark cinematic epic mood, ancient Arabia, deep shadows and dramatic light, every face hidden (seen from behind, in silhouette or covered), doodle, a few men in simple robes seen from behind, raising their hands toward the sky, soft light",
+   "dark cinematic epic mood, ancient Arabia, deep shadows and dramatic light, every face hidden (seen from behind, in silhouette or covered), doodle, the preachers in silhouette walking safely out of the village at dawn",
+   "dark cinematic epic mood, ancient Arabia, deep shadows and dramatic light, every face hidden (seen from behind, in silhouette or covered), doodle, dark empty village houses with shadows of monkeys on the walls, eerie moonlight",
+   "dark cinematic epic mood, ancient Arabia, deep shadows and dramatic light, every face hidden (seen from behind, in silhouette or covered), doodle, the abandoned village at sunrise by the calm sea, no people"
+  ],
+  "visuals": [
+   "desert",
+   "desert",
+   "desert",
+   "desert",
+   "desert",
+   "desert",
+   "desert",
+   "desert",
+   "desert",
+   "desert",
+   "desert"
+  ]
+ },
+ {
+  "topic": "man from the far city",
+  "kind": "faith",
+  "mood": "ambience",
+  "title": "رجل جاء يسعى من أقصى المدينة.. قصة مؤمن سورة يس",
+  "lines": [
+   "رَجُلٌ.. جَاءَ يَرْكُضُ مِنْ أَقْصَى المَدِينَة.. لِيَقُولَ كَلِمَةَ حَقٍّ وَاحِدَة!",
+   "هَذِهِ قِصَّتُه.. كَمَا جَاءَتْ فِي سُورَةِ يس.",
+   "أَرْسَلَ اللهُ إِلَى أَهْلِ قَرْيَةٍ رَسُولَيْن.. فَكَذَّبُوهُمَا.",
+   "فَأَيَّدَهُمَا اللهُ بِرَسُولٍ ثَالِث.. فَقَالُوا: إِنَّا إِلَيْكُم مُرْسَلُون.",
+   "فَقَالَ القَوْم: لَئِنْ لَمْ تَنْتَهُوا لَنَرْجُمَنَّكُم.",
+   "وَجَاءَ مِنْ أَقْصَى المَدِينَةِ رَجُلٌ يَسْعَى.. فَقَال: يَا قَوْمِ اتَّبِعُوا المُرْسَلِين.",
+   "اتَّبِعُوا مَنْ لَا يَسْأَلُكُم أَجْرًا.. وَهُم مُهْتَدُون.",
+   "فَغَضِبُوا عَلَيْه.. وَقَتَلُوه.",
+   "فَقِيلَ لَه: ادْخُلِ الجَنَّة.",
+   "فَقَال: يَا لَيْتَ قَوْمِي يَعْلَمُونَ بِمَا غَفَرَ لِي رَبِّي.. وَجَعَلَنِي مِنَ المُكْرَمِين.",
+   "أَمَّا قَوْمُه.. فَمَا كَانَتْ إِلَّا صَيْحَةً وَاحِدَة.. فَإِذَا هُم خَامِدُون."
+  ],
+  "question": "",
+  "description": "",
+  "tags": [
+   "سورة يس",
+   "مؤمن آل ياسين",
+   "قصص القرآن",
+   "قصص إسلامية"
+  ],
+  "search_terms": [
+   "desert",
+   "ancient"
+  ],
+  "scenes": [
+   "dark cinematic epic mood, ancient Arabia, deep shadows and dramatic light, every face hidden (seen from behind, in silhouette or covered), doodle, a man in silhouette running through narrow streets of an ancient city at dusk, dust behind him",
+   "dark cinematic epic mood, ancient Arabia, deep shadows and dramatic light, every face hidden (seen from behind, in silhouette or covered), doodle, an ancient walled city at night under a starry sky, no people",
+   "dark cinematic epic mood, ancient Arabia, deep shadows and dramatic light, every face hidden (seen from behind, in silhouette or covered), doodle, two travelers in long robes seen from behind entering the city gate, people in silhouette mocking",
+   "dark cinematic epic mood, ancient Arabia, deep shadows and dramatic light, every face hidden (seen from behind, in silhouette or covered), doodle, three robed figures seen from behind standing in a city square, a crowd in silhouette around them",
+   "dark cinematic epic mood, ancient Arabia, deep shadows and dramatic light, every face hidden (seen from behind, in silhouette or covered), doodle, an angry crowd in silhouette picking up stones, torches in the dark",
+   "dark cinematic epic mood, ancient Arabia, deep shadows and dramatic light, every face hidden (seen from behind, in silhouette or covered), doodle, the running man in silhouette arriving in the square, arm raised, the crowd turning toward him",
+   "dark cinematic epic mood, ancient Arabia, deep shadows and dramatic light, every face hidden (seen from behind, in silhouette or covered), doodle, the man seen from behind speaking to the crowd, a warm light falling on him",
+   "dark cinematic epic mood, ancient Arabia, deep shadows and dramatic light, every face hidden (seen from behind, in silhouette or covered), doodle, the crowd in silhouette closing in around the man, dark red sky",
+   "dark cinematic epic mood, ancient Arabia, deep shadows and dramatic light, every face hidden (seen from behind, in silhouette or covered), doodle, a glowing garden of light opening in the sky above the city, rays of gold",
+   "dark cinematic epic mood, ancient Arabia, deep shadows and dramatic light, every face hidden (seen from behind, in silhouette or covered), doodle, a peaceful paradise garden with rivers and light, a silhouette walking away into it",
+   "dark cinematic epic mood, ancient Arabia, deep shadows and dramatic light, every face hidden (seen from behind, in silhouette or covered), doodle, the city at night suddenly silent and dark, a shockwave of light across the sky, empty streets"
+  ],
+  "visuals": [
+   "desert",
+   "desert",
+   "desert",
+   "desert",
+   "desert",
+   "desert",
+   "desert",
+   "desert",
+   "desert",
+   "desert",
+   "desert"
+  ]
+ },
+ {
+  "topic": "thamud",
+  "kind": "faith",
+  "mood": "ambience",
+  "title": "نحتوا بيوتهم في الجبال.. قصة ثمود والناقة",
+  "lines": [
+   "قَوْمٌ نَحَتُوا بُيُوتَهُم فِي الجِبَال.. وَمَا زَالَتْ آثَارُهُم إِلَى اليَوْم!",
+   "هَذِهِ قِصَّةُ ثَمُود.. فِي شَمَالِ جَزِيرَةِ العَرَب.",
+   "أَعْطَاهُمُ اللهُ القُوَّةَ وَالنَّخِيلَ وَالعُيُون.. فَتَكَبَّرُوا وَعَبَدُوا الأَصْنَام.",
+   "فَأَرْسَلَ اللهُ إِلَيْهِم أَخَاهُم صَالِحًا.. يَدْعُوهُم إِلَى عِبَادَةِ اللهِ وَحْدَه.",
+   "فَطَلَبُوا مِنْهُ آيَة.. فَأَخْرَجَ اللهُ لَهُم نَاقَةً عَظِيمَة.",
+   "وَقِيلَ لَهُم: لَهَا شِرْبٌ مِنَ المَاء.. وَلَكُم شِرْبُ يَوْمٍ مَعْلُوم.. وَلَا تَمَسُّوهَا بِسُوء.",
+   "لَكِنَّ أَشْقَاهُم قَام.. فَعَقَرَ النَّاقَة.",
+   "فَقَالَ لَهُم: تَمَتَّعُوا فِي دَارِكُم ثَلَاثَةَ أَيَّام.",
+   "ثُمَّ جَاءَتِ الصَّيْحَة.. فَأَصْبَحُوا فِي دِيَارِهِم جَاثِمِين.",
+   "وَبَقِيَتْ بُيُوتُهُم خَالِيَة.. شَاهِدَةً عَلَيْهِم.",
+   "فَتِلْكَ مَسَاكِنُهُم.. لَمْ تُسْكَنْ مِنْ بَعْدِهِم إِلَّا قَلِيلًا."
+  ],
+  "question": "",
+  "description": "",
+  "tags": [
+   "قوم ثمود",
+   "ناقة صالح",
+   "مدائن صالح",
+   "قصص القرآن"
+  ],
+  "search_terms": [
+   "desert",
+   "ancient"
+  ],
+  "scenes": [
+   "dark cinematic epic mood, ancient Arabia, deep shadows and dramatic light, every face hidden (seen from behind, in silhouette or covered), doodle, huge tombs and houses carved into giant sandstone rocks in the desert of Al-Ula at sunset",
+   "dark cinematic epic mood, ancient Arabia, deep shadows and dramatic light, every face hidden (seen from behind, in silhouette or covered), doodle, the rocky desert of northern Arabia under a starry sky, carved rock facades, no people",
+   "dark cinematic epic mood, ancient Arabia, deep shadows and dramatic light, every face hidden (seen from behind, in silhouette or covered), doodle, palm groves and springs beside carved rock houses, idols in torchlight, people in silhouette",
+   "dark cinematic epic mood, ancient Arabia, deep shadows and dramatic light, every face hidden (seen from behind, in silhouette or covered), doodle, the carved city at dawn, a beam of light falling on the valley, crowds in silhouette far away",
+   "dark cinematic epic mood, ancient Arabia, deep shadows and dramatic light, every face hidden (seen from behind, in silhouette or covered), doodle, a huge majestic she-camel standing among desert rocks, glowing light around her",
+   "dark cinematic epic mood, ancient Arabia, deep shadows and dramatic light, every face hidden (seen from behind, in silhouette or covered), doodle, the she-camel drinking alone from a desert well, villagers in silhouette waiting at a distance",
+   "dark cinematic epic mood, ancient Arabia, deep shadows and dramatic light, every face hidden (seen from behind, in silhouette or covered), doodle, a dark figure in silhouette with a sword at night near the she-camel, red sky, ominous",
+   "dark cinematic epic mood, ancient Arabia, deep shadows and dramatic light, every face hidden (seen from behind, in silhouette or covered), doodle, three dark nights over the carved rock city, the moon changing, an eerie silence",
+   "dark cinematic epic mood, ancient Arabia, deep shadows and dramatic light, every face hidden (seen from behind, in silhouette or covered), doodle, a blinding shockwave of light across the sky over the carved houses, dust rising",
+   "dark cinematic epic mood, ancient Arabia, deep shadows and dramatic light, every face hidden (seen from behind, in silhouette or covered), doodle, empty carved rock houses in the desert at sunset, wind and sand, no people",
+   "dark cinematic epic mood, ancient Arabia, deep shadows and dramatic light, every face hidden (seen from behind, in silhouette or covered), doodle, a wide view of the ancient carved tombs under a golden sky, no people"
+  ],
+  "visuals": [
+   "desert",
+   "desert",
+   "desert",
+   "desert",
+   "desert",
+   "desert",
+   "desert",
+   "desert",
+   "desert",
+   "desert",
+   "desert"
+  ]
+ },
+ {
+  "topic": "bilal",
+  "kind": "faith",
+  "mood": "ambience",
+  "title": "تحت الصخرة في حر مكة قال: أحد أحد.. قصة بلال بن رباح",
+  "lines": [
+   "صَخْرَةٌ عَظِيمَةٌ عَلَى صَدْرِه.. وَرِمَالٌ تَحْتَرِق.. وَلَا يَقُولُ إِلَّا: أَحَدٌ أَحَد!",
+   "هَذَا بِلَالُ بْنُ رَبَاح.. مُؤَذِّنُ رَسُولِ اللهِ صَلَّى اللهُ عَلَيْهِ وَسَلَّم.",
+   "كَانَ عَبْدًا عِنْدَ أُمَيَّةَ بْنِ خَلَف.. فِي مَكَّة.",
+   "فَلَمَّا أَسْلَم.. غَضِبَ سَيِّدُهُ غَضَبًا شَدِيدًا.",
+   "كَانَ يُخْرِجُهُ فِي حَرِّ الظَّهِيرَة.. وَيَضَعُ الصَّخْرَةَ عَلَى صَدْرِه.",
+   "وَيَقُولُ لَه: اكْفُرْ بِمُحَمَّد.. فَيَقُولُ بِلَال: أَحَدٌ أَحَد.",
+   "فَمَرَّ بِهِ أَبُو بَكْرٍ الصِّدِّيق.. فَاشْتَرَاهُ وَأَعْتَقَه.",
+   "وَصَارَ بِلَالٌ أَوَّلَ مُؤَذِّنٍ فِي الإِسْلَام.",
+   "وَيَوْمَ فَتْحِ مَكَّة.. صَعِدَ فَوْقَ الكَعْبَة.. وَرَفَعَ الأَذَان.",
+   "العَبْدُ الَّذِي عُذِّبَ فِي رِمَالِهَا.. أَصْبَحَ صَوْتُهُ يَعْلُو فَوْقَ أَشْرَفِ بِقَاعِهَا."
+  ],
+  "question": "",
+  "description": "",
+  "tags": [
+   "بلال بن رباح",
+   "قصص الصحابة",
+   "مؤذن الرسول",
+   "قصص إسلامية"
+  ],
+  "search_terms": [
+   "desert",
+   "ancient"
+  ],
+  "scenes": [
+   "dark cinematic epic mood, ancient Arabia, deep shadows and dramatic light, every face hidden (seen from behind, in silhouette or covered), doodle, a man in silhouette lying on burning desert sand under a blazing sun, a huge rock on his chest",
+   "dark cinematic epic mood, ancient Arabia, deep shadows and dramatic light, every face hidden (seen from behind, in silhouette or covered), doodle, ancient Mecca at dawn, mountains and simple houses, no people",
+   "dark cinematic epic mood, ancient Arabia, deep shadows and dramatic light, every face hidden (seen from behind, in silhouette or covered), doodle, a cruel master in rich robes seen from behind, a slave in silhouette carrying heavy water jars",
+   "dark cinematic epic mood, ancient Arabia, deep shadows and dramatic light, every face hidden (seen from behind, in silhouette or covered), doodle, the master in shadow pointing angrily, servants in silhouette dragging a man out",
+   "dark cinematic epic mood, ancient Arabia, deep shadows and dramatic light, every face hidden (seen from behind, in silhouette or covered), doodle, a blazing white sun over the desert, figures in silhouette placing a big rock on a man lying on the sand",
+   "dark cinematic epic mood, ancient Arabia, deep shadows and dramatic light, every face hidden (seen from behind, in silhouette or covered), doodle, close view of the man's raised finger toward the sky, his face hidden, heat waves rising",
+   "dark cinematic epic mood, ancient Arabia, deep shadows and dramatic light, every face hidden (seen from behind, in silhouette or covered), doodle, a dignified man in white robes seen from behind handing a bag of coins to the master",
+   "dark cinematic epic mood, ancient Arabia, deep shadows and dramatic light, every face hidden (seen from behind, in silhouette or covered), doodle, a man in silhouette standing on a rooftop in old Medina at dawn, calling to prayer, soft light",
+   "dark cinematic epic mood, ancient Arabia, deep shadows and dramatic light, every face hidden (seen from behind, in silhouette or covered), doodle, a man in silhouette standing on top of the Kaaba at dawn, crowds far below, golden sky",
+   "dark cinematic epic mood, ancient Arabia, deep shadows and dramatic light, every face hidden (seen from behind, in silhouette or covered), doodle, a wide view of Mecca at sunrise with rays of light, no people"
+  ],
+  "visuals": [
+   "desert",
+   "desert",
+   "desert",
+   "desert",
+   "desert",
+   "desert",
+   "desert",
+   "desert",
+   "desert",
+   "desert"
+  ]
+ },
+ {
+  "topic": "umar islam",
+  "kind": "faith",
+  "mood": "ambience",
+  "title": "خرج بسيفه.. فعاد مسلمًا! قصة إسلام عمر بن الخطاب",
+  "lines": [
+   "خَرَجَ بِسَيْفِهِ يُرِيدُ أَمْرًا عَظِيمًا.. فَعَادَ وَقَدْ تَغَيَّرَ كُلُّ شَيْء!",
+   "هَذِهِ قِصَّةُ إِسْلَامِ عُمَرَ بْنِ الخَطَّاب.",
+   "كَانَ عُمَرُ مِنْ أَشَدِّ النَّاسِ عَلَى المُسْلِمِين.",
+   "فَلَقِيَهُ رَجُلٌ فِي الطَّرِيقِ وَقَال: أَهْلُ بَيْتِكَ أَوْلَى بِك.. أُخْتُكَ وَزَوْجُهَا أَسْلَمَا!",
+   "فَذَهَبَ إِلَى بَيْتِ أُخْتِهِ غَاضِبًا.. فَسَمِعَهُم يَقْرَؤُونَ القُرْآن.",
+   "فَدَخَلَ عَلَيْهِم.. وَضَرَبَ زَوْجَ أُخْتِه.. وَضَرَبَ أُخْتَهُ فَسَالَ الدَّم.",
+   "فَلَمَّا رَأَى الدَّمَ عَلَى وَجْهِهَا.. نَدِمَ وَلَانَ قَلْبُه.",
+   "وَطَلَبَ الصَّحِيفَة.. فَقَرَأَ أَوَّلَ سُورَةِ طه.",
+   "فَقَال: مَا أَحْسَنَ هَذَا الكَلَامَ وَأَكْرَمَه!",
+   "وَذَهَبَ إِلَى دَارِ الأَرْقَم.. وَأَعْلَنَ إِسْلَامَه.",
+   "فَكَبَّرَ المُسْلِمُونَ فَرَحًا.. وَخَرَجُوا يُصَلُّونَ عِنْدَ الكَعْبَةِ جِهَارًا."
+  ],
+  "question": "",
+  "description": "",
+  "tags": [
+   "عمر بن الخطاب",
+   "إسلام عمر",
+   "قصص الصحابة",
+   "قصص إسلامية"
+  ],
+  "search_terms": [
+   "desert",
+   "ancient"
+  ],
+  "scenes": [
+   "dark cinematic epic mood, ancient Arabia, deep shadows and dramatic light, every face hidden (seen from behind, in silhouette or covered), doodle, a tall strong man in silhouette walking through Mecca's streets at noon holding a sword",
+   "dark cinematic epic mood, ancient Arabia, deep shadows and dramatic light, every face hidden (seen from behind, in silhouette or covered), doodle, ancient Mecca under a dramatic sky, no people",
+   "dark cinematic epic mood, ancient Arabia, deep shadows and dramatic light, every face hidden (seen from behind, in silhouette or covered), doodle, the strong man in silhouette standing with arms crossed, people in silhouette avoiding him",
+   "dark cinematic epic mood, ancient Arabia, deep shadows and dramatic light, every face hidden (seen from behind, in silhouette or covered), doodle, two men in silhouette meeting in a narrow alley, one pointing toward a distant house",
+   "dark cinematic epic mood, ancient Arabia, deep shadows and dramatic light, every face hidden (seen from behind, in silhouette or covered), doodle, the man in silhouette standing outside a small house door, warm lamp light leaking from inside",
+   "dark cinematic epic mood, ancient Arabia, deep shadows and dramatic light, every face hidden (seen from behind, in silhouette or covered), doodle, inside a dim room, shadows on the wall of an angry man and a couple, an overturned lamp",
+   "dark cinematic epic mood, ancient Arabia, deep shadows and dramatic light, every face hidden (seen from behind, in silhouette or covered), doodle, the man in silhouette lowering his hand, his shadow softening, a quiet light in the room",
+   "dark cinematic epic mood, ancient Arabia, deep shadows and dramatic light, every face hidden (seen from behind, in silhouette or covered), doodle, close view of hands holding an old parchment with glowing light, no face visible",
+   "dark cinematic epic mood, ancient Arabia, deep shadows and dramatic light, every face hidden (seen from behind, in silhouette or covered), doodle, the man seen from behind holding the parchment to his chest, golden light around him",
+   "dark cinematic epic mood, ancient Arabia, deep shadows and dramatic light, every face hidden (seen from behind, in silhouette or covered), doodle, the man in silhouette walking toward a house at dusk, others inside raising their hands",
+   "dark cinematic epic mood, ancient Arabia, deep shadows and dramatic light, every face hidden (seen from behind, in silhouette or covered), doodle, two lines of men in silhouette walking openly toward the Kaaba at sunrise, light rays"
+  ],
+  "visuals": [
+   "desert",
+   "desert",
+   "desert",
+   "desert",
+   "desert",
+   "desert",
+   "desert",
+   "desert",
+   "desert",
+   "desert",
+   "desert"
+  ]
+ },
+ {
+  "topic": "abu bakr tabuk",
+  "kind": "faith",
+  "mood": "ambience",
+  "title": "عمر أراد أن يسبق أبا بكر.. فماذا حدث؟",
+  "lines": [
+   "عُمَرُ قَال: الْيَوْمَ أَسْبِقُ أَبَا بَكْر.. لَكِنَّ المُفَاجَأَةَ كَانَتْ عَظِيمَة!",
+   "هَذِهِ قِصَّةٌ مِنْ غَزْوَةِ تَبُوك.",
+   "طَلَبَ النَّبِيُّ صَلَّى اللهُ عَلَيْهِ وَسَلَّمَ مِنَ النَّاسِ أَنْ يَتَصَدَّقُوا لِتَجْهِيزِ الجَيْش.",
+   "فَقَالَ عُمَر: هَذِهِ فُرْصَتِي لِأَسْبِقَ أَبَا بَكْر.",
+   "فَجَاءَ بِنِصْفِ مَالِه.",
+   "فَسُئِلَ: مَاذَا أَبْقَيْتَ لِأَهْلِك؟ قَال: أَبْقَيْتُ لَهُم مِثْلَه.",
+   "ثُمَّ جَاءَ أَبُو بَكْرٍ بِكُلِّ مَالِه.",
+   "فَسُئِلَ: مَاذَا أَبْقَيْتَ لِأَهْلِك؟",
+   "قَال: أَبْقَيْتُ لَهُمُ اللهَ وَرَسُولَه.",
+   "فَقَالَ عُمَر: لَا أُسَابِقُكَ إِلَى شَيْءٍ أَبَدًا."
+  ],
+  "question": "",
+  "description": "",
+  "tags": [
+   "أبو بكر الصديق",
+   "عمر بن الخطاب",
+   "قصص الصحابة",
+   "غزوة تبوك"
+  ],
+  "search_terms": [
+   "desert",
+   "ancient"
+  ],
+  "scenes": [
+   "dark cinematic epic mood, ancient Arabia, deep shadows and dramatic light, every face hidden (seen from behind, in silhouette or covered), doodle, two men in silhouette walking toward old Medina's mosque at dawn, each carrying something",
+   "dark cinematic epic mood, ancient Arabia, deep shadows and dramatic light, every face hidden (seen from behind, in silhouette or covered), doodle, old Medina with palm trees under a dramatic sky, no people",
+   "dark cinematic epic mood, ancient Arabia, deep shadows and dramatic light, every face hidden (seen from behind, in silhouette or covered), doodle, people in silhouette gathering in a simple mosque courtyard with palm trunks, bringing goods",
+   "dark cinematic epic mood, ancient Arabia, deep shadows and dramatic light, every face hidden (seen from behind, in silhouette or covered), doodle, a strong man seen from behind standing at his house door, determined",
+   "dark cinematic epic mood, ancient Arabia, deep shadows and dramatic light, every face hidden (seen from behind, in silhouette or covered), doodle, the man in silhouette carrying sacks of grain and a pile of coins into the courtyard",
+   "dark cinematic epic mood, ancient Arabia, deep shadows and dramatic light, every face hidden (seen from behind, in silhouette or covered), doodle, the man seen from behind standing proudly beside his donation, others in silhouette watching",
+   "dark cinematic epic mood, ancient Arabia, deep shadows and dramatic light, every face hidden (seen from behind, in silhouette or covered), doodle, a gentle man in white robes seen from behind bringing everything he owns, many camels behind him",
+   "dark cinematic epic mood, ancient Arabia, deep shadows and dramatic light, every face hidden (seen from behind, in silhouette or covered), doodle, the courtyard falling silent, men in silhouette turning toward the man in white",
+   "dark cinematic epic mood, ancient Arabia, deep shadows and dramatic light, every face hidden (seen from behind, in silhouette or covered), doodle, the man in white seen from behind, a warm divine light falling on him",
+   "dark cinematic epic mood, ancient Arabia, deep shadows and dramatic light, every face hidden (seen from behind, in silhouette or covered), doodle, the two men seen from behind standing side by side at sunset, palm trees, golden light"
+  ],
+  "visuals": [
+   "desert",
+   "desert",
+   "desert",
+   "desert",
+   "desert",
+   "desert",
+   "desert",
+   "desert",
+   "desert",
+   "desert"
+  ]
+ },
+ {
+  "topic": "musab",
+  "kind": "faith",
+  "mood": "ambience",
+  "title": "أغنى شباب مكة.. مات وكفنه لا يغطيه! قصة مصعب بن عمير",
+  "lines": [
+   "كَانَ أَغْنَى شَبَابِ مَكَّةَ وَأَجْمَلَهُم ثِيَابًا.. وَمَاتَ وَكَفَنُهُ لَا يُغَطِّيه!",
+   "هَذِهِ قِصَّةُ مُصْعَبِ بْنِ عُمَيْر.",
+   "كَانَ يَلْبَسُ أَجْمَلَ الثِّيَاب.. وَيُعْرَفُ بِطِيبِ رَائِحَتِه.",
+   "فَلَمَّا أَسْلَم.. حَبَسَتْهُ أُمُّه.. وَمَنَعَتْهُ مِنْ كُلِّ شَيْء.",
+   "فَتَرَكَ النَّعِيمَ كُلَّه.. وَهَاجَرَ فِي سَبِيلِ الله.",
+   "ثُمَّ أَرْسَلَهُ النَّبِيُّ صَلَّى اللهُ عَلَيْهِ وَسَلَّم.. أَوَّلَ سَفِيرٍ إِلَى المَدِينَة.",
+   "فَكَانَ يُعَلِّمُ النَّاسَ القُرْآن.. حَتَّى أَسْلَمَ عَلَى يَدَيْهِ سَادَةُ المَدِينَة.",
+   "وَفِي غَزْوَةِ أُحُد.. حَمَلَ رَايَةَ المُسْلِمِين.",
+   "وَثَبَتَ حَتَّى اسْتُشْهِد.. وَالرَّايَةُ فِي يَدِه.",
+   "فَلَمْ يَجِدُوا لَهُ إِلَّا ثَوْبًا قَصِيرًا.. إِذَا غَطَّوْا رَأْسَهُ بَدَتْ قَدَمَاه.",
+   "فَغَطَّوْا رَأْسَه.. وَوَضَعُوا عَلَى قَدَمَيْهِ مِنَ الإِذْخِر."
+  ],
+  "question": "",
+  "description": "",
+  "tags": [
+   "مصعب بن عمير",
+   "قصص الصحابة",
+   "سفير الإسلام",
+   "قصص إسلامية"
+  ],
+  "search_terms": [
+   "desert",
+   "ancient"
+  ],
+  "scenes": [
+   "dark cinematic epic mood, ancient Arabia, deep shadows and dramatic light, every face hidden (seen from behind, in silhouette or covered), doodle, a young man in silhouette in fine colorful robes walking in Mecca's market, perfume bottles",
+   "dark cinematic epic mood, ancient Arabia, deep shadows and dramatic light, every face hidden (seen from behind, in silhouette or covered), doodle, ancient Mecca market at sunset, no people",
+   "dark cinematic epic mood, ancient Arabia, deep shadows and dramatic light, every face hidden (seen from behind, in silhouette or covered), doodle, the young man seen from behind with rich silk robes, admired by people in silhouette",
+   "dark cinematic epic mood, ancient Arabia, deep shadows and dramatic light, every face hidden (seen from behind, in silhouette or covered), doodle, the young man in silhouette sitting alone in a locked dark room, a thin beam of light",
+   "dark cinematic epic mood, ancient Arabia, deep shadows and dramatic light, every face hidden (seen from behind, in silhouette or covered), doodle, the young man in simple worn clothes seen from behind walking away from a rich house into the desert",
+   "dark cinematic epic mood, ancient Arabia, deep shadows and dramatic light, every face hidden (seen from behind, in silhouette or covered), doodle, a lone rider in silhouette approaching the palm groves of Medina at dawn",
+   "dark cinematic epic mood, ancient Arabia, deep shadows and dramatic light, every face hidden (seen from behind, in silhouette or covered), doodle, men in silhouette sitting in a circle under palm trees listening, warm lamp light",
+   "dark cinematic epic mood, ancient Arabia, deep shadows and dramatic light, every face hidden (seen from behind, in silhouette or covered), doodle, a warrior in silhouette holding a banner high on a battlefield near a mountain, dust",
+   "dark cinematic epic mood, ancient Arabia, deep shadows and dramatic light, every face hidden (seen from behind, in silhouette or covered), doodle, a fallen banner on the ground at sunset, the mountain behind, smoke",
+   "dark cinematic epic mood, ancient Arabia, deep shadows and dramatic light, every face hidden (seen from behind, in silhouette or covered), doodle, a simple short white cloth over a resting figure, faces hidden, soft dawn light",
+   "dark cinematic epic mood, ancient Arabia, deep shadows and dramatic light, every face hidden (seen from behind, in silhouette or covered), doodle, green desert grass placed gently, mountain of Uhud at sunrise, no faces"
+  ],
+  "visuals": [
+   "desert",
+   "desert",
+   "desert",
+   "desert",
+   "desert",
+   "desert",
+   "desert",
+   "desert",
+   "desert",
+   "desert",
+   "desert"
+  ]
+ },
+ {
+  "topic": "khalid mutah",
+  "kind": "faith",
+  "mood": "ambience",
+  "title": "تسعة سيوف انكسرت في يده.. قصة خالد بن الوليد في مؤتة",
+  "lines": [
+   "تِسْعَةُ سُيُوفٍ.. انْكَسَرَتْ فِي يَدِهِ فِي يَوْمٍ وَاحِد!",
+   "هَذِهِ قِصَّةُ خَالِدِ بْنِ الوَلِيدِ فِي مَعْرَكَةِ مُؤْتَة.",
+   "خَرَجَ ثَلَاثَةُ آلَافِ مُسْلِم.. فَوَجَدُوا أَمَامَهُم جَيْشًا هَائِلًا لِلرُّوم.",
+   "وَكَانَ النَّبِيُّ صَلَّى اللهُ عَلَيْهِ وَسَلَّمَ قَدْ جَعَلَ عَلَيْهِم ثَلَاثَةَ أُمَرَاء.",
+   "فَاسْتُشْهِدَ زَيْد.. ثُمَّ جَعْفَر.. ثُمَّ عَبْدُ اللهِ بْنُ رَوَاحَة.",
+   "فَأَخَذَ الرَّايَةَ خَالِدُ بْنُ الوَلِيد.",
+   "وَقَاتَلَ قِتَالًا شَدِيدًا.. حَتَّى انْكَسَرَتْ فِي يَدِهِ تِسْعَةُ أَسْيَاف.",
+   "وَفِي اللَّيْل.. غَيَّرَ أَمَاكِنَ الجَيْش.. فَجَعَلَ المُقَدِّمَةَ مُؤَخِّرَة.. وَالمَيْمَنَةَ مَيْسَرَة.",
+   "فَلَمَّا أَصْبَحَ الرُّومُ.. ظَنُّوا أَنَّ جَيْشًا جَدِيدًا جَاءَ لِلْمُسْلِمِين.",
+   "فَانْسَحَبَ خَالِدٌ بِالجَيْشِ سَالِمًا.. وَحَفِظَ دِمَاءَ المُسْلِمِين.",
+   "وَسَمَّاهُ النَّبِيُّ صَلَّى اللهُ عَلَيْهِ وَسَلَّم: سَيْفًا مِنْ سُيُوفِ الله."
+  ],
+  "question": "",
+  "description": "",
+  "tags": [
+   "خالد بن الوليد",
+   "غزوة مؤتة",
+   "سيف الله المسلول",
+   "قصص الصحابة"
+  ],
+  "search_terms": [
+   "desert",
+   "ancient"
+  ],
+  "scenes": [
+   "dark cinematic epic mood, ancient Arabia, deep shadows and dramatic light, every face hidden (seen from behind, in silhouette or covered), doodle, broken swords lying on a battlefield at sunset, dust and smoke",
+   "dark cinematic epic mood, ancient Arabia, deep shadows and dramatic light, every face hidden (seen from behind, in silhouette or covered), doodle, a vast battlefield in the land of Sham under a dramatic sky, no people",
+   "dark cinematic epic mood, ancient Arabia, deep shadows and dramatic light, every face hidden (seen from behind, in silhouette or covered), doodle, a small army in silhouette on a hill facing an enormous army with banners filling the plain",
+   "dark cinematic epic mood, ancient Arabia, deep shadows and dramatic light, every face hidden (seen from behind, in silhouette or covered), doodle, three banners standing in a row on a desert hill at dawn",
+   "dark cinematic epic mood, ancient Arabia, deep shadows and dramatic light, every face hidden (seen from behind, in silhouette or covered), doodle, a banner falling and being caught again by riders in silhouette, the battle raging",
+   "dark cinematic epic mood, ancient Arabia, deep shadows and dramatic light, every face hidden (seen from behind, in silhouette or covered), doodle, a warrior in silhouette raising the banner high on his horse in the middle of the battle",
+   "dark cinematic epic mood, ancient Arabia, deep shadows and dramatic light, every face hidden (seen from behind, in silhouette or covered), doodle, the warrior in silhouette fighting with a broken sword, sparks, dust, sunset",
+   "dark cinematic epic mood, ancient Arabia, deep shadows and dramatic light, every face hidden (seen from behind, in silhouette or covered), doodle, an army camp at night, soldiers in silhouette quietly moving positions by torchlight",
+   "dark cinematic epic mood, ancient Arabia, deep shadows and dramatic light, every face hidden (seen from behind, in silhouette or covered), doodle, the enemy army in silhouette at dawn looking at new banners on the hill, hesitating",
+   "dark cinematic epic mood, ancient Arabia, deep shadows and dramatic light, every face hidden (seen from behind, in silhouette or covered), doodle, the small army in silhouette riding safely away across the desert at sunrise",
+   "dark cinematic epic mood, ancient Arabia, deep shadows and dramatic light, every face hidden (seen from behind, in silhouette or covered), doodle, a single sword planted in the sand glowing in golden sunrise light, no people"
+  ],
+  "visuals": [
+   "desert",
+   "desert",
+   "desert",
+   "desert",
+   "desert",
+   "desert",
+   "desert",
+   "desert",
+   "desert",
+   "desert",
+   "desert"
+  ]
  }
 ]
