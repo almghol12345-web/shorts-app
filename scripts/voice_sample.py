@@ -25,12 +25,14 @@ def list_voices() -> None:
     import requests
     url, key, _ = darijat._cfg()
     headers = {"Authorization": f"Bearer {key}", "X-API-Key": key, "api-key": key}
-    for path in ("/api/v2/external/voices", "/api/v2/voices", "/api/v2/external/get-voices", "/api/voices"):
+    for path in ("/api/v2/voices", "/api/v2/external/voices", "/api/v2/external/get-voices", "/api/voices"):
         try:
             r = requests.get(url + path, headers=headers, timeout=30)
-            print(f"[voices] {path}: HTTP {r.status_code} {r.text[:3000]}")
-            if r.ok:
+            if r.ok and "voices" in r.text:
+                for v in r.json().get("voices", []):
+                    print(f"[voices] {v.get('voice_name')} | {v.get('dialect')} | {v.get('category') or ''}")
                 return
+            print(f"[voices] {path}: HTTP {r.status_code}")
         except Exception as exc:
             print(f"[voices] {path}: {exc}")
 
