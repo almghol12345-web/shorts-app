@@ -21,6 +21,8 @@ OUTRO = "وأنت لو كنت مكانهم.. وش كنت بتسوي؟ اكتب �
 
 def add_outro(script: content.Script) -> None:
     n = len(script.lines)
+    if script.kind == "faith" and not script.question.strip():
+        return                      # Quran stories end on the story itself, no question
     closing = script.question.strip() or OUTRO
     if script.lines and script.lines[-1] == closing:
         return

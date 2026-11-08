@@ -80,7 +80,7 @@ def hashtags_for(topic_tags: list[str], trending: list[str], evergreen: list[str
     return out
 
 
-FAITH_TAGS = ["قصص_القرآن", "قصص_إسلامية", "سورة_الكهف", "أهل_الكهف", "قصص_حقيقية"]
+FAITH_TAGS = ["قصص_القرآن", "قصص_إسلامية", "القرآن_الكريم", "قصص_حقيقية"]
 NEWS_EVERGREEN = ["اكتشاف", "علوم", "تقنية", "أخبار_العلم", "معلومات", "هل_تعلم"]
 # broad Arabic hashtags with big search volume, mixed with the subject's own ones
 NEWS_BROAD = ["معلومات", "هل_تعلم", "اكتشاف", "معلومة_تهمك", "ترند"]
@@ -109,9 +109,11 @@ def build(title: str, hook: str, topic_tags: list[str], trending: list[str],
     news = kind == "news"
     if kind == "faith":
         # Quran stories: own hashtags, no shock emoji, no random trending tags
-        tags_line = FAITH_TAGS[:5]
+        # the story's own hashtags first (e.g. أصحاب_الفيل، سورة_الفيل), then the general ones
+        tags_line = list(dict.fromkeys([t.replace(" ", "_") for t in topic_tags[:2]] + FAITH_TAGS))[:5]
         final_title = f"{clean_title(title)} #shorts"[:100]
-        description = (f"{hook}\n\n{question} 👇\n"
+        description = (f"{hook}\n\n" + (f"{question} 👇\n" if question else "")
+                       + 
                        "تابع القناة.. قصة جديدة كل يوم 🔍\n\n"
                        + " ".join(f"#{t}" for t in tags_line) + " #shorts")
         return final_title, description, list(dict.fromkeys(t.replace("_", " ") for t in topic_tags + FAITH_TAGS))[:15]
