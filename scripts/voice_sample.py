@@ -10,7 +10,7 @@ sys.path.insert(0, str(ROOT))
 from shorts import darijat  # noqa: E402
 
 SAMPLE = "قَال: القَهْوَة قَدِيمَة.. وْالقِصَّة صَارَت فِي القَرْيَة"
-VOICE_TEXT = "تْخَيَّل القَمَر اخْتِفَى اللَّيْلَة.. وِش اللِّي بِيْصِير؟ أَوَّل شِي بِتْلَاحْظَه إِن اللَّيْل صَار ظَلَام تَام. وْبَعْدَهَا البَحَر.. المَد وْالجَزْر بِيِضْعَف كَثِير."
+VOICE_TEXT = "تْخَيَّل القَمَر اخْتَفَى اللَّيْلِة.. شُو رَحْ يْصِير؟ أَوَّل شِي رَحْ تْلَاحِظ إِنُّو اللَّيْل صَار عَتْمِة كْتِير. وْبَعْدِين البَحِر.. المَدّ وْالجَزِر رَحْ يِضْعَف كْتِير."
 # name -> (Darijat voice, text): the same lines in each Saudi voice, to compare by ear
 VARIANTS = {
     "1_jassar": ("جسار", VOICE_TEXT),
@@ -20,7 +20,23 @@ VARIANTS = {
 }
 
 
+def list_voices() -> None:
+    """Print the voices the service offers (to find dialects we have not tried)."""
+    import requests
+    url, key, _ = darijat._cfg()
+    headers = {"Authorization": f"Bearer {key}", "X-API-Key": key, "api-key": key}
+    for path in ("/api/v2/external/voices", "/api/v2/voices", "/api/v2/external/get-voices", "/api/voices"):
+        try:
+            r = requests.get(url + path, headers=headers, timeout=30)
+            print(f"[voices] {path}: HTTP {r.status_code} {r.text[:3000]}")
+            if r.ok:
+                return
+        except Exception as exc:
+            print(f"[voices] {path}: {exc}")
+
+
 def main() -> None:
+    list_voices()
     out = ROOT / "output" / "voice"
     out.mkdir(parents=True, exist_ok=True)
     parts = []
