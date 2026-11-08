@@ -13,10 +13,10 @@ SAMPLE = "قَال: القَهْوَة قَدِيمَة.. وْالقِصَّة �
 VOICE_TEXT = "تْخَيَّل القَمَر اخْتَفَى اللَّيْلِة.. شُو رَحْ يْصِير؟ أَوَّل شِي رَحْ تْلَاحِظ إِنُّو اللَّيْل صَار عَتْمِة كْتِير. وْبَعْدِين البَحِر.. المَدّ وْالجَزِر رَحْ يِضْعَف كْتِير."
 # name -> (Darijat voice, text): the same lines in each Saudi voice, to compare by ear
 VARIANTS = {
-    "1_jassar": ("جسار", VOICE_TEXT),
-    "2_turki": ("تركي", VOICE_TEXT),
-    "3_faisal": ("فيصل", VOICE_TEXT),
-    "4_fayez": ("فايز", VOICE_TEXT),
+    "1_samer_shami": ("سامر", VOICE_TEXT),
+    "2_shahm_jordan": ("شهم", VOICE_TEXT),
+    "3_maha_syria": ("مها", VOICE_TEXT),
+    "4_hazem_multi": ("حازم", VOICE_TEXT),
 }
 
 
@@ -38,7 +38,6 @@ def list_voices() -> None:
 
 
 def main() -> None:
-    list_voices()
     out = ROOT / "output" / "voice"
     out.mkdir(parents=True, exist_ok=True)
     parts = []
