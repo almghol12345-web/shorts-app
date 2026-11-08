@@ -400,9 +400,16 @@ def generate(cfg: Config, used: list[str], scores: dict | None = None) -> Script
     import os
     wanted = os.environ.get("SHORTS_TOPIC", "").strip()
     if wanted:   # a specific script asked for by the owner (requests.json is only used this way)
-        for s in _load_json("requests.json") + _load_json("wow.json") + load_bank():
+        for s in _load_json("requests.json") + _load_json("faith.json") + _load_json("wow.json") + load_bank():
             if s.topic == wanted:
                 return s
+    if cfg.kind == "faith":
+        # Quran and Companions stories, in the order they were written
+        fresh = [s for s in _load_json("faith.json") if s.topic not in used]
+        if fresh:
+            return fresh[0]
+        print("[faith] no stories left; making an amazing-facts Short")
+        cfg.kind = "news"
     if cfg.kind == "news":
         # hand-written "wow" Shorts first (free), then live news when a Claude key is set
         fresh = [s for s in _load_json("wow.json") if s.topic not in used]

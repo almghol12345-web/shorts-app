@@ -25,7 +25,7 @@ on:
         description: "public / unlisted / private"
         default: "public"
       kind:
-        description: "news (something new in the world) / mystery (story)"
+        description: "faith (Quran / Companions story) / news (amazing facts) / mystery (story)"
         default: "news"
       topic:
         description: "Make this exact script (topic id), empty = automatic choice"
@@ -114,7 +114,7 @@ jobs:
           SHORTS_KIND: ${{ steps.gate.outputs.kind }}
           SHORTS_TOPIC: ${{ inputs.topic }}
           REPLICATE_VIDEO_SHOTS: ${{ vars.REPLICATE_VIDEO_SHOTS }}
-          DARIJAT_VOICE: ${{ inputs.darijat_voice || vars.DARIJAT_VOICE }}
+          DARIJAT_VOICE: ${{ inputs.darijat_voice || 'فيصل' }}
           DARIJAT_API_URL: ${{ vars.DARIJAT_API_URL }}
           ELEVENLABS_VOICE_ID: ${{ vars.ELEVENLABS_VOICE_ID }}
           ELEVENLABS_VOICE_PICK: ${{ inputs.voice }}
@@ -126,6 +126,9 @@ jobs:
           SHORTS_PRIVACY: ${{ inputs.privacy || vars.SHORTS_PRIVACY }}
           SHORTS_NARRATOR: ${{ inputs.narrator || vars.SHORTS_NARRATOR }}
         run: |
+          if [ "$SHORTS_KIND" = "faith" ] && [ -z "${{ inputs.quality }}" ]; then
+            export REPLICATE_VIDEO_SHOTS=none         # drawn stories: stills with slow camera moves
+          fi
           if [ "${{ inputs.quality }}" = "best" ]; then
             export REPLICATE_VIDEO_SHOTS=all REPLICATE_IMAGE_MODEL=black-forest-labs/flux-1.1-pro
           elif [ "${{ inputs.quality }}" = "video" ]; then
