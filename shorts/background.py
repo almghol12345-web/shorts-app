@@ -349,6 +349,8 @@ def paid_scene(scene: str, seconds: float, out: Path, src: Sources, width: int, 
     raw = out.with_suffix(".jpg")
     style = (DOODLE_STYLE if "doodle" in scene else FILM_STYLE if "photorealistic" in scene
              else ART_STYLE)
+    if style is DOODLE_STYLE:          # "doodle" only picks the style; keep it out of the picture prompt
+        scene = scene.replace("doodle, ", "").replace("doodle", "")
     aspect = "16:9" if width > height else "9:16"
     # paid clips are kept between runs (GitHub cache), so remaking a video after a voice or
     # text fix costs nothing for the scenes that did not change
