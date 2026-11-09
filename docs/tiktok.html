@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ربط تيك توك | غيهب</title>
+<style>body{margin:0;background:#120a10;color:#f3ece6;font-family:system-ui,-apple-system,Tahoma,sans-serif;line-height:1.8;text-align:center}
+main{max-width:600px;margin:0 auto;padding:48px 16px}#code{direction:ltr;word-break:break-all;background:#2a1a22;padding:16px;border-radius:12px;font-size:15px}</style>
+</head><body><main>
+<h1>ربط تيك توك</h1>
+<p>انسخ الرمز التالي وأرسله في المحادثة:</p>
+<div id="code">—</div>
+<script>
+const p = new URLSearchParams(location.search);
+document.getElementById("code").textContent = p.get("code") || p.get("error_description") || "لا يوجد رمز";
+</script>
+</main></body></html>
