@@ -149,6 +149,22 @@ jobs:
           retention-days: 7
           if-no-files-found: ignore
 
+      - name: Keep a copy for TikTok (branch "tiktok", latest 6)
+        if: steps.gate.outputs.run == 'true' && always()
+        run: |
+          [ -f output/published.jsonl ] || exit 0
+          f=$(ls output/*.mp4 2>/dev/null | head -1); [ -n "$f" ] || exit 0
+          mkdir -p /tmp/tk && cd /tmp/tk
+          git init -q && git checkout -q -b tiktok
+          git config user.name "shorts-bot" && git config user.email "shorts-bot@users.noreply.github.com"
+          remote="https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git"
+          if git fetch -q --depth 1 "$remote" tiktok 2>/dev/null; then git checkout -q FETCH_HEAD -- . 2>/dev/null || true; fi
+          n=$(printf "%05d" ${{ github.run_number }})
+          cp "$GITHUB_WORKSPACE/$f" "$n.mp4"
+          python3 -c "import json,sys; r=[json.loads(l) for l in open(sys.argv[1]) if l.strip()][-1]; print(r.get('title','').replace('#shorts','').strip())" "$GITHUB_WORKSPACE/output/published.jsonl" > "$n.txt"
+          ls *.mp4 | sort | head -n -6 | while read old; do rm -f "$old" "${old%.mp4}.txt"; done
+          git add -A && git commit -qm "tiktok copies" && git push -qf "$remote" HEAD:tiktok
+
       - name: Publish preview frames (branch "previews")
         if: steps.gate.outputs.run == 'true' && always()
         run: |
