@@ -96,3 +96,15 @@ def contact_sheet(video: Path, times: list[float], out: Path) -> Path:
     for f in frames:
         f.unlink(missing_ok=True)
     return out
+
+
+def append_endcard(video: Path, endcard: Path, out: Path) -> Path:
+    """Adds the channel's end card (made once with HyperFrames, assets/channel/endcard_src)."""
+    from .media import run
+    run(["ffmpeg", "-y", "-i", str(video), "-i", str(endcard), "-filter_complex",
+         "[0:v]fps=30,format=yuv420p,setsar=1[v0];[1:v]scale=1080:1920,fps=30,format=yuv420p,setsar=1[v1];"
+         "[0:a]aresample=44100,aformat=channel_layouts=stereo[a0];[1:a]aresample=44100,aformat=channel_layouts=stereo[a1];"
+         "[v0][a0][v1][a1]concat=n=2:v=1:a=1[v][a]",
+         "-map", "[v]", "-map", "[a]", "-c:v", "libx264", "-preset", "medium", "-crf", "19",
+         "-pix_fmt", "yuv420p", "-c:a", "aac", "-b:a", "192k", "-movflags", "+faststart", str(out)])
+    return out

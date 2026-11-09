@@ -109,6 +109,14 @@ def make_one(cfg: Config, do_upload: bool, keep_work: bool = False) -> dict:
     video = render.render(cfg, narration, bg, work, cfg.output_dir / f"{name}.mp4",
                           narrator=narrator, mood=mood, cuts=starts[1:], booms=booms, cards=cards or None,
                           clean=any("doodle" in sc for sc in script.scenes))
+    endcard = Path(__file__).resolve().parent.parent / "assets" / "channel" / "endcard.mp4"
+    if script.kind == "faith" and endcard.exists():
+        try:      # the channel's animated end card (name + subscribe), polish only
+            final = video.with_name(video.stem + "_end.mp4")
+            render.append_endcard(video, endcard, final)
+            final.replace(video)
+        except Exception as exc:
+            print(f"[endcard] skipped ({str(exc)[:150]})")
     print(f"[video] {video}")
     mids = [starts[i] + spans[i] / 2 for i in range(len(spans))]
     render.contact_sheet(video, mids, cfg.output_dir / "preview.jpg")

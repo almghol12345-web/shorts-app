@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1080, height=1920" />
+    <script src="assets/gsap.min.js"></script>
+    <style>
+      @font-face { font-family: "NotoArabicBlack"; src: url("assets/fonts/NotoSansArabic-Black.ttf"); }
+      @font-face { font-family: "Lalezar"; src: url("assets/fonts/Lalezar-Regular.ttf"); }
+      :root { --ground: #0b0705; --ink: #fff7ea; --gold: #f2c14e; --red: #e23b2e; }
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body { width: 1080px; height: 1920px; overflow: hidden; background: var(--ground); }
+      #root { position: relative; width: 1080px; height: 1920px; overflow: hidden; font-family: "NotoArabicBlack", sans-serif;
+        background: radial-gradient(circle at 50% 42%, #3a2410 0%, #160d07 45%, #0b0705 75%); }
+      #glow { position: absolute; left: 240px; top: 520px; width: 600px; height: 600px; border-radius: 50%;
+        background: radial-gradient(circle, rgba(242,193,78,0.35) 0%, rgba(242,193,78,0) 70%); }
+      #avatar { position: absolute; left: 340px; top: 620px; width: 400px; height: 400px; border-radius: 50%;
+        border: 10px solid var(--gold); object-fit: cover; box-shadow: 0 0 60px rgba(242,193,78,0.5); }
+      .center { position: absolute; left: 0; right: 0; text-align: center; }
+      #name { top: 1070px; font-family: "Lalezar", sans-serif; font-size: 150px; color: var(--ink); }
+      #tag { top: 1290px; font-size: 52px; color: var(--gold); }
+      #btn { position: absolute; left: 300px; top: 1440px; width: 480px; height: 130px; border-radius: 65px; background: var(--red);
+        color: #fff; font-size: 64px; display: flex; align-items: center; justify-content: center; gap: 22px;
+        box-shadow: 0 10px 40px rgba(226,59,46,0.5); }
+      #bell { font-size: 60px; display: inline-block; }
+    </style>
+  </head>
+  <body>
+    <div id="root" data-composition-id="main" data-start="0" data-duration="3" data-width="1080" data-height="1920">
+      <div id="glowclip" class="clip" data-start="0" data-duration="3" data-track-index="0"><div id="glow"></div></div>
+      <div id="avclip" class="clip" data-start="0" data-duration="3" data-track-index="1"><img id="avatar" src="assets/avatar.jpg" alt="" /></div>
+      <div id="nameclip" class="clip" data-start="0.3" data-duration="2.7" data-track-index="2"><div id="name" class="center">غيهب</div></div>
+      <div id="tagclip" class="clip" data-start="0.6" data-duration="2.4" data-track-index="3"><div id="tag" class="center">قِصَّةٌ جَدِيدَةٌ كُلَّ يَوْم</div></div>
+      <div id="btnclip" class="clip" data-start="0.9" data-duration="2.1" data-track-index="4"><div id="btn"><span id="bell">🔔</span><span>اشْتَرِك</span></div></div>
+      <audio id="sound" src="assets/sound.wav" data-start="0" data-duration="3"></audio>
+    </div>
+    <script>
+      const tl = gsap.timeline({ paused: true });
+      tl.fromTo("#glow", { opacity: 0, scale: 0.6 }, { opacity: 1, scale: 1.1, duration: 1.2, ease: "power2.out" }, 0);
+      tl.fromTo("#avatar", { opacity: 0, scale: 0.4, rotation: -12 }, { opacity: 1, scale: 1, rotation: 0, duration: 0.6, ease: "back.out(1.8)" }, 0.05);
+      tl.fromTo("#name", { opacity: 0, y: 50, filter: "blur(10px)" }, { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.6, ease: "power3.out" }, 0.3);
+      tl.fromTo("#tag", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.5, ease: "power2.out" }, 0.6);
+      tl.fromTo("#btn", { opacity: 0, scale: 0.7 }, { opacity: 1, scale: 1, duration: 0.45, ease: "back.out(2)" }, 0.9);
+      tl.to("#btn", { scale: 1.08, duration: 0.18, yoyo: true, repeat: 3, ease: "power1.inOut" }, 1.5);
+      tl.to("#bell", { rotation: 18, duration: 0.09, yoyo: true, repeat: 7, ease: "sine.inOut" }, 1.5);
+      tl.to(["#avatar", "#name", "#tag", "#btn", "#glow"], { opacity: 0, duration: 0.35, ease: "power1.in" }, 2.62);
+      window.__timelines["main"] = tl;
+      tl.seek(0);
+    </script>
+  </body>
+</html>
