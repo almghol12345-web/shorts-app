@@ -12,3 +12,7 @@
 | impeccable | github.com/pbakaus/impeccable |
 | find-skills | github.com/vercel-labs/skills |
 | graphify | github.com/safishamsi/graphify (يحتاج تثبيت `pip install graphifyy`) |
+| caveman | github.com/JuliusBrussee/caveman |
+| humanizer | github.com/blader/humanizer |
+| superpowers (brainstorming, writing-plans, systematic-debugging, ...) | github.com/obra/superpowers |
+| remotion-* | github.com/remotion-dev/skills |
