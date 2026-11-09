@@ -8,23 +8,21 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from shorts import replicate  # noqa: E402
 
-STYLE = ("3D animated cartoon character, Pixar style, friendly expressive face, big eyes, "
-         "full upper body facing the camera, simple dark studio background with soft rim light, "
-         "high detail, no text")
+from shorts.background import DOODLE_STYLE  # noqa: E402
+
+# Channel picture in the look of the Quran-story videos (dark cinematic drawings)
+STYLE = ("dark cinematic epic mood, deep shadows and dramatic warm light, centered bold composition that "
+         "reads well as a small round channel avatar, no people's faces, " + DOODLE_STYLE)
 DESIGNS = {
-    "1_saudi_storyteller": "a young Saudi man storyteller wearing a white thobe and red-and-white shemagh, "
-                           "short neat beard, warm smile, holding an old glowing book",
-    "2_grandfather": "a kind old Bedouin grandfather storyteller with a grey beard, brown bisht cloak and "
-                     "white ghutra, sitting by a small campfire, wise curious eyes",
-    "3_detective_owl": "a cute owl detective wearing a small shemagh and a magnifying glass, curious "
-                       "expression, mysterious adventurer",
-    "4_explorer": "a young Saudi explorer with a desert scarf, explorer jacket and a lantern, excited "
-                  "adventurous expression, mysteries around him",
+    "1_cave_lantern": "a lone figure in silhouette holding a glowing lantern at the mouth of a mountain cave "
+                      "under a starry night sky",
+    "2_crescent_book": "a glowing ancient open book on a desert dune under a big golden crescent moon and stars",
+    "3_cave_light": "a dark mountain cave entrance at night with warm golden light shining from inside, stars above",
+    "4_lantern": "a single ornate Arabian lantern glowing warm gold in deep darkness with tiny stars around it",
 }
 
 
 def main() -> None:
-    os.environ.setdefault("REPLICATE_IMAGE_MODEL", "black-forest-labs/flux-1.1-pro")
     out = Path("output/mascot")
     out.mkdir(parents=True, exist_ok=True)
     for name, desc in DESIGNS.items():
