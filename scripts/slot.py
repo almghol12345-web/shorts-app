@@ -1,8 +1,8 @@
 """Decides whether a scheduled run should publish now, and what kind of Short.
 
 GitHub sometimes delays or drops scheduled runs, so the workflow wakes up every hour
-during the day and this script keeps the real plan: 5 Shorts a day (Riyadh time),
-at least 2.5 hours apart, all Quran / Companions stories.
+during the day and this script keeps the real plan: 3 Shorts a day (Riyadh time),
+at least 2.5 hours apart: two amazing facts, then a Quran / Companions story at night.
 Prints "run=<true|false>" and "kind=<news|mystery>" for $GITHUB_OUTPUT.
 """
 import json
@@ -11,9 +11,9 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 RIYADH = timezone(timedelta(hours=3))
-PER_DAY = 5                           # YouTube's daily upload quota allows about 5
+PER_DAY = 3                           # fewer, stronger Shorts get more views each
 MIN_GAP = timedelta(hours=2, minutes=30)
-FIRST_HOUR, MYSTERY_HOUR = 10, 21     # Riyadh: first Short at 10am
+FIRST_HOUR, MYSTERY_HOUR = 16, 21     # Riyadh: facts at 4pm and 7pm, a story at 10pm
 
 
 def decide(history: list[dict], mysteries: set[str], now: datetime) -> tuple[bool, str]:
@@ -27,8 +27,8 @@ def decide(history: list[dict], mysteries: set[str], now: datetime) -> tuple[boo
     last = max((datetime.fromisoformat(h["date"]) for h in history if h.get("date")), default=None)
     if last and now - last < MIN_GAP:
         return False, "news"
-    # the channel now runs Quran and Companions stories (drawn, formal Arabic) all day
-    return True, "faith"
+    # amazing facts in the afternoon, one Quran / Companions story at night
+    return True, ("faith" if local.hour >= MYSTERY_HOUR else "news")
 
 
 def main() -> None:

@@ -458,13 +458,14 @@ def test_daily_slot_plan():
     slot = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(slot)
     utc = lambda h, m=0: datetime(2026, 11, 3, h, m, tzinfo=timezone.utc)   # Riyadh = UTC+3
-    assert slot.decide([], set(), utc(6))[0] is False                  # 9am Riyadh: too early
-    assert slot.decide([], set(), utc(7)) == (True, "faith")            # 10am Riyadh
-    one = [{"topic": "x", "date": "2026-11-03T10:00:00+00:00"}]
-    assert slot.decide(one, set(), utc(11))[0] is False                # under 2.5 hours apart
-    assert slot.decide(one, set(), utc(13)) == (True, "faith")
-    five = [{"topic": str(i), "date": f"2026-11-03T{7 + 3 * i:02d}:00:00+00:00"} for i in range(5)]
-    assert slot.decide(five, set(), utc(21, 30))[0] is False           # 5 already today
+    assert slot.decide([], set(), utc(12))[0] is False                 # 3pm Riyadh: too early
+    assert slot.decide([], set(), utc(13)) == (True, "news")            # 4pm Riyadh
+    one = [{"topic": "x", "date": "2026-11-03T13:00:00+00:00"}]
+    assert slot.decide(one, set(), utc(14))[0] is False                # under 2.5 hours apart
+    assert slot.decide(one, set(), utc(16)) == (True, "news")
+    assert slot.decide(one, set(), utc(19)) == (True, "faith")          # 10pm Riyadh: the story
+    three = [{"topic": str(i), "date": f"2026-11-03T{13 + 3 * i:02d}:00:00+00:00"} for i in range(3)]
+    assert slot.decide(three, set(), utc(20, 45))[0] is False          # 3 already today
 
 
 def test_learning_favours_strong_groups():
