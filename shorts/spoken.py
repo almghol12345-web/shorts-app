@@ -61,6 +61,8 @@ QUESTION = re.compile(r"(^|\s|و|ف)(طيب|مين|من|وش|ليش|لماذا|�
 
 def speakable(text: str) -> str:
     text = text.translate(str.maketrans("٠١٢٣٤٥٦٧٨٩", "0123456789"))
+    # surah names written as letters are read letter by letter: say them as words
+    text = re.sub(r"(?<![\u0621-\u064A])يس(?![\u0621-\u064A\u064B-\u0652])", "يَاسِين", text)
     text = re.sub(r"(\d+)\s*%", lambda m: f"{number_words(int(m.group(1)))} بالمية", text)
     text = re.sub(r"(\d+)/(\d+)", lambda m: f"{number_words(int(m.group(1)))} على {number_words(int(m.group(2)))}", text)
     text = re.sub(r"(\d+)\.(\d+)", _decimal, text)
