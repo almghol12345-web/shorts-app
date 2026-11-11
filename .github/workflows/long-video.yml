@@ -1,9 +1,7 @@
 name: Long Video
 
 on:
-  schedule:
-    # Tuesdays and Fridays, ~8:40pm Riyadh (UTC+3): a long compilation for watch hours
-    - cron: "41 17 * * 2,5"
+  # paused: long compilations got ~150 views while Shorts get thousands (run by hand if needed)
   workflow_dispatch:
     inputs:
       kind:
