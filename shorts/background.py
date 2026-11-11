@@ -43,6 +43,9 @@ ART_STYLE = ("anime style illustration, clear readable composition, the subject 
 # scenes written as "photorealistic" (e.g. Quran stories) get a film look instead of anime
 FILM_STYLE = ("cinematic film still, photorealistic, epic historical drama, 35mm, rich detail, "
               "atmospheric lighting, no text, no watermark")
+# "footage" scenes: looks like real phone/documentary video of a modern process (how-it's-made)
+FOOTAGE_STYLE = ("real documentary video footage, shot on a phone, natural daylight, sharp realistic detail, "
+                 "modern day, workers seen from behind or as hands only, no faces, no text, no watermark")
 # "doodle" scenes: simple explainer drawings (stick figures, arrows, diagrams)
 DOODLE_STYLE = ("modern stylish flat vector illustration like a high-end science explainer channel, "
                 "clean bold outlines, rich vibrant colors, cinematic lighting and depth, a full background "
@@ -347,10 +350,12 @@ def paid_scene(scene: str, seconds: float, out: Path, src: Sources, width: int, 
     import hashlib
     import shutil
     raw = out.with_suffix(".jpg")
-    style = (DOODLE_STYLE if "doodle" in scene else FILM_STYLE if "photorealistic" in scene
-             else ART_STYLE)
+    style = (DOODLE_STYLE if "doodle" in scene else FOOTAGE_STYLE if "footage" in scene
+             else FILM_STYLE if "photorealistic" in scene else ART_STYLE)
     if style is DOODLE_STYLE:          # "doodle" only picks the style; keep it out of the picture prompt
         scene = scene.replace("doodle, ", "").replace("doodle", "")
+    if style is FOOTAGE_STYLE:
+        scene = scene.replace("footage, ", "").replace("footage", "")
     aspect = "16:9" if width > height else "9:16"
     # paid clips are kept between runs (GitHub cache), so remaking a video after a voice or
     # text fix costs nothing for the scenes that did not change
