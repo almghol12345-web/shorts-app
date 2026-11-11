@@ -114,7 +114,7 @@ jobs:
           SHORTS_KIND: ${{ steps.gate.outputs.kind }}
           SHORTS_TOPIC: ${{ inputs.topic }}
           REPLICATE_VIDEO_SHOTS: ${{ vars.REPLICATE_VIDEO_SHOTS }}
-          DARIJAT_VOICE: ${{ inputs.darijat_voice || 'فيصل' }}
+          DARIJAT_VOICE: ${{ inputs.darijat_voice || (steps.gate.outputs.kind == 'faith' && 'فيصل' || 'جسار') }}
           DARIJAT_API_URL: ${{ vars.DARIJAT_API_URL }}
           ELEVENLABS_VOICE_ID: ${{ vars.ELEVENLABS_VOICE_ID }}
           ELEVENLABS_VOICE_PICK: ${{ inputs.voice }}

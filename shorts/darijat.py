@@ -24,7 +24,7 @@ _last_call = [0.0]
 def _cfg():
     return (os.environ.get("DARIJAT_API_URL", "").strip() or DEFAULT_URL).rstrip("/"), \
         os.environ.get("DARIJAT_API_KEY", "").strip(), \
-        os.environ.get("DARIJAT_VOICE", "").strip() or "فيصل"   # the channel voice, chosen by the owner
+        os.environ.get("DARIJAT_VOICE", "").strip() or "جسار"   # facts: جسار (what got views); stories: فيصل (set by the workflow)
 
 
 def _save_audio(resp: requests.Response, out: Path, headers: dict) -> None:
