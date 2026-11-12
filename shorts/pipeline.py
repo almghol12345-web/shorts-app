@@ -64,6 +64,9 @@ def make_one(cfg: Config, do_upload: bool, keep_work: bool = False) -> dict:
     used = history.used_topics(cfg.history_file)
     scores = _learn(cfg)
     script = content.generate(cfg, used, scores)
+    if do_upload and (script.source or script.topic) in used:
+        # a topic asked for by name skips the "not used yet" filter: never publish it twice
+        raise SystemExit(f"[upload] '{script.topic}' was already published; not uploading it again")
     add_outro(script)
     print(f"[script] {script.title}")
 
