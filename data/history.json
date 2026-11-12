@@ -242,7 +242,8 @@
     "topic": "moon disappears",
     "title": "لو اختفى القمر الليلة.. وش بيصير؟",
     "video_id": "iTFfvZ6rOt8",
-    "date": "2026-11-08T14:49:46+00:00"
+    "date": "2026-11-08T14:49:46+00:00",
+    "deleted": true
   },
   {
     "topic": "immortal jellyfish",
@@ -260,7 +261,8 @@
     "topic": "people of the trench",
     "title": "ملك أشعل الأخاديد نارًا.. قصة أصحاب الأخدود",
     "video_id": "67dhE4zxR3o",
-    "date": "2026-11-08T19:15:06+00:00"
+    "date": "2026-11-08T19:15:06+00:00",
+    "deleted": true
   },
   {
     "topic": "qarun",
@@ -345,5 +347,11 @@
     "title": "ليش بير زمزم ما يخلص؟ #shorts",
     "video_id": "QcOWE5mS9nM",
     "date": "2026-11-12T14:15:03+00:00"
+  },
+  {
+    "topic": "europa ocean",
+    "title": "قمر تحت ثلجه محيط أكبر من بحار الأرض! 🤯 #shorts",
+    "video_id": "Ud0AIlx60f0",
+    "date": "2026-11-12T17:36:32+00:00"
   }
 ]
