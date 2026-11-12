@@ -463,7 +463,7 @@ def test_daily_slot_plan():
     one = [{"topic": "x", "date": "2026-11-03T13:00:00+00:00"}]
     assert slot.decide(one, set(), utc(14))[0] is False                # under 2.5 hours apart
     assert slot.decide(one, set(), utc(16)) == (True, "news")
-    assert slot.decide(one, set(), utc(19)) == (True, "faith")          # 10pm Riyadh: the story
+    assert slot.decide(one, set(), utc(19)) == (True, "news")           # 10pm Riyadh: a fact too (stories dropped)
     three = [{"topic": str(i), "date": f"2026-11-03T{13 + 3 * i:02d}:00:00+00:00"} for i in range(3)]
     assert slot.decide(three, set(), utc(20, 45))[0] is False          # 3 already today
 

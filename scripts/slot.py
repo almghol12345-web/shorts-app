@@ -28,7 +28,7 @@ def decide(history: list[dict], mysteries: set[str], now: datetime) -> tuple[boo
     if last and now - last < MIN_GAP:
         return False, "news"
     # amazing facts in the afternoon, one Quran / Companions story at night
-    return True, ("faith" if local.hour >= MYSTERY_HOUR else "news")
+    return True, "news"     # Companions stories were dropped (36-320 views); facts in every slot
 
 
 def main() -> None:
