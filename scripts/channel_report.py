@@ -22,11 +22,15 @@ def main() -> None:
         token = page.get("nextPageToken")
         if not token:
             break
+    rows = []
     for k in range(0, len(ids), 50):
         vids = yt.videos().list(part="snippet,statistics,status,contentDetails",
                                 id=",".join(ids[k:k + 50])).execute()["items"]
         for v in vids:
             st = v.get("statistics", {})
+            rows.append({"id": v["id"], "title": v["snippet"]["title"][:60],
+                         "published": v["snippet"]["publishedAt"], "views": int(st.get("viewCount", 0)),
+                         "likes": int(st.get("likeCount", 0)), "duration": v["contentDetails"]["duration"]})
             print("VIDEO", json.dumps({
                 "id": v["id"], "title": v["snippet"]["title"],
                 "published": v["snippet"]["publishedAt"], "privacy": v["status"]["privacyStatus"],
@@ -34,6 +38,11 @@ def main() -> None:
                 "views": int(st.get("viewCount", 0)), "likes": int(st.get("likeCount", 0)),
                 "comments": int(st.get("commentCount", 0)),
             }, ensure_ascii=False))
+
+    # the newest uploads again at the very end, so a short tail of the log is enough
+    for r in sorted(rows, key=lambda r: r["published"], reverse=True)[:12][::-1]:
+        print("RECENT", json.dumps(r, ensure_ascii=False))
+    print("CHANNEL", json.dumps(ch["statistics"]))
 
 
 if __name__ == "__main__":
