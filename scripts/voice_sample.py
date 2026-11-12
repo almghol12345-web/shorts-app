@@ -17,10 +17,15 @@ CASUAL = ("شِف الأَلْمَان كَيْف يْغَيْرُون غَطَ�
 CASUAL_PLAIN = ("شف الألمان كيف يغيرون غطا البلاعة.. بأقل من ساعتين! "
                 "يجيبون مكينة فيها منشار مدور كبير.. وتقص دايرة حول الغطا. "
                 "بعدين يشيلون الغطا مع الزفت اللي حوله.. كله مرة وحدة!")
-# name -> (Darijat voice, text): the same casual Saudi lines with and without tashkeel
+FUSHA = ("انْظُرْ كَيْفَ يُبَدِّلُ الأَلْمَانُ غِطَاءَ الصَّرْفِ.. فِي أَقَلَّ مِنْ سَاعَتَيْنِ! "
+         "يُحْضِرُونَ آلَةً فِيهَا مِنْشَارٌ دَائِرِيٌّ ضَخْمٌ.. تَقْطَعُ حَلْقَةً كَامِلَةً حَوْلَ الغِطَاءِ. "
+         "ثُمَّ يَرْفَعُونَ الغِطَاءَ مَعَ الإِسْفَلْتِ الَّذِي حَوْلَهُ.. قِطْعَةً وَاحِدَةً!")
+# name -> (Darijat voice, text): other Saudi voices on the same casual lines, and a formal version
 VARIANTS = {
-    "1_tashkeel": ("جسار", CASUAL),
-    "2_plain": ("جسار", CASUAL_PLAIN),
+    "1_turki": ("تركي", CASUAL),
+    "2_fayez": ("فايز", CASUAL),
+    "3_faisal": ("فيصل", CASUAL),
+    "4_faisal_fusha": ("فيصل", FUSHA),
 }
 
 
