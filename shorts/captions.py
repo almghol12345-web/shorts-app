@@ -18,6 +18,9 @@ def _ts(seconds: float) -> str:
 def _escape(text: str) -> str:
     from .spoken import plain
     text = plain(text)
+    # commas and dots at a caption's edge show on the wrong side in right-to-left text: drop them
+    text = text.replace("،", " ").replace(",", " ").replace(".", " ").strip()
+    text = " ".join(text.split())
     return text.replace("\\", "").replace("{", "(").replace("}", ")").replace("\n", " ")
 
 
