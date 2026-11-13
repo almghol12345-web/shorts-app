@@ -20,12 +20,23 @@ CASUAL_PLAIN = ("شف الألمان كيف يغيرون غطا البلاعة..
 FUSHA = ("انْظُرْ كَيْفَ يُبَدِّلُ الأَلْمَانُ غِطَاءَ الصَّرْفِ.. فِي أَقَلَّ مِنْ سَاعَتَيْنِ! "
          "يُحْضِرُونَ آلَةً فِيهَا مِنْشَارٌ دَائِرِيٌّ ضَخْمٌ.. تَقْطَعُ حَلْقَةً كَامِلَةً حَوْلَ الغِطَاءِ. "
          "ثُمَّ يَرْفَعُونَ الغِطَاءَ مَعَ الإِسْفَلْتِ الَّذِي حَوْلَهُ.. قِطْعَةً وَاحِدَةً!")
-# name -> (Darijat voice, text): other Saudi voices on the same casual lines, and a formal version
+# How much tashkeel does جسار need to sound like a Saudi chatting? The same chatty lines three ways:
+# every word vowelled, only the words the voice could misread vowelled, and no tashkeel at all.
+CHAT_FULL = ("تَدْرِي إِنّ البِتْرُول اللِّي تَحْت الأَرْض مُو بُحَيْرَة؟ وَالله إِنِّي كِنْت أَحْسِبَه كِذَا! "
+             "لَو تِنْزِل تَحْت مَا تْشُوف وَلَا بِرْكَة.. تْشُوف صَخَر وْبَس. "
+             "طَيِّب وَيْن البِتْرُول؟ دَاخِل الصَّخَر نَفْسَه.. الصَّخَر مَلْيَان خْرُوم صْغَيْرَة مَرَّة مَا تِنْشَاف بِالعَيْن. "
+             "يَعْنِي زَي الإِسْفَنْجَة اللِّي شَارْبَة مُويَة.. بَس مِن حَجَر! "
+             "وْفَوْقَه صَخَر مْسَكَّر زَي الغَطَا.. مَا يْخَلِّي شِي يِطْلَع.")
+CHAT_SELECTIVE = ("تدري إنّ البِتْرُول اللي تحت الأرض مو بُحَيْرَة؟ والله إنّي كِنْت أَحْسِبَه كذا! "
+                  "لو تِنْزِل تحت ما تْشُوف ولا بِرْكَة.. تْشُوف صَخَر وبس. "
+                  "طيب وين البِتْرُول؟ داخل الصَّخَر نَفْسَه.. الصَّخَر مَلْيَان خْرُوم صْغَيْرَة مَرَّة ما تِنْشَاف بالعين. "
+                  "يعني زي الإسفنجة اللي شَارْبَة مُويَة.. بس من حَجَر! "
+                  "وفوقه صَخَر مْسَكَّر زي الغَطَا.. ما يْخَلِّي شي يِطْلَع.")
+# name -> (Darijat voice, text)
 VARIANTS = {
-    "1_turki": ("تركي", CASUAL),
-    "2_fayez": ("فايز", CASUAL),
-    "3_faisal": ("فيصل", CASUAL),
-    "4_faisal_fusha": ("فيصل", FUSHA),
+    "1_full_tashkeel": ("جسار", CHAT_FULL),
+    "2_selective_tashkeel": ("جسار", CHAT_SELECTIVE),
+    "3_no_tashkeel": ("جسار", "CHAT_PLAIN"),
 }
 
 
@@ -59,6 +70,8 @@ def main() -> None:
         from shorts.spoken import plain
         if text == "PLAIN":
             text = plain(VOICE_TEXT)
+        if text == "CHAT_PLAIN":
+            text = plain(CHAT_FULL)
         if voice:
             os.environ["DARIJAT_VOICE"] = voice
         f = out / f"{name}.mp3"
