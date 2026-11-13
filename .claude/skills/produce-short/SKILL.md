@@ -10,11 +10,11 @@ move needs evidence. Publishing is refused by the pipeline unless the board says
 | Stage | Who | Evidence to record |
 |---|---|---|
 | idea | idea-scout (growth-strategist and competitor-scout feed it) | the question and why |
-| script | script-writer, then hook-doctor, retention-editor, pronunciation-coach | entry added to `data/requests.json` |
+| script | script-writer, then hook-doctor, retention-editor, saudi-talk-coach, pronunciation-coach | entry added to `data/requests.json` |
 | fact_check | fact-checker (+ culture-reviewer for religion, state, customs) | verdict and sources |
 | storyboard | visual-director writes one "doodle, ..." prompt per line | scene count equals line count |
 | render | dispatch `daily-shorts.yml` with `upload=false`, `quality=video`, `topic` | run id |
-| qa | automatic gate (`[qa]` lines in the run log) + read the preview sheet (previews branch) | qa score, sheet reviewed |
+| qa | automatic gate (`[qa]` lines in the run log) + read the preview sheet (previews branch) + saudi-talk-coach compares the `check-speech.yml` transcript of the render (input `run_id`) with the script | qa score, sheet reviewed, slips heard |
 | approved | critical-reviewer -> quality-defender -> final-judge | score and verdict |
 
 Commands:

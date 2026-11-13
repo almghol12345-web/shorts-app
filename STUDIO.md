@@ -14,13 +14,13 @@ IDEA -> RESEARCH -> SCRIPT -> FACT CHECK -> STORYBOARD -> VISUALS -> ANIMATION -
 | Step | Done by | Proof it happened |
 |---|---|---|
 | Idea, research | agents: growth-strategist, competitor-scout, idea-scout | board entry `idea` |
-| Script | agents: script-writer, hook-doctor, retention-editor, pronunciation-coach | entry in `data/requests.json`, board `script` |
+| Script | agents: script-writer, hook-doctor, retention-editor, saudi-talk-coach, pronunciation-coach | entry in `data/requests.json`, board `script` |
 | Fact check | agents: fact-checker, culture-reviewer | board `fact_check` with sources |
 | Storyboard | agent: visual-director | one picture prompt per line, board `storyboard` |
 | Visuals, animation | code: `shorts/background.py`, `shorts/replicate.py` (Replicate) | scene clips, cached between runs |
 | Voice | code: `shorts/darijat.py` (Darijat, voice جسار) | narration audio with timings |
 | Edit, subtitles, music | code: `shorts/render.py`, `shorts/captions.py`, `shorts/music.py` (ffmpeg) | the mp4 |
-| Final QA | code: `shorts/qa.py`; agents: critical-reviewer, quality-defender, final-judge | `output/qa.json`, board `qa` then `approved` |
+| Final QA | code: `shorts/qa.py`, `check-speech.yml`; agents: saudi-talk-coach (heard vs written), critical-reviewer, quality-defender, final-judge | `output/qa.json`, board `qa` then `approved` |
 | Publish | code: `shorts/upload.py` through `daily-shorts.yml` | `data/history.json` |
 | Performance | code: `scripts/channel_report.py`; agents: channel-analyst, comments-manager | `data/analytics/*.json` |
 
@@ -50,7 +50,7 @@ IDEA -> RESEARCH -> SCRIPT -> FACT CHECK -> STORYBOARD -> VISUALS -> ANIMATION -
 | Strategy and growth | growth-strategist, channel-analyst |
 | Market research | competitor-scout, idea-scout |
 | Writing | script-writer, hook-doctor, retention-editor |
-| Language and voice | pronunciation-coach, `shorts/spoken.py`, `shorts/darijat.py` |
+| Language and voice | saudi-talk-coach, pronunciation-coach, `shorts/spoken.py`, `shorts/darijat.py`, `check-speech.yml` |
 | Research and accuracy | fact-checker |
 | Culture and compliance | culture-reviewer |
 | Art direction | visual-director, `shorts/background.py` |
@@ -60,13 +60,14 @@ IDEA -> RESEARCH -> SCRIPT -> FACT CHECK -> STORYBOARD -> VISUALS -> ANIMATION -
 | Publishing and SEO | seo-specialist, `shorts/seo.py`, `shorts/upload.py` |
 | Community and data | comments-manager, `scripts/channel_report.py` |
 
-17 agents and the code modules above cover the twelve departments. Extra agent files are added
+18 agents and the code modules above cover the twelve departments. Extra agent files are added
 only when a job is really called from a skill.
 
 ## Known limits
 
-- Pronunciation (for example ق read as a hamza) is not detected automatically; `check-speech.yml`
-  transcribes a video on request, but speech recognition tends to "correct" such slips.
+- Pronunciation (for example ق read as a hamza) is not detected by the automatic gate. The
+  saudi-talk-coach reads the `check-speech.yml` transcript of every render, but speech recognition
+  tends to "correct" slips, and how natural the voice sounds can only be judged by ear.
 - Picture quality (does the drawing explain its line, are there people) is judged by reading the
   preview sheet, not by code.
 - Retention numbers need the `yt-analytics.readonly` permission on the saved YouTube login.
