@@ -656,3 +656,11 @@ def test_moya_is_not_read_as_muwaya():
     out = speakable("وْالمُوَيَة تْدِفّ البِتْرُول.. وْمُوَيَة البَحَر")
     assert "مُوَيَ" not in out
     assert "المُويَه" in out and "مُويَت البَحَر" in out
+
+
+def test_music_is_off_unless_asked(monkeypatch):
+    from shorts.config import Config
+    monkeypatch.delenv("SHORTS_MUSIC", raising=False)
+    assert Config().music is False
+    monkeypatch.setenv("SHORTS_MUSIC", "on")
+    assert Config().music is True

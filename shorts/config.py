@@ -43,6 +43,8 @@ class Config:
     font_dir: Path = ROOT / "assets" / "fonts"
     font_name: str = "Noto Sans Arabic Blk"
     music_dir: Path = ROOT / "assets" / "music"
+    # background music under the voice (off: the owner wants the voice alone; the soft booms stay)
+    music: bool = field(default_factory=lambda: _env("SHORTS_MUSIC", "off").lower() in ("1", "on", "yes", "true"))
     # the animated narrator overlay (off: the scene art fills the screen)
     show_narrator: bool = field(default_factory=lambda: _env("SHORTS_NARRATOR", "off").lower() in ("1", "on", "yes", "true"))
     width: int = 1080

@@ -1,4 +1,4 @@
-"""Final assembly: background + captions + narration + music composed for the story's mood."""
+"""Final assembly: background + captions + narration (+ a music bed only when cfg.music is on)."""
 import random
 import subprocess
 from pathlib import Path
@@ -26,8 +26,12 @@ def render(cfg: Config, narration: Narration, background: Path, workdir: Path, o
     music = sorted(cfg.music_dir.glob("*.mp3")) if cfg.music_dir.exists() else []
     cmd = ["ffmpeg", "-y", "-stream_loop", "-1", "-i", str(background.resolve()),
            "-i", str(narration.audio.resolve())]
-    # inputs: 0 background, 1 voice, 2..3 music bed, last: the narrator overlay (optional)
-    if music:
+    # inputs: 0 background, 1 voice, then the music bed (only when cfg.music), the sound effects,
+    # and last the narrator overlay (optional)
+    bed = ""
+    if not cfg.music:
+        pass                      # voice alone: no bed input at all
+    elif music:
         cmd += ["-stream_loop", "-1", "-i", str(random.choice(music).resolve())]
         bed = "[2:a]volume=0.12"
     else:
@@ -41,18 +45,22 @@ def render(cfg: Config, narration: Narration, background: Path, workdir: Path, o
     from .music import write_sfx
     # no whoosh on the cuts (the owner finds it cheap); only a soft low boom on the big moments
     sfx = write_sfx(total, [], [0.0] + (booms or []), workdir / "sfx.wav", boom_gain=0.25)
-    sfx_idx = 3
+    sfx_idx = 3 if bed else 2
     cmd += ["-i", str(sfx.resolve())]
-    af = (f"[1:a]asplit=2[v1][v2];"
-          f"{bed},afade=t=in:d=0.3,afade=t=out:st={fade:.2f}:d=1.5[bed];"
-          # the bed ducks under the voice so every word stays clear
-          f"[bed][v2]sidechaincompress=threshold=0.04:ratio=5:attack=20:release=500[duck];"
-          f"[{sfx_idx}:a]aresample=44100[fx];"
-          f"[v1][duck][fx]amix=inputs=3:normalize=0:duration=longest,alimiter=limit=0.95[a]")
+    if bed:
+        af = (f"[1:a]asplit=2[v1][v2];"
+              f"{bed},afade=t=in:d=0.3,afade=t=out:st={fade:.2f}:d=1.5[bed];"
+              # the bed ducks under the voice so every word stays clear
+              f"[bed][v2]sidechaincompress=threshold=0.04:ratio=5:attack=20:release=500[duck];"
+              f"[{sfx_idx}:a]aresample=44100[fx];"
+              f"[v1][duck][fx]amix=inputs=3:normalize=0:duration=longest,alimiter=limit=0.95[a]")
+    else:
+        af = (f"[{sfx_idx}:a]aresample=44100[fx];"
+              f"[1:a][fx]amix=inputs=2:normalize=0:duration=longest,alimiter=limit=0.95[a]")
     # Dark, grainy look: stronger vignette and film grain on top of the graded footage.
     subs = f"subtitles=captions.ass:fontsdir={cfg.font_dir.resolve()}"
     if narrator:
-        idx = 4
+        idx = sfx_idx + 1
         cmd += ["-i", str(narrator.resolve())]
         # the storyteller stands at the bottom, a little left of centre (clear of YouTube's buttons)
         vf = (f"[0:v]vignette=PI/3.2,noise=alls=3:allf=t[bgv];"
