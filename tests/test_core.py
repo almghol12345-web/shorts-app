@@ -531,7 +531,7 @@ def test_tashkeel_rules_and_amazing_facts_are_vowelled(monkeypatch):
     monkeypatch.setenv("DARIJAT_VOICE", "فيصل")                                # formal voice links instead
     assert "القَهْوَةُ قَدِيمَة" in speakable("قَال: القَهْوَة قَدِيمَة")
     monkeypatch.delenv("DARIJAT_VOICE")
-    assert speakable("السَّالْفَة..").endswith("السَّالْفَة.")          # no damma before a pause
+    assert speakable("السَّالْفَة..").endswith("السَّالْفَه.")          # a soft "ah" before a pause
     used = {h["topic"] for h in json.load(open("data/history.json", encoding="utf-8"))}
     for s in json.load(open("data/wow.json", encoding="utf-8")):
         if s["topic"] in used:
