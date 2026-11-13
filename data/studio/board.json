@@ -172,10 +172,10 @@
   }
  },
  "red sea color": {
-  "stage": "storyboard",
+  "stage": "render",
   "reworks": 2,
   "blocked": false,
-  "updated": "2026-11-13T14:07:27+00:00",
+  "updated": "2026-11-13T14:20:46+00:00",
   "evidence": {
    "idea": {
     "by": "idea-scout",
@@ -196,6 +196,11 @@
     "by": "visual-director",
     "note": "12 برومبت doodle = 12 سطر؛ تشخيص بحري أزرق ثابت، بدون بشر/وجوه/نص، نفس أسلوب zamzam/haram (cutaway bright diagrams).",
     "at": "2026-11-13T13:43:33+00:00"
+   },
+   "render": {
+    "by": "producer",
+    "note": "رندر ثالث run 43441602084 بعد تصحيح برومبت المشهد 7 (إزالة البشر من الصورة الاحتياطية)، upload=false quality=video",
+    "at": "2026-11-13T14:20:46+00:00"
    }
   }
  },
