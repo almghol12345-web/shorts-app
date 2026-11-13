@@ -258,10 +258,10 @@
   }
  },
  "desert temperature swing": {
-  "stage": "storyboard",
+  "stage": "render",
   "reworks": 1,
   "blocked": false,
-  "updated": "2026-11-13T21:14:21+00:00",
+  "updated": "2026-11-13T21:14:41+00:00",
   "evidence": {
    "idea": {
     "by": "idea-scout",
@@ -282,6 +282,11 @@
     "by": "visual-director",
     "note": "12 مشهد = 12 سطر. شلنا الترمومتر (أرقام) والشاشة المقسومة؛ 4 مشاهد نظيفة بقيت بنفس النص (من الكاش)",
     "at": "2026-11-13T21:14:21+00:00"
+   },
+   "render": {
+    "by": "producer",
+    "note": "run 43508890968 (upload=false, quality=video) بعد إعادة الكتابة",
+    "at": "2026-11-13T21:14:41+00:00"
    }
   }
  }
