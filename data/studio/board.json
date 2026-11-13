@@ -215,10 +215,10 @@
   }
  },
  "sand dune shape": {
-  "stage": "render",
+  "stage": "approved",
   "reworks": 4,
   "blocked": false,
-  "updated": "2026-11-13T15:01:53+00:00",
+  "updated": "2026-11-13T15:08:21+00:00",
   "evidence": {
    "idea": {
     "by": "idea-scout",
@@ -244,6 +244,16 @@
     "by": "producer",
     "note": "رندر خامس (محاولة أخيرة قبل حد الـ4 reworks) ببرومبت مبسّط للمشهد 9",
     "at": "2026-11-13T15:01:53+00:00"
+   },
+   "qa": {
+    "by": "producer",
+    "note": "run 43448482151 qa.py score 100/100 PASS (duration 61s, 1080x1920, صوت موجود). الشيت روجع: كل الرسمات بأسلوب doodle مسطح، المشهد 9 صار شكل كروي بسيط بدون بشر (بدل محاولات crescent السابقة اللي رجعت أشخاص)، بدون خطأ حرج.",
+    "at": "2026-11-13T15:08:21+00:00"
+   },
+   "approved": {
+    "by": "final-judge",
+    "note": "critical-reviewer: لا خلل حرج بعد 4 محاولات على المشهد 9 (انتهينا بشكل مبسّط بدون crescent). quality-defender: أكد النتيجة. final-judge: APPROVE, score 100، 4 reworks كلها موثقة ومعالجة، تحت حد الـ4 المسموح.",
+    "at": "2026-11-13T15:08:21+00:00"
    }
   }
  }
