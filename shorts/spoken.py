@@ -59,6 +59,27 @@ def _decimal(m: re.Match) -> str:
 QUESTION = re.compile(r"(^|\s|و|ف)(طيب|مين|من|وش|ليش|لماذا|كيف|هل|وين|متى|ماذا|ايش|إيش)(\s|$)")
 
 
+_TAA = re.compile(r"([\u0621-\u064A\u064B-\u0652]+[\u064B-\u0652])ة(?![\u0621-\u064A\u064B-\u0652])(\s+[\u0621-\u064A]+)?")
+_DEFINITE = re.compile(r"^[وفبلك]?[\u064B-\u0652]*(ال|لل)")
+
+
+def _taa_marbuta(text: str) -> str:
+    """How the final ة is said. In spoken Saudi it is a soft "ah" (جزيره), so the casual voice
+    gets a ه; only when the word owns the next one (قهوة الصباح) is it a "t". The formal
+    voice keeps the linking vowel instead. Vowelled words only."""
+    import os
+    formal = os.environ.get("DARIJAT_VOICE", "").strip() == "فيصل"
+
+    def fix(m: re.Match) -> str:
+        word, nxt = m.group(1), m.group(2) or ""
+        if formal:
+            return f"{word}ة{'ُ' if nxt else ''}{nxt}"
+        plain_word, plain_next = HARAKAT.sub("", word), HARAKAT.sub("", nxt).strip()
+        owns_next = bool(plain_next) and plain_next.startswith("ال") and not _DEFINITE.match(plain_word)
+        return f"{word}{'ت' if owns_next else 'ه'}{nxt}"
+    return _TAA.sub(fix, text)
+
+
 def speakable(text: str) -> str:
     text = text.translate(str.maketrans("٠١٢٣٤٥٦٧٨٩", "0123456789"))
     # surah names written as letters are read letter by letter: say them as words
@@ -72,10 +93,7 @@ def speakable(text: str) -> str:
     end = "؟" if QUESTION.search(text) else "."
     text = re.sub(r"\s*\.{2,}\s*$", end, text)
     text = re.sub(r"\s*\.{2,}\s*(?=[^\s.])", "، ", text)       # inner '..' is a breath
-    # taa marbuta joined to the next word (no pause between): give it a damma so the voice
-    # links them ("القَهْوَةُ قَدِيمَة") instead of stopping or reading it as a 'h'
-    # (only in vowelled words: unvowelled text and spelled-out numbers are left alone)
-    text = re.sub(r"(?<=[\u064B-\u0652])ة(?![\u064B-\u0652])(?=\s+[\u0621-\u064A])", "ةُ", text)
+    text = _taa_marbuta(text)
     # a sukun on a word's first letter (dialect spelling like نْدَفْعَه، وْشْوَي) trips the voice:
     # drop it and let the voice choose the opening vowel
     text = re.sub(r"(^|[\s،.؟!])([\u0621-\u064A])\u0652", r"\1\2", text)

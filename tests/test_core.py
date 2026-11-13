@@ -521,10 +521,16 @@ def test_long_video_assembly_and_chapters():
     assert ch[0] == "0:00 البداية" and ch[1].startswith("0:10 الأولى: قصة رقم 0") and len(ch) == 5
 
 
-def test_tashkeel_rules_and_amazing_facts_are_vowelled():
+def test_tashkeel_rules_and_amazing_facts_are_vowelled(monkeypatch):
+    monkeypatch.delenv("DARIJAT_VOICE", raising=False)
     import json
     from shorts.spoken import speakable, vowel_coverage
+    assert "القَهْوَه قَدِيمَه" in speakable("قَال: القَهْوَة قَدِيمَة")       # Saudi: a soft "ah"
+    assert "جِزِيرَه فِي" in speakable("مِن جِزِيرَة فِي اليُونَان")
+    assert "قَهْوَت الصَّبَاح" in speakable("قَهْوَة الصَّبَاح")                # owns the next word: "t"
+    monkeypatch.setenv("DARIJAT_VOICE", "فيصل")                                # formal voice links instead
     assert "القَهْوَةُ قَدِيمَة" in speakable("قَال: القَهْوَة قَدِيمَة")
+    monkeypatch.delenv("DARIJAT_VOICE")
     assert speakable("السَّالْفَة..").endswith("السَّالْفَة.")          # no damma before a pause
     used = {h["topic"] for h in json.load(open("data/history.json", encoding="utf-8"))}
     for s in json.load(open("data/wow.json", encoding="utf-8")):
