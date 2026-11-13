@@ -19,6 +19,14 @@ def main() -> None:
     cfg = Config()
     script = next(s for s in content._load_json("requests.json") + content._load_json("wow.json")
                   + content.load_bank() if s.topic == topic)
+    from shorts import history as hist, qa, studio
+    allowed, why = studio.can_publish(script.topic, hist.used_topics(cfg.history_file))
+    if not allowed:
+        sys.exit(f"[upload] refused: {why}")
+    report = qa.inspect(video)
+    print(report.summary())
+    if not report.passed:
+        sys.exit("[upload] refused: the quality gate blocked this video")
     work = video.parent / "upload_work"
     work.mkdir(exist_ok=True)
     cover = None

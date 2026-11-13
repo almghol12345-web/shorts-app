@@ -142,7 +142,9 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: shorts-${{ github.run_number }}
-          path: output/*.mp4
+          path: |
+            output/*.mp4
+            output/qa.json
           retention-days: 7
           if-no-files-found: ignore
 

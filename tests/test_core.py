@@ -554,3 +554,76 @@ def test_muapi_higgsfield_alternative_routing(tmp_path, monkeypatch):
     replicate.animate("https://x/i.jpg", "a cat", tmp_path / "a.mp4")
     assert calls[0][0] == muapi.IMAGE_MODEL and calls[0][1]["width"] == 768
     assert calls[1][0] == muapi.VIDEO_MODEL and calls[1][1]["image_url"] == "https://x/i.jpg"
+
+
+# ---------- the studio: quality gate and production board ----------
+
+def _clip(path, video="testsrc=size=1080x1920:rate=30", audio="sine=frequency=440", seconds=20, volume="2.5"):
+    import subprocess
+    subprocess.run(["ffmpeg", "-v", "error", "-y", "-f", "lavfi", "-i", f"{video}:duration={seconds}",
+                    "-f", "lavfi", "-i", f"{audio}:duration={seconds}", "-af", f"volume={volume}",
+                    "-c:v", "libx264", "-preset", "ultrafast", "-pix_fmt", "yuv420p", "-b:v", "3M",
+                    "-c:a", "aac", "-shortest", str(path)], check=True)
+    return path
+
+
+def test_quality_gate_passes_a_healthy_vertical_video(tmp_path):
+    from shorts import qa
+    report = qa.inspect(_clip(tmp_path / "ok.mp4"), expected_seconds=20)
+    assert report.passed and report.score >= qa.PASS_SCORE, report.summary()
+    assert report.facts["width"] == 1080 and report.facts["height"] == 1920 and report.facts["has_audio"]
+
+
+def test_quality_gate_blocks_broken_videos(tmp_path):
+    from shorts import qa
+    wide = qa.inspect(_clip(tmp_path / "wide.mp4", video="testsrc=size=1920x1080:rate=30"))
+    assert not wide.passed and any(f.check == "frame" for f in wide.findings)
+    black = qa.inspect(_clip(tmp_path / "black.mp4", video="color=c=black:size=1080x1920:rate=30"))
+    assert not black.passed and any(f.check == "black screen" for f in black.findings)
+    quiet = qa.inspect(_clip(tmp_path / "quiet.mp4", volume="0.0001"))
+    assert not quiet.passed and any(f.check in ("loudness", "silence") for f in quiet.findings)
+    short = qa.inspect(_clip(tmp_path / "short.mp4", seconds=5))
+    assert not short.passed and any(f.check == "duration" for f in short.findings)
+    good = _clip(tmp_path / "good.mp4")
+    assert not qa.inspect(good, silent_voice=True).passed          # voice service failed
+    assert not qa.inspect(good, fallback_shots=["shot_05"]).passed   # drawings from the wrong artist
+    assert not qa.inspect(good, expected_seconds=40).passed        # picture and narration out of step
+    assert not qa.inspect(tmp_path / "missing.mp4").passed
+
+
+def test_production_board_enforces_order_evidence_and_single_publication(tmp_path):
+    import pytest
+    from shorts import studio
+    board = tmp_path / "board.json"
+    studio.add("t", "idea-scout", "a question", path=board)
+    with pytest.raises(ValueError):
+        studio.add("t", "idea-scout", path=board)                       # no duplicates
+    with pytest.raises(ValueError):
+        studio.advance("t", "approved", "final-judge", "skip", path=board)   # stages cannot be skipped
+    with pytest.raises(ValueError):
+        studio.advance("t", "script", "script-writer", "  ", path=board)     # evidence is required
+    assert studio.can_publish("t", [], path=board)[0] is False          # not approved yet
+    for stage in studio.STAGES[1:]:
+        studio.advance("t", stage, "agent", f"evidence for {stage}", path=board)
+    assert studio.can_publish("t", [], path=board)[0] is True
+    assert studio.next_ready([], path=board) == "t"
+    assert studio.can_publish("t", ["t"], path=board)[0] is False       # never twice
+    assert studio.next_ready(["t"], path=board) is None
+    assert studio.status("t", ["t"], path=board) == "published"
+    assert studio.can_publish("old stock", [], path=board)[0] is True   # untracked older scripts
+    assert (tmp_path / "log.jsonl").read_text().count("\n") == 1 + len(studio.STAGES) - 1
+
+
+def test_production_board_rework_drops_signoffs_and_blocks_endless_loops(tmp_path):
+    from shorts import studio
+    board = tmp_path / "board.json"
+    studio.add("t", "idea-scout", path=board)
+    for stage in ("script", "fact_check", "storyboard"):
+        studio.advance("t", stage, "agent", "ok", path=board)
+    item = studio.rework("t", "script", "fact-checker", "wrong number", path=board)
+    assert item["stage"] == "script" and "fact_check" not in item["evidence"] and item["reworks"] == 1
+    for _ in range(studio.MAX_REWORKS):
+        studio.advance("t", "fact_check", "agent", "ok", path=board)
+        item = studio.rework("t", "script", "fact-checker", "again", path=board)
+    assert item["blocked"] and studio.status("t", [], path=board) == "blocked"
+    assert studio.can_publish("t", [], path=board)[0] is False

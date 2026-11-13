@@ -5,7 +5,7 @@ import shutil
 from datetime import datetime
 from pathlib import Path
 
-from . import animate, background, content, history, render, voice
+from . import animate, background, content, history, qa, render, studio, voice
 from .captions import split_lines
 from .config import Config
 
@@ -64,9 +64,12 @@ def make_one(cfg: Config, do_upload: bool, keep_work: bool = False) -> dict:
     used = history.used_topics(cfg.history_file)
     scores = _learn(cfg)
     script = content.generate(cfg, used, scores)
-    if do_upload and (script.source or script.topic) in used:
-        # a topic asked for by name skips the "not used yet" filter: never publish it twice
-        raise SystemExit(f"[upload] '{script.topic}' was already published; not uploading it again")
+    if do_upload:
+        # the production board decides: never twice, and tracked videos only once approved
+        allowed, why = studio.can_publish(script.source or script.topic, used)
+        if not allowed:
+            raise SystemExit(f"[upload] refused: {why}")
+    background.FALLBACK_SHOTS.clear()
     add_outro(script)
     print(f"[script] {script.title}")
 
@@ -124,9 +127,17 @@ def make_one(cfg: Config, do_upload: bool, keep_work: bool = False) -> dict:
     mids = [starts[i] + spans[i] / 2 for i in range(len(spans))]
     render.contact_sheet(video, mids, cfg.output_dir / "preview.jpg")
 
+    # the automatic quality gate: measured on the finished file, saved next to it
+    report = qa.inspect(video, expected_seconds=None if (narration.silent or script.kind == "faith") else narration.length,
+                        silent_voice=narration.silent, fallback_shots=list(background.FALLBACK_SHOTS))
+    qa.save(report, cfg.output_dir / "qa.json")
+    print(report.summary())
+
     video_id = None
     if do_upload:
-        if narration.silent:
+        if not report.passed:
+            print("[upload] skipped: the quality gate blocked this video")
+        elif narration.silent:
             print("[upload] skipped: narration is silent (TTS was unavailable)")
         elif not cfg.can_upload:
             print("[upload] skipped: YouTube credentials are not configured")
@@ -139,4 +150,4 @@ def make_one(cfg: Config, do_upload: bool, keep_work: bool = False) -> dict:
 
     if not keep_work:
         shutil.rmtree(work, ignore_errors=True)
-    return {"title": script.title, "video": str(video), "video_id": video_id}
+    return {"title": script.title, "video": str(video), "video_id": video_id, "qa": report.to_dict()}

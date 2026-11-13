@@ -51,6 +51,9 @@ DOODLE_STYLE = ("modern stylish flat vector illustration like a high-end science
                 "clean bold outlines, rich vibrant colors, cinematic lighting and depth, a full background "
                 "that fits the scene (dark scenes are dark), grown-up look, not childish, no chibi, "
                 "no realistic people, no photo, no text, no letters, no words, no watermark")
+# explainer ("doodle") shots the paid illustrator could not draw this run; the quality gate
+# refuses to publish a video that has any (the free fallback draws in another style)
+FALLBACK_SHOTS: list[str] = []
 AI_GAP = 20       # seconds between requests: the free tier answers 402 when called too fast
 _last_ai_call = [0.0]
 
@@ -423,6 +426,8 @@ def shot(spec: str, seconds: float, out: Path, src: Sources, width: int, height:
         from . import replicate
         if replicate.token() and paid_scene(scene.strip(), seconds, out, src, width, height, index, moving):
             return
+        if "doodle" in scene:
+            FALLBACK_SHOTS.append(out.stem)
         # after two shots in a row fail, the generator is down: go straight to the
         # real photo / footage of the event instead of waiting on retries
         if src.ai_failures < 2 and fetch_ai_image(scene.strip(), raw, src, width, height,
