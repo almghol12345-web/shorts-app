@@ -129,10 +129,10 @@
   }
  },
  "earth stops spinning": {
-  "stage": "render",
+  "stage": "approved",
   "reworks": 1,
   "blocked": false,
-  "updated": "2026-11-13T01:20:03+00:00",
+  "updated": "2026-11-13T01:26:24+00:00",
   "evidence": {
    "idea": {
     "by": "idea-scout",
@@ -158,6 +158,16 @@
     "by": "visual-director",
     "note": "pictures 9 and 11 redrawn with the defender's prompts; lines 8 and 10 reworded",
     "at": "2026-11-13T01:20:03+00:00"
+   },
+   "qa": {
+    "by": "producer",
+    "note": "run 133: automatic gate 100/100; sheet read: pictures 9 and 11 now show Earth on its orbit and the dry belt with two arrows; no lettering",
+    "at": "2026-11-13T01:26:24+00:00"
+   },
+   "approved": {
+    "by": "final-judge",
+    "note": "both kept major findings fixed and verified on the new sheet; two words replaced; no critical; score 100",
+    "at": "2026-11-13T01:26:24+00:00"
    }
   }
  }

@@ -28,3 +28,5 @@
 {"at": "2026-11-13T01:09:05+00:00", "topic": "earth stops spinning", "event": "advance", "stage": "approved", "by": "producer", "note": "approved before the committee existed (owner liked the format)"}
 {"at": "2026-11-13T01:20:03+00:00", "topic": "earth stops spinning", "event": "rework", "stage": "storyboard", "by": "final-judge", "note": "score 77: pictures 9 and 11 do not explain their lines; two formal words", "blocked": false}
 {"at": "2026-11-13T01:20:03+00:00", "topic": "earth stops spinning", "event": "advance", "stage": "render", "by": "visual-director", "note": "pictures 9 and 11 redrawn with the defender's prompts; lines 8 and 10 reworded"}
+{"at": "2026-11-13T01:26:24+00:00", "topic": "earth stops spinning", "event": "advance", "stage": "qa", "by": "producer", "note": "run 133: automatic gate 100/100; sheet read: pictures 9 and 11 now show Earth on its orbit and the dry belt with two arrows; no lettering"}
+{"at": "2026-11-13T01:26:24+00:00", "topic": "earth stops spinning", "event": "advance", "stage": "approved", "by": "final-judge", "note": "both kept major findings fixed and verified on the new sheet; two words replaced; no critical; score 100"}
