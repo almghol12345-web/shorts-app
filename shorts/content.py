@@ -403,6 +403,15 @@ def generate(cfg: Config, used: list[str], scores: dict | None = None) -> Script
         for s in _load_json("requests.json") + _load_json("faith.json") + _load_json("wow.json") + load_bank():
             if s.topic == wanted:
                 return s
+    if cfg.kind == "news":
+        # the production board first: the oldest approved explainer that is not on the channel yet
+        from . import studio
+        ready = studio.next_ready(used)
+        if ready:
+            for s in _load_json("requests.json"):
+                if s.topic == ready:
+                    print(f"[board] next approved video: {ready}")
+                    return s
     if cfg.kind == "faith":
         # Quran and Companions stories, in the order they were written
         fresh = [s for s in _load_json("faith.json") if s.topic not in used]

@@ -3,8 +3,9 @@ name: Daily Shorts
 on:
   schedule:
     # GitHub sometimes delays or drops scheduled runs, so the job wakes every hour from
-    # noon to 1am Riyadh (UTC+3) and scripts/slot.py keeps the plan: 4 Shorts a day,
-    # 3+ hours apart, the late-night one a mystery story.
+    # noon to 1am Riyadh (UTC+3) and scripts/slot.py keeps the plan: 3 Shorts a day from 4pm,
+    # 2.5+ hours apart. Each takes the next approved video from the production board, so
+    # publishing needs no one (and no AI session) to start it.
     - cron: "11 9-22 * * *"
   workflow_dispatch:
     inputs:
@@ -132,6 +133,8 @@ jobs:
             export REPLICATE_VIDEO_SHOTS=all          # every shot moves, cheap images
           elif [ "${{ inputs.quality }}" = "still" ]; then
             export REPLICATE_VIDEO_SHOTS=none         # drawings only (doodle explainers)
+          elif [ "${{ github.event_name }}" = "schedule" ]; then
+            export REPLICATE_VIDEO_SHOTS=all          # scheduled explainers: the approved full quality
           fi
           UPLOAD_FLAG="--upload"
           if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "${{ inputs.upload }}" != "true" ]; then UPLOAD_FLAG=""; fi

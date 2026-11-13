@@ -633,3 +633,19 @@ def test_production_board_rework_drops_signoffs_and_blocks_endless_loops(tmp_pat
         item = studio.rework("t", "script", "fact-checker", "again", path=board)
     assert item["blocked"] and studio.status("t", [], path=board) == "blocked"
     assert studio.can_publish("t", [], path=board)[0] is False
+
+
+def test_scheduled_runs_take_the_next_approved_video_from_the_board(tmp_path, monkeypatch):
+    from shorts import content, studio
+    from shorts.config import Config
+    board = tmp_path / "board.json"
+    monkeypatch.setattr(studio, "BOARD", board)
+    monkeypatch.setattr(studio.next_ready, "__defaults__", (board,))
+    monkeypatch.delenv("SHORTS_TOPIC", raising=False)
+    studio.add("haram marble", "idea-scout", path=board)
+    for stage in studio.STAGES[1:]:
+        studio.advance("haram marble", stage, "agent", "ok", path=board)
+    cfg = Config()
+    cfg.kind = "news"
+    assert content.generate(cfg, used=[]).topic == "haram marble"
+    assert content.generate(cfg, used=["haram marble"]).topic != "haram marble"   # never twice
