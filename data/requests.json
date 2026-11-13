@@ -783,5 +783,62 @@
    "doodle, a wide desert landscape at sunset with a glowing orange crescent dune, peaceful, no humans"
   ],
   "question": "وِش تِبِي نِشْرَح لَك بَعْدَه؟ اكْتِب لَنَا تَحْت"
+ },
+ {
+  "topic": "desert temperature swing",
+  "kind": "news",
+  "title": "ليش الصحراء حارّة بالنهار وبارِدة جدًا بالليل؟!",
+  "lines": [
+   "الصحرا بالنَّهار حارَّة مِثِل الفُرُن.. وبالليل بارِدة مِثِل الثَّلَّاجة.. ليش كِذا؟!",
+   "أوَّل شي.. الرَّمل يَسْخَن بِسُرْعة وِياّ الشَّمس",
+   "لِأَنَّ حَبَّات الرَّمل جافَّة.. ومِب مِثِل الموية اللي تِمْسِك الحَرارة",
+   "فَفوق الرَّمل الحَرارة تِطْلَع لِفوق بِسُرعة.. والجو يِصير حارّ جِدًّا",
+   "طَيِّب.. السَّما فوق الصَّحرا صافْية مِن الغِيوم",
+   "والهوا هِناك جافّ.. ما فيه بُخار موية يِحبِس الحَرارة",
+   "فَلَيلًا.. الحَرارة اللي طِلعت فوق تِهْرُب لِلفَضا بِسُرعة.. وِلا شي يِردّها",
+   "ومو بَس كِذا.. الرَّمل نَفسَه يِبَرِّد بِسُرعة أكْثَر مِن أي أرض ثانية",
+   "فَتَشوف دَرَجة الحَرارة تِنزِل عَشر دَرَجات أو أكْثَر بَعد غُروب الشَّمس بِساعة وِحدة",
+   "وِبَعض الصَّحاري.. تِبدا النَّهار فَوق خَمسين دَرَجة.. وَتِخلِّص الليل تَحت الصِّفر!",
+   "فَالصَّحرا مو غَريبة.. هِي بَس ما عِندها موية تِحفَظ الحَرارة.. فَتِتَقَلَّب بِسُرعة"
+  ],
+  "description": "ليش الصحراء حارة بالنهار وبارِدة جدًا بالليل؟\nالرمل الجاف يسخن ويبرد بسرعة لأنه لا يحتفظ بالحرارة مثل الماء، والسماء الصافية الخالية من الغيوم وبخار الماء تسمح بهروب الحرارة ليلاً إلى الفضاء بسرعة (التبريد الإشعاعي)، فتتفاوت الحرارة بين النهار والليل بشكل كبير.\nالمصادر: NASA Earth Observatory، National Geographic.\nرسم توضيحي مبسّط.",
+  "tags": [
+   "الصحراء",
+   "حرارة",
+   "فضول",
+   "معلومات",
+   "طبيعة"
+  ],
+  "search_terms": [
+   "desert heat shimmer sand dunes",
+   "desert night cold moon"
+  ],
+  "visuals": [
+   "desert heat shimmer sand dunes",
+   "desert heat shimmer sand dunes",
+   "desert heat shimmer sand dunes",
+   "desert heat shimmer sand dunes",
+   "desert heat shimmer sand dunes",
+   "desert heat shimmer sand dunes",
+   "desert heat shimmer sand dunes",
+   "desert heat shimmer sand dunes",
+   "desert heat shimmer sand dunes",
+   "desert heat shimmer sand dunes",
+   "desert heat shimmer sand dunes"
+  ],
+  "scenes": [
+   "doodle, bright simple picture, empty scene with no humans: a wide desert landscape with a huge blazing sun above golden sand dunes, wavy heat lines rising from the ground, light sky",
+   "doodle, bright cutaway diagram, empty scene with no humans: a cross-section of sand grains with thick sun rays hitting the surface and quickly heating only the top thin layer, light background",
+   "doodle, bright simple diagram, empty scene with no humans: a cup of water and a pile of sand side by side under the same sun ray, the sand surface glowing hot while the water stays cool, light background",
+   "doodle, bright cutaway diagram, empty scene with no humans: thick upward arrows showing heat rising fast from a sand surface into the air above it, a thermometer needle pointing high, light background",
+   "doodle, bright simple picture, empty scene with no humans: a clear empty sky over the desert with no clouds at all, a bright sun, light background",
+   "doodle, bright simple diagram, empty scene with no humans: a desert landscape with a small cloud-and-water-droplet icon crossed out above it, showing no moisture in the dry air, light background",
+   "doodle, bright cutaway diagram, empty scene with no humans: thin arrows showing heat leaving a sand surface straight up into dark empty space at night, a moon in the sky, light background",
+   "doodle, bright simple diagram, empty scene with no humans: a pile of sand cooling down quickly next to a pile of rock cooling down slowly, both under a night moon, light background",
+   "doodle, bright simple diagram, empty scene with no humans: a large thermometer showing its needle dropping fast right after a setting sun disappears behind dunes, light background",
+   "doodle, bright simple diagram, empty scene with no humans: one half of the scene a bright hot desert at noon, the other half the same desert cold and dark at night, a dividing line down the middle, light background",
+   "doodle, bright simple picture, empty scene with no humans: a calm desert night scene with a glowing moon over dunes, cold-looking blue tint, peaceful, no humans"
+  ],
+  "question": "وِش تِبِي نِشْرَح لَك بَعْدَه؟ اكْتِب لَنَا تَحْت"
  }
 ]
