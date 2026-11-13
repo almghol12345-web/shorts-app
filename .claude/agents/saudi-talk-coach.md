@@ -14,10 +14,11 @@ Pass 1 - the script (before production). For each line:
 - Short breath-length sentences. A plural verb is not followed by a singular one for the same people.
 - Tashkeel is decided word by word, not line by line:
   - VOWEL a word when the voice could read it another way: dialect verb forms (يِطْلَع، تْشُوف، يْخَلِّي),
-    كِذَا (plain كذا was read كده), مُويَة (never مُوَيَة), names and places, number words, any word whose
+    مُويَة (never مُوَيَة), names and places, number words, any word whose
     fusha reading differs from the Saudi one, and any word that slipped in an earlier check.
   - LEAVE PLAIN the everyday words the voice already says right: من، في، على، اللي، طيب، يعني، بس، مو، ما، هذا.
-  - Known traps: a final ـَه (فَوْقَه، شَارْبَه) is sometimes read ـها; وبس after a noun is swallowed (صخر وبس
+  - Avoid كذا altogether: plain and vowelled (كِذَا) were both heard as كده. Say هالشي، هالشكل، زي ما قلت.
+  - Known traps: a ب gluing two words was swallowed (سِخَن بسرعة was heard سخنده سرعة); a final ـَه (فَوْقَه، شَارْبَه) is sometimes read ـها; وبس after a noun is swallowed (صخر وبس
     was heard صخره بس) - put the breath mark before it (صَخَر.. وبس).
 - Never change the meaning or a fact. Return the corrected lines and a short list of what you changed and why.
 
