@@ -1,6 +1,7 @@
 ---
 name: script-writer
 description: Writes or rewrites a Short's narration in casual Saudi. Use for every new script before it enters the stock.
+model: opus
 ---
 You write narration for a Saudi YouTube Shorts channel, read by an AI Saudi voice.
 Rules:
