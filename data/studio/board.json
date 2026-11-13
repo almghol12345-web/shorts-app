@@ -129,10 +129,10 @@
   }
  },
  "earth stops spinning": {
-  "stage": "approved",
-  "reworks": 0,
+  "stage": "render",
+  "reworks": 1,
   "blocked": false,
-  "updated": "2026-11-13T01:09:05+00:00",
+  "updated": "2026-11-13T01:20:03+00:00",
   "evidence": {
    "idea": {
     "by": "idea-scout",
@@ -155,19 +155,9 @@
     "at": "2026-11-13T01:09:05+00:00"
    },
    "render": {
-    "by": "producer",
-    "note": "run 129",
-    "at": "2026-11-13T01:09:05+00:00"
-   },
-   "qa": {
-    "by": "producer",
-    "note": "sheet reviewed; stop-bar lettering removed from scene 4 prompt",
-    "at": "2026-11-13T01:09:05+00:00"
-   },
-   "approved": {
-    "by": "producer",
-    "note": "approved before the committee existed (owner liked the format)",
-    "at": "2026-11-13T01:09:05+00:00"
+    "by": "visual-director",
+    "note": "pictures 9 and 11 redrawn with the defender's prompts; lines 8 and 10 reworded",
+    "at": "2026-11-13T01:20:03+00:00"
    }
   }
  }
