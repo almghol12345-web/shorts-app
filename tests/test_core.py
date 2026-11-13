@@ -649,3 +649,10 @@ def test_scheduled_runs_take_the_next_approved_video_from_the_board(tmp_path, mo
     cfg.kind = "news"
     assert content.generate(cfg, used=[]).topic == "haram marble"
     assert content.generate(cfg, used=["haram marble"]).topic != "haram marble"   # never twice
+
+
+def test_moya_is_not_read_as_muwaya():
+    from shorts.spoken import speakable
+    out = speakable("وْالمُوَيَة تْدِفّ البِتْرُول.. وْمُوَيَة البَحَر")
+    assert "مُوَيَ" not in out
+    assert "المُويَه" in out and "مُويَت البَحَر" in out

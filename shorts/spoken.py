@@ -93,6 +93,8 @@ def speakable(text: str) -> str:
     end = "؟" if QUESTION.search(text) else "."
     text = re.sub(r"\s*\.{2,}\s*$", end, text)
     text = re.sub(r"\s*\.{2,}\s*(?=[^\s.])", "، ", text)       # inner '..' is a breath
+    # موية is said "mōya" in Saudi; a fatha on the و makes the voice say "mu-wa-ya" (heard as موايا)
+    text = text.replace("مُوَيَ", "مُويَ")
     text = _taa_marbuta(text)
     # a sukun on a word's first letter (dialect spelling like نْدَفْعَه، وْشْوَي) trips the voice:
     # drop it and let the voice choose the opening vowel
