@@ -129,10 +129,10 @@
   }
  },
  "earth stops spinning": {
-  "stage": "qa",
+  "stage": "approved",
   "reworks": 3,
   "blocked": false,
-  "updated": "2026-11-14T00:59:15+00:00",
+  "updated": "2026-11-14T01:01:00+00:00",
   "evidence": {
    "idea": {
     "by": "idea-scout",
@@ -163,6 +163,11 @@
     "by": "saudi-talk-coach",
     "note": "Automatic gate 100/100, 61.3s. Preview sheet 157 read by the coordinator: no people, no digits, captions now show ة (الطيارة، السيارة، ستة). Speech check run 43537489865 (large-v3), compared by the coordinator: the negation in line 6 is now heard ('ما هم ثبت' for 'ما هو مثبت'), no other slip, no كده.",
     "at": "2026-11-14T00:59:15+00:00"
+   },
+   "approved": {
+    "by": "final-judge",
+    "note": "Committee run as three separate agents. critical-reviewer: 2 major (negation lost in line 6, captions with ه) + 4 minor. After the fix and re-render (run 43536531288), quality-defender dropped all six with reasons. final-judge: APPROVED, score 100, no critical finding.",
+    "at": "2026-11-14T01:01:00+00:00"
    }
   }
  },
