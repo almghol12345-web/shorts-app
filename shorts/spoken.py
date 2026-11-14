@@ -80,7 +80,9 @@ def _taa_marbuta(text: str) -> str:
     return _TAA.sub(fix, text)
 
 
-def speakable(text: str) -> str:
+def speakable(text: str, display: bool = False) -> str:
+    """The text the voice reads. With display=True: the same words as they are WRITTEN on screen
+    (same word count, but the ة stays a ة), so captions can pair one to one with the spoken words."""
     text = text.translate(str.maketrans("٠١٢٣٤٥٦٧٨٩", "0123456789"))
     # surah names written as letters are read letter by letter: say them as words
     text = re.sub(r"(?<![\u0621-\u064A])يس(?![\u0621-\u064A\u064B-\u0652])", "يَاسِين", text)
@@ -94,8 +96,9 @@ def speakable(text: str) -> str:
     text = re.sub(r"\s*\.{2,}\s*$", end, text)
     text = re.sub(r"\s*\.{2,}\s*(?=[^\s.])", "، ", text)       # inner '..' is a breath
     # موية is said "mōya" in Saudi; a fatha on the و makes the voice say "mu-wa-ya" (heard as موايا)
-    text = text.replace("مُوَيَ", "مُويَ")
-    text = _taa_marbuta(text)
+    if not display:
+        text = text.replace("مُوَيَ", "مُويَ")
+        text = _taa_marbuta(text)
     # a sukun on a word's first letter (dialect spelling like نْدَفْعَه، وْشْوَي) trips the voice:
     # drop it and let the voice choose the opening vowel
     text = re.sub(r"(^|[\s،.؟!])([\u0621-\u064A])\u0652", r"\1\2", text)

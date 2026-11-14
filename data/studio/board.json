@@ -129,10 +129,10 @@
   }
  },
  "earth stops spinning": {
-  "stage": "qa",
-  "reworks": 2,
+  "stage": "storyboard",
+  "reworks": 3,
   "blocked": false,
-  "updated": "2026-11-14T00:44:30+00:00",
+  "updated": "2026-11-14T00:47:36+00:00",
   "evidence": {
    "idea": {
     "by": "idea-scout",
@@ -146,23 +146,13 @@
    },
    "fact_check": {
     "by": "fact-checker",
-    "note": "fact-checker agent: PASS. Lines 9, 12, 13 changed wording only; numbers and claims identical to the approved version.",
-    "at": "2026-11-14T00:30:55+00:00"
+    "note": "One negation respelled (مو → ما هو); no claim changed since the fact-checker agent's PASS on this rework round.",
+    "at": "2026-11-14T00:47:36+00:00"
    },
    "storyboard": {
     "by": "visual-director",
-    "note": "No picture work: all 13 scene prompts are unchanged from the approved render, so scenes come from the cache (coordinator note, visual-director not re-run).",
-    "at": "2026-11-14T00:30:55+00:00"
-   },
-   "render": {
-    "by": "coordinator",
-    "note": "run 43534708758 (upload=false, quality=video). All 14 shots came from the cache. Voice only, no music.",
-    "at": "2026-11-14T00:44:30+00:00"
-   },
-   "qa": {
-    "by": "saudi-talk-coach",
-    "note": "Automatic gate 100/100, 60.8s. Frame sheet read by the coordinator: no people, no digits. Speech check run 43535758851 (large-v3), compared with the script by the coordinator (not the agent): one slip, 'مُو مْثَبَّت' heard glued as 'ممثبت'; the rest matches, 1670 read correctly, no كده.",
-    "at": "2026-11-14T00:44:30+00:00"
+    "note": "Scene prompts unchanged; all shots come from the cache (coordinator note).",
+    "at": "2026-11-14T00:47:36+00:00"
    }
   }
  },

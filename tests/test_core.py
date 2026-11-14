@@ -664,3 +664,17 @@ def test_music_is_off_unless_asked(monkeypatch):
     assert Config().music is False
     monkeypatch.setenv("SHORTS_MUSIC", "on")
     assert Config().music is True
+
+
+def test_captions_keep_taa_marbuta_while_voice_says_haa():
+    from shorts.spoken import speakable
+    from shorts.voice import Segment, _as_written, _spoken_words
+    line = "مِن الطَّيَّارَة.. مَرَّة وَحْدَة وْمُوَيَة البَحَر"
+    spoken = _spoken_words(speakable(line))
+    written = _spoken_words(speakable(line, display=True))
+    assert len(spoken) == len(written)
+    assert "الطَّيَّارَه،" in spoken and "الطَّيَّارَة،" in written
+    segs = [Segment(w, i, i + 1) for i, w in enumerate(spoken)]
+    out = _as_written(segs, written)
+    assert [s.text for s in out] == written and out[2].start == 2
+    assert _as_written(segs[:-1], written) == segs[:-1]      # counts differ: left alone

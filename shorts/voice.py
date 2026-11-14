@@ -71,9 +71,19 @@ def _estimate(lines: list[str]) -> list[Segment]:
     return words
 
 
+def _as_written(words: list[Segment], written: list[str]) -> list[Segment]:
+    """Captions show the written word (جزيرة), not the spoken respelling (جزيره). Only when the two
+    lists pair one to one; a voice that splits words differently keeps its own text."""
+    if len(words) != len(written):
+        return words
+    return [Segment(w, s.start, s.end) for w, s in zip(written, words)]
+
+
 def synthesize(lines: list[str], voice: str, workdir: Path) -> Narration:
     from .spoken import speakable
     workdir.mkdir(parents=True, exist_ok=True)
+    # what viewers read keeps the ة; what the voice reads says it as ه (same words, one to one)
+    written = [w for line in lines for w in _spoken_words(speakable(line, display=True))]
     lines = [speakable(line) for line in lines]   # numbers as words, natural pauses
     line_sizes = [len(_spoken_words(line)) for line in lines]
     raw = workdir / "voice.mp3"
@@ -116,6 +126,7 @@ def synthesize(lines: list[str], voice: str, workdir: Path) -> Narration:
         run(["ffmpeg", "-y", "-f", "lavfi", "-i", "anullsrc=r=24000:cl=mono",
              "-t", f"{words[-1].end + 0.4:.2f}", "-c:a", "libmp3lame", str(raw)])
 
+    words = _as_written(words, written)
     audio = workdir / "voice.m4a"
     run(["ffmpeg", "-y", "-i", str(raw), "-ar", "44100", "-ac", "2",
          "-c:a", "aac", "-b:a", "160k", str(audio)])
