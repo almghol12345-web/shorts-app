@@ -678,3 +678,21 @@ def test_captions_keep_taa_marbuta_while_voice_says_haa():
     out = _as_written(segs, written)
     assert [s.text for s in out] == written and out[2].start == 2
     assert _as_written(segs[:-1], written) == segs[:-1]      # counts differ: left alone
+
+
+def test_owner_can_unblock_a_video_for_one_more_pass(tmp_path):
+    import pytest
+    from shorts import studio
+    board = tmp_path / "board.json"
+    studio.add("t", "idea-scout", "q", path=board)
+    for stage in ("script", "fact_check"):
+        studio.advance("t", stage, "a", "e", path=board)
+    for _ in range(studio.MAX_REWORKS + 1):
+        studio.rework("t", "script", "judge", "r", path=board)
+        if not studio.load(board)["t"]["blocked"]:
+            studio.advance("t", "fact_check", "a", "e", path=board)
+    with pytest.raises(ValueError):
+        studio.unblock("t", "  ", path=board)
+    studio.unblock("t", "owner: fix it", path=board)
+    assert studio.advance("t", "fact_check", "a", "e", path=board)["stage"] == "fact_check"
+    assert studio.rework("t", "script", "judge", "again", path=board)["blocked"]

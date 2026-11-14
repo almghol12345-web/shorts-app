@@ -93,6 +93,21 @@ def rework(topic: str, back_to: str, by: str, reason: str, path: Path = BOARD) -
     return item
 
 
+def unblock(topic: str, decision: str, path: Path = BOARD) -> dict:
+    """The owner's decision on a blocked video: it may go through ONE more pass. The decision is
+    logged in his words; another send-back blocks the video again."""
+    board = load(path)
+    item = board.get(topic)
+    if item is None or not item["blocked"]:
+        raise ValueError(f"'{topic}' is not blocked")
+    if not decision.strip():
+        raise ValueError("unblocking needs the owner's decision in the note")
+    item["blocked"], item["updated"] = False, _now()
+    _save(board, path)
+    _log(path, topic=topic, event="unblock", stage=item["stage"], by="owner", note=decision)
+    return item
+
+
 def status(topic: str, published: list[str], path: Path = BOARD) -> str:
     if topic in published:
         return "published"

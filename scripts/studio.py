@@ -19,7 +19,7 @@ from shorts.config import Config  # noqa: E402
 
 def main() -> None:
     p = argparse.ArgumentParser()
-    p.add_argument("command", choices=["list", "next", "add", "advance", "rework"])
+    p.add_argument("command", choices=["list", "next", "add", "advance", "rework", "unblock"])
     p.add_argument("topic", nargs="?")
     p.add_argument("stage", nargs="?")
     p.add_argument("--by", default="producer")
@@ -41,6 +41,9 @@ def main() -> None:
             item = studio.rework(a.topic, a.stage, a.by, a.note)
             print(f"'{a.topic}' back to {item['stage']} (rework {item['reworks']}"
                   f"{', BLOCKED' if item['blocked'] else ''})")
+        elif a.command == "unblock":      # only on the owner's word; --note carries what he said
+            item = studio.unblock(a.topic, a.note)
+            print(f"'{a.topic}' unblocked at {item['stage']} (one more pass)")
     except ValueError as exc:
         sys.exit(f"refused: {exc}")
 
