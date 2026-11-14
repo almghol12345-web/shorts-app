@@ -129,10 +129,10 @@
   }
  },
  "earth stops spinning": {
-  "stage": "storyboard",
+  "stage": "qa",
   "reworks": 3,
   "blocked": false,
-  "updated": "2026-11-14T00:47:36+00:00",
+  "updated": "2026-11-14T00:59:15+00:00",
   "evidence": {
    "idea": {
     "by": "idea-scout",
@@ -153,6 +153,16 @@
     "by": "visual-director",
     "note": "Scene prompts unchanged; all shots come from the cache (coordinator note).",
     "at": "2026-11-14T00:47:36+00:00"
+   },
+   "render": {
+    "by": "coordinator",
+    "note": "run 43536531288 (upload=false, quality=video), all shots from the cache, voice only.",
+    "at": "2026-11-14T00:59:15+00:00"
+   },
+   "qa": {
+    "by": "saudi-talk-coach",
+    "note": "Automatic gate 100/100, 61.3s. Preview sheet 157 read by the coordinator: no people, no digits, captions now show ة (الطيارة، السيارة، ستة). Speech check run 43537489865 (large-v3), compared by the coordinator: the negation in line 6 is now heard ('ما هم ثبت' for 'ما هو مثبت'), no other slip, no كده.",
+    "at": "2026-11-14T00:59:15+00:00"
    }
   }
  },
