@@ -129,10 +129,10 @@
   }
  },
  "earth stops spinning": {
-  "stage": "approved",
-  "reworks": 1,
+  "stage": "storyboard",
+  "reworks": 2,
   "blocked": false,
-  "updated": "2026-11-13T01:26:24+00:00",
+  "updated": "2026-11-14T00:30:55+00:00",
   "evidence": {
    "idea": {
     "by": "idea-scout",
@@ -146,36 +146,21 @@
    },
    "fact_check": {
     "by": "fact-checker",
-    "note": "claims verified with sources in the description",
-    "at": "2026-11-13T01:09:05+00:00"
+    "note": "fact-checker agent: PASS. Lines 9, 12, 13 changed wording only; numbers and claims identical to the approved version.",
+    "at": "2026-11-14T00:30:55+00:00"
    },
    "storyboard": {
     "by": "visual-director",
-    "note": "one doodle prompt per line",
-    "at": "2026-11-13T01:09:05+00:00"
-   },
-   "render": {
-    "by": "visual-director",
-    "note": "pictures 9 and 11 redrawn with the defender's prompts; lines 8 and 10 reworded",
-    "at": "2026-11-13T01:20:03+00:00"
-   },
-   "qa": {
-    "by": "producer",
-    "note": "run 133: automatic gate 100/100; sheet read: pictures 9 and 11 now show Earth on its orbit and the dry belt with two arrows; no lettering",
-    "at": "2026-11-13T01:26:24+00:00"
-   },
-   "approved": {
-    "by": "final-judge",
-    "note": "both kept major findings fixed and verified on the new sheet; two words replaced; no critical; score 100",
-    "at": "2026-11-13T01:26:24+00:00"
+    "note": "No picture work: all 13 scene prompts are unchanged from the approved render, so scenes come from the cache (coordinator note, visual-director not re-run).",
+    "at": "2026-11-14T00:30:55+00:00"
    }
   }
  },
  "red sea color": {
-  "stage": "approved",
-  "reworks": 3,
+  "stage": "storyboard",
+  "reworks": 4,
   "blocked": false,
-  "updated": "2026-11-13T14:46:06+00:00",
+  "updated": "2026-11-14T00:30:55+00:00",
   "evidence": {
    "idea": {
     "by": "idea-scout",
@@ -189,28 +174,13 @@
    },
    "fact_check": {
     "by": "fact-checker",
-    "note": "التفسير الرئيسي (ازدهار طحالب تريكوديزميوم يحول اللون محمر) TRUE، موثّق في NOAA Ocean Service وناشونال جيوغرافيك؛ تفسير انعكاس الجبال MOSTLY TRUE (نظرية بديلة مقبولة، غير حاسمة)؛ لا ذكر حسم علمي كاذب، النص يقول العلماء ما حسموا السبب 100%. لا مساس بالدين أو الدولة أو العادات -> لا حاجة لمراجع الحساسية. القرار: safe to publish.",
-    "at": "2026-11-13T13:43:28+00:00"
+    "note": "fact-checker agent failed two reworded lines (L4 'مو تحت' too strong, L10 said the sea itself turns red); both corrected to its wording (at the surface; the sea's surface turns reddish). L6 red-brown and L12 'not known for sure' confirmed. Sources: livescience.com/32112-is-the-red-sea-really-red.html, britannica.com/science/Trichodesmium-erthyraeum",
+    "at": "2026-11-14T00:30:55+00:00"
    },
    "storyboard": {
     "by": "visual-director",
-    "note": "12 برومبت doodle = 12 سطر؛ تشخيص بحري أزرق ثابت، بدون بشر/وجوه/نص، نفس أسلوب zamzam/haram (cutaway bright diagrams).",
-    "at": "2026-11-13T13:43:33+00:00"
-   },
-   "render": {
-    "by": "producer",
-    "note": "رندر رابع بعد تقوية برومبت المشهد 10 لتفادي صورة بشرية مخزنة بالكاش",
-    "at": "2026-11-13T14:40:06+00:00"
-   },
-   "qa": {
-    "by": "producer",
-    "note": "run 43444942283 qa.py score 100/100 PASS (duration 51.7s, 1080x1920, صوت موجود). الشيت روجع بالكامل: كل الـ12 رسمة + الختام بأسلوب doodle مسطح متجانس، بدون بشر/وجوه/تصوير فوتوغرافي، بدون نص زائد.",
-    "at": "2026-11-13T14:45:53+00:00"
-   },
-   "approved": {
-    "by": "final-judge",
-    "note": "critical-reviewer: لا خلل حرج هذي المرة (المشهد 10 اتولد من جديد بأسلوب خريطة مسطحة سليم). quality-defender: أكد. final-judge: APPROVE, score 100، بدون خطأ حرج، 3 reworks مسجلة وكلها عولجت.",
-    "at": "2026-11-13T14:46:06+00:00"
+    "note": "No picture work: all 12 scene prompts are unchanged from the approved render, so scenes come from the cache (coordinator note, visual-director not re-run).",
+    "at": "2026-11-14T00:30:55+00:00"
    }
   }
  },
