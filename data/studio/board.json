@@ -208,10 +208,10 @@
   }
  },
  "desert temperature swing": {
-  "stage": "qa",
+  "stage": "approved",
   "reworks": 4,
   "blocked": false,
-  "updated": "2026-11-14T01:15:37+00:00",
+  "updated": "2026-11-14T01:16:37+00:00",
   "evidence": {
    "idea": {
     "by": "idea-scout",
@@ -242,6 +242,11 @@
     "by": "saudi-talk-coach",
     "note": "Automatic gate 100/100. Preview sheet 159 read by the coordinator: scene 9 is now a full-frame humid landscape with one cloud layer and arrows curving back down; no people, no digits. Speech check run 43539290565 (large-v3), compared by the coordinator: every line matches the script, no slip.",
     "at": "2026-11-14T01:15:37+00:00"
+   },
+   "approved": {
+    "by": "final-judge",
+    "note": "First independent committee pass, three separate agents. critical-reviewer: facts verified, no critical, 3 major + 5 minor on pictures. quality-defender kept one major (scene 9), then dropped it after the redraw (run 43538774493). final-judge: APPROVED, score 100, no kept findings.",
+    "at": "2026-11-14T01:16:37+00:00"
    }
   }
  }
