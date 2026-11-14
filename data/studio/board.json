@@ -172,10 +172,10 @@
   }
  },
  "red sea color": {
-  "stage": "qa",
-  "reworks": 4,
-  "blocked": false,
-  "updated": "2026-11-14T00:44:30+00:00",
+  "stage": "script",
+  "reworks": 5,
+  "blocked": true,
+  "updated": "2026-11-14T01:04:54+00:00",
   "evidence": {
    "idea": {
     "by": "idea-scout",
@@ -186,34 +186,14 @@
     "by": "script-writer",
     "note": "11 سطر + سطر اضافي = 12، تشكيل كامل، عامي سعودي، بدون قاف إلا لضرورة؛ hook-doctor راجع العنوان والسطر الأول؛ retention-editor تأكد من إعادة شد وسط المقطع (ومو بس كذا)؛ pronunciation-coach دقق النطق؛ أضيف لـ data/requests.json",
     "at": "2026-11-13T13:43:20+00:00"
-   },
-   "fact_check": {
-    "by": "fact-checker",
-    "note": "fact-checker agent failed two reworded lines (L4 'مو تحت' too strong, L10 said the sea itself turns red); both corrected to its wording (at the surface; the sea's surface turns reddish). L6 red-brown and L12 'not known for sure' confirmed. Sources: livescience.com/32112-is-the-red-sea-really-red.html, britannica.com/science/Trichodesmium-erthyraeum",
-    "at": "2026-11-14T00:30:55+00:00"
-   },
-   "storyboard": {
-    "by": "visual-director",
-    "note": "No picture work: all 12 scene prompts are unchanged from the approved render, so scenes come from the cache (coordinator note, visual-director not re-run).",
-    "at": "2026-11-14T00:30:55+00:00"
-   },
-   "render": {
-    "by": "coordinator",
-    "note": "run 43534721515 (upload=false, quality=video). All 13 shots came from the cache. Voice only, no music.",
-    "at": "2026-11-14T00:44:30+00:00"
-   },
-   "qa": {
-    "by": "saudi-talk-coach",
-    "note": "Automatic gate 100/100, 51.1s. Preview sheet 155 read by the coordinator: no people, no digits. Speech check run 43535771265 (large-v3), compared with the script by the coordinator (not the agent): one slip, 'غِطَا' heard as 'غطن'; أزرق read correctly; العلمة/حمرة are spelling only; no كده.",
-    "at": "2026-11-14T00:44:30+00:00"
    }
   }
  },
  "sand dune shape": {
-  "stage": "approved",
-  "reworks": 4,
-  "blocked": false,
-  "updated": "2026-11-13T15:08:21+00:00",
+  "stage": "script",
+  "reworks": 5,
+  "blocked": true,
+  "updated": "2026-11-14T01:04:54+00:00",
   "evidence": {
    "idea": {
     "by": "idea-scout",
@@ -224,31 +204,6 @@
     "by": "script-writer",
     "note": "12 سطر، تشكيل كامل، عامي سعودي، استبدلنا قفزات/القفزات بـ طفرات/الطفرات لتفادي القاف؛ hook-doctor/retention-editor/pronunciation-coach راجعوا؛ أضيف لـ data/requests.json",
     "at": "2026-11-13T13:43:20+00:00"
-   },
-   "fact_check": {
-    "by": "fact-checker",
-    "note": "آلية الوثب الرملي (saltation) ونشوء الكثيب الهلالي (barchan) TRUE، موثّقة في USGS وناسا لعلوم الأرض. لا أرقام ملفّقة، لا مقارنات مبالغ فيها. لا مساس بالدين أو الدولة أو العادات -> لا حاجة لمراجع الحساسية. القرار: safe to publish.",
-    "at": "2026-11-13T13:43:28+00:00"
-   },
-   "storyboard": {
-    "by": "visual-director",
-    "note": "12 برومبت doodle = 12 سطر؛ كثيب رملي ثابت التصميم، بدون بشر/وجوه/نص، نفس أسلوب الكتيبات السابقة.",
-    "at": "2026-11-13T13:43:33+00:00"
-   },
-   "render": {
-    "by": "producer",
-    "note": "رندر خامس (محاولة أخيرة قبل حد الـ4 reworks) ببرومبت مبسّط للمشهد 9",
-    "at": "2026-11-13T15:01:53+00:00"
-   },
-   "qa": {
-    "by": "producer",
-    "note": "run 43448482151 qa.py score 100/100 PASS (duration 61s, 1080x1920, صوت موجود). الشيت روجع: كل الرسمات بأسلوب doodle مسطح، المشهد 9 صار شكل كروي بسيط بدون بشر (بدل محاولات crescent السابقة اللي رجعت أشخاص)، بدون خطأ حرج.",
-    "at": "2026-11-13T15:08:21+00:00"
-   },
-   "approved": {
-    "by": "final-judge",
-    "note": "critical-reviewer: لا خلل حرج بعد 4 محاولات على المشهد 9 (انتهينا بشكل مبسّط بدون crescent). quality-defender: أكد النتيجة. final-judge: APPROVE, score 100، 4 reworks كلها موثقة ومعالجة، تحت حد الـ4 المسموح.",
-    "at": "2026-11-13T15:08:21+00:00"
    }
   }
  },
