@@ -1,0 +1,18 @@
+{
+ "video": "/home/runner/work/shorts-app/shorts-app/output/20261114-010945-desert-temperature-swing.mp4",
+ "score": 100,
+ "passed": true,
+ "facts": {
+  "duration": 52.266667,
+  "size_bytes": 16439120,
+  "width": 1080,
+  "height": 1920,
+  "fps": 30.0,
+  "has_audio": true,
+  "black": [],
+  "silence": [],
+  "mean_db": -22.3,
+  "max_db": -4.3
+ },
+ "findings": []
+}
