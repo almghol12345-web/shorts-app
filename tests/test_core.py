@@ -696,3 +696,16 @@ def test_owner_can_unblock_a_video_for_one_more_pass(tmp_path):
     studio.unblock("t", "owner: fix it", path=board)
     assert studio.advance("t", "fact_check", "a", "e", path=board)["stage"] == "fact_check"
     assert studio.rework("t", "script", "judge", "again", path=board)["blocked"]
+
+
+def test_quiz_levels_get_harder_and_hide_the_odd_letter_inside():
+    from shorts import quiz
+    game = quiz.levels(7)
+    assert game == quiz.levels(7) and game != quiz.levels(8)      # same seed, same video
+    assert len(game) == 5
+    cells = [level.cols * level.rows for level in game]
+    assert cells == sorted(cells) and cells[0] < cells[-1]
+    for level in game:
+        assert level.common != level.odd
+        assert 0 < level.at[0] < level.cols - 1 and 0 < level.at[1] < level.rows - 1
+    assert quiz.arabic_number(15) == "١٥"
