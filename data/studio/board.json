@@ -172,10 +172,10 @@
   }
  },
  "red sea color": {
-  "stage": "qa",
+  "stage": "approved",
   "reworks": 5,
   "blocked": false,
-  "updated": "2026-11-14T19:34:55+00:00",
+  "updated": "2026-11-14T19:41:41+00:00",
   "evidence": {
    "idea": {
     "by": "idea-scout",
@@ -206,14 +206,19 @@
     "by": "saudi-talk-coach",
     "note": "Automatic gate 100/100. Pictures unchanged (sheet 155 read earlier: no people, no digits). Speech check run 43631834406 (large-v3), compared by the coordinator: every line matches, غطا is gone, أزرق read correctly, no slip.",
     "at": "2026-11-14T19:34:55+00:00"
+   },
+   "approved": {
+    "by": "final-judge",
+    "note": "Committee, three separate agents. critical-reviewer raised 2 critical + 4 major + 4 minor; the two criticals came from an old preview sheet the coordinator supplied by mistake and were dropped against the real render's sheet. quality-defender kept one minor (algae drawn red from the start). final-judge: APPROVED, score 97, no critical.",
+    "at": "2026-11-14T19:41:41+00:00"
    }
   }
  },
  "sand dune shape": {
-  "stage": "qa",
-  "reworks": 5,
+  "stage": "storyboard",
+  "reworks": 6,
   "blocked": false,
-  "updated": "2026-11-14T19:35:06+00:00",
+  "updated": "2026-11-14T19:41:41+00:00",
   "evidence": {
    "idea": {
     "by": "idea-scout",
@@ -234,16 +239,6 @@
     "by": "visual-director",
     "note": "Coordinator rewrote two prompts after reading sheet 163: scene 9 (the two horns) was a round ball, scene 11 (a grain's path) an unreadable dark shape. New sheet 164: scene 9 is a C-shaped dune seen from above, scene 11 a clean side view; no people, no digits. Other scenes unchanged.",
     "at": "2026-11-14T19:34:55+00:00"
-   },
-   "render": {
-    "by": "coordinator",
-    "note": "run 43632060248 (upload=false, quality=video); scenes 9 and 11 redrawn, the rest cached; voice only.",
-    "at": "2026-11-14T19:34:55+00:00"
-   },
-   "qa": {
-    "by": "saudi-talk-coach",
-    "note": "Automatic gate 100/100. Sheet 164 read by the coordinator. Speech check run 43632670117 (large-v3), compared by the coordinator: all 12 lines match the script (no كده, no ق slips); one possible slip in the closing question, heard as 'وش تبي نشرحها؟ وش نشرح لك بعدها؟' in this take (the earlier take, run 43631842765, read it correctly).",
-    "at": "2026-11-14T19:35:06+00:00"
    }
   }
  },
