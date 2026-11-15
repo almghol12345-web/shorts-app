@@ -118,3 +118,28 @@ def upload_long(cfg: Config, title: str, description: str, tags: list[str], vide
             print(f"[upload] thumbnail not set ({str(exc)[:200]})")
     post_comment(yt, vid, "وش أغرب وحدة فيهم بالنسبة لك؟ اكتب رقمها 👇")
     return vid
+
+
+def upload_plain(cfg: Config, title: str, description: str, tags: list[str], video: Path,
+                 comment: str = "", category: str = "24") -> str:
+    """A finished Short with a ready-made title, description and first comment (the quizzes)."""
+    from googleapiclient.http import MediaFileUpload
+
+    yt = _client(cfg)
+    body = {
+        "snippet": {"title": title[:100], "description": description[:4900], "tags": tags,
+                    "categoryId": category, "defaultLanguage": cfg.language,
+                    "defaultAudioLanguage": cfg.language},
+        "status": {"privacyStatus": cfg.privacy, "selfDeclaredMadeForKids": False,
+                   "containsSyntheticMedia": False},
+    }
+    media = MediaFileUpload(str(video), mimetype="video/mp4", chunksize=8 * 1024 * 1024, resumable=True)
+    request = yt.videos().insert(part="snippet,status", body=body, media_body=media)
+    response = None
+    while response is None:
+        status, response = request.next_chunk()
+        if status:
+            print(f"[upload] {int(status.progress() * 100)}%")
+    if comment:
+        post_comment(yt, response["id"], comment)
+    return response["id"]

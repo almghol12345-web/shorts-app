@@ -10,6 +10,9 @@ import sys
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+from shorts.rotation import whose_turn  # noqa: E402
+
 RIYADH = timezone(timedelta(hours=3))
 PER_DAY = 3                           # fewer, stronger Shorts get more views each
 MIN_GAP = timedelta(hours=2, minutes=30)
@@ -35,7 +38,10 @@ def main() -> None:
     root = Path(__file__).resolve().parent.parent
     history = json.loads((root / "data/history.json").read_text(encoding="utf-8"))
     mysteries = {m["topic"] for m in json.loads((root / "data/mysteries.json").read_text(encoding="utf-8"))}
-    run, kind = decide(history, mysteries, datetime.now(timezone.utc))
+    now = datetime.now(timezone.utc)
+    run, kind = decide(history, mysteries, now)
+    if run and whose_turn(history, now) == "quiz":      # a quiz is next: its own workflow runs
+        run = False
     print(f"run={'true' if run else 'false'}")
     print(f"kind={kind}")
 

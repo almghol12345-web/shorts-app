@@ -709,3 +709,25 @@ def test_quiz_levels_get_harder_and_hide_the_odd_letter_inside():
         assert level.common != level.odd
         assert 0 < level.at[0] < level.cols - 1 and 0 < level.at[1] < level.rows - 1
     assert quiz.arabic_number(15) == "١٥"
+
+
+def test_quiz_kinds_and_rotation():
+    from datetime import datetime, timedelta, timezone
+
+    from shorts import quiz, rotation
+
+    for kind in quiz.KINDS:
+        game = quiz.levels(7, kind)
+        assert len(game) == 5 and all(level.kind == kind for level in game)
+        assert quiz.levels(7, kind) == game                          # same seed, same video
+    colours = quiz.levels(7, "colors")
+    assert all(level.colour != level.odd_colour for level in colours)
+    now = datetime(2026, 11, 15, 15, tzinfo=timezone.utc)
+    ago = lambda h: (now - timedelta(hours=h)).isoformat()           # noqa: E731
+    assert rotation.whose_turn([], now) == "news"
+    assert rotation.whose_turn([{"topic": "x", "date": ago(1)}], now) == "quiz"
+    assert rotation.whose_turn([{"topic": "اختبار:letters:3", "date": ago(1)}], now) == "news"
+    assert rotation.whose_turn([{"topic": "x", "date": ago(9)}], now) == "any"   # nothing for 9h
+    assert rotation.next_quiz([])[2] == "اختبار:letters:3"
+    done = [{"topic": "اختبار:letters:3"}, {"topic": "اختبار:colors:3"}]
+    assert rotation.next_quiz(done)[2] == "اختبار:numbers:3"

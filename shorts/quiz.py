@@ -25,6 +25,17 @@ FONTS = Path(__file__).resolve().parent.parent / "assets" / "fonts"
 EASY = [("٨", "٧"), ("س", "ش"), ("ب", "ت"), ("ص", "ض")]
 MEDIUM = [("ح", "خ"), ("ر", "ز"), ("د", "ذ"), ("ع", "غ"), ("ط", "ظ")]
 HARD = [("ي", "ى"), ("ه", "ة"), ("ف", "ق"), ("ا", "أ"), ("ن", "ت")]
+# look-alike digits (Latin digits read the same for every Arab viewer)
+NUM_EASY = [("6", "9"), ("8", "3"), ("5", "2")]
+NUM_MEDIUM = [("6", "8"), ("3", "5"), ("0", "8"), ("1", "7")]
+NUM_HARD = [("6", "5"), ("8", "9"), ("0", "6"), ("3", "9"), ("2", "7")]
+# colour kind: how much lighter the odd tile is, per level (smaller = harder)
+SHADE_STEPS = [0.20, 0.13, 0.085, 0.055, 0.035]
+KINDS = {
+    "letters": ("الحرف", "وين الحرف الغريب؟"),
+    "numbers": ("الرقم", "وين الرقم الغريب؟"),
+    "colors": ("المربع", "أي مربع لونه مختلف؟"),
+}
 # (columns, rows, seconds to look) per level
 SHAPES = [(5, 6, 5), (6, 8, 5), (7, 9, 5), (8, 11, 5), (10, 13, 6)]
 
@@ -43,18 +54,35 @@ class Level:
     rows: int
     seconds: int
     at: tuple[int, int]          # (column, row) of the odd letter
+    kind: str = "letters"        # letters / numbers / colors
+    colour: tuple[int, int, int] = (0, 0, 0)      # colors kind: the common tile colour
+    odd_colour: tuple[int, int, int] = (0, 0, 0)  # colors kind: the odd tile colour
 
 
-def levels(seed: int) -> list[Level]:
+def levels(seed: int, kind: str = "letters") -> list[Level]:
     """Five levels, harder each time; the same seed always gives the same video."""
     rng = random.Random(seed)
-    pairs = [rng.choice(EASY), *rng.sample(MEDIUM, 2), *rng.sample(HARD, 2)]
+    if kind == "numbers":
+        pairs = [rng.choice(NUM_EASY), *rng.sample(NUM_MEDIUM, 2), *rng.sample(NUM_HARD, 2)]
+    else:
+        pairs = [rng.choice(EASY), *rng.sample(MEDIUM, 2), *rng.sample(HARD, 2)]
+    hue = rng.random()
     out = []
-    for (common, odd), (cols, rows, seconds) in zip(pairs, SHAPES):
+    for i, ((common, odd), (cols, rows, seconds)) in enumerate(zip(pairs, SHAPES)):
         # never on the outer ring: the eye lands on corners and edges first
         at = (rng.randrange(1, cols - 1), rng.randrange(1, rows - 1))
-        out.append(Level(common, odd, cols, rows, seconds, at))
+        level = Level(common, odd, cols, rows, seconds, at, kind)
+        if kind == "colors":
+            h = (hue + 0.17 * i) % 1.0
+            level.colour = _hsv(h, 0.55, 0.62)
+            level.odd_colour = _hsv(h, 0.55 - SHADE_STEPS[i] * 0.5, 0.62 + SHADE_STEPS[i])
+        out.append(level)
     return out
+
+
+def _hsv(h: float, s: float, v: float) -> tuple[int, int, int]:
+    import colorsys
+    return tuple(int(round(c * 255)) for c in colorsys.hsv_to_rgb(h, s, min(v, 1.0)))
 
 
 def arabic_number(n: int) -> str:
@@ -104,7 +132,7 @@ def _level_base(level: Level, number: int, total: int, reveal: bool) -> Image.Im
     d = ImageDraw.Draw(img)
     _ladder(d, 150, total, number)
     _text(d, (W // 2, 345), f"المستوى {arabic_number(number + 1)}", 76, AMBER)
-    _text(d, (W // 2, 455), "وين الحرف الغريب؟", 66, (255, 255, 255))
+    _text(d, (W // 2, 455), KINDS[level.kind][1], 66, (255, 255, 255))
     x0, y0, x1, y1, cell = _grid_box(level)
     d.rounded_rectangle((x0, y0, x1, y1), 44, fill=CARD)
     size = int(cell * 0.66)
@@ -117,14 +145,26 @@ def _level_base(level: Level, number: int, total: int, reveal: bool) -> Image.Im
             odd = (col, row) == level.at
             cx = x0 + 30 + cell * (level.cols - 1 - col) + cell / 2
             cy = y0 + 30 + cell * row + cell / 2
-            if reveal and odd:
+            if reveal and odd and level.kind != "colors":
                 r = cell * 0.52
                 d.ellipse((cx - r, cy - r, cx + r, cy + r), fill=GREEN)
+            if level.kind == "colors":
+                half = cell * 0.44
+                tile = level.odd_colour if odd else level.colour
+                if reveal and not odd:
+                    tile = tuple((a + 255 * 2) // 3 for a in tile)
+                d.rounded_rectangle((cx - half, cy - half, cx + half, cy + half), 14, fill=tile)
+                if reveal and odd:
+                    d.rounded_rectangle((cx - half - 8, cy - half - 8, cx + half + 8, cy + half + 8),
+                                        20, outline=GREEN, width=9)
+                continue
             fill = INK if (odd or not reveal) else (205, 198, 186)
             _text(d, (cx, cy - size * 0.08), level.odd if odd else level.common, size, fill)
     if reveal:
         d.rounded_rectangle((W // 2 - 330, y1 + 28, W // 2 + 330, y1 + 138), 55, fill=GREEN)
-        _text(d, (W // 2, y1 + 76), f"هنا!  «{level.odd}» بين «{level.common}»", 58, INK)
+        note = {"colors": "هنا!  لونه أفتح شوي", "numbers": "هنا!  هذا الرقم الغريب"}.get(
+            level.kind, f"هنا!  «{level.odd}» بين «{level.common}»")
+        _text(d, (W // 2, y1 + 76), note, 58, INK)
     return img
 
 
@@ -153,6 +193,10 @@ def _hook(game: list[Level], t: float) -> Image.Image:
         for col in range(5):
             cx, cy = x0 + cell * col + cell // 2, y0 + cell * row + cell // 2
             odd = (col, row) == (1, 1)
+            if first.kind == "colors":
+                d.rounded_rectangle((cx - 52, cy - 52, cx + 52, cy + 52), 14,
+                                    fill=first.odd_colour if odd else first.colour)
+                continue
             if odd:
                 d.ellipse((cx - 56, cy - 56, cx + 56, cy + 56), fill=GREEN)
             _text(d, (cx, cy - 6), first.odd if odd else first.common, 78, INK)
@@ -182,6 +226,11 @@ def _tone(freq: float, seconds: float, volume: float, rate: int = 44100) -> np.n
 
 # the same question in fuller Arabic, for the standard (non-Saudi) voice
 INTRO_FUSHA = "هَلْ تَعْرِفُ أَيْنَ الحَرْفُ الغَرِيبُ؟ خَمْسُ مَرَاحِلَ، وَكُلُّ مَرْحَلَةٍ أَصْعَبُ. هَلْ أَنْتَ جَاهِزٌ؟ هَيَّا نَبْدَأْ!"
+INTRO_BY_KIND = {
+    "letters": INTRO_FUSHA,
+    "numbers": "هَلْ تَعْرِفُ أَيْنَ الرَّقْمُ الغَرِيبُ؟ خَمْسُ مَرَاحِلَ، وَكُلُّ مَرْحَلَةٍ أَصْعَبُ. هَلْ أَنْتَ جَاهِزٌ؟ هَيَّا نَبْدَأْ!",
+    "colors": "أَيُّ مُرَبَّعٍ لَوْنُهُ مُخْتَلِفٌ؟ خَمْسُ مَرَاحِلَ، وَكُلُّ مَرْحَلَةٍ أَصْعَبُ. هَلْ أَنْتَ جَاهِزٌ؟ هَيَّا نَبْدَأْ!",
+}
 INTRO_TEXT = "تدري وين الحرف الغريب؟ خمس مستويات.. وكل واحد أصعب. جاهز؟ يلا!"
 
 
@@ -232,12 +281,12 @@ def soundtrack(game: list[Level], out: Path, rate: int = 44100,
     return total
 
 
-def render(out: Path, seed: int, intro: Path | None = None) -> list[Level]:
+def render(out: Path, seed: int, intro: Path | None = None, kind: str = "letters") -> list[Level]:
     """Writes the finished 9:16 video and returns the levels it used.
     `intro` is the spoken opening question: the test starts after it ends."""
     if not features.check("raqm"):
         raise RuntimeError("Pillow has no raqm text layout: Arabic words would come out unjoined")
-    game = levels(seed)
+    game = levels(seed, kind)
     out.parent.mkdir(parents=True, exist_ok=True)
     sound = out.with_suffix(".wav")
     voice = _voice_pcm(intro) if intro else None
@@ -281,9 +330,10 @@ def main() -> None:
     p = argparse.ArgumentParser()
     p.add_argument("out", type=Path)
     p.add_argument("--seed", type=int, default=1)
+    p.add_argument("--kind", choices=list(KINDS), default="letters")
     p.add_argument("--intro", type=Path, help="audio file with the spoken opening question")
     a = p.parse_args()
-    for number, level in enumerate(render(a.out, a.seed, a.intro), 1):
+    for number, level in enumerate(render(a.out, a.seed, a.intro, a.kind), 1):
         print(f"[quiz] level {number}: «{level.odd}» among «{level.common}» "
               f"{level.cols}x{level.rows} at column {level.at[0] + 1}, row {level.at[1] + 1}")
 
