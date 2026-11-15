@@ -4,7 +4,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from shorts import darijat, quiz  # noqa: E402
+from shorts import darijat, quiz, voice  # noqa: E402
 from shorts.spoken import speakable  # noqa: E402
 
 
@@ -15,7 +15,13 @@ def main() -> None:
     intro = out.with_name("quiz_intro.mp3")
     spoken = speakable(quiz.INTRO_TEXT)
     print("[quiz] intro:", spoken)
-    darijat.generate(spoken, intro)
+    try:
+        darijat.generate(spoken, intro)
+    except Exception as err:          # no key or no credit: use the free standard voice
+        print("[quiz] Darijat unavailable, using the standard voice:", str(err)[:120])
+        import asyncio
+        from shorts.config import Config
+        asyncio.run(voice._tts(spoken, Config().voice, intro))
     for n, level in enumerate(quiz.render(out, seed, intro), 1):
         print(f"[quiz] level {n}: {level.odd} among {level.common}")
 
