@@ -1,0 +1,36 @@
+name: Quiz Video
+
+on:
+  workflow_dispatch:
+    inputs:
+      seed:
+        description: "Seed for the levels"
+        default: "1"
+
+jobs:
+  quiz:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install ffmpeg
+        timeout-minutes: 6
+        run: |
+          url=https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/ffmpeg-master-latest-linux64-gpl.tar.xz
+          curl -fsSL --retry 3 --max-time 180 "$url" -o /tmp/ffmpeg.tar.xz
+          mkdir -p /tmp/ffmpeg && tar -xf /tmp/ffmpeg.tar.xz -C /tmp/ffmpeg --strip-components=1
+          echo "/tmp/ffmpeg/bin" >> "$GITHUB_PATH"
+      - run: pip install -r requirements.txt
+      - name: Make the video
+        env:
+          DARIJAT_API_KEY: ${{ secrets.DARIJAT_API_KEY }}
+          DARIJAT_VOICE: ${{ vars.DARIJAT_VOICE }}
+        run: python scripts/quiz_make.py "${{ inputs.seed }}"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: quiz-${{ github.run_number }}
+          path: output/quiz.mp4
+          retention-days: 7

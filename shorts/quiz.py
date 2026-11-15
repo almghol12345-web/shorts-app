@@ -180,17 +180,37 @@ def _tone(freq: float, seconds: float, volume: float, rate: int = 44100) -> np.n
     return volume * np.sin(2 * math.pi * freq * t) * np.exp(-t * 18)
 
 
-def soundtrack(game: list[Level], out: Path, rate: int = 44100) -> float:
+INTRO_TEXT = "تدري وين الحرف الغريب؟ خمس مستويات.. وكل واحد أصعب. جاهز؟ يلا!"
+
+
+def _voice_pcm(path: Path, rate: int = 44100) -> np.ndarray:
+    """Decodes the spoken intro to mono floats at the quiz sample rate."""
+    raw = subprocess.run(["ffmpeg", "-v", "error", "-i", str(path), "-f", "s16le", "-ac", "1",
+                          "-ar", str(rate), "-"], capture_output=True, check=True).stdout
+    return np.frombuffer(raw, dtype=np.int16).astype(np.float64) / 32768
+
+
+def hook_length(voice: np.ndarray | None, rate: int = 44100) -> float:
+    """The opening screen lasts as long as the question is spoken, plus a short beat."""
+    return HOOK_S if voice is None else max(HOOK_S, len(voice) / rate + 0.5)
+
+
+def soundtrack(game: list[Level], out: Path, rate: int = 44100,
+               voice: np.ndarray | None = None) -> float:
     """Ticks for the countdown and a two-note chime on each answer. Returns the length."""
-    total = HOOK_S + sum(level.seconds + REVEAL_S for level in game) + END_S
+    hook = hook_length(voice, rate)
+    total = hook + sum(level.seconds + REVEAL_S for level in game) + END_S
     audio = np.zeros(int(rate * total) + rate)
 
     def put(at: float, sound: np.ndarray) -> None:
         i = int(at * rate)
         audio[i:i + len(sound)] += sound
 
-    put(0.0, _tone(180, 0.5, 0.5))
-    at = HOOK_S
+    if voice is None:
+        put(0.0, _tone(180, 0.5, 0.5))
+    else:
+        put(0.1, voice * 0.95)
+    at = hook
     for level in game:
         put(at, _tone(520, 0.25, 0.35))                        # a new level opens
         for second in range(level.seconds):
@@ -210,14 +230,17 @@ def soundtrack(game: list[Level], out: Path, rate: int = 44100) -> float:
     return total
 
 
-def render(out: Path, seed: int) -> list[Level]:
-    """Writes the finished 9:16 video and returns the levels it used."""
+def render(out: Path, seed: int, intro: Path | None = None) -> list[Level]:
+    """Writes the finished 9:16 video and returns the levels it used.
+    `intro` is the spoken opening question: the test starts after it ends."""
     if not features.check("raqm"):
         raise RuntimeError("Pillow has no raqm text layout: Arabic words would come out unjoined")
     game = levels(seed)
     out.parent.mkdir(parents=True, exist_ok=True)
     sound = out.with_suffix(".wav")
-    total = soundtrack(game, sound)
+    voice = _voice_pcm(intro) if intro else None
+    hook = hook_length(voice)
+    total = soundtrack(game, sound, voice=voice)
     ff = subprocess.Popen(
         ["ffmpeg", "-y", "-v", "error", "-f", "rawvideo", "-pix_fmt", "rgb24", "-s", f"{W}x{H}",
          "-r", str(FPS), "-i", "-", "-i", str(sound), "-c:v", "libx264", "-preset", "medium",
@@ -233,7 +256,7 @@ def render(out: Path, seed: int) -> list[Level]:
         ff.stdin.write(img.tobytes())
         done += 1
 
-    for i in range(int(HOOK_S * FPS)):
+    for i in range(int(hook * FPS)):
         write(_hook(game, i / FPS))
     for number, level in enumerate(game):
         base = _level_base(level, number, len(game), reveal=False)
@@ -256,8 +279,9 @@ def main() -> None:
     p = argparse.ArgumentParser()
     p.add_argument("out", type=Path)
     p.add_argument("--seed", type=int, default=1)
+    p.add_argument("--intro", type=Path, help="audio file with the spoken opening question")
     a = p.parse_args()
-    for number, level in enumerate(render(a.out, a.seed), 1):
+    for number, level in enumerate(render(a.out, a.seed, a.intro), 1):
         print(f"[quiz] level {number}: «{level.odd}» among «{level.common}» "
               f"{level.cols}x{level.rows} at column {level.at[0] + 1}, row {level.at[1] + 1}")
 
