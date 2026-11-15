@@ -17,7 +17,10 @@ def main() -> None:
     print("[quiz] intro:", spoken)
     try:
         darijat.generate(spoken, intro)
-    except Exception as err:          # no key or no credit: use the free standard voice
+    except Exception as err:
+        import os
+        if not os.environ.get("QUIZ_STANDARD_VOICE"):   # the standard voice sounds robotic: never by default
+            raise
         print("[quiz] Darijat unavailable, using the standard voice:", str(err)[:120])
         import asyncio
         from shorts.config import Config
