@@ -19,6 +19,8 @@ NICHE_WORDS = ("اكتشاف", "علوم", "علم", "تقنية", "اختراع
 EVERGREEN = ["ألغاز", "قصص_حقيقية", "غموض", "ألغاز_لم_تحل", "قصص_غامضة", "معلومات"]
 SEARCH_TAGS = ["ألغاز لم تحل", "قصص غامضة حقيقية", "قصص حقيقية", "أغرب القصص",
                "ألغاز حيرت العلماء", "قصص غامضة", "قصص بالسعودي", "دهشة"]
+# said once, plainly: viewers ask for 'the real photo' when they take the drawings for photos
+AI_NOTE = "الرسومات مولّدة بالذكاء الصناعي للتوضيح، مو صور حقيقية. المعلومة نفسها مأخوذة من مصادر موثوقة."
 HASHTAG = re.compile(r"#([\w؀-ۿ]+)")
 
 
@@ -130,6 +132,7 @@ def build(title: str, hook: str, topic_tags: list[str], trending: list[str],
             f"{question or 'وش رأيك فيها؟ اكتب لي في التعليقات'} 👇\n"
             "تابع القناة.. كل يوم شي يبهرك من العالم 🌍\n\n"
             + (f"المصدر: {source}\n\n" if source else "")
+            + AI_NOTE + "\n\n"
             + " ".join(f"#{t}" for t in tags_line) + " #shorts"
         )
     else:
