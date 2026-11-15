@@ -13,18 +13,16 @@ def main() -> None:
     out = Path("output/quiz.mp4")
     out.parent.mkdir(parents=True, exist_ok=True)
     intro = out.with_name("quiz_intro.mp3")
-    spoken = speakable(quiz.INTRO_TEXT)
-    print("[quiz] intro:", spoken)
-    try:
+    import asyncio
+    import os
+    from shorts.config import Config
+    if os.environ.get("QUIZ_STANDARD_VOICE"):          # fuller Arabic, free standard voice
+        print("[quiz] intro (standard voice):", quiz.INTRO_FUSHA)
+        asyncio.run(voice._tts(quiz.INTRO_FUSHA, Config().voice, intro))
+    else:                                              # Saudi chat, Darijat only
+        spoken = speakable(quiz.INTRO_TEXT)
+        print("[quiz] intro:", spoken)
         darijat.generate(spoken, intro)
-    except Exception as err:
-        import os
-        if not os.environ.get("QUIZ_STANDARD_VOICE"):   # the standard voice sounds robotic: never by default
-            raise
-        print("[quiz] Darijat unavailable, using the standard voice:", str(err)[:120])
-        import asyncio
-        from shorts.config import Config
-        asyncio.run(voice._tts(spoken, Config().voice, intro))
     for n, level in enumerate(quiz.render(out, seed, intro), 1):
         print(f"[quiz] level {n}: {level.odd} among {level.common}")
 

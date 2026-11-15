@@ -6,6 +6,9 @@ on:
       seed:
         description: "Seed for the levels"
         default: "1"
+      standard_voice:
+        description: "Use the free standard voice with fuller Arabic (true/false)"
+        default: "false"
 
 jobs:
   quiz:
@@ -28,6 +31,7 @@ jobs:
         env:
           DARIJAT_API_KEY: ${{ secrets.DARIJAT_API_KEY }}
           DARIJAT_VOICE: ${{ vars.DARIJAT_VOICE }}
+          QUIZ_STANDARD_VOICE: ${{ inputs.standard_voice == 'true' && '1' || '' }}
         run: python scripts/quiz_make.py "${{ inputs.seed }}"
       - uses: actions/upload-artifact@v4
         with:

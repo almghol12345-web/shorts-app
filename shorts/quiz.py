@@ -180,6 +180,8 @@ def _tone(freq: float, seconds: float, volume: float, rate: int = 44100) -> np.n
     return volume * np.sin(2 * math.pi * freq * t) * np.exp(-t * 18)
 
 
+# the same question in fuller Arabic, for the standard (non-Saudi) voice
+INTRO_FUSHA = "هَلْ تَعْرِفُ أَيْنَ الحَرْفُ الغَرِيبُ؟ خَمْسُ مَرَاحِلَ، وَكُلُّ مَرْحَلَةٍ أَصْعَبُ. هَلْ أَنْتَ جَاهِزٌ؟ هَيَّا نَبْدَأْ!"
 INTRO_TEXT = "تدري وين الحرف الغريب؟ خمس مستويات.. وكل واحد أصعب. جاهز؟ يلا!"
 
 
