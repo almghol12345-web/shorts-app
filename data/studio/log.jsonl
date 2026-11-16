@@ -117,3 +117,5 @@
 {"at": "2026-11-16T06:04:31+00:00", "topic": "sand dune shape", "event": "advance", "stage": "qa", "by": "claude", "note": "qa 100/100 PASS, scene 9 redrawn as plain desert picture"}
 {"at": "2026-11-16T06:06:50+00:00", "topic": "sand dune shape", "event": "rework", "stage": "storyboard", "by": "quality-defender", "note": "committee: redraw scenes 9 and 10 only (crescent with two horns, ghost outline of earlier position), no footprints", "blocked": true}
 {"at": "2026-11-16T15:59:47+00:00", "topic": "sand dune shape", "event": "unblock", "stage": "storyboard", "by": "owner", "note": "owner said تمام (16 Nov) to one last pass: redraw scenes 9 and 10 per committee"}
+{"at": "2026-11-16T16:16:10+00:00", "topic": "Al-Ahsa oasis", "event": "added", "by": "idea-scout", "note": "ليش وسط الصحرا أكبر واحة نخيل بالعالم؟ عيون طبيعية تحت الأرض + قنوات. مصدر: اليونسكو واحة الأحساء + هيئة التراث"}
+{"at": "2026-11-16T16:16:10+00:00", "topic": "jeddah roshan", "event": "added", "by": "idea-scout", "note": "ليش بيوت جدة البلد فيها الروشان؟ تظليل وهواء وخصوصية. مصدر: اليونسكو جدة التاريخية + هيئة التراث. المدقق يتأكد من أثر التبريد"}
