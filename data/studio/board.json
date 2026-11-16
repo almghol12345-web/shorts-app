@@ -342,28 +342,58 @@
   }
  },
  "Boiling river Amazon": {
-  "stage": "idea",
+  "stage": "storyboard",
   "reworks": 0,
   "blocked": false,
-  "updated": "2026-11-16T19:38:48+00:00",
+  "updated": "2026-11-16T19:41:05+00:00",
   "evidence": {
    "idea": {
     "by": "idea-scout",
     "note": "اقتراح يوتيوب ستوديو: نهر يغلي تحت غابات الأمازون (شاناي تيمبيشكا)",
     "at": "2026-11-16T19:38:48+00:00"
+   },
+   "script": {
+    "by": "script-writer",
+    "note": "script reviewed by fact-check pass; line 2 changed to average temp",
+    "at": "2026-11-16T19:40:55+00:00"
+   },
+   "fact_check": {
+    "by": "fact-checker",
+    "note": "MOSTLY TRUE: 86C is average not max (fixed line 2); ~700km nearest active volcanic center (Ruzo/NatGeo); small animal cooked in seconds (NatGeo); fault-fed hydrothermal, rain water heated deep (NatGeo, TheWorld); locals/shamans knew. Sources: nationalgeographic.com adventure article, theworld.org 2016/04/13 story",
+    "at": "2026-11-16T19:40:55+00:00"
+   },
+   "storyboard": {
+    "by": "visual-director",
+    "note": "8 مشاهد طبيعة/فضاء بسيطة تطابق 8 أسطر",
+    "at": "2026-11-16T19:41:05+00:00"
    }
   }
  },
  "Diamond rain": {
-  "stage": "idea",
+  "stage": "storyboard",
   "reworks": 0,
   "blocked": false,
-  "updated": "2026-11-16T19:38:48+00:00",
+  "updated": "2026-11-16T19:41:05+00:00",
   "evidence": {
    "idea": {
     "by": "idea-scout",
     "note": "اقتراح يوتيوب ستوديو: كوكب تمطر سماؤه ألماس (نبتون/أورانوس، فرضية علمية مو حقيقة مثبتة)",
     "at": "2026-11-16T19:38:48+00:00"
+   },
+   "script": {
+    "by": "script-writer",
+    "note": "script reviewed by fact-check pass; line 2 changed to average temp",
+    "at": "2026-11-16T19:40:55+00:00"
+   },
+   "fact_check": {
+    "by": "fact-checker",
+    "note": "TRUE: hedged wording ok; 2017 hydrocarbon plastic lasers (SLAC), 2022 PET He et al Science Advances, nanodiamonds few nm, oxygen helps. Nature Astronomy 2017 not opened (not allowlisted), confirmed only via search listing. Source: slac.stanford.edu 2022-09-02 news",
+    "at": "2026-11-16T19:40:55+00:00"
+   },
+   "storyboard": {
+    "by": "visual-director",
+    "note": "8 مشاهد طبيعة/فضاء بسيطة تطابق 8 أسطر",
+    "at": "2026-11-16T19:41:05+00:00"
    }
   }
  }
