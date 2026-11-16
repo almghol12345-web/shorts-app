@@ -843,5 +843,102 @@
       "doodle, bright simple picture, empty scene with no humans: a calm desert night scene with a glowing moon over dunes, cold-looking blue tint, peaceful, no humans"
     ],
     "question": "وِش تِبِي نِشْرَح لَك بَعْدَه؟ اكْتِب لَنَا تَحْت"
+  },
+  {
+    "topic": "Al-Ahsa oasis",
+    "kind": "news",
+    "title": "ليش أكبر واحة نخل بالعالم وسط الصحرا؟",
+    "lines": [
+      "تَدْرِي.. هَذِي الأَحْسَا! حَوَالِي مِلْيُونَيْن.. وِنُصّ نَخْلَة وَسْط الصَّحْرَا!",
+      "شُوف.. حَوَالَيْهَا رَمْل! طَيِّب، مِن وَيْن تِجِيهَا المُويَة؟",
+      "السِّرّ تَحْت الأَحْسَا.. مُويَة مَخْزُونَة، وَمُو بَعِيدَة عَن وَجْه الأَرْض!",
+      "وَاللَّه مُو بَس هَالشِّي.. فِي أَمَاكِن كَانَت المُويَة تِفُور لِحَالْهَا وَتِصِير عُيُون مُويَة!",
+      "وَاللِّي مَا تُوصَل لِوَجْه الأَرْض.. حَفَرُوا لَهَا بِيَار.",
+      "تَخَيَّل.. بَس العِين فِي مَكَان وَاحِد، وَالمَزَارِع وَاسْعَة حَوَالَيْهَا!",
+      "طَيِّب وِش سَوَّوا أَهْل الأَحْسَا؟ سَوَّوا سَوَاقِي.. خُطُوط مُويَة تِمْشِي وَسْط المَزَارِع، وَالمُويَة تُوصَل لِكُلّ نَخْلَة!",
+      "وَالمُفَاجَأَة.. مَوْسُوعَة غِينِيس سَجَّلَتْهَا أَكْبَر وَاحَة فِي العَالَم!"
+    ],
+    "description": "ليش أكبر واحة نخل بالعالم وسط الصحراء؟\nواحة الأحساء فيها حوالي ٢٫٥ مليون نخلة، وهي أكبر واحة في العالم حسب اليونسكو. السر مياه جوفية قريبة من سطح الأرض، كانت تطلع عيوناً طبيعية، وتُسحب من آبار، وتتوزع على المزارع عبر شبكة سواقي (قنوات ري). سُجّلت في قائمة التراث العالمي لليونسكو سنة ٢٠١٨، وفي موسوعة غينيس سنة ٢٠٢٠ كأكبر واحة قائمة بذاتها في العالم.\nالمصدر: مركز التراث العالمي - اليونسكو (واحة الأحساء، موقع رقم ١٥٦٣)، اللجنة الوطنية السعودية لليونسكو، سعوديبيديا.\nرسم توضيحي مبسّط.",
+    "tags": [
+      "الأحساء",
+      "واحة_الأحساء",
+      "السعودية",
+      "نخيل",
+      "معلومات"
+    ],
+    "search_terms": [
+      "date palm oasis",
+      "palm trees desert"
+    ],
+    "visuals": [
+      "date palm oasis",
+      "date palm oasis",
+      "date palm oasis",
+      "date palm oasis",
+      "date palm oasis",
+      "date palm oasis",
+      "date palm oasis",
+      "date palm oasis"
+    ],
+    "scenes": [
+      "doodle, bright simple picture, empty scene with no humans: a huge green forest of date palm trees standing in the middle of wide golden sand dunes, clear blue sky, seen from ground level",
+      "doodle, bright simple picture, empty scene with no humans: the edge of a palm grove where green palms meet dry golden sand dunes, hot sun in a clear sky",
+      "doodle, bright simple picture, empty scene with no humans: a natural rocky pool sunk slightly into the ground, filled to the brim with calm clear water, sand and a few palm trees around it",
+      "doodle, bright simple picture, empty scene with no humans: clear water bubbling up from the bottom of a rocky spring pool, small rings spreading on the surface, palm leaves hanging over it",
+      "doodle, bright simple picture, empty scene with no humans: an old round stone well with a wooden pulley and a rope bucket standing among date palm trees, sandy ground",
+      "doodle, bright simple picture, empty scene with no humans: a clear spring pool in the foreground and several separate palm farms with mud brick walls spread out behind it",
+      "doodle, bright simple picture, empty scene with no humans: clear water flowing gently along a small earth channel and spreading into a round basin dug around the base of one date palm tree",
+      "doodle, bright simple picture, empty scene with no humans: a vast date palm oasis glowing under a golden sunset sky, seen from a low sandy hill at its edge, peaceful"
+    ],
+    "question": "وِش تِبِي نِشْرَح لَك بَعْدَه؟ اكْتِب لَنَا تَحْت"
+  },
+  {
+    "topic": "jeddah roshan",
+    "kind": "news",
+    "mood": "ancient",
+    "title": "ليش شبابيك جدة البلد خشب وطالعة برا؟!",
+    "lines": [
+      "شُفْ هَالشَّبَابِيك.. اسْمَهَا رَوَاشِينْ، وْالوَاحِد مِنْهَا رُوشَانْ",
+      "وْتِدْرِي؟ مُو لِلزِّينَة بَسّ.. هِي حَلّ لِجَوّ جِدَّة، حَرّ وْرُطُوبَة عَلَى البَحْر",
+      "تَخَيَّل.. الخَشَب المُخَرَّم يِكْسِر الشَّمْس، وْيِدْخُل البِيت نُور هَادِي.. مُو ضَوّ يِعَمِّي",
+      "طَيِّب، بَيْن الخَشَب فَتْحَات صُغَار.. الهَوَا يِدْخُل مِنْهَا، وْيِطْلَع مِن فَتْحَات فِي السَّطْح",
+      "وْمُو بَسّ هَالشِّي.. بِيُوت جِدَّة البَلَد تِطِلّ عَلَى الشَّارِع",
+      "يَعْنِي اللِّي جَوَّا يِشُوف كِلّ الشَّارِع",
+      "وْاللِّي فِي الشَّارِع.. وَاللَّه مَا يِشُوف شِي جَوَّا",
+      "وْالأَغْرَب؟ الحِيطَة اللِّي شَايْلَة الرُّوشَانْ.. مَبْنِيَّة مِن حَجَر مَرْجَانْ طَالِع مِن البَحْر!"
+    ],
+    "question": "وِش تِبِي نِشْرَح لَك بَعْدَه؟ اكْتِب لَنَا تَحْت",
+    "description": "ليش شبابيك جدة البلد خشب وطالعة برا؟\nالروشان شباك خشبي بارز بستارة خشب مخرّمة: يخفف وهج الشمس ويتحكم بالضوء، ويدخّل الهواء إلى البيت فيمر فيه ويخرج من فتحات في السطح أو ملاقف الهواء، ويسمح لمن في الداخل برؤية الشارع دون أن يُرى من الخارج. وبيوت جدة التاريخية مبنية من الحجر المرجاني (المنقبي) المستخرج من البحر الأحمر، وتطل على الشارع بدل الفناء الداخلي.\nالمصدر: اليونسكو، قائمة التراث العالمي \"جدة التاريخية، بوابة مكة المكرمة\" (whc.unesco.org/en/list/1361) وتقرير تقييم إيكوموس 2014؛ مشروع جدة التاريخية مع وزارة الثقافة على Google Arts & Culture؛ الموسوعة السعودية (سعوديبيديا).\nرسم توضيحي مبسّط.",
+    "tags": [
+      "جدة_التاريخية",
+      "جدة_البلد",
+      "الرواشين",
+      "عمارة",
+      "معلومات"
+    ],
+    "search_terms": [
+      "jeddah al balad wooden roshan windows",
+      "historic jeddah coral stone houses"
+    ],
+    "visuals": [
+      "jeddah al balad wooden roshan windows",
+      "red sea coast calm water",
+      "wooden lattice window sunlight",
+      "carved wooden lattice window",
+      "jeddah al balad narrow street",
+      "jeddah al balad wooden roshan windows",
+      "jeddah al balad narrow street",
+      "historic jeddah coral stone houses"
+    ],
+    "scenes": [
+      "doodle, bright simple picture, empty scene with no humans: a tall old stone house in a narrow sandy street, with a big brown carved wooden window box sticking out from its white wall, clear blue sky",
+      "doodle, bright simple picture, empty scene with no humans: old stone houses with wooden window boxes standing near a calm blue sea shore, hot bright sun in a hazy sky",
+      "doodle, bright simple picture, empty scene with no humans: a close view of a carved wooden lattice screen with soft golden light dots passing through its small holes onto a plain stone wall",
+      "doodle, bright simple picture, empty scene with no humans: a wooden lattice window with its small wooden shutter panel pushed open, a light white curtain inside it blowing gently in the breeze",
+      "doodle, bright simple picture, empty scene with no humans: a narrow old stone street lined on both sides with tall houses and wooden window boxes facing the street, no courtyard, soft daylight",
+      "doodle, bright simple picture, empty scene with no humans: looking down from a high wooden lattice window onto an empty narrow stone street below, wooden lattice frame around the view",
+      "doodle, bright simple picture, empty scene with no humans: looking up from an empty stone street at a closed dark brown wooden lattice window box high on a wall, nothing visible behind the lattice",
+      "doodle, bright simple picture, empty scene with no humans: a close view of a rough pale coral stone wall with small holes and shell shapes, the edge of a brown wooden window box beside it, calm blue sea in the far background"
+    ]
   }
 ]
