@@ -1,0 +1,40 @@
+name: Voice Pick
+
+# Lists the Darijat voices, or makes a sample of the same script lines with each voice named,
+# published on the 'voice' branch as 1.mp3, 2.mp3...
+on:
+  workflow_dispatch:
+    inputs:
+      voices:
+        description: "Comma-separated voice names (or 'list' to print the available voices)"
+        required: true
+      topic:
+        description: "Script topic to read"
+        default: "red sea color"
+
+permissions:
+  contents: write
+
+jobs:
+  pick:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -r requirements.txt
+      - name: Run
+        env:
+          DARIJAT_API_KEY: ${{ secrets.DARIJAT_API_KEY }}
+        run: |
+          if [ "${{ inputs.voices }}" = "list" ]; then python scripts/voice_pick.py list
+          else python scripts/voice_pick.py "${{ inputs.topic }}" "${{ inputs.voices }}"; fi
+      - name: Publish on the 'voice' branch
+        if: inputs.voices != 'list'
+        run: |
+          mkdir -p /tmp/v && cp output/voice/*.mp3 /tmp/v/ && cd /tmp/v
+          git init -q && git checkout -q -b voice
+          git config user.name "shorts-bot" && git config user.email "shorts-bot@users.noreply.github.com"
+          git add . && git commit -qm "voice picks"
+          git push -qf "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" voice
