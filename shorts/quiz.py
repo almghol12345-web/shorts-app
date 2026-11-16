@@ -30,14 +30,16 @@ NUM_EASY = [("6", "9"), ("8", "3"), ("5", "2")]
 NUM_MEDIUM = [("6", "8"), ("3", "5"), ("0", "8"), ("1", "7")]
 NUM_HARD = [("6", "5"), ("8", "9"), ("0", "6"), ("3", "9"), ("2", "7")]
 # colour kind: how much lighter the odd tile is, per level (smaller = harder)
-SHADE_STEPS = [0.20, 0.13, 0.085, 0.055, 0.035]
+SHADE_STEPS = [0.20, 0.10, 0.055, 0.03, 0.017]
 KINDS = {
     "letters": ("الحرف", "وين الحرف الغريب؟"),
     "numbers": ("الرقم", "وين الرقم الغريب؟"),
     "colors": ("المربع", "أي مربع لونه مختلف؟"),
 }
 # (columns, rows, seconds to look) per level
-SHAPES = [(5, 6, 5), (6, 8, 5), (7, 9, 5), (8, 11, 5), (10, 13, 6)]
+SHAPES = [(5, 6, 5), (7, 9, 6), (9, 12, 7), (11, 15, 8), (13, 18, 9)]
+# letters/numbers: how much each glyph wanders in position and size, per level (camouflage)
+JITTER = [0.0, 0.0, 0.05, 0.09, 0.13]
 
 BG_TOP, BG_BOTTOM = (16, 30, 54), (8, 14, 28)
 CARD, INK = (255, 248, 236), (18, 28, 48)
@@ -159,7 +161,11 @@ def _level_base(level: Level, number: int, total: int, reveal: bool) -> Image.Im
                                         20, outline=GREEN, width=9)
                 continue
             fill = INK if (odd or not reveal) else (205, 198, 186)
-            _text(d, (cx, cy - size * 0.08), level.odd if odd else level.common, size, fill)
+            wob = JITTER[min(number, len(JITTER) - 1)]
+            g = random.Random(number * 10007 + row * 131 + col)
+            gx, gy = g.uniform(-wob, wob) * cell, g.uniform(-wob, wob) * cell
+            gs = int(size * (1 + g.uniform(-wob, wob) * 0.8))
+            _text(d, (cx + gx, cy - size * 0.08 + gy), level.odd if odd else level.common, gs, fill)
     if reveal:
         d.rounded_rectangle((W // 2 - 330, y1 + 28, W // 2 + 330, y1 + 138), 55, fill=GREEN)
         note = {"colors": "هنا!  لونه أفتح شوي", "numbers": "هنا!  هذا الرقم الغريب"}.get(
