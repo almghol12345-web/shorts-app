@@ -215,10 +215,10 @@
   }
  },
  "sand dune shape": {
-  "stage": "qa",
-  "reworks": 6,
-  "blocked": false,
-  "updated": "2026-11-16T06:04:31+00:00",
+  "stage": "storyboard",
+  "reworks": 7,
+  "blocked": true,
+  "updated": "2026-11-16T06:06:50+00:00",
   "evidence": {
    "idea": {
     "by": "idea-scout",
@@ -239,16 +239,6 @@
     "by": "visual-director",
     "note": "Coordinator rewrote two prompts after reading sheet 163: scene 9 (the two horns) was a round ball, scene 11 (a grain's path) an unreadable dark shape. New sheet 164: scene 9 is a C-shaped dune seen from above, scene 11 a clean side view; no people, no digits. Other scenes unchanged.",
     "at": "2026-11-14T19:34:55+00:00"
-   },
-   "render": {
-    "by": "claude",
-    "note": "run 43813833294 quality=video",
-    "at": "2026-11-16T06:04:31+00:00"
-   },
-   "qa": {
-    "by": "claude",
-    "note": "qa 100/100 PASS, scene 9 redrawn as plain desert picture",
-    "at": "2026-11-16T06:04:31+00:00"
    }
   }
  },
