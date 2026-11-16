@@ -286,28 +286,48 @@
   }
  },
  "Al-Ahsa oasis": {
-  "stage": "idea",
+  "stage": "fact_check",
   "reworks": 0,
   "blocked": false,
-  "updated": "2026-11-16T16:16:10+00:00",
+  "updated": "2026-11-16T16:26:26+00:00",
   "evidence": {
    "idea": {
     "by": "idea-scout",
     "note": "ليش وسط الصحرا أكبر واحة نخيل بالعالم؟ عيون طبيعية تحت الأرض + قنوات. مصدر: اليونسكو واحة الأحساء + هيئة التراث",
     "at": "2026-11-16T16:16:10+00:00"
+   },
+   "script": {
+    "by": "script-writer",
+    "note": "writer+hook+retention+talk+pronunciation passes done, 8 lines",
+    "at": "2026-11-16T16:26:26+00:00"
+   },
+   "fact_check": {
+    "by": "fact-checker",
+    "note": "passes after edits: line 7 for farms and palms, line 8 Guinness largest self-contained oasis, UNESCO 2.5 million palms, sources UNESCO and Guinness only",
+    "at": "2026-11-16T16:26:26+00:00"
    }
   }
  },
  "jeddah roshan": {
-  "stage": "idea",
+  "stage": "fact_check",
   "reworks": 0,
   "blocked": false,
-  "updated": "2026-11-16T16:16:10+00:00",
+  "updated": "2026-11-16T16:26:37+00:00",
   "evidence": {
    "idea": {
     "by": "idea-scout",
     "note": "ليش بيوت جدة البلد فيها الروشان؟ تظليل وهواء وخصوصية. مصدر: اليونسكو جدة التاريخية + هيئة التراث. المدقق يتأكد من أثر التبريد",
     "at": "2026-11-16T16:16:10+00:00"
+   },
+   "script": {
+    "by": "script-writer",
+    "note": "writer+hook+retention+talk+pronunciation passes done, 8 lines",
+    "at": "2026-11-16T16:26:37+00:00"
+   },
+   "fact_check": {
+    "by": "fact-checker",
+    "note": "passes after edits: roshan one of the answers to hot humid climate, air exits roof openings in some houses, hard to be seen from outside, most walls coral stone",
+    "at": "2026-11-16T16:26:37+00:00"
    }
   }
  }
