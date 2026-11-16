@@ -47,16 +47,18 @@ def render(cfg: Config, narration: Narration, background: Path, workdir: Path, o
     sfx = write_sfx(total, [], [0.0] + (booms or []), workdir / "sfx.wav", boom_gain=0.25)
     sfx_idx = 3 if bed else 2
     cmd += ["-i", str(sfx.resolve())]
+    # every voice is brought to the same loudness (a quieter voice must not fail the gate)
+    leveled = "[1:a]loudnorm=I=-16:TP=-2:LRA=9[vn];"
     if bed:
-        af = (f"[1:a]asplit=2[v1][v2];"
+        af = (leveled + f"[vn]asplit=2[v1][v2];"
               f"{bed},afade=t=in:d=0.3,afade=t=out:st={fade:.2f}:d=1.5[bed];"
               # the bed ducks under the voice so every word stays clear
               f"[bed][v2]sidechaincompress=threshold=0.04:ratio=5:attack=20:release=500[duck];"
               f"[{sfx_idx}:a]aresample=44100[fx];"
               f"[v1][duck][fx]amix=inputs=3:normalize=0:duration=longest,alimiter=limit=0.95[a]")
     else:
-        af = (f"[{sfx_idx}:a]aresample=44100[fx];"
-              f"[1:a][fx]amix=inputs=2:normalize=0:duration=longest,alimiter=limit=0.95[a]")
+        af = (leveled + f"[{sfx_idx}:a]aresample=44100[fx];"
+              f"[vn][fx]amix=inputs=2:normalize=0:duration=longest,alimiter=limit=0.95[a]")
     # Dark, grainy look: stronger vignette and film grain on top of the graded footage.
     subs = f"subtitles=captions.ass:fontsdir={cfg.font_dir.resolve()}"
     if narrator:
