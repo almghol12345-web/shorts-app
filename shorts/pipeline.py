@@ -27,10 +27,12 @@ def add_outro(script: content.Script) -> None:
     if script.lines and script.lines[-1] == closing:
         return
     script.lines = script.lines + [closing]
+    # the closing line shows the opening picture again: no repeated last frame, and the end
+    # flows back into the start when the Short loops
     if len(script.scenes) == n:
-        script.scenes = script.scenes + [script.scenes[-1]]
+        script.scenes = script.scenes + [script.scenes[0]]
     if len(script.visuals) == n:
-        script.visuals = script.visuals + [script.visuals[-1]]
+        script.visuals = script.visuals + [script.visuals[0]]
 
 
 def line_spans(narration: voice.Narration, n_lines: int) -> list[float]:
