@@ -143,3 +143,9 @@
 {"at": "2026-11-17T20:25:46+00:00", "topic": "camel hump", "event": "added", "by": "idea-scout", "note": "من نمط الناجحين (زمزم/الرخام): سؤال ليش عن شي سعودي"}
 {"at": "2026-11-17T20:25:46+00:00", "topic": "empty quarter red sand", "event": "added", "by": "idea-scout", "note": "من نمط الناجحين (زمزم/الرخام): سؤال ليش عن شي سعودي"}
 {"at": "2026-11-17T20:25:46+00:00", "topic": "madinah volcano", "event": "added", "by": "idea-scout", "note": "من نمط الناجحين (زمزم/الرخام): سؤال ليش عن شي سعودي"}
+{"at": "2026-11-17T21:30:31+00:00", "topic": "camel hump", "event": "advance", "stage": "script", "by": "script-writer", "note": "فصحى 8 أسطر"}
+{"at": "2026-11-17T21:30:31+00:00", "topic": "camel hump", "event": "advance", "stage": "fact_check", "by": "fact-checker", "note": "صحيح بعد تعديل بسيط؛ المصادر بالوصف (بريتانيكا/كليفلاند، USGS/عرب نيوز)؛ المدينة: مراجع الحساسية وافق"}
+{"at": "2026-11-17T21:30:31+00:00", "topic": "camel hump", "event": "advance", "stage": "storyboard", "by": "visual-director", "note": "8 مشاهد طبيعة بسيطة بدون وجوه"}
+{"at": "2026-11-17T21:30:31+00:00", "topic": "madinah volcano", "event": "advance", "stage": "script", "by": "script-writer", "note": "فصحى 8 أسطر"}
+{"at": "2026-11-17T21:30:31+00:00", "topic": "madinah volcano", "event": "advance", "stage": "fact_check", "by": "fact-checker", "note": "صحيح بعد تعديل بسيط؛ المصادر بالوصف (بريتانيكا/كليفلاند، USGS/عرب نيوز)؛ المدينة: مراجع الحساسية وافق"}
+{"at": "2026-11-17T21:30:31+00:00", "topic": "madinah volcano", "event": "advance", "stage": "storyboard", "by": "visual-director", "note": "8 مشاهد طبيعة بسيطة بدون وجوه"}
