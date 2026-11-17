@@ -411,5 +411,44 @@
     "at": "2026-11-16T19:41:05+00:00"
    }
   }
+ },
+ "camel hump": {
+  "stage": "idea",
+  "reworks": 0,
+  "blocked": false,
+  "updated": "2026-11-17T20:25:46+00:00",
+  "evidence": {
+   "idea": {
+    "by": "idea-scout",
+    "note": "من نمط الناجحين (زمزم/الرخام): سؤال ليش عن شي سعودي",
+    "at": "2026-11-17T20:25:46+00:00"
+   }
+  }
+ },
+ "empty quarter red sand": {
+  "stage": "idea",
+  "reworks": 0,
+  "blocked": false,
+  "updated": "2026-11-17T20:25:46+00:00",
+  "evidence": {
+   "idea": {
+    "by": "idea-scout",
+    "note": "من نمط الناجحين (زمزم/الرخام): سؤال ليش عن شي سعودي",
+    "at": "2026-11-17T20:25:46+00:00"
+   }
+  }
+ },
+ "madinah volcano": {
+  "stage": "idea",
+  "reworks": 0,
+  "blocked": false,
+  "updated": "2026-11-17T20:25:46+00:00",
+  "evidence": {
+   "idea": {
+    "by": "idea-scout",
+    "note": "من نمط الناجحين (زمزم/الرخام): سؤال ليش عن شي سعودي",
+    "at": "2026-11-17T20:25:46+00:00"
+   }
+  }
  }
 }
