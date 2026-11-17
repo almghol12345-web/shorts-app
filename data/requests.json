@@ -946,13 +946,13 @@
     "kind": "news",
     "title": "ليش فيه نهر يغلي في غابة الأمازون؟",
     "lines": [
-      "تَدْرِي؟ فِي غَابَة بِبِيرُو.. نَهَر يِغْلِي!",
-      "مُعَدَّل حَرَارَة مُويْتَه حَوَالَيْن سِتَّة وثَمَانِين دَرَجَة!",
-      "يَعْنِي لَو طَاح فِيه ضِفْدَع.. يِنْطَبِخ!",
-      "طَيِّب، وِش اللِّي يِسَخِّنَه؟ بُرْكَان؟",
-      "لَا وَاللَّه! مَا فِيه بُرْكَان حَوَالَيْه.. إِلَّا بَعْد سَبْعِمِيَّة كِيلُو!",
+      "تَدْرِي؟ فِي غَابَة بِيرُو.. نَهَر يِغْلِي!",
+      "حَرَارَة مُويَة النَّهَر تَقْرِيب سِتَّة وتِمَانِين دَرَجَة!",
+      "يَعْنِي لَو طَاح فِيه حَيَوَان صَغِير.. يِنْطَبِخ!",
+      "طَيِّب، وِش اللِّي يِسَخِّنَه؟ جَبَل نَار؟",
+      "لَا وَاللَّه! مَا فِيه جَبَل نَار حَوَالَيْه.. إِلَّا بَعْد سَبْعِمِيَّة كِيلُو!",
       "السِّرّ تَحْت الأَرْض.. مُويَة مَطَر تِنْزِل لِتَحْت بَعِيد، وَحَرَارَة الأَرْض تِسَخِّنْهَا.",
-      "وَتِرْجَع تِطْلَع مِن شُرُوخ فِي الصَّخْر.. وَهِي تِفُور!",
+      "وَتِرْجَع تِطْلَع مِن شُرُوخ فِي الصَّخْر.. وِتِفُور!",
       "وَالمُفَاجَأَة.. أَهْل الدِّيرَة يِعْرِفُونَه مِن زَمَان، وَغَيْرُهُم حَسَبُوه حِكَايَة!"
     ],
     "description": "ليش فيه نهر يغلي في غابة الأمازون؟\nنهر شاناي تيمبيشكا في الأمازون البيروفية تصل حرارة مياهه إلى حوالي ٨٦ درجة مئوية. ما فيه بركان نشط قريب منه (أقرب واحد يبعد حوالي ٧٠٠ كم). السبب حرارة جوفية: مياه الأمطار تتسرب عميقاً في الأرض وتسخن، ثم تطلع من الصدوع في الصخر على شكل ينابيع حارة تصب في النهر. درسه عالم الجيوفيزياء البيروفي أندريس روزو بعد ما سمع عنه كأسطورة من جده، وأهل المنطقة يعرفونه من زمان كمكان مقدس.\nالمصدر: أندريس روزو، كتاب The Boiling River (TED Books، ٢٠١٦)، ومحاضرته في TED، وناشيونال جيوغرافيك.\nhttps://www.nationalgeographic.com/adventure/article/this-mythical-river-in-peru-is-boiling-and-one-young-scientist-is-on-a-quest-to-protect-it\nhttps://theworld.org/stories/2016/04/13/what-young-scientist-found-when-he-started-researching-famous-boiling-river-peru\nرسم توضيحي مبسّط.",
@@ -978,12 +978,12 @@
       "steaming jungle river"
     ],
     "scenes": [
-      "doodle, bright simple picture, empty scene with no humans: a turquoise river winding through thick green Amazon jungle, white steam rising from the water, seen from the riverbank",
+      "doodle, bright simple picture, empty scene with no humans: a river with big bubbles boiling on its surface and thick white steam rolling off it in clouds, thick green Amazon jungle on both banks",
       "doodle, bright simple picture, empty scene with no humans: close view of hot river water with thick white steam curling up over rocks, green jungle leaves on both sides",
-      "doodle, bright simple picture, empty scene with no humans: a small green frog sitting on a wet rock at the edge of a steaming river, steam drifting around it",
-      "doodle, bright simple picture, empty scene with no humans: a steaming jungle river in the foreground and a far distant blue mountain on the horizon, hazy sky",
+      "doodle, bright simple picture, empty scene with no humans: a small green frog sitting on a wet rock at the edge of a boiling bubbling river, thick steam drifting around it",
+      "doodle, bright simple picture, empty scene with no humans: a steaming jungle river in the foreground and flat green rainforest all the way to the horizon, no mountains, hazy sky",
       "doodle, bright simple picture, empty scene with no humans: endless flat green Amazon rainforest seen from above, a tiny steaming river line inside it, no mountains anywhere",
-      "doodle, bright simple picture, empty scene with no humans: a block of jungle ground cut open like a cake, rain falling on top, blue water seeping down through brown rock layers toward a glowing orange warm layer deep below",
+      "doodle, bright simple picture, empty scene with no humans: a block of jungle ground cut open like a cake, rain falling on top, blue water seeping down through brown rock layers toward a warm reddish hot-rock layer deep below, no fire, no lava",
       "doodle, bright simple picture, empty scene with no humans: hot water bubbling up out of a crack in dark river rocks, steam rising, splashing into the river",
       "doodle, bright simple picture, empty scene with no humans: a misty steaming jungle river at golden sunset, tall rainforest trees on both banks, calm and mysterious"
     ],
