@@ -139,3 +139,4 @@
 {"at": "2026-11-17T17:26:11+00:00", "topic": "Diamond rain", "event": "advance", "stage": "render", "by": "producer", "note": "run 44135926504"}
 {"at": "2026-11-17T17:26:11+00:00", "topic": "Diamond rain", "event": "advance", "stage": "qa", "by": "quality-gate", "note": "QA 100/100, sheet reviewed, speech check 44135547283 clean"}
 {"at": "2026-11-17T17:26:11+00:00", "topic": "Diamond rain", "event": "advance", "stage": "approved", "by": "final-judge", "note": "100/100 APPROVED after two-scene rework"}
+{"at": "2026-11-17T20:20:04+00:00", "topic": "Diamond rain", "event": "rework", "stage": "storyboard", "by": "growth-strategist", "note": "موقوف: المالك طلب تغيير المواضيع", "blocked": false}
