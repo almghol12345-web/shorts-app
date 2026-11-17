@@ -133,3 +133,6 @@
 {"at": "2026-11-16T19:40:55+00:00", "topic": "Diamond rain", "event": "advance", "stage": "fact_check", "by": "fact-checker", "note": "TRUE: hedged wording ok; 2017 hydrocarbon plastic lasers (SLAC), 2022 PET He et al Science Advances, nanodiamonds few nm, oxygen helps. Nature Astronomy 2017 not opened (not allowlisted), confirmed only via search listing. Source: slac.stanford.edu 2022-09-02 news"}
 {"at": "2026-11-16T19:41:05+00:00", "topic": "Boiling river Amazon", "event": "advance", "stage": "storyboard", "by": "visual-director", "note": "8 مشاهد طبيعة/فضاء بسيطة تطابق 8 أسطر"}
 {"at": "2026-11-16T19:41:05+00:00", "topic": "Diamond rain", "event": "advance", "stage": "storyboard", "by": "visual-director", "note": "8 مشاهد طبيعة/فضاء بسيطة تطابق 8 أسطر"}
+{"at": "2026-11-17T16:50:04+00:00", "topic": "Boiling river Amazon", "event": "advance", "stage": "render", "by": "producer", "note": "run 44129446022"}
+{"at": "2026-11-17T16:50:04+00:00", "topic": "Boiling river Amazon", "event": "advance", "stage": "qa", "by": "quality-gate", "note": "QA 100/100, sheet reviewed, speech check 44128703176 clean"}
+{"at": "2026-11-17T16:50:04+00:00", "topic": "Boiling river Amazon", "event": "advance", "stage": "approved", "by": "final-judge", "note": "97 APPROVED: QA 100, minus 3 for kept minor (يغلي wording)"}
