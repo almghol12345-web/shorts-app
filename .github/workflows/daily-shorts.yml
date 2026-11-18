@@ -58,7 +58,10 @@ jobs:
           if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
             echo "run=true" >> "$GITHUB_OUTPUT"; echo "kind=${{ inputs.kind }}" >> "$GITHUB_OUTPUT"
           else
-            python3 scripts/slot.py | tee -a "$GITHUB_OUTPUT"
+            # Owner rule (18 Nov): nothing is published without his explicit OK, so the
+            # hourly schedule no longer makes or uploads videos on its own.
+            echo "run=false" >> "$GITHUB_OUTPUT"
+            echo "scheduled publishing is off: every upload needs the owner's OK"
           fi
 
       - uses: actions/setup-python@v5
