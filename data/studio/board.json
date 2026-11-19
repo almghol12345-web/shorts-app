@@ -413,10 +413,10 @@
   }
  },
  "camel hump": {
-  "stage": "storyboard",
+  "stage": "approved",
   "reworks": 0,
   "blocked": false,
-  "updated": "2026-11-17T21:30:31+00:00",
+  "updated": "2026-11-19T21:22:09+00:00",
   "evidence": {
    "idea": {
     "by": "idea-scout",
@@ -437,6 +437,21 @@
     "by": "visual-director",
     "note": "8 مشاهد طبيعة بسيطة بدون وجوه",
     "at": "2026-11-17T21:30:31+00:00"
+   },
+   "render": {
+    "by": "producer",
+    "note": "run 44563013791",
+    "at": "2026-11-19T21:22:08+00:00"
+   },
+   "qa": {
+    "by": "quality-gate",
+    "note": "QA 100/100، إطارات البداية والنهاية مفحوصة",
+    "at": "2026-11-19T21:22:08+00:00"
+   },
+   "approved": {
+    "by": "owner",
+    "note": "موافقة المالك: نزله (٢٠ نوفمبر)",
+    "at": "2026-11-19T21:22:09+00:00"
    }
   }
  },
