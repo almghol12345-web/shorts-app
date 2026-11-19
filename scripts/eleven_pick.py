@@ -61,8 +61,9 @@ def main():
                   "|", v.get("use_case"), "|", (v.get("description") or "")[:80])
         return
     topic, n = sys.argv[1], int(sys.argv[2]) if len(sys.argv) > 2 else 4
-    entry = next(e for e in json.loads(Path("data/requests.json").read_text(encoding="utf-8")) if e["topic"] == topic)
-    text = " ".join(entry["lines"][:int(os.environ.get("ELEVEN_LINES", "3"))])
+    text = os.environ.get("ELEVEN_TEXT", "").strip()
+    entry = None if text else next(e for e in json.loads(Path("data/requests.json").read_text(encoding="utf-8")) if e["topic"] == topic)
+    text = text or " ".join(entry["lines"][:int(os.environ.get("ELEVEN_LINES", "3"))])
     out = Path("output/voice"); out.mkdir(parents=True, exist_ok=True)
     names, i = [], 0
     for v in arabic_voices(20):

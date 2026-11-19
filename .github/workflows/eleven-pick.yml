@@ -21,6 +21,9 @@ on:
       lines:
         description: "How many script lines to read"
         default: "3"
+      text:
+        description: "Read this text instead of the script"
+        default: ""
 
 permissions:
   contents: write
@@ -40,6 +43,7 @@ jobs:
           ELEVEN_SKIP: ${{ inputs.skip }}
           ELEVEN_NAME: ${{ inputs.name }}
           ELEVEN_LINES: ${{ inputs.lines }}
+          ELEVEN_TEXT: ${{ inputs.text }}
         run: |
           if [ "${{ inputs.topic }}" = "list" ]; then python scripts/eleven_pick.py list
           else python scripts/eleven_pick.py "${{ inputs.topic }}" "${{ inputs.count }}"; fi
