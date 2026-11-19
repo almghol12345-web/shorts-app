@@ -9,6 +9,12 @@ on:
       count:
         description: "How many voices to sample"
         default: "4"
+      search:
+        description: "Comma-separated accent words to search (e.g. saudi,khaleeji)"
+        default: ""
+      skip:
+        description: "Comma-separated voice ids already tried"
+        default: ""
 
 permissions:
   contents: write
@@ -24,6 +30,8 @@ jobs:
       - name: Run
         env:
           ELEVENLABS_API_KEY: ${{ secrets.ELEVENLABS_API_KEY }}
+          ELEVEN_SEARCH: ${{ inputs.search }}
+          ELEVEN_SKIP: ${{ inputs.skip }}
         run: |
           if [ "${{ inputs.topic }}" = "list" ]; then python scripts/eleven_pick.py list
           else python scripts/eleven_pick.py "${{ inputs.topic }}" "${{ inputs.count }}"; fi

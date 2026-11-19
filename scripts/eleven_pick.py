@@ -27,9 +27,18 @@ def call(path, body=None, raw=False):
 
 
 def arabic_voices(limit=20):
-    q = urllib.parse.urlencode({"language": "ar", "gender": "male", "page_size": limit,
-                                "sort": "usage_character_count_1y"})
-    voices = call(f"/v1/shared-voices?{q}").get("voices", [])
+    """Arabic male library voices; ELEVEN_SEARCH="saudi,khaleeji,gulf" narrows by accent words,
+    ELEVEN_SKIP="id1,id2" drops voices already tried."""
+    skip = set(filter(None, os.environ.get("ELEVEN_SKIP", "").split(",")))
+    terms = [t.strip() for t in os.environ.get("ELEVEN_SEARCH", "").split(",") if t.strip()] or [""]
+    seen, voices = set(), []
+    for term in terms:
+        params = {"language": "ar", "gender": "male", "page_size": limit, "sort": "usage_character_count_1y"}
+        if term:
+            params["search"] = term
+        for v in call(f"/v1/shared-voices?{urllib.parse.urlencode(params)}").get("voices", []):
+            if v["voice_id"] not in seen and v["voice_id"] not in skip:
+                seen.add(v["voice_id"]); voices.append(v)
     return voices
 
 
