@@ -1,0 +1,37 @@
+name: ElevenLabs Voice Pick
+
+on:
+  workflow_dispatch:
+    inputs:
+      topic:
+        description: "Script topic to read, or 'list' to print Arabic voices"
+        default: "camel hump"
+      count:
+        description: "How many voices to sample"
+        default: "4"
+
+permissions:
+  contents: write
+
+jobs:
+  pick:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Run
+        env:
+          ELEVENLABS_API_KEY: ${{ secrets.ELEVENLABS_API_KEY }}
+        run: |
+          if [ "${{ inputs.topic }}" = "list" ]; then python scripts/eleven_pick.py list
+          else python scripts/eleven_pick.py "${{ inputs.topic }}" "${{ inputs.count }}"; fi
+      - name: Publish on the 'voice' branch
+        if: inputs.topic != 'list'
+        run: |
+          mkdir -p /tmp/v && cp output/voice/* /tmp/v/ && cd /tmp/v
+          git init -q && git checkout -q -b voice
+          git config user.name "shorts-bot" && git config user.email "shorts-bot@users.noreply.github.com"
+          git add . && git commit -qm "eleven voice picks"
+          git push -qf "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" voice
