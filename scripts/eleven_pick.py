@@ -33,10 +33,13 @@ def arabic_voices(limit=20):
     terms = [t.strip() for t in os.environ.get("ELEVEN_SEARCH", "").split(",") if t.strip()] or [""]
     seen, voices = set(), []
     for term in terms:
-        params = {"language": "ar", "gender": "male", "page_size": limit, "sort": "usage_character_count_1y"}
+        params = {"language": "ar", "gender": "male", "page_size": max(limit, 50), "sort": "usage_character_count_1y"}
         if term:
             params["search"] = term
         for v in call(f"/v1/shared-voices?{urllib.parse.urlencode(params)}").get("voices", []):
+            want = os.environ.get("ELEVEN_NAME", "").lower()
+            if want and want not in v.get("name", "").lower():
+                continue
             if v["voice_id"] not in seen and v["voice_id"] not in skip:
                 seen.add(v["voice_id"]); voices.append(v)
     return voices
@@ -59,7 +62,7 @@ def main():
         return
     topic, n = sys.argv[1], int(sys.argv[2]) if len(sys.argv) > 2 else 4
     entry = next(e for e in json.loads(Path("data/requests.json").read_text(encoding="utf-8")) if e["topic"] == topic)
-    text = " ".join(entry["lines"][:3])
+    text = " ".join(entry["lines"][:int(os.environ.get("ELEVEN_LINES", "3"))])
     out = Path("output/voice"); out.mkdir(parents=True, exist_ok=True)
     names, i = [], 0
     for v in arabic_voices(20):
@@ -67,18 +70,18 @@ def main():
             break
         vid = v["voice_id"]
         try:
-            speak(vid, text, out / f"e{i + 1}.mp3")
+            speak(vid, text, out / f"{os.environ.get('ELEVEN_TAG', 'e')}{i + 1}.mp3")
         except Exception as err:  # library voice may need adding to the account first
             try:
                 call(f"/v1/voices/add/{v['public_owner_id']}/{vid}", {"new_name": v["name"][:40]})
-                speak(vid, text, out / f"e{i + 1}.mp3")
+                speak(vid, text, out / f"{os.environ.get('ELEVEN_TAG', 'e')}{i + 1}.mp3")
             except Exception as err2:
                 print("skip", v.get("name"), err, err2)
                 continue
         i += 1
         names.append(f"e{i}.mp3 = {v.get('name')} | {v.get('accent')} | {vid}")
         print(names[-1])
-    (out / "names.txt").write_text("\n".join(names), encoding="utf-8")
+    (out / f"names{os.environ.get('ELEVEN_TAG', '')}.txt").write_text("\n".join(names), encoding="utf-8")
 
 
 if __name__ == "__main__":

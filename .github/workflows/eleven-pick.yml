@@ -15,6 +15,12 @@ on:
       skip:
         description: "Comma-separated voice ids already tried"
         default: ""
+      name:
+        description: "Only voices whose name contains this"
+        default: ""
+      lines:
+        description: "How many script lines to read"
+        default: "3"
 
 permissions:
   contents: write
@@ -32,6 +38,8 @@ jobs:
           ELEVENLABS_API_KEY: ${{ secrets.ELEVENLABS_API_KEY }}
           ELEVEN_SEARCH: ${{ inputs.search }}
           ELEVEN_SKIP: ${{ inputs.skip }}
+          ELEVEN_NAME: ${{ inputs.name }}
+          ELEVEN_LINES: ${{ inputs.lines }}
         run: |
           if [ "${{ inputs.topic }}" = "list" ]; then python scripts/eleven_pick.py list
           else python scripts/eleven_pick.py "${{ inputs.topic }}" "${{ inputs.count }}"; fi
