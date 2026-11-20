@@ -156,3 +156,6 @@
 {"at": "2026-11-20T21:23:41+00:00", "topic": "gta 6 sales", "event": "advance", "stage": "script", "by": "fact-checker", "note": "أرقام من بيان تيك تو (GMA)، Box Office Mojo (أفاتار ٢.٩٢ مليار)، GameSpot (GTA5 ٨٠٠ مليون)؛ صور بدون شعارات"}
 {"at": "2026-11-20T21:23:41+00:00", "topic": "gta 6 sales", "event": "advance", "stage": "fact_check", "by": "fact-checker", "note": "أرقام من بيان تيك تو (GMA)، Box Office Mojo (أفاتار ٢.٩٢ مليار)، GameSpot (GTA5 ٨٠٠ مليون)؛ صور بدون شعارات"}
 {"at": "2026-11-20T21:23:41+00:00", "topic": "gta 6 sales", "event": "advance", "stage": "storyboard", "by": "fact-checker", "note": "أرقام من بيان تيك تو (GMA)، Box Office Mojo (أفاتار ٢.٩٢ مليار)، GameSpot (GTA5 ٨٠٠ مليون)؛ صور بدون شعارات"}
+{"at": "2026-11-20T22:46:52+00:00", "topic": "gta 6 sales", "event": "advance", "stage": "render", "by": "producer", "note": "run 44821694235"}
+{"at": "2026-11-20T22:46:53+00:00", "topic": "gta 6 sales", "event": "advance", "stage": "qa", "by": "quality-gate", "note": "QA 100/100، الصور بدون شعارات"}
+{"at": "2026-11-20T22:46:53+00:00", "topic": "gta 6 sales", "event": "advance", "stage": "approved", "by": "owner", "note": "موافقة المالك: تمام نزله (٢١ نوفمبر)"}
