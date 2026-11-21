@@ -1,0 +1,18 @@
+{
+ "video": "/home/runner/work/shorts-app/shorts-app/output/20261121-202339-gta-6-surprises.mp4",
+ "score": 100,
+ "passed": true,
+ "facts": {
+  "duration": 48.566667,
+  "size_bytes": 23254591,
+  "width": 1080,
+  "height": 1920,
+  "fps": 30.0,
+  "has_audio": true,
+  "black": [],
+  "silence": [],
+  "mean_db": -18.4,
+  "max_db": -1.3
+ },
+ "findings": []
+}
