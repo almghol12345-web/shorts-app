@@ -24,6 +24,9 @@ on:
       text:
         description: "Read this text instead of the script"
         default: ""
+      model:
+        description: "ElevenLabs model id"
+        default: "eleven_multilingual_v2"
 
 permissions:
   contents: write
@@ -44,6 +47,7 @@ jobs:
           ELEVEN_NAME: ${{ inputs.name }}
           ELEVEN_LINES: ${{ inputs.lines }}
           ELEVEN_TEXT: ${{ inputs.text }}
+          ELEVEN_MODEL: ${{ inputs.model }}
         run: |
           if [ "${{ inputs.topic }}" = "list" ]; then python scripts/eleven_pick.py list
           else python scripts/eleven_pick.py "${{ inputs.topic }}" "${{ inputs.count }}"; fi
