@@ -538,5 +538,33 @@
     "at": "2026-11-20T22:46:53+00:00"
    }
   }
+ },
+ "gta 6 surprises": {
+  "stage": "storyboard",
+  "reworks": 0,
+  "blocked": false,
+  "updated": "2026-11-21T16:31:35+00:00",
+  "evidence": {
+   "idea": {
+    "by": "idea-scout",
+    "note": "أمر المالك: ٣ معلومات مؤكدة عن قراند 6",
+    "at": "2026-11-21T16:31:35+00:00"
+   },
+   "script": {
+    "by": "fact-checker",
+    "note": "إعلان ٩٠ مليون/٢٤ساعة + غينيس (PushSquare/TechRadar)، الخريطة ضعف GTA5 (IBTimes عن Edge)، PS5/Xbox بس؛ صور بدون شعارات",
+    "at": "2026-11-21T16:31:35+00:00"
+   },
+   "fact_check": {
+    "by": "fact-checker",
+    "note": "إعلان ٩٠ مليون/٢٤ساعة + غينيس (PushSquare/TechRadar)، الخريطة ضعف GTA5 (IBTimes عن Edge)، PS5/Xbox بس؛ صور بدون شعارات",
+    "at": "2026-11-21T16:31:35+00:00"
+   },
+   "storyboard": {
+    "by": "fact-checker",
+    "note": "إعلان ٩٠ مليون/٢٤ساعة + غينيس (PushSquare/TechRadar)، الخريطة ضعف GTA5 (IBTimes عن Edge)، PS5/Xbox بس؛ صور بدون شعارات",
+    "at": "2026-11-21T16:31:35+00:00"
+   }
+  }
  }
 }

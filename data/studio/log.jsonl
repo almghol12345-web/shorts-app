@@ -159,3 +159,7 @@
 {"at": "2026-11-20T22:46:52+00:00", "topic": "gta 6 sales", "event": "advance", "stage": "render", "by": "producer", "note": "run 44821694235"}
 {"at": "2026-11-20T22:46:53+00:00", "topic": "gta 6 sales", "event": "advance", "stage": "qa", "by": "quality-gate", "note": "QA 100/100، الصور بدون شعارات"}
 {"at": "2026-11-20T22:46:53+00:00", "topic": "gta 6 sales", "event": "advance", "stage": "approved", "by": "owner", "note": "موافقة المالك: تمام نزله (٢١ نوفمبر)"}
+{"at": "2026-11-21T16:31:35+00:00", "topic": "gta 6 surprises", "event": "added", "by": "idea-scout", "note": "أمر المالك: ٣ معلومات مؤكدة عن قراند 6"}
+{"at": "2026-11-21T16:31:35+00:00", "topic": "gta 6 surprises", "event": "advance", "stage": "script", "by": "fact-checker", "note": "إعلان ٩٠ مليون/٢٤ساعة + غينيس (PushSquare/TechRadar)، الخريطة ضعف GTA5 (IBTimes عن Edge)، PS5/Xbox بس؛ صور بدون شعارات"}
+{"at": "2026-11-21T16:31:35+00:00", "topic": "gta 6 surprises", "event": "advance", "stage": "fact_check", "by": "fact-checker", "note": "إعلان ٩٠ مليون/٢٤ساعة + غينيس (PushSquare/TechRadar)، الخريطة ضعف GTA5 (IBTimes عن Edge)، PS5/Xbox بس؛ صور بدون شعارات"}
+{"at": "2026-11-21T16:31:35+00:00", "topic": "gta 6 surprises", "event": "advance", "stage": "storyboard", "by": "fact-checker", "note": "إعلان ٩٠ مليون/٢٤ساعة + غينيس (PushSquare/TechRadar)، الخريطة ضعف GTA5 (IBTimes عن Edge)، PS5/Xbox بس؛ صور بدون شعارات"}

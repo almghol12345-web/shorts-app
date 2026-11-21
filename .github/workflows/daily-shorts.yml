@@ -25,6 +25,9 @@ on:
       privacy:
         description: "public / unlisted / private"
         default: "public"
+      music:
+        description: "on = soft channel-owned music bed under the voice"
+        default: "off"
       kind:
         description: "faith (Quran / Companions story) / news (amazing facts) / mystery (story)"
         default: "news"
@@ -128,6 +131,7 @@ jobs:
           SHORTS_NICHE: ${{ vars.SHORTS_NICHE }}
           SHORTS_VOICE: ${{ vars.SHORTS_VOICE }}
           SHORTS_PRIVACY: ${{ inputs.privacy || vars.SHORTS_PRIVACY }}
+          SHORTS_MUSIC: ${{ inputs.music || 'off' }}
           SHORTS_NARRATOR: ${{ inputs.narrator || vars.SHORTS_NARRATOR }}
         run: |
           if [ "${{ inputs.quality }}" = "best" ]; then
