@@ -166,3 +166,7 @@
 {"at": "2026-11-21T20:22:25+00:00", "topic": "gta 6 surprises", "event": "advance", "stage": "render", "by": "producer", "note": "run 44945122418"}
 {"at": "2026-11-21T20:22:25+00:00", "topic": "gta 6 surprises", "event": "advance", "stage": "qa", "by": "quality-gate", "note": "QA 100/100، الناقد راجع، النطق مصحح"}
 {"at": "2026-11-21T20:22:25+00:00", "topic": "gta 6 surprises", "event": "advance", "stage": "approved", "by": "owner", "note": "موافقة المالك: نزل الفديو (٢١ نوفمبر)"}
+{"at": "2026-11-22T11:33:21+00:00", "topic": "gta 6 part 2", "event": "added", "by": "idea-scout", "note": "جزء ٢ قراند: ميتاكرتك ٩٩، الحجم، بدون ديسك، السعر"}
+{"at": "2026-11-22T11:33:21+00:00", "topic": "gta 6 part 2", "event": "advance", "stage": "script", "by": "fact-checker", "note": "VideoGamer + JoltJournal: ٩٩ ميتاكرتك مع زيلدا ١٩٩٨، ٢١٢ جيجا، كود بدل ديسك، ٧٩.٩٩$؛ تجربة صور واقعية بطلب المالك"}
+{"at": "2026-11-22T11:33:21+00:00", "topic": "gta 6 part 2", "event": "advance", "stage": "fact_check", "by": "fact-checker", "note": "VideoGamer + JoltJournal: ٩٩ ميتاكرتك مع زيلدا ١٩٩٨، ٢١٢ جيجا، كود بدل ديسك، ٧٩.٩٩$؛ تجربة صور واقعية بطلب المالك"}
+{"at": "2026-11-22T11:33:21+00:00", "topic": "gta 6 part 2", "event": "advance", "stage": "storyboard", "by": "fact-checker", "note": "VideoGamer + JoltJournal: ٩٩ ميتاكرتك مع زيلدا ١٩٩٨، ٢١٢ جيجا، كود بدل ديسك، ٧٩.٩٩$؛ تجربة صور واقعية بطلب المالك"}
