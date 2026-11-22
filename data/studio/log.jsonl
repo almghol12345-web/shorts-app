@@ -170,3 +170,6 @@
 {"at": "2026-11-22T11:33:21+00:00", "topic": "gta 6 part 2", "event": "advance", "stage": "script", "by": "fact-checker", "note": "VideoGamer + JoltJournal: ٩٩ ميتاكرتك مع زيلدا ١٩٩٨، ٢١٢ جيجا، كود بدل ديسك، ٧٩.٩٩$؛ تجربة صور واقعية بطلب المالك"}
 {"at": "2026-11-22T11:33:21+00:00", "topic": "gta 6 part 2", "event": "advance", "stage": "fact_check", "by": "fact-checker", "note": "VideoGamer + JoltJournal: ٩٩ ميتاكرتك مع زيلدا ١٩٩٨، ٢١٢ جيجا، كود بدل ديسك، ٧٩.٩٩$؛ تجربة صور واقعية بطلب المالك"}
 {"at": "2026-11-22T11:33:21+00:00", "topic": "gta 6 part 2", "event": "advance", "stage": "storyboard", "by": "fact-checker", "note": "VideoGamer + JoltJournal: ٩٩ ميتاكرتك مع زيلدا ١٩٩٨، ٢١٢ جيجا، كود بدل ديسك، ٧٩.٩٩$؛ تجربة صور واقعية بطلب المالك"}
+{"at": "2026-11-22T12:43:39+00:00", "topic": "gta 6 part 2", "event": "advance", "stage": "render", "by": "producer", "note": "run 45022791283"}
+{"at": "2026-11-22T12:43:39+00:00", "topic": "gta 6 part 2", "event": "advance", "stage": "qa", "by": "quality-gate", "note": "QA 100/100، صور مراجعة، النطق نظيف"}
+{"at": "2026-11-22T12:43:39+00:00", "topic": "gta 6 part 2", "event": "advance", "stage": "approved", "by": "owner", "note": "موافقة المالك: نزله (٢٢ نوفمبر)"}
