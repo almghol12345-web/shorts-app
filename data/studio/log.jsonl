@@ -177,3 +177,7 @@
 {"at": "2026-11-23T10:06:56+00:00", "topic": "black friday name", "event": "advance", "stage": "script", "by": "fact-checker", "note": "History.com: شرطة فيلادلفيا ٥٠s-٦٠s، Big Friday ١٩٦١؛ الراتب ٢٦ نوفمبر (الوئام)"}
 {"at": "2026-11-23T10:06:56+00:00", "topic": "black friday name", "event": "advance", "stage": "fact_check", "by": "fact-checker", "note": "History.com: شرطة فيلادلفيا ٥٠s-٦٠s، Big Friday ١٩٦١؛ الراتب ٢٦ نوفمبر (الوئام)"}
 {"at": "2026-11-23T10:06:56+00:00", "topic": "black friday name", "event": "advance", "stage": "storyboard", "by": "fact-checker", "note": "History.com: شرطة فيلادلفيا ٥٠s-٦٠s، Big Friday ١٩٦١؛ الراتب ٢٦ نوفمبر (الوئام)"}
+{"at": "2026-11-24T18:04:49+00:00", "topic": "saudi budget 2027", "event": "added", "by": "idea-scout", "note": "ترند اليوم: إقرار الميزانية ٢٤ نوفمبر؛ المالك قال ورني"}
+{"at": "2026-11-24T18:04:49+00:00", "topic": "saudi budget 2027", "event": "advance", "stage": "script", "by": "fact-checker", "note": "واس/اليوم السابع: مصروفات ١٣٩٢ مليار؛ السكان ~٣٥ مليون؛ حسبات تقريبية موضحة بالوصف"}
+{"at": "2026-11-24T18:04:49+00:00", "topic": "saudi budget 2027", "event": "advance", "stage": "fact_check", "by": "fact-checker", "note": "واس/اليوم السابع: مصروفات ١٣٩٢ مليار؛ السكان ~٣٥ مليون؛ حسبات تقريبية موضحة بالوصف"}
+{"at": "2026-11-24T18:04:49+00:00", "topic": "saudi budget 2027", "event": "advance", "stage": "storyboard", "by": "fact-checker", "note": "واس/اليوم السابع: مصروفات ١٣٩٢ مليار؛ السكان ~٣٥ مليون؛ حسبات تقريبية موضحة بالوصف"}
