@@ -59,7 +59,9 @@ def _decimal(m: re.Match) -> str:
 QUESTION = re.compile(r"(^|\s|و|ف)(طيب|مين|من|وش|ليش|لماذا|كيف|هل|وين|متى|ماذا|ايش|إيش)(\s|$)")
 
 
-_TAA = re.compile(r"([\u0621-\u064A\u064B-\u0652]+[\u064B-\u0652])ة(?![\u0621-\u064A\u064B-\u0652])(\s+[\u0621-\u064A]+)?")
+# the next word is only LOOKED at (lookahead), never consumed: consuming it hid the next
+# word's own ة (ميزانية السعودية الجديدة made السعودية a "t")
+_TAA = re.compile(r"(?<![\u0621-\u064A\u064B-\u0652])([\u0621-\u064A\u064B-\u0652]+[\u064B-\u0652])ة(?![\u0621-\u064A\u064B-\u0652])(?=(\s+[\u0621-\u064A\u064B-\u0652]+))?")
 _DEFINITE = re.compile(r"^[وفبلك]?[\u064B-\u0652]*(ال|لل)")
 
 
@@ -73,10 +75,10 @@ def _taa_marbuta(text: str) -> str:
     def fix(m: re.Match) -> str:
         word, nxt = m.group(1), m.group(2) or ""
         if formal:
-            return f"{word}ة{'ُ' if nxt else ''}{nxt}"
+            return f"{word}ة{'ُ' if nxt else ''}"
         plain_word, plain_next = HARAKAT.sub("", word), HARAKAT.sub("", nxt).strip()
         owns_next = bool(plain_next) and plain_next.startswith("ال") and not _DEFINITE.match(plain_word)
-        return f"{word}{'ت' if owns_next else 'ه'}{nxt}"
+        return f"{word}{'ت' if owns_next else 'ه'}"
     return _TAA.sub(fix, text)
 
 
