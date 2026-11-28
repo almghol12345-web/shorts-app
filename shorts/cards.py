@@ -323,12 +323,12 @@ def _free_frame(spec: dict, t: float) -> Image.Image:
     rise = int((1 - _ease(t / 0.4)) * 50)
 
     if kind == "title":
-        iy = 650
+        iy = 630
         if icon:
             _halo(d, cx, iy + rise, 270 * _ease(t / 0.4), halo_c)
             icons.paste(img, icon, cx, iy + rise, 400, _pop(t / 0.45))
             icons.sparkles(d, cx, iy, 300, t)
-            y = 1010
+            y = 975
         else:
             y = 760
         y = _big_text(d, cx, y + rise, spec["text"], int(spec.get("size", 118)),
@@ -372,7 +372,7 @@ def _free_frame(spec: dict, t: float) -> Image.Image:
             _big_text(d, cx, 400, spec["title"], 60, ink, name="NotoSansArabic-Black.ttf")
         top = max(float(v) for _, v in items) or 1
         n = len(items)
-        cw, gap, base, max_h = 230, 90, 1170, 520
+        cw, gap, base, max_h = 230, 90, 1090, 470
         x0 = cx + (n * cw + (n - 1) * gap) / 2
         colours = [PILL, ORANGE, RED, GREEN]
         for i, (label, v) in enumerate(items):
@@ -387,7 +387,7 @@ def _free_frame(spec: dict, t: float) -> Image.Image:
                 _text(d, (x + cw / 2, base - h - 60), val, 70, ink, name=TITLE_FONT)
             if i < len(names):
                 icons.paste(img, names[i], x + cw / 2, base - h - 170, 130, _pop((t - i * 0.25) / 0.4))
-            _text(d, (x + cw / 2, base + 50), label, 52, ink)
+            _text(d, (x + cw / 2, base + 48), label, 50, ink)
 
     elif kind == "question":
         p = _pop(t / 0.4)
@@ -400,7 +400,7 @@ def _free_frame(spec: dict, t: float) -> Image.Image:
         if icon:
             icons.paste(img, icon, cx + 250, qy + 160, 190, _pop((t - 0.2) / 0.4))
         if t > 0.25:
-            _big_text(d, cx, 1000, spec["text"], 84, ink, name="NotoSansArabic-Black.ttf")
+            _big_text(d, cx, 975, spec["text"], 84, ink, name="NotoSansArabic-Black.ttf")
 
     elif kind == "list":
         items, names = spec["items"], spec.get("icons") or []
