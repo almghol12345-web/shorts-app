@@ -241,7 +241,7 @@ def _card_frame(spec: dict, t: float) -> Image.Image:
 
     elif kind == "question":
         p = _pop(t / 0.4)
-        r = 150 * p
+        r = max(1.0, 150 * p)
         qy = y0 + shift + 260
         d.ellipse((cx - r, qy - r, cx + r, qy + r), fill=ORANGE)
         if p > 0.3:
@@ -290,6 +290,8 @@ def _palette_bg(name: str) -> Image.Image:
 
 
 def _halo(d: ImageDraw.ImageDraw, cx: float, cy: float, r: float, colour) -> None:
+    if r < 2:
+        return
     for k, a in ((1.0, 0.35), (0.78, 0.6)):
         c = tuple(int(255 - (255 - v) * a) for v in colour)
         d.ellipse((cx - r * k, cy - r * k, cx + r * k, cy + r * k), fill=c)
@@ -391,7 +393,7 @@ def _free_frame(spec: dict, t: float) -> Image.Image:
         p = _pop(t / 0.4)
         qy = 650
         _halo(d, cx, qy, 300 * p, halo_c)
-        r = 200 * p
+        r = max(1.0, 200 * p)
         d.ellipse((cx - r, qy - r, cx + r, qy + r), fill=ORANGE)
         if p > 0.3:
             _text(d, (cx, qy - 26), "؟", int(300 * min(p, 1.1)), (255, 255, 255), name=TITLE_FONT)
