@@ -144,7 +144,7 @@ def _frame(spec: dict, t: float) -> Image.Image:
             ry = y0 + shift + (170 if title else 70) + row_h * i
             grow = _ease((t - 0.2 - i * 0.25) / 0.8)
             _text(d, (x1 - 60, ry + 40), label, 50, ink, anchor="rm")
-            bar_w = (inner - 20) * float(v) / top * grow
+            bar_w = (inner - 230) * float(v) / top * grow
             d.rounded_rectangle((x1 - 60 - bar_w, ry + 85, x1 - 60, ry + 155), 30,
                                 fill=colours[i % len(colours)])
             if grow > 0.5:
