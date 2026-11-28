@@ -16,7 +16,7 @@ from dataclasses import dataclass
 from pathlib import Path
 
 import numpy as np
-from PIL import Image, ImageDraw, ImageFont, features
+from PIL import Image, ImageDraw, ImageFilter, ImageFont, features
 
 W, H, FPS = 1080, 1920, 30
 FONTS = Path(__file__).resolve().parent.parent / "assets" / "fonts"
@@ -41,11 +41,18 @@ SHAPES = [(5, 6, 5), (7, 9, 6), (9, 12, 7), (11, 15, 8), (13, 18, 9)]
 # letters/numbers: how much each glyph wanders in position and size, per level (camouflage)
 JITTER = [0.0, 0.0, 0.05, 0.09, 0.13]
 
-BG_TOP, BG_BOTTOM = (16, 30, 54), (8, 14, 28)
-CARD, INK = (255, 248, 236), (18, 28, 48)
-AMBER, GREEN, RED, MUTED = (255, 183, 3), (45, 201, 122), (255, 77, 77), (150, 165, 190)
+# look of the video: warm cream levels, a dark warm opening (owner's reference, 28 Nov)
+CREAM_TOP, CREAM_BOTTOM = (253, 243, 228), (246, 222, 190)
+DARK_TOP, DARK_BOTTOM = (44, 32, 26), (16, 13, 12)
+CARD, INK, SOFT_INK = (255, 255, 255), (24, 20, 18), (60, 50, 44)
+ORANGE, PILL, GREEN, RED = (245, 146, 32), (255, 190, 64), (22, 168, 128), (232, 64, 80)
+FADED, TRACK, TILE = (214, 210, 206), (226, 214, 200), (58, 44, 36)
+AMBER, MUTED = ORANGE, (150, 140, 130)
 DIGITS = "٠١٢٣٤٥٦٧٨٩"
 HOOK_S, REVEAL_S, END_S = 2.6, 1.7, 3.2
+FILL_S = 0.6                     # the grid draws itself in at the start of a level
+LABELS = ["سهل", "متوسط", "صعب", "صعب جدًا", "مستحيل"]
+BRAND = "غيهب - تحديات"
 
 
 @dataclass
@@ -100,128 +107,200 @@ def _text(draw: ImageDraw.ImageDraw, xy, text: str, size: int, fill, anchor: str
     draw.text(xy, text, font=_font(size, name), fill=fill, anchor=anchor, direction="rtl", language="ar")
 
 
-def _background() -> Image.Image:
+def _gradient(top, bottom) -> Image.Image:
     ramp = np.linspace(0, 1, H)[:, None, None]
-    top, bottom = np.array(BG_TOP), np.array(BG_BOTTOM)
-    rows = (top + (bottom - top) * ramp).astype(np.uint8)
+    rows = (np.array(top) + (np.array(bottom) - np.array(top)) * ramp).astype(np.uint8)
     return Image.fromarray(np.repeat(rows, W, axis=1), "RGB")
 
 
-def _ladder(draw: ImageDraw.ImageDraw, y: int, total: int, current: int, shown: int | None = None) -> None:
-    """The row of level chips: done ones green, the current one amber, the rest dim."""
-    size, gap = 104, 26
-    x0 = (W - (total * size + (total - 1) * gap)) // 2
-    for i in range(total if shown is None else shown):
-        # right to left, as Arabic reads
-        x = x0 + (total - 1 - i) * (size + gap)
-        colour = GREEN if i < current else AMBER if i == current else (40, 58, 92)
-        draw.rounded_rectangle((x, y, x + size, y + size), 26, fill=colour)
-        _text(draw, (x + size // 2, y + size // 2 - 6), arabic_number(i + 1), 60,
-              INK if i <= current else MUTED)
+_CACHE: dict[str, Image.Image] = {}
+
+
+def _background(dark: bool = False) -> Image.Image:
+    """Warm gradient, a soft glow at the top and a faint dot grid, drawn once and reused."""
+    key = "dark" if dark else "cream"
+    if key not in _CACHE:
+        img = _gradient(DARK_TOP, DARK_BOTTOM) if dark else _gradient(CREAM_TOP, CREAM_BOTTOM)
+        glow = Image.new("L", (W, H), 0)
+        ImageDraw.Draw(glow).ellipse((W * 0.1, -H * 0.18, W * 0.9, H * 0.32), fill=120 if dark else 150)
+        glow = glow.filter(ImageFilter.GaussianBlur(160))
+        tint = Image.new("RGB", (W, H), (150, 82, 30) if dark else (255, 214, 150))
+        img = Image.composite(tint, img, glow)
+        d = ImageDraw.Draw(img)
+        dot = (60, 46, 38) if dark else (236, 214, 186)
+        for y in range(40, H, 64):
+            for x in range(40, W, 64):
+                d.ellipse((x - 2, y - 2, x + 2, y + 2), fill=dot)
+        _CACHE[key] = img
+    return _CACHE[key].copy()
+
+
+def _segments(d: ImageDraw.ImageDraw, total: int, current: int, y: int = 210) -> None:
+    """Thin progress segments along the top, right to left: done and current lit."""
+    x0, x1, gap = 210, W - 210, 14
+    seg = (x1 - x0 - gap * (total - 1)) / total
+    for i in range(total):
+        x = x1 - (i + 1) * seg - i * gap
+        colour = ORANGE if i == current else (250, 196, 120) if i < current else TRACK
+        d.rounded_rectangle((x, y, x + seg, y + 12), 6, fill=colour)
+
+
+def _pill(d: ImageDraw.ImageDraw, cx: int, cy: int, text: str, size: int, fill, ink, pad: int = 44) -> tuple:
+    w = _font(size).getlength(text) + pad * 2
+    h = size * 1.75
+    box = (cx - w / 2, cy - h / 2, cx + w / 2, cy + h / 2)
+    d.rounded_rectangle(box, h / 2, fill=fill)
+    _text(d, (cx, cy - size * 0.08), text, size, ink)
+    return box
 
 
 def _grid_box(level: Level) -> tuple[int, int, int, int, float]:
-    """Card rectangle and cell size: inside the area the Shorts buttons do not cover."""
-    max_w, max_h = 900, 1010
+    """The white card and its cell size, kept clear of the Shorts buttons and caption."""
+    max_w, max_h, pad = 800, 860, 34
     cell = min(max_w / level.cols, max_h / level.rows)
     w, h = cell * level.cols, cell * level.rows
-    x, y = (W - w) / 2, 560 + (max_h - h) / 2
-    return int(x - 30), int(y - 30), int(x + w + 30), int(y + h + 30), cell
+    x, y = (W - w) / 2, 460 + pad
+    return int(x - pad), int(y - pad), int(x + w + pad), int(y + h + pad), cell
 
 
-def _level_base(level: Level, number: int, total: int, reveal: bool) -> Image.Image:
+def _card(img: Image.Image, box) -> None:
+    """White rounded card with a soft shadow under it."""
+    shadow = Image.new("L", (W, H), 0)
+    x0, y0, x1, y1 = box
+    ImageDraw.Draw(shadow).rounded_rectangle((x0, y0 + 18, x1, y1 + 18), 40, fill=70)
+    shadow = shadow.filter(ImageFilter.GaussianBlur(28))
+    img.paste(Image.new("RGB", (W, H), (170, 120, 70)), (0, 0), shadow)
+    ImageDraw.Draw(img).rounded_rectangle(box, 40, fill=CARD)
+
+
+def _level_base(level: Level, number: int, total: int, reveal: bool, shown: float = 1.0) -> Image.Image:
+    """One level screen. `shown` (0..1) is how much of the grid has drawn itself in."""
     img = _background()
     d = ImageDraw.Draw(img)
-    _ladder(d, 150, total, number)
-    _text(d, (W // 2, 345), f"المستوى {arabic_number(number + 1)}", 76, AMBER)
-    _text(d, (W // 2, 455), KINDS[level.kind][1], 66, (255, 255, 255))
+    _segments(d, total, number)
+    label = LABELS[min(number, len(LABELS) - 1)]
+    _pill(d, W // 2, 318, f"المستوى {arabic_number(number + 1)} - {label}", 46, PILL, INK)
+    heading = {"colors": "دوّر على المربع المختلف!", "numbers": "دوّر على الرقم المختلف!"}.get(
+        level.kind, "دوّر على الحرف المختلف!")
+    _text(d, (W // 2, 405), heading, 62, INK)
     x0, y0, x1, y1, cell = _grid_box(level)
-    d.rounded_rectangle((x0, y0, x1, y1), 44, fill=CARD)
-    size = int(cell * 0.66)
-    # wide letters (س، ص) must not touch their neighbours
+    _card(img, (x0, y0, x1, y1))
+    d = ImageDraw.Draw(img)
+    size = int(cell * 0.62)
     widest = max(_font(size).getlength(ch) for ch in (level.common, level.odd))
     if widest > cell * 0.72:
         size = int(size * cell * 0.72 / widest)
+    count = level.rows * level.cols
     for row in range(level.rows):
         for col in range(level.cols):
+            if row * level.cols + col >= shown * count:
+                continue
             odd = (col, row) == level.at
-            cx = x0 + 30 + cell * (level.cols - 1 - col) + cell / 2
-            cy = y0 + 30 + cell * row + cell / 2
-            if reveal and odd and level.kind != "colors":
-                r = cell * 0.52
-                d.ellipse((cx - r, cy - r, cx + r, cy + r), fill=GREEN)
+            cx = x0 + 34 + cell * (level.cols - 1 - col) + cell / 2
+            cy = y0 + 34 + cell * row + cell / 2
             if level.kind == "colors":
-                half = cell * 0.44
+                half = cell * 0.42
                 tile = level.odd_colour if odd else level.colour
                 if reveal and not odd:
                     tile = tuple((a + 255 * 2) // 3 for a in tile)
-                d.rounded_rectangle((cx - half, cy - half, cx + half, cy + half), 14, fill=tile)
+                d.rounded_rectangle((cx - half, cy - half, cx + half, cy + half), 12, fill=tile)
                 if reveal and odd:
-                    d.rounded_rectangle((cx - half - 8, cy - half - 8, cx + half + 8, cy + half + 8),
-                                        20, outline=GREEN, width=9)
+                    d.rounded_rectangle((cx - half - 9, cy - half - 9, cx + half + 9, cy + half + 9),
+                                        18, outline=GREEN, width=8)
                 continue
-            fill = INK if (odd or not reveal) else (205, 198, 186)
+            if reveal and odd:
+                r = cell * 0.56
+                d.ellipse((cx - r, cy - r, cx + r, cy + r), fill=(226, 247, 239), outline=GREEN,
+                          width=max(4, int(cell * 0.07)))
+            fill = GREEN if (reveal and odd) else FADED if reveal else INK
             wob = JITTER[min(number, len(JITTER) - 1)]
             g = random.Random(number * 10007 + row * 131 + col)
             gx, gy = g.uniform(-wob, wob) * cell, g.uniform(-wob, wob) * cell
             gs = int(size * (1 + g.uniform(-wob, wob) * 0.8))
+            if reveal and odd:
+                gx = gy = 0
+                gs = int(size * 1.12)
             _text(d, (cx + gx, cy - size * 0.08 + gy), level.odd if odd else level.common, gs, fill)
     if reveal:
-        d.rounded_rectangle((W // 2 - 330, y1 + 28, W // 2 + 330, y1 + 138), 55, fill=GREEN)
-        note = {"colors": "هنا!  لونه أفتح شوي", "numbers": "هنا!  هذا الرقم الغريب"}.get(
-            level.kind, f"هنا!  «{level.odd}» بين «{level.common}»")
-        _text(d, (W // 2, y1 + 76), note, 58, INK)
+        note = {"colors": "هني!  لونه أفتح شوي", "numbers": f"هني!  «{level.odd}» بين «{level.common}»"}.get(
+            level.kind, f"هني!  «{level.odd}» بين «{level.common}»")
+        box = _pill(d, W // 2 - 30, y1 + 90, note, 52, GREEN, (255, 255, 255), pad=60)
+        # the check badge at the start of the pill (right side, Arabic reads right to left)
+        r, cx, cy = 34, box[2] + 10, (box[1] + box[3]) / 2
+        d.ellipse((cx - r, cy - r, cx + r, cy + r), fill=GREEN, outline=(255, 255, 255), width=5)
+        d.line((cx - 15, cy, cx - 4, cy + 12, cx + 16, cy - 12), fill=(255, 255, 255), width=8, joint="curve")
     return img
 
 
 def _timer(img: Image.Image, left: float, total: int) -> Image.Image:
-    """Countdown ring in the top corner: turns red for the last two seconds."""
+    """Countdown circle tucked into the left edge: white disc, orange ring, red at the end."""
     frame = img.copy()
     d = ImageDraw.Draw(frame)
-    cx, cy, r = 150, 400, 78
-    colour = RED if left <= 2 else AMBER
-    d.ellipse((cx - r, cy - r, cx + r, cy + r), fill=(28, 44, 74))
-    d.arc((cx - r, cy - r, cx + r, cy + r), -90, -90 + 360 * left / total, fill=colour, width=14)
-    _text(d, (cx, cy - 8), arabic_number(max(1, math.ceil(left))), 84, colour)
+    cx, cy, r = 58, 405, 78
+    colour = RED if left <= 2 else ORANGE
+    d.ellipse((cx - r, cy - r, cx + r, cy + r), fill=(255, 255, 255))
+    d.arc((cx - r + 6, cy - r + 6, cx + r - 6, cy + r - 6), -90, -90 + 360 * left / total, fill=colour, width=12)
+    _text(d, (cx + 14, cy - 8), arabic_number(max(1, math.ceil(left))), 70, INK)
     return frame
 
 
+def _eye(d: ImageDraw.ImageDraw, cx: int, cy: int, w: int) -> None:
+    h = w * 0.55
+    d.ellipse((cx - w / 2, cy - h / 2, cx + w / 2, cy + h / 2), outline=ORANGE, width=14)
+    d.ellipse((cx - h * 0.36, cy - h * 0.36, cx + h * 0.36, cy + h * 0.36), fill=ORANGE)
+    d.ellipse((cx - h * 0.13, cy - h * 0.13, cx + h * 0.13, cy + h * 0.13), fill=DARK_BOTTOM)
+
+
 def _hook(game: list[Level], t: float) -> Image.Image:
-    img = _background()
+    """Dark opening: title with an eye, a taste of the grid, then the levels rise as bars."""
+    img = _background(dark=True)
     d = ImageDraw.Draw(img)
-    _text(d, (W // 2, 330), "تحدّي العين", 150, AMBER, name="Lalezar-Regular.ttf")
-    _text(d, (W // 2, 520), f"{arabic_number(len(game))} مستويات.. كل واحد أصعب", 64, (255, 255, 255))
-    # a taste of the game: a small grid with its odd letter already lit
-    first, cell = game[0], 118
-    x0, y0 = (W - cell * 5) // 2, 660
-    d.rounded_rectangle((x0 - 30, y0 - 30, x0 + cell * 5 + 30, y0 + cell * 3 + 30), 40, fill=CARD)
-    for row in range(3):
-        for col in range(5):
+    _pill(d, W // 2, 150, BRAND, 36, (52, 40, 34), (236, 222, 206))
+    title = "تحدّي النظر!"
+    tw = _font(130, "Lalezar-Regular.ttf").getlength(title)
+    _text(d, (W // 2 - 70, 330), title, 130, ORANGE, name="Lalezar-Regular.ttf")
+    _eye(d, int(W // 2 - 70 + tw / 2 + 110), 318, 150)
+    first, cell, cols, rows = game[0], 132, 6, 4
+    x0, y0 = (W - cell * cols) // 2, 470
+    for row in range(rows):
+        for col in range(cols):
             cx, cy = x0 + cell * col + cell // 2, y0 + cell * row + cell // 2
-            odd = (col, row) == (1, 1)
+            odd = (col, row) == (2, 2)
+            lit = odd and t > 0.9
+            d.rounded_rectangle((cx - 58, cy - 58, cx + 58, cy + 58), 22, fill=(20, 110, 86) if lit else TILE)
             if first.kind == "colors":
-                d.rounded_rectangle((cx - 52, cy - 52, cx + 52, cy + 52), 14,
+                d.rounded_rectangle((cx - 40, cy - 40, cx + 40, cy + 40), 12,
                                     fill=first.odd_colour if odd else first.colour)
                 continue
-            if odd:
-                d.ellipse((cx - 56, cy - 56, cx + 56, cy + 56), fill=GREEN)
-            _text(d, (cx, cy - 6), first.odd if odd else first.common, 78, INK)
-    # the chips pop in one by one, then the question lands
-    _ladder(d, 1130, len(game), -1, shown=min(len(game), int(t / 0.22) + 1))
-    if t > 1.3:
-        d.rounded_rectangle((W // 2 - 330, 1320, W // 2 + 330, 1450), 65, fill=AMBER)
-        _text(d, (W // 2, 1376), "توصل للأخير؟", 76, INK)
+            _text(d, (cx, cy - 8), first.odd if odd else first.common, 80,
+                  (120, 240, 200) if lit else (246, 236, 224))
+    total = len(game)
+    hard = "أصعب نسخة..." if total >= 5 else "تحدي جديد..."
+    _text(d, (W // 2, 1060), f"{hard} {arabic_number(total)} مستويات!", 64, ORANGE)
+    # bars grow one after another, level 1 on the right and shortest
+    base, bw, gap = 1420, 104, 18
+    xs = (W - (total * bw + (total - 1) * gap)) / 2
+    for i in range(total):
+        grow = min(1.0, max(0.0, (t - 0.25 - i * 0.16) / 0.3))
+        if grow <= 0:
+            continue
+        h = (70 + 230 * i / max(1, total - 1)) * grow
+        x = xs + (total - 1 - i) * (bw + gap)
+        mix = i / max(1, total - 1)
+        colour = tuple(int(a + (b - a) * mix) for a, b in zip(PILL, RED))
+        d.rounded_rectangle((x, base - h, x + bw, base), 18, fill=colour)
+        if grow > 0.6:
+            _text(d, (x + bw / 2, base - h + 42), arabic_number(i + 1), 48, (255, 255, 255))
     return img
 
 
 def _end(total: int) -> Image.Image:
     img = _background()
     d = ImageDraw.Draw(img)
-    _ladder(d, 420, total, total)
-    _text(d, (W // 2, 720), "وصلت أي مستوى؟", 118, AMBER, name="Lalezar-Regular.ttf")
-    _text(d, (W // 2, 900), "اكتب رقمك بالتعليقات", 70, (255, 255, 255))
-    d.rounded_rectangle((W // 2 - 380, 1050, W // 2 + 380, 1180), 65, fill=GREEN)
-    _text(d, (W // 2, 1106), "تابعنا للتحدي الجاي", 66, INK)
+    _segments(d, total, total)
+    _text(d, (W // 2, 640), "وصلت أي مستوى؟", 120, ORANGE, name="Lalezar-Regular.ttf")
+    _text(d, (W // 2, 810), "اكتب رقمك بالتعليقات 👇".replace(" 👇", ""), 66, INK)
+    _pill(d, W // 2, 990, "تابعنا للتحدي الجاي", 58, GREEN, (255, 255, 255), pad=70)
     return img
 
 
@@ -317,8 +396,11 @@ def render(out: Path, seed: int, intro: Path | None = None, kind: str = "letters
         write(_hook(game, i / FPS))
     for number, level in enumerate(game):
         base = _level_base(level, number, len(game), reveal=False)
+        fill_frames = int(FILL_S * FPS)
         for i in range(level.seconds * FPS):
-            write(_timer(base, level.seconds - i / FPS, level.seconds))
+            left = level.seconds - i / FPS
+            frame = base if i >= fill_frames else _level_base(level, number, len(game), False, (i + 1) / fill_frames)
+            write(_timer(frame, left, level.seconds))
         answer = _level_base(level, number, len(game), reveal=True)
         for _ in range(int(REVEAL_S * FPS)):
             write(answer.copy())
