@@ -1,0 +1,18 @@
+{
+ "video": "/home/runner/work/shorts-app/shorts-app/output/20261128-174205-ronaldo-per-second.mp4",
+ "score": 100,
+ "passed": true,
+ "facts": {
+  "duration": 40.9,
+  "size_bytes": 5293200,
+  "width": 1080,
+  "height": 1920,
+  "fps": 30.0,
+  "has_audio": true,
+  "black": [],
+  "silence": [],
+  "mean_db": -18.4,
+  "max_db": -1.4
+ },
+ "findings": []
+}
