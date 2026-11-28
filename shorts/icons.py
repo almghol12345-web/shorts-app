@@ -196,23 +196,88 @@ def _star(d, s):
     d.polygon(pts, fill=GOLD)
 
 
+def _ball(d, s):
+    c, r = s / 2, s * 0.42
+    d.ellipse((c - r, c - r, c + r, c + r), fill=WHITE, outline=INK, width=int(s * 0.025))
+    pent = [(c + math.cos(-math.pi / 2 + k * 2 * math.pi / 5) * r * 0.32,
+             c + math.sin(-math.pi / 2 + k * 2 * math.pi / 5) * r * 0.32) for k in range(5)]
+    d.polygon(pent, fill=INK)
+    for k in range(5):
+        a = -math.pi / 2 + k * 2 * math.pi / 5
+        x, y = c + math.cos(a) * r * 0.85, c + math.sin(a) * r * 0.85
+        d.line([pent[k], (x, y)], fill=INK, width=int(s * 0.02))
+        d.ellipse((x - r * 0.16, y - r * 0.16, x + r * 0.16, y + r * 0.16), fill=INK)
+
+
+def _trophy(d, s):
+    d.pieslice((s * 0.22, s * 0.0, s * 0.78, s * 0.6), 0, 180, fill=GOLD)
+    d.rectangle((s * 0.22, s * 0.12, s * 0.78, s * 0.3), fill=GOLD)
+    d.arc((s * 0.08, s * 0.12, s * 0.34, s * 0.42), 90, 270, fill=GOLD_DARK, width=int(s * 0.04))
+    d.arc((s * 0.66, s * 0.12, s * 0.92, s * 0.42), 270, 90, fill=GOLD_DARK, width=int(s * 0.04))
+    d.rectangle((s * 0.45, s * 0.58, s * 0.55, s * 0.74), fill=GOLD_DARK)
+    d.rounded_rectangle((s * 0.28, s * 0.74, s * 0.72, s * 0.9), s * 0.03, fill=(120, 80, 50))
+    d.polygon([(s * 0.32, s * 0.14), (s * 0.42, s * 0.14), (s * 0.4, s * 0.4), (s * 0.34, s * 0.36)], fill=GOLD_LIGHT)
+
+
+def _stadium(d, s):
+    d.ellipse((s * 0.05, s * 0.3, s * 0.95, s * 0.9), fill=(120, 112, 106))
+    d.ellipse((s * 0.15, s * 0.4, s * 0.85, s * 0.82), fill=(70, 170, 90))
+    d.line([(s * 0.5, s * 0.4), (s * 0.5, s * 0.82)], fill=WHITE, width=int(s * 0.015))
+    d.ellipse((s * 0.42, s * 0.55, s * 0.58, s * 0.67), outline=WHITE, width=int(s * 0.015))
+    for x in (0.2, 0.8):
+        d.rectangle((s * (x - 0.01), s * 0.1, s * (x + 0.01), s * 0.35), fill=GREY_DARK)
+        d.ellipse((s * (x - 0.05), s * 0.06, s * (x + 0.05), s * 0.14), fill=GOLD_LIGHT)
+
+
+def _plane(d, s):
+    d.polygon([(s * 0.1, s * 0.55), (s * 0.85, s * 0.42), (s * 0.95, s * 0.47), (s * 0.85, s * 0.55),
+               (s * 0.12, s * 0.62)], fill=WHITE, outline=GREY, width=int(s * 0.01))
+    d.polygon([(s * 0.45, s * 0.5), (s * 0.62, s * 0.2), (s * 0.7, s * 0.2), (s * 0.6, s * 0.48)], fill=BLUE)
+    d.polygon([(s * 0.45, s * 0.58), (s * 0.62, s * 0.85), (s * 0.7, s * 0.85), (s * 0.6, s * 0.56)], fill=BLUE)
+    d.polygon([(s * 0.12, s * 0.56), (s * 0.06, s * 0.4), (s * 0.14, s * 0.4), (s * 0.22, s * 0.55)], fill=RED)
+
+
+def _car(d, s):
+    d.rounded_rectangle((s * 0.08, s * 0.45, s * 0.92, s * 0.72), s * 0.08, fill=RED)
+    d.polygon([(s * 0.28, s * 0.45), (s * 0.38, s * 0.26), (s * 0.68, s * 0.26), (s * 0.78, s * 0.45)], fill=RED)
+    d.polygon([(s * 0.34, s * 0.44), (s * 0.41, s * 0.3), (s * 0.52, s * 0.3), (s * 0.52, s * 0.44)], fill=SKY)
+    d.polygon([(s * 0.56, s * 0.44), (s * 0.56, s * 0.3), (s * 0.65, s * 0.3), (s * 0.72, s * 0.44)], fill=SKY)
+    for x in (0.27, 0.73):
+        d.ellipse((s * (x - 0.1), s * 0.62, s * (x + 0.1), s * 0.82), fill=INK)
+        d.ellipse((s * (x - 0.045), s * 0.67, s * (x + 0.045), s * 0.77), fill=GREY)
+
+
 DRAW = {
     "gold": _bars, "coin": _coin, "coins": _coins, "money": _banknote, "clock": _clock,
     "hourglass": _hourglass, "people": _people, "house": _house, "school": _school,
     "hospital": _hospital, "road": _road, "chart": _chart, "calendar": _calendar, "cube": _cube,
     "ring": _ring, "globe": _globe, "gamepad": _gamepad, "phone": _phone, "star": _star,
+    "ball": _ball, "trophy": _trophy, "stadium": _stadium, "plane": _plane, "car": _car,
 }
+
+
+_SPRITES: dict = {}
+
+
+def sprite(name: str, size: int) -> Image.Image:
+    """The icon drawn smooth at `size` pixels (cached: falling coins reuse one drawing)."""
+    key = (name, size)
+    if key not in _SPRITES:
+        big = max(6, size * SS)
+        canvas = Image.new("RGBA", (big, big), (0, 0, 0, 0))
+        DRAW[name](ImageDraw.Draw(canvas), big)
+        _SPRITES[key] = canvas.resize((size, size), Image.LANCZOS)
+        if len(_SPRITES) > 400:
+            _SPRITES.pop(next(iter(_SPRITES)))
+    return _SPRITES[key]
 
 
 def paste(img: Image.Image, name: str, cx: float, cy: float, size: int, scale: float = 1.0) -> None:
     """Draw icon `name` centred at (cx, cy); `scale` animates it (0..1, may overshoot)."""
     if name not in DRAW or scale <= 0.02:
         return
-    big = int(size * SS)
-    canvas = Image.new("RGBA", (big, big), (0, 0, 0, 0))
-    DRAW[name](ImageDraw.Draw(canvas), big)
     final = max(2, int(size * scale))
-    small = canvas.resize((final, final), Image.LANCZOS)
+    small = sprite(name, final)
     # a soft round shadow under the icon
     sh = Image.new("RGBA", (final, final // 4 + 2), (0, 0, 0, 0))
     ImageDraw.Draw(sh).ellipse((final * 0.22, 0, final * 0.78, final // 5), fill=(120, 80, 40, 32))
