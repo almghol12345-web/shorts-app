@@ -192,3 +192,6 @@
 {"at": "2026-11-28T16:32:22+00:00", "topic": "ronaldo per second", "event": "advance", "stage": "script", "by": "fact-checker", "note": "فوربس ٢٠٢٦ عبر ESPN: رونالدو ٣٠٠م$، ميسي ١٤٠م$؛ حسبات تقريبية"}
 {"at": "2026-11-28T16:32:22+00:00", "topic": "ronaldo per second", "event": "advance", "stage": "fact_check", "by": "fact-checker", "note": "فوربس ٢٠٢٦ عبر ESPN: رونالدو ٣٠٠م$، ميسي ١٤٠م$؛ حسبات تقريبية"}
 {"at": "2026-11-28T16:32:22+00:00", "topic": "ronaldo per second", "event": "advance", "stage": "storyboard", "by": "fact-checker", "note": "فوربس ٢٠٢٦ عبر ESPN: رونالدو ٣٠٠م$، ميسي ١٤٠م$؛ حسبات تقريبية"}
+{"at": "2026-11-28T17:40:59+00:00", "topic": "ronaldo per second", "event": "advance", "stage": "render", "by": "producer", "note": "run 46170354813"}
+{"at": "2026-11-28T17:40:59+00:00", "topic": "ronaldo per second", "event": "advance", "stage": "qa", "by": "quality-gate", "note": "QA 100/100، النطق نظيف"}
+{"at": "2026-11-28T17:40:59+00:00", "topic": "ronaldo per second", "event": "advance", "stage": "approved", "by": "owner", "note": "موافقة المالك: نزله (٢٨ نوفمبر)"}
