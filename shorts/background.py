@@ -406,6 +406,12 @@ def shot(spec: str, seconds: float, out: Path, src: Sources, width: int, height:
          index: int = 0, moving: bool = False) -> None:
     """Make one shot for one line, trying the best source first."""
     raw = out.with_suffix(".src")
+    if spec.startswith("card:"):
+        # motion graphics drawn in code (the channel's look since 28 Nov): free and always on topic
+        from .cards import card_clip
+        card_clip(spec[5:], seconds, out, width, height, step=index)
+        print(f"[visual] {out.stem}: card")
+        return
     if spec.startswith("nasa:"):
         # real NASA footage first, then a real NASA photo, then the rest of the plan
         query, _, rest = spec[5:].partition(" >> ")

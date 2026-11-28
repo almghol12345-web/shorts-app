@@ -116,7 +116,8 @@ def make_one(cfg: Config, do_upload: bool, keep_work: bool = False) -> dict:
     booms = reveal[:2] + [starts[i] for i, _, _ in script.beats if i < len(starts)]
     video = render.render(cfg, narration, bg, work, cfg.output_dir / f"{name}.mp4",
                           narrator=narrator, mood=mood, cuts=starts[1:], booms=booms, cards=cards or None,
-                          clean=any("doodle" in sc for sc in script.scenes))
+                          clean=any("doodle" in sc for sc in script.scenes)
+                          or any(v.startswith("card:") for v in script.visual_plan()))
     endcard = Path(__file__).resolve().parent.parent / "assets" / "channel" / "endcard.mp4"
     if script.kind == "faith" and endcard.exists():
         try:      # the channel's animated end card (name + subscribe), polish only
